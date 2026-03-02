@@ -4,7 +4,7 @@ import { IBaseRepository } from "../interfaces/IBase.repository";
 
 
 export class BaseRepository<T extends Document> implements IBaseRepository<T> {
-    protected model: Model<T>;
+    protected model: Model<T>;//any class extended from this class can use the variable
     constructor(model: Model<T>) {
         this.model = model;
     }
