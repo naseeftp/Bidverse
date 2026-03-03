@@ -18,3 +18,12 @@ export interface UserResponseDTO{
     profileImage?:string|null;
     isActive:boolean
 }
+export interface VerifyotpDTO{
+    email:string;
+    otp:string;
+    role:string
+}
+export interface sendotpDTO{
+  email:string;
+  otp:string;
+}

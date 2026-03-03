@@ -9,6 +9,6 @@ export class UserRepository extends BaseRepository<IUserDocument> implements IUs
         super(UserModel)
     }
     async findByEmail(email: string): Promise<IUserDocument | null> {
-        return UserModel.findOne({email})
+        return this.model.findOne({email})
     }
 }
