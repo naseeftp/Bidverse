@@ -7,10 +7,11 @@ export interface IOTP extends Document {
   _id:Types.ObjectId;
   email: string;
   otp: string;
+  userData:OtpUserData
   expiresAt: Date;
   createdAt: Date;
   updatedAt: Date;
-  expireAt:Date;
+  
 }
 // it contain temporary userinfo while verifying the email
 export interface OtpUserData{

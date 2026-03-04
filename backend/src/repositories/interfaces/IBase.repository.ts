@@ -1,11 +1,17 @@
-import mongoose, { Document } from "mongoose";
-import { Filter, UpdateFilter } from "mongodb";
+import mongoose, { Document, QueryFilter, UpdateQuery, DeleteResult, Types } from "mongoose";
+
+
 
 export interface IBaseRepository<T extends Document> {
     create(data: Partial<T>): Promise<T>;
-    // findAll(filter: Filter<T>): Promise<T>;
-    // findById(id: string | mongoose.Types.ObjectId): Promise<T | null>;
-    // findOne(filter: Filter<T>): Promise<T | null>
-    // update(filter: Filter<T>, update: UpdateFilter<T>): Promise<T | null>
-    // delete(filter: Filter<T>): Promise<boolean>
+    findAll(filter?: QueryFilter<T>): Promise<T[]>;
+    findOne(filter?: QueryFilter<T>): Promise<T | null>;
+    findById(id: string | Types.ObjectId): Promise<T | null>
+    updateById(id: string | Types.ObjectId, data: UpdateQuery<T>): Promise<T | null>
+    deleteById(id: string | Types.ObjectId): Promise<T | null>
+    deleteByFilter(filter: QueryFilter<T>): Promise<DeleteResult>;
+    count(filter?: QueryFilter<T>): Promise<number>
+
 }
+
+

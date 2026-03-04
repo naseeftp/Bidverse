@@ -1,5 +1,4 @@
-import mongoose, { Document, Model } from "mongoose";
-import { Filter, UpdateFilter } from "mongodb";
+import mongoose, { Document, Model, QueryFilter, UpdateQuery, DeleteResult } from "mongoose";
 import { IBaseRepository } from "../interfaces/IBase.repository";
 
 
@@ -11,6 +10,27 @@ export class BaseRepository<T extends Document> implements IBaseRepository<T> {
 
     async create(data: Partial<T>): Promise<T> {
         return await this.model.create(data)
+    }
+    async findAll(filter?: mongoose.QueryFilter<T> | undefined): Promise<T[]> {
+        return await this.model.find(filter)
+    }
+    async findOne(filter?: mongoose.QueryFilter<T> | undefined): Promise<T | null> {
+        return await this.model.findOne(filter)
+    }
+    async findById(id: string | mongoose.Types.ObjectId): Promise<T | null> {
+        return await this.model.findById(id)
+    }
+    async updateById(id: string | mongoose.Types.ObjectId, data: mongoose.UpdateQuery<T>): Promise<T | null> {
+        return await this.model.findByIdAndUpdate(id, data, { new: true })
+    }
+    async deleteById(id: string | mongoose.Types.ObjectId): Promise<T | null> {
+        return await this.model.findByIdAndDelete(id)
+    }
+    async deleteByFilter(filter: mongoose.QueryFilter<T>): Promise<DeleteResult> {
+        return await this.model.deleteMany(filter)
+    }
+    async count(filter?: mongoose.QueryFilter<T> | undefined): Promise<number> {
+        return await this.model.countDocuments(filter)
     }
 
 }
