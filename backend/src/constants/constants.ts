@@ -17,6 +17,11 @@ export enum HttpStatus {
     GONE = StatusCodes.GONE,
 }
 
+export const CONFIG = {
+//   SESSION_MAX_AGE: env.SESSION_MAX_AGE,
+  OTP_EXPIRY_MINUTES: 1,
+  OTP_RESEND_DELAY_SECONDS: 30,
+} as const;
 
 export const MESSAGES = {
     SERVER_ERROR: "Server error",
