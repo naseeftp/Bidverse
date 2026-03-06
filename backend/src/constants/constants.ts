@@ -58,7 +58,7 @@ export const MESSAGES = {
     INVALID_EMAIL_FORMAT: "Invalid email format",
     INVALID_PHONE_NUMBER: "Invalid phone number",
     INVALID_NAME: "Name must be at least 2 characters",
-    INVALID_GENDER: "Gender must be male, female, or other",
+    
 
     LOGOUT_SUCCESS: "Logout success",
     LOGOUT_FAILED: "Logout failed",
