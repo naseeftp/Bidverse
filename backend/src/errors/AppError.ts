@@ -1,12 +1,11 @@
 export class AppError extends Error{
     public readonly statusCode:number;
-    public readonly isOperational:boolean;
+    public readonly isOperational:boolean;//expected error or not
     constructor(message:string,statusCode:number=500,isisOperational=true){
         super(message);
         this.statusCode=statusCode;
         this.isOperational=isisOperational
-        Object.setPrototypeOf(this,AppError.prototype)
-        Error.captureStackTrace(this,this.constructor)
+        // Error.captureStackTrace(this,this.constructor)// to list of files and line numbers where error happend
     }
 }
 

@@ -64,6 +64,9 @@ export const MESSAGES = {
     INVALID_PHONE_NUMBER: "Invalid phone number",
     INVALID_NAME: "Name must be at least 2 characters",
     
+     INVALID_ACCESS_TOKEN: "Invalid Access token",
+     INVALID_REFRESH_TOKEN:"Invalid Refresh token",
+    
 
     LOGOUT_SUCCESS: "Logout success",
     LOGOUT_FAILED: "Logout failed",

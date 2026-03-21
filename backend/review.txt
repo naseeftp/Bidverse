@@ -1,0 +1,6 @@
+1)main file : do not impprt all the routes in app.ts /server.ts  
+2)route/controller:input validation(body/params/in some case headers also) either in controller or middleware in route
+3)inject repository and all (resrch how to that)
+4)rsrch abt how we can do input validation(zod,dto)
+5)output validation(mappers)
+6) service file shouldd be scalable not depent on anything(service file doesnt need  to know what db we using)

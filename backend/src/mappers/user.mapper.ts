@@ -1,5 +1,5 @@
 import { IUserDocument } from '../types/user.type'
-import { UserResponseDTO } from '../dtos/auth.dto'
+import { UserResponseDTO } from '../dtos/Common.dto'
 
 export class UserMapper {
     static toResponseDTO(user: IUserDocument): UserResponseDTO {

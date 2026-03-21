@@ -1,7 +1,6 @@
 import dotenv from "dotenv"
 dotenv.config()
 
-
 export const env = {
     get MONGODB_URI() {
         return process.env.MONGO_URL || ""
@@ -20,6 +19,12 @@ export const env = {
     },
     get SMTP_PASS(){
         return process.env.SMTP_PASS||""
+    },
+    get ACCESS_TOKEN_SECRET(){
+        return process.env.ACCESS_TOKEN_SECRET
+    },
+    get REFRESH_TOKEN_SECRET(){
+        return process.env.REFRESH_TOKEN_SECRET
     }
 
 }
