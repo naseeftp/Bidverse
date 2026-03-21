@@ -2,9 +2,9 @@ import { IUserDocument } from '../types/user.type'
 import { UserResponseDTO } from '../dtos/Common.dto'
 
 export class UserMapper {
-    static toResponseDTO(user: IUserDocument): UserResponseDTO {
+    static toDTO(user: IUserDocument): UserResponseDTO {
         return {
-            id: String(user._id),
+            id: user._id.toString(),
             name: user.name,
             email: user.email,
             phone: user.phone,

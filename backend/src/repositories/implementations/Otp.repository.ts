@@ -11,4 +11,7 @@ export class OtpRepository extends BaseRepository<IOTP> implements IOtpRepositor
     async findByEmailAndOtp(email: string, otp: string): Promise<IOTP | null> {
         return  await this.model.findOne({email,otp})
     }
+    async updateOtp(email: string, data: { otp: string|null; expiresAt: Date }): Promise<IOTP| null> {
+    return await this.model.findOneAndUpdate({ email }, { $set: data }, { new: true }).exec();
+    }
 }

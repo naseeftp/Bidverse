@@ -18,7 +18,7 @@ export interface OtpUserData{
       name: string;
       email: string;
       phone?: string;
-      password?:string;
+      password:string;
       role: roles;
 }
 

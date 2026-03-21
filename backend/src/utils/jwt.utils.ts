@@ -26,7 +26,7 @@ export const generateAccessToken = (user: IUserDocument): string => {
     } as jwt.SignOptions)
 }
 
-export const generateRefreshToken = (user: IUserDocument): String => {
+export const generateRefreshToken = (user: IUserDocument): string => {
     if (!REFRESH_TOKEN_SECRET) {
         throw new AppError(MESSAGES.SERVER_ERROR, HttpStatus.INTERNAL_ERROR)
     }

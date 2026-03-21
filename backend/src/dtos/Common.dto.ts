@@ -4,9 +4,9 @@ import { Roles } from "../constants/constants";
 export interface RegisterUserDTO {
     name: string;
     email: string;
-    password?: string;
-    confirmPassword?: string;
-    phone?: string;
+    password: string;
+    confirmPassword: string;
+    phone: string;
     role?: typeof Roles[keyof typeof Roles]
 }
 
