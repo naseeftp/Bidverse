@@ -11,7 +11,7 @@ export class OtpService implements IOTPService {
     constructor(private readonly _otpRepository: IOtpRepository,
         private readonly _emailService: IEmailService
     ) { }
-    async generateAndSaveOtp(email:string,name:string,userData: OtpUserData, expiryMinutes: number = 1): Promise<string> {
+    async generateAndSaveOtp(email: string, name: string, userData: OtpUserData, expiryMinutes: number = 1): Promise<string> {
         const otp = genarateOtp(6)
         const expiresAt = getOtpExpiry(expiryMinutes)
         await this._otpRepository.create({
@@ -37,14 +37,14 @@ export class OtpService implements IOTPService {
         }
         return otprecord.userData;
     }
-    async resendOtp(email: string, expiryMinutes: number=1, maxSessionAge: number=30): Promise<void> {
-       const otprecord=await this._otpRepository.findOneByField("email",email) 
-       if(!otprecord){
-        throw new AppError(MESSAGES.OTP_SESSION_EXPIRED_RESEND,HttpStatus.GONE)
-       }
-       const sessionAge=Date.now()-new Date(otprecord.createdAt!).getTime() //! (non-null assertion) says that it has a creation time
-       const maxSessionAgeMs=maxSessionAge*60*1000;
-       
+    async resendOtp(email: string, expiryMinutes: number = 1, maxSessionAge: number = 30): Promise<void> {
+        const otprecord = await this._otpRepository.findOneByField("email", email)
+        if (!otprecord) {
+            throw new AppError(MESSAGES.OTP_SESSION_EXPIRED_RESEND, HttpStatus.GONE)
+        }
+        const sessionAge = Date.now() - new Date(otprecord.createdAt!).getTime() //! (non-null assertion) says that it has a creation time
+        const maxSessionAgeMs = maxSessionAge * 60 * 1000;
+
     }
     async deleteOtp(email: string): Promise<void> {
         await this._otpRepository.deleteByFilter({ email })
