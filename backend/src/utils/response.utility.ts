@@ -1,4 +1,4 @@
-import { response, Response } from "express";
+import { Response } from "express";
 import { ApiResponse } from "../types/response.type";
 import { HttpStatus } from "../constants/constants";
 
