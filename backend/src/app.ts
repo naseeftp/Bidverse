@@ -3,12 +3,17 @@ import dotenv from "dotenv"
 import { env } from './config/env'
 import connectDB from "./config/db";
 import {errorHandler } from "./middlewares/error-handler.middleware";
+import { BASE_ROUTES } from "./constants/route.constant";
+import authRouter from './routes/auth.router'
 
 dotenv.config()
 const app: Application = express()
 app.use(express.json())
 app.use(express.urlencoded({extended:true}))
 const PORT = env.PORT
+
+app.use(BASE_ROUTES.AUTH,authRouter)
+
 
 app.use(errorHandler);
 const startServer = async () => {

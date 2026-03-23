@@ -19,7 +19,7 @@ import type {
 } from "../dtos/Common.dto";
 
 export class AuthValidators {
-    static validaeteValidateRegisterInput(data: RegisterUserDTO): void {
+    static ValidateRegisterInput(data: RegisterUserDTO): void {
         validateRequired(data.email, "Email");
         validateRequired(data.name, "Name");
         validateRequired(data.password, "Password")

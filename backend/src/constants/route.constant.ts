@@ -1,0 +1,10 @@
+
+export const BASE_ROUTES={
+    AUTH:'/auth'
+} as const
+
+export const AUTH_ROUTES={
+    REGISTER:'/register',
+    VERIFY_OTP:'/verify-otp',
+    RESEND_OTP:'/resend-otp'
+}as const
