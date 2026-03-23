@@ -1,5 +1,5 @@
 import { generateAccessToken, generateRefreshToken, verifyAccessToken, verifyRefreshToken } from '../../utils/jwt.utils'
-import { hashPassword, comparePassword, validatePassword, validatePasswordMatch } from '../../utils/Password.util'
+import { hashPassword, comparePassword, validatePassword, validatePasswordMatch } from '../../utils/password.util'
 import { MESSAGES, Roles, CONFIG } from '../../constants/constants'
 import { IAuthService } from '../interface/IAuth.service'
 import { RegisterUserDTO, LoginDTO, VerifyotpDTO, ResendOtpDTO, ForgetPaswordDTO, ForgetPasswordVerifyOtpDTO, ResetPasswordDTO, changePasswordDTO, AuthResponseDTO, UserResponseDTO } from '../../dtos/Common.dto'
