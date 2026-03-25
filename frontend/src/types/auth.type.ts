@@ -23,6 +23,15 @@ export interface ResendOtpDTO {
     email: string
 }
 
+export interface JwtPayload{
+    userId:string;
+    email:string;
+    role:string;
+    name:string;
+    exp:number
+
+}
+
 export interface ApiResponse<T=any>{
     success:boolean;
     message:string;
