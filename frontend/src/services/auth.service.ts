@@ -1,6 +1,6 @@
 import { AUTH_ROUTES } from '../constants/api.constant'
 import axiosInstance from '../api/axios.instance'
-import type { RegisterDTO, VerifyOtpDTO, ResendOtpDTO, JwtPayload } from '../types/auth.type'
+import type { RegisterDTO, VerifyOtpDTO, ResendOtpDTO, JwtPayload,ApiResponse } from '../types/auth.type'
 import { apiErrorHandler } from '../utils/error.handle'
 
 
@@ -17,8 +17,11 @@ class AuthService {
     }
     async register(userData: RegisterDTO) {
         try {
-            const response = await axiosInstance.post(AUTH_ROUTES.REGISTER, userData)
-            return response
+            const response = await axiosInstance.post<any,ApiResponse>(AUTH_ROUTES.REGISTER, userData) // make sure that response similar to backend 
+            return {success: true,
+                message:response.message,
+                ...response.data
+            };
         } catch (error: any) {
             return apiErrorHandler(error, "Registration failed")
 
@@ -27,11 +30,12 @@ class AuthService {
 
     async verifyOtp(otpData: VerifyOtpDTO) {
         try {
-            const response = await axiosInstance.post(AUTH_ROUTES.VERIFY_OTP, otpData)
-            if (response.data?.accessToken) {
-                this.saveToken(response.data.accessToken)
+            const response = await axiosInstance.post<any,ApiResponse>(AUTH_ROUTES.VERIFY_OTP, otpData)
+            const data = response.data
+            if (data?.token) {
+                this.saveToken(data.token)
             }
-            return response
+            return { message:response.message,...data, success: true }
         } catch (error: any) {
 
             return apiErrorHandler(error, 'otp verification failed')
@@ -40,7 +44,8 @@ class AuthService {
 
     async resendOtp(emailData: ResendOtpDTO) {
         try {
-            return await axiosInstance.post(AUTH_ROUTES.RESEND_OTP, emailData)
+            const response = await axiosInstance.post<any,ApiResponse>(AUTH_ROUTES.RESEND_OTP, emailData)
+            return {message:response.message,success:true,...response.data}
         } catch (error: any) {
 
             return apiErrorHandler(error, "failed to resend OTP")

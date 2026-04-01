@@ -29,7 +29,6 @@ export interface JwtPayload{
     role:string;
     name:string;
     exp:number
-
 }
 
 export interface ApiResponse<T=any>{

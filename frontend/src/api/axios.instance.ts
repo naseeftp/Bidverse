@@ -14,7 +14,7 @@ axiosInstance.interceptors.request.use((config)=>{
     const token=localStorage.getItem('accessToken')
     if(token&&config.headers)
     {
-        config.headers.Authorization=`Bearer${token}`
+        config.headers.Authorization=`Bearer ${token}`
     }
     return config
 })
@@ -41,7 +41,7 @@ axiosInstance.interceptors.response.use(
                 return Promise.reject(refreshError)
             }
         }
-        return Promise.reject(error.response?.data || { message: "Something went wrong" });
+        return Promise.reject(error);
     }
     
     
