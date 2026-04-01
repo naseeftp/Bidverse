@@ -1,12 +1,38 @@
-import { Request, Response, NextFunction } from "express";
+// import { Request, Response, NextFunction } from "express";
 
-export const validator = <T>(validatorFn: (data: T) => void) => {
-  return (req: Request, res: Response, next: NextFunction) => {
+// export const validator = <T>(validatorFn: (data: T) => void) => {
+//   return (req: Request, res: Response, next: NextFunction) => {
+//     try {
+//       validatorFn(req.body as T)
+//       next()
+//     } catch (error) {
+//       next(error)
+//     }
+//   }
+// }
+
+import { Request, Response, NextFunction } from "express";
+import { ZodError, ZodSchema } from "zod";
+
+export const validator = (schema: ZodSchema) => {
+  return async (req: Request, res: Response, next: NextFunction) => {
     try {
-      validatorFn(req.body as T)
-      next()
+      req.body = await schema.parseAsync(req.body);
+      next();
     } catch (error) {
-      next(error)
+      if (error instanceof ZodError) {
+       const validationErrors = error.issues.map((issue) => ({
+          field: issue.path[issue.path.length - 1], 
+          message: issue.message,
+        }));
+
+        return res.status(400).json({
+          success: false,
+          message: "Validation Failed",
+          errors: validationErrors, 
+        });
+      }
+      next(error);
     }
-  }
-}
+  };
+};

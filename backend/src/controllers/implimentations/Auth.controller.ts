@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { RegisterUserDTO, ResendOtpDTO, Role, VerifyotpDTO,LoginDTO} from "../../dtos/Common.dto";
+import { RegisterUserDTO, ResendOtpDTO,  VerifyotpDTO,LoginDTO} from "../../dtos/Common.dto";
 import { IAuthController } from "../interfaces/IAuth.controller";
 import { HttpStatus, MESSAGES, Roles } from "../../constants/constants";
 import { SuccessResponse, ErrorResponse } from "../../utils/response.utility";
@@ -17,8 +17,8 @@ export class AuthController implements IAuthController {
         next: NextFunction
     ): Promise<void> {
         try {
-            const dto = req.body;
-            const result = await this._authService.register(dto)
+            
+            const result = await this._authService.register(req.body)
             SuccessResponse(res, MESSAGES.OTP_SENT, result, HttpStatus.OK)
 
         } catch (error: unknown) {
@@ -26,14 +26,10 @@ export class AuthController implements IAuthController {
         }
     }
 
-    async verifyOtp(req: Request<Record<string, never>, unknown, VerifyotpDTO & { role?: Role; }>, res: Response, next: NextFunction): Promise<void> {
+    async verifyOtp(req: Request<Record<string, never>, unknown, VerifyotpDTO >, res: Response, next: NextFunction): Promise<void> {
         try {
-            const dto = req.body;
-            const result = await this._authService.verifyOtp({
-                email: dto.email,
-                otp: dto.otp,
-                role: dto.role,
-            })
+           
+            const result = await this._authService.verifyOtp(req.body)
             SuccessResponse(res, MESSAGES.REGISTRATION_COMPLETE, result, HttpStatus.CREATED)
         } catch (error: unknown) {
             next(error)
@@ -41,8 +37,7 @@ export class AuthController implements IAuthController {
     }
     async resendOtp(req: Request<ParamsDictionary, unknown, ResendOtpDTO>, res: Response, next: NextFunction): Promise<void> {
         try {
-            const dto = req.body;
-            const result = await this._authService.resendOtp(dto)
+            const result = await this._authService.resendOtp(req.body)
             SuccessResponse(res, MESSAGES.OTP_RESENT, undefined, HttpStatus.OK)
 
         } catch (error: unknown) {
@@ -51,8 +46,7 @@ export class AuthController implements IAuthController {
     }
     async login( req:Request<ParamsDictionary,any,LoginDTO>, res:Response,next:NextFunction):Promise<void>{
        try {
-        const dto=req.body;
-        const result=await this._authService.login(dto);
+        const result=await this._authService.login(req.body);
         SuccessResponse(res,MESSAGES.LOGIN_SUCCESS,result,HttpStatus.OK)
 
        } catch (error:unknown) {
