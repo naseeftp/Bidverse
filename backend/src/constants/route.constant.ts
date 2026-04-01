@@ -6,5 +6,6 @@ export const BASE_ROUTES={
 export const AUTH_ROUTES={
     REGISTER:'/register',
     VERIFY_OTP:'/verify-otp',
-    RESEND_OTP:'/resend-otp'
+    RESEND_OTP:'/resend-otp',
+    LOGIN:'/login'
 }as const

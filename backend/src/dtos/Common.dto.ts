@@ -1,12 +1,12 @@
 import { Roles } from "../constants/constants";
 
 
-export enum Role{
-    ADMIN='admin',
-    TENANT= 'tenant',
-    USER='user'
+export enum Role {
+    ADMIN = 'admin',
+    TENANT = 'tenant',
+    USER = 'user'
 }
- 
+
 
 export interface RegisterUserDTO {
     name: string;

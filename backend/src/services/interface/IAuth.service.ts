@@ -15,8 +15,8 @@ import type {
 export interface IAuthService {
     register(data: RegisterUserDTO): Promise<{ email: string }>
     verifyOtp(data: VerifyotpDTO): Promise<AuthResponseDTO<UserResponseDTO>>
-    resendOtp(data: ResendOtpDTO): Promise<void>
-    // login(data: LoginDTO): Promise<AuthResponseDTO<UserResponseDTO>>
+    resendOtp(data: ResendOtpDTO): Promise<{ email: string; expiresAt: Date }>
+    login(data: LoginDTO): Promise<AuthResponseDTO<UserResponseDTO>>
     // forgotPassword(data: ForgetPaswordDTO): Promise<void>
     // forgetPasswordVerifyOtp(data: ForgetPasswordVerifyOtpDTO): Promise<{ resetToken: string }>
     // resetPassword(data: ResetPasswordDTO): Promise<void>

@@ -13,12 +13,11 @@ import { UserMapper } from '../../mappers/user.mapper'
 export class AuthService implements IAuthService {
     constructor(private _userRepository: IUserRepository, private _otpService: IOTPService) { }
 
-    async register(data: RegisterUserDTO): Promise<{ email: string }> {
-        validatePasswordMatch(data.password, data.confirmPassword)
-        validatePassword(data.password)
+    async register(data: RegisterUserDTO): Promise<{ email: string; expiresAt: Date }> {
+        
         await this._checkUserDoesNotExist(data.email, data.phone)
         const passwordHash = await hashPassword(data.password)
-        await this._otpService.generateAndSaveOtp(
+        const otpresult = await this._otpService.generateAndSaveOtp(
             data.email,
             data.name,
             {
@@ -31,11 +30,12 @@ export class AuthService implements IAuthService {
             },
             CONFIG.OTP_EXPIRY_MINUTES
         )
-        return { email: data.email }
+        return { email: data.email, expiresAt: otpresult.expiresAt }
 
     }
     async verifyOtp(data: VerifyotpDTO): Promise<AuthResponseDTO<UserResponseDTO>> {
         const userData = await this._otpService.verifyOtp(data.email, data.otp)
+
         const user = await this._userRepository.create({
             name: userData.name,
             email: userData.email,
@@ -44,24 +44,46 @@ export class AuthService implements IAuthService {
             role: userData.role,
             isActive: true
         })
+
         const token = generateAccessToken(user)
         const refreshToken = generateRefreshToken(user)
         await this._otpService.deleteOtp(data.email)
+
         return {
             user: UserMapper.toDTO(user),
             token,
             refreshToken
         }
     }
-    async resendOtp(data: ResendOtpDTO): Promise<void> {
+    async resendOtp(data: ResendOtpDTO): Promise<{ email: string; expiresAt: Date }> {
         const existingUser = await this._userRepository.findByEmail(data.email)
         if (existingUser) {
             throw new ConflictError(MESSAGES.USER_EXISTS_EMAIL)
         }
-        await this._otpService.resendOtp(data.email, CONFIG.OTP_EXPIRY_MINUTES, CONFIG.OTP_RESEND_DELAY_SECONDS)
+        return await this._otpService.resendOtp(data.email, CONFIG.OTP_EXPIRY_MINUTES, CONFIG.OTP_RESEND_DELAY_SECONDS)
     }
 
-
+    async login(data: LoginDTO): Promise<AuthResponseDTO<UserResponseDTO>> {
+        const existingUser=await this._userRepository.findByEmail(data.email)
+        if(!existingUser){
+            throw new NotFoundError(MESSAGES.USER_NOT_FOUND)
+        }
+        if(!existingUser.isActive){
+            throw new UnauthorizedError(MESSAGES.USER_NOT_ACTIVE)
+        }
+        const passwordMatch=await comparePassword(data.password,existingUser.password!)
+        if(!passwordMatch){
+            throw new UnauthorizedError(MESSAGES.INVALID_CREDENTIALS)
+        }
+        const token=generateAccessToken(existingUser);
+        const refreshToken=generateRefreshToken(existingUser)
+        return{
+            user:UserMapper.toDTO(existingUser),
+            token,
+            refreshToken
+        }
+        
+    }
 
     private async _checkUserDoesNotExist(email: string, phone: string): Promise<void> {
         const existingUser = await this._userRepository.findByEmail(email)

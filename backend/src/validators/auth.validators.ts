@@ -15,9 +15,10 @@ import { MESSAGES } from "../constants/constants";
 import type {
     RegisterUserDTO,
     VerifyotpDTO,
-    ResendOtpDTO
+    ResendOtpDTO,
+    LoginDTO
 } from "../dtos/Common.dto";
-
+// using dto zod/ class validsators itslf
 export class AuthValidators {
     static ValidateRegisterInput(data: RegisterUserDTO): void {
         validateRequired(data.email, "Email");
@@ -27,7 +28,7 @@ export class AuthValidators {
         validateRequired(data.phone, "Phone number needed")
 
         if (!validateEmail(data.email)) {
-            throw new ValidationError(MESSAGES.INVALID_ID_FORMAT)
+            throw new ValidationError(MESSAGES.INVALID_EMAIL_FORMAT)
         }
         if (!validatePhone(data.phone)) {
             throw new ValidationError(MESSAGES.INVALID_PHONE_NUMBER)
@@ -53,6 +54,14 @@ export class AuthValidators {
         if (!validateEmail) {
             throw new ValidationError(MESSAGES.INVALID_EMAIL_FORMAT)
         }
+    }
+    static validateLoginInput(data:LoginDTO):void{
+      validateRequired(data.email,'Email')
+      validateRequired(data.password,'Password')
+      if(!validateEmail(data.email)){
+        throw new ValidationError(MESSAGES.INVALID_EMAIL_FORMAT)
+      }
+       validatePassword(data.password)
     }
 
 

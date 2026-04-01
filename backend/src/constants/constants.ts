@@ -18,9 +18,9 @@ export enum HttpStatus {
 }
 
 export const CONFIG = {
-//   SESSION_MAX_AGE: env.SESSION_MAX_AGE,
-  OTP_EXPIRY_MINUTES: 1,
-  OTP_RESEND_DELAY_SECONDS: 30,
+    //   SESSION_MAX_AGE: env.SESSION_MAX_AGE,
+    OTP_EXPIRY_MINUTES: 2,
+    OTP_RESEND_DELAY_SECONDS: 30,
 } as const;
 
 export const MESSAGES = {
@@ -59,14 +59,14 @@ export const MESSAGES = {
     GOOGLE_PROFILE_EMAIL_MISSING: "No email in Google profile",
 
     PASSWORDS_NOT_MATCH: "Passwords do not match",
-    PASSWORD_TOO_WEAK: "Password must be at least 6 characters and include one uppercase letter and one number",
+    PASSWORD_TOO_WEAK: "Password must be at least 8 characters and include one uppercase letter and one number",
     INVALID_EMAIL_FORMAT: "Invalid email format",
     INVALID_PHONE_NUMBER: "Invalid phone number",
     INVALID_NAME: "Name must be at least 2 characters",
-    
-     INVALID_ACCESS_TOKEN: "Invalid Access token",
-     INVALID_REFRESH_TOKEN:"Invalid Refresh token",
-    
+
+    INVALID_ACCESS_TOKEN: "Invalid Access token",
+    INVALID_REFRESH_TOKEN: "Invalid Refresh token",
+
 
     LOGOUT_SUCCESS: "Logout success",
     LOGOUT_FAILED: "Logout failed",
