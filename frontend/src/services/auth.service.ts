@@ -1,6 +1,6 @@
 import { AUTH_ROUTES } from '../constants/api.constant'
 import axiosInstance from '../api/axios.instance'
-import type { RegisterDTO, VerifyOtpDTO, ResendOtpDTO, JwtPayload,ApiResponse } from '../types/auth.type'
+import type { RegisterDTO,LoginDto, VerifyOtpDTO, ResendOtpDTO, JwtPayload,ApiResponse } from '../types/auth.type'
 import { apiErrorHandler } from '../utils/error.handle'
 
 
@@ -49,6 +49,15 @@ class AuthService {
         } catch (error: any) {
 
             return apiErrorHandler(error, "failed to resend OTP")
+        }
+    }
+
+    async login(userData:LoginDto){
+        try {
+            const response=await axiosInstance.post<any,ApiResponse>(AUTH_ROUTES.LOGIN,userData)
+            return {message:response.message,success:true,...response.data}
+        } catch (error:any) {
+            return apiErrorHandler(error,'user login failed')
         }
     }
 }

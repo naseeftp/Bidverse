@@ -4,6 +4,7 @@ import LandingPage from "./pages/LandingPage";
 import RegisterPage from "./pages/users/registerPage";
 import VerifyOtpPage from "./pages/users/verifyotpPage";
 import UserHomePage from './pages/users/homePage'
+import LoginPage from "./pages/users/loginPage";
 import ToastProvider from "./components/common/ToastProvider";
 function App() {
 
@@ -16,7 +17,8 @@ function App() {
            <Route path="/" element={<LandingPage />} />
            <Route path="/register" element={<RegisterPage />} />
            <Route path="/verify-otp" element={<VerifyOtpPage />} />
-           <Route path="/user-home" element={<UserHomePage/>} />
+           <Route path="/home" element={<UserHomePage/>} />
+           <Route path="/login" element={<LoginPage/>}/>
         </Routes>
         </MainLayout>
      </Router>

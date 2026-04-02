@@ -25,7 +25,8 @@ axiosInstance.interceptors.response.use(
     async(error)=>{
         const originalRequest=error.config as any;
         if (!originalRequest) return Promise.reject(error);
-        if(error.response?.status===401&&!originalRequest._retry){
+        const isLoginRequest = originalRequest.url?.includes(AUTH_ROUTES.LOGIN);
+        if(error.response?.status===401&&!originalRequest._retry&& !isLoginRequest){
             originalRequest._retry=true
             try {
                 const res=await axios.post(`${API_BASE_URL}${AUTH_ROUTES.REFRESH}`,{},{withCredentials:true})

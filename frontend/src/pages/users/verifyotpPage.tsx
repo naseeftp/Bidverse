@@ -4,6 +4,7 @@ import { useAppDispatch, useAppSelector } from "../../hooks/redux.hooks";
 import { setAuthSuccess } from "../../redux/user/auth.slice";
 import authService from "../../services/auth.service";
 import toast from "react-hot-toast";
+
 const VerifyOtpPage: React.FC = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
@@ -123,7 +124,7 @@ const VerifyOtpPage: React.FC = () => {
         localStorage.setItem("accessToken", result.token);
         dispatch(setAuthSuccess(result.user));
         toast.success(result.message)
-        navigate("/user-home");
+        navigate("/home");
       } else {
         // setLocalError(result?.message || "Invalid Code");
         toast.error(result.message || "invalid code")

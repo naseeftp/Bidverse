@@ -30,6 +30,11 @@ export interface JwtPayload{
     name:string;
     exp:number
 }
+export interface LoginDto{
+    email:string,
+    password:string,
+    role?:userRole
+}
 
 export interface ApiResponse<T=any>{
     success:boolean;
