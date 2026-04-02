@@ -25,6 +25,9 @@ export const env = {
     },
     get REFRESH_TOKEN_SECRET(){
         return process.env.REFRESH_TOKEN_SECRET
+    },
+    get NODE_ENV(){
+        return process.env.NODE_ENV
     }
 
 }
