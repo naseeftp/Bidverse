@@ -5,10 +5,10 @@ import { OtpUserData, IOTP } from "../../types/otp.type";
 import { genarateOtp, getOtpExpiry, isOtpExpired } from '../../utils/otp.utils'
 import { AppError, ValidationError } from "../../errors/AppError";
 import { HttpStatus, MESSAGES } from "../../constants/constants";
-
+import { ILoggerService } from "../interface/ILogger.service";
 
 export class OtpService implements IOTPService {
-    constructor(private readonly _otpRepository: IOtpRepository,
+    constructor(private readonly _otpRepository: IOtpRepository,private _logger:ILoggerService,
         private readonly _emailService: IEmailService
     ) { }
     async generateAndSaveOtp(email: string, name: string, userData: OtpUserData, expiryMinutes: number = 2): Promise<{ otp: string; expiresAt: Date }> {

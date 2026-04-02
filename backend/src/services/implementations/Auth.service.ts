@@ -9,9 +9,10 @@ import { IOtpRepository } from '../../repositories/interfaces/IOtp.repository'
 import { IOTPService } from '../interface/IOtp.service'
 import { ConflictError, UnauthorizedError, NotFoundError, ForbiddenError } from '../../errors/AppError'
 import { UserMapper } from '../../mappers/user.mapper'
+import { ILoggerService } from '../interface/ILogger.service'
 
 export class AuthService implements IAuthService {
-    constructor(private _userRepository: IUserRepository, private _otpService: IOTPService) { }
+    constructor(private _userRepository: IUserRepository,private _logger:ILoggerService, private _otpService: IOTPService) { }
 
     async register(data: RegisterUserDTO): Promise<{ email: string; expiresAt: Date }> {
         

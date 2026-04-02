@@ -6,10 +6,12 @@ import cors from 'cors'
 import {errorHandler } from "./middlewares/error-handler.middleware";
 import { BASE_ROUTES } from "./constants/route.constant";
 import authRouter from './routes/auth.router'
+import {LoggerService } from "./services/implementations/Logger.service";
 
 
 dotenv.config()
 const app: Application = express()
+const appLogger=new LoggerService("App")
 app.use(cors({
     origin:"http://localhost:5173",
     credentials:true,
@@ -27,7 +29,7 @@ app.use(errorHandler);
 const startServer = async () => {
     await connectDB()
     app.listen(PORT, () => {
-        console.log(`server running on the http://localhost:${PORT}`)
+        appLogger.info(`your application running on port ${PORT}`)
     })
 }
 startServer()
