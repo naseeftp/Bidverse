@@ -3,9 +3,7 @@ import { hashPassword, comparePassword} from '../../utils/password.util'
 import { MESSAGES, Roles, CONFIG } from '../../constants/constants'
 import { IAuthService } from '../interface/IAuth.service'
 import { RegisterUserDTO, LoginDTO, VerifyotpDTO, ResendOtpDTO,  AuthResponseDTO, UserResponseDTO } from '../../dtos/Common.dto'
-import { IUserDocument } from '../../types/user.type'
 import { IUserRepository } from '../../repositories/interfaces/iUser.repository'
-import { IOtpRepository } from '../../repositories/interfaces/IOtp.repository'
 import { IOTPService } from '../interface/IOtp.service'
 import { ConflictError, UnauthorizedError, NotFoundError, ForbiddenError } from '../../errors/AppError'
 import { UserMapper } from '../../mappers/user.mapper'
@@ -66,12 +64,14 @@ export class AuthService implements IAuthService {
 
     async login(data: LoginDTO): Promise<AuthResponseDTO<UserResponseDTO>> {
         const existingUser=await this._userRepository.findByEmail(data.email)
+       
         if(!existingUser){
             throw new NotFoundError(MESSAGES.USER_NOT_FOUND)
         }
         if(!existingUser.isActive){
             throw new UnauthorizedError(MESSAGES.USER_NOT_ACTIVE)
         }
+        
         const passwordMatch=await comparePassword(data.password,existingUser.password!)
         if(!passwordMatch){
             throw new UnauthorizedError(MESSAGES.INVALID_CREDENTIALS)

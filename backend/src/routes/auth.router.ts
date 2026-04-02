@@ -3,7 +3,7 @@ import { authController } from "../di/container";
 import { AuthValidators } from "../validators/auth.validators";
 import { validator } from "../middlewares/validation.middleware";
 import { AUTH_ROUTES } from "../constants/route.constant";
-// injection logic in seperate file
+
 const router = Router()
 router.post(
     AUTH_ROUTES.REGISTER,
