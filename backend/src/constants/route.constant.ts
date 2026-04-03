@@ -7,5 +7,7 @@ export const AUTH_ROUTES={
     REGISTER:'/register',
     VERIFY_OTP:'/verify-otp',
     RESEND_OTP:'/resend-otp',
-    LOGIN:'/login'
+    LOGIN:'/login',
+    GOOGLE:'/google',
+    GOOGLE_CALLBACK:'/google/callback'
 }as const

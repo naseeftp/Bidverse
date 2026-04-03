@@ -7,6 +7,8 @@ import { generateAccessToken, generateRefreshToken } from "../../utils/jwt.utils
 import { IUserDocument } from "../../types/user.type";
 import { IAuthService } from "../../services/interface/IAuth.service";
 import { ParamsDictionary } from "express-serve-static-core";
+import { roles } from "../../types/user.type";
+import { oauth2Client,googleScopes } from "../../config/google.confing";
 export class AuthController implements IAuthController {
     constructor(
         private _authService: IAuthService
@@ -53,6 +55,35 @@ export class AuthController implements IAuthController {
         next(error)
        } 
     }
+   async redirectToGoogle(req: Request, res: Response): Promise<void> {
+        const role = (req.query.role as string) || 'user';
+        
+        const url = oauth2Client.generateAuthUrl({
+            access_type: 'offline',
+            scope: googleScopes,
+            state: role, // We pass the role here; Google will return it in the callback
+        });
+        
+        res.redirect(url);
+    }
 
+    async googleCallback(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const { code, state } = req.query;
 
+            if (!code) {
+                res.redirect(`${process.env.FRONTEND_URL}/login?error=no_code`);
+                return;
+            }
+            // 'state' contains the role we passed in Step 1
+            const result = await this._authService.googleAuth(
+                code as string, 
+                state as roles
+            );
+            res.redirect(`${process.env.FRONTEND_URL}/auth-success?token=${result.token}`);
+        } catch (error) {
+            console.error("Google Auth Error:", error);
+            res.redirect(`${process.env.FRONTEND_URL}/login?error=auth_failed`);
+        }
+    }
 }

@@ -25,7 +25,13 @@ router.post(
     validator(AuthValidators.validateLoginInput),
     (req, res, next) => authController.login(req, res, next)
 )
-
-
+router.get(
+    AUTH_ROUTES.GOOGLE, 
+    (req, res) => authController.redirectToGoogle(req, res)
+);
+router.get(
+    AUTH_ROUTES.GOOGLE_CALLBACK,
+    (req, res, next) => authController.googleCallback(req, res, next)
+);
 
 export default router

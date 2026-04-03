@@ -8,7 +8,9 @@ import { IOTPService } from '../interface/IOtp.service'
 import { ConflictError, UnauthorizedError, NotFoundError, ForbiddenError } from '../../errors/AppError'
 import { UserMapper } from '../../mappers/user.mapper'
 import { ILoggerService } from '../interface/ILogger.service'
-
+import { oauth2Client } from '../../config/google.confing'
+import { google } from 'googleapis'
+import { roles } from '../../types/otp.type'
 export class AuthService implements IAuthService {
     constructor(private _userRepository: IUserRepository,private _logger:ILoggerService, private _otpService: IOTPService) { }
 
@@ -85,6 +87,34 @@ export class AuthService implements IAuthService {
         }
         
     }
+    async googleAuth(code: string,role:roles): Promise<AuthResponseDTO<UserResponseDTO>> {
+        const {tokens}=await oauth2Client.getToken(code)
+        oauth2Client.setCredentials(tokens)
+
+        const oauth2=google.oauth2({auth:oauth2Client,version:'v2'})
+        const {data}=await oauth2.userinfo.get()
+          this._logger.info('google user info',{data})
+        if(!data.email){
+            throw new Error('google email is missing')
+        }
+        let user=await this._userRepository.findByEmail(data.email)
+        if(!user){
+            user = await this._userRepository.createOAuthUser({
+            email: data.email,
+            googleId:data.id!,
+            name: data.name || "Google User",
+            profileImage: data.picture || "",
+             role: role 
+        });
+        }
+
+        return {
+        user: UserMapper.toDTO(user),
+        token: generateAccessToken(user),
+        refreshToken: generateRefreshToken(user)
+    };
+    }
+
 
     private async _checkUserDoesNotExist(email: string, phone: string): Promise<void> {
         const existingUser = await this._userRepository.findByEmail(email)

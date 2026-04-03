@@ -1,11 +1,11 @@
-// import { Roles } from "../constants/constants";
+import { Roles } from "../constants/constants";
 
 
-// export enum Role {
-//     ADMIN = 'admin',
-//     TENANT = 'tenant',
-//     USER = 'user'
-// }
+export enum Role {
+    ADMIN = 'admin',
+    TENANT = 'tenant',
+    USER = 'user'
+}
 
 
 // export interface RegisterUserDTO {
@@ -105,8 +105,13 @@ export const VerifyOtpSchema = z.object({
   otp: z.string().length(6, "OTP must be 6 digits"),
   role: z.string().optional()
 });
+export const GoogleCallbackSchema=z.object({
+  code:z.string().min(1,'Authorization code is required'),
+  state: z.enum(['admin', 'tenant', 'user']).default('user')
+});
 
 export type RegisterUserDTO=z.infer<typeof RegisterUserSchema>;
 export type LoginDTO=z.infer<typeof LoginSchema>;
 export type VerifyotpDTO=z.infer<typeof VerifyOtpSchema>;
 export type ResendOtpDTO={email:string}
+export type GoogleCallbackDTO=z.infer<typeof GoogleCallbackSchema>
