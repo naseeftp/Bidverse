@@ -19,7 +19,7 @@ const LoginPage: React.FC = () => {
     const [showPassword, setShowPassword] = useState(false);
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
-    
+
     // Pull global loading state from Redux
     const { loading } = useAppSelector((state) => state.auth);
 
@@ -28,29 +28,29 @@ const LoginPage: React.FC = () => {
     });
 
     const onSubmit = async (data: any) => {
-    dispatch(setLoading(true));
-    try {
-        const loginData = { ...data, role: "user" };
-        const result = await authService.login(loginData);
-        console.log(result)
-        if (result && result.success) {
-            dispatch(setAuthSuccess(result.user));
-            toast.success(result.message || "Welcome to BidVerse");
-            navigate('/home');
-        } else {
-            // This handles cases where the server returns 200 but success: false
-            const errorMsg = result?.message || "Invalid email or password";
-            dispatch(setAuthError(errorMsg));
-            toast.error(errorMsg);
+        dispatch(setLoading(true));
+        try {
+            const loginData = { ...data, role: "user" };
+            const result = await authService.login(loginData);
+            console.log(result)
+            if (result && result.success) {
+                dispatch(setAuthSuccess(result.user));
+                toast.success(result.message || "Welcome to BidVerse");
+                navigate('/home');
+            } else {
+                // This handles cases where the server returns 200 but success: false
+                const errorMsg = result?.message || "Invalid email or password";
+                dispatch(setAuthError(errorMsg));
+                toast.error(errorMsg);
+            }
+        } catch (error: any) {
+            const serverMessage = error.response?.data?.message || "Invalid email or password";
+            dispatch(setAuthError(serverMessage));
+            toast.error(serverMessage);
+        } finally {
+            dispatch(setLoading(false));
         }
-    } catch (error: any) {
-       const serverMessage = error.response?.data?.message || "Invalid email or password";
-        dispatch(setAuthError(serverMessage));
-        toast.error(serverMessage);
-    } finally {
-        dispatch(setLoading(false));
-    }
-};
+    };
 
     return (
         <div className="min-h-screen bg-[#FFF9F4] flex items-center justify-center px-6">
@@ -62,13 +62,10 @@ const LoginPage: React.FC = () => {
                     <p className="text-[#6B6B6B] text-[10px] uppercase tracking-[0.2em] mt-1">Access your bidder dashboard</p>
                 </div>
 
-                <form 
-  onSubmit={(e) => {
-    e.preventDefault(); // Stop the reload first
-    handleSubmit(onSubmit)(e);
-  }} 
-  className="space-y-5"
->
+                <form onSubmit={(e) => {
+                    e.preventDefault(); // Stop the reload first
+                    handleSubmit(onSubmit)(e);
+                }} className="space-y-5">
                     {/* Email Input */}
                     <div>
                         <label className="block text-[9px] font-bold uppercase tracking-[0.2em] text-[#6B6B6B] mb-1.5">
@@ -91,7 +88,7 @@ const LoginPage: React.FC = () => {
                             <label className="block text-[9px] font-bold uppercase tracking-[0.2em] text-[#6B6B6B]">
                                 Password
                             </label>
-                           <Link to="/forgot-password" className="size-2 text-[9px] font-bold text-[#C9653B] uppercase tracking-widest hover:underline">                                Forgot?
+                            <Link to="/forgot-password" className="size-2 text-[9px] font-bold text-[#C9653B] uppercase tracking-widest hover:underline">                                Forgot?
                             </Link>
                         </div>
                         <div className="relative">
@@ -150,8 +147,8 @@ const LoginPage: React.FC = () => {
 
                     <div className="bg-[#FFF9F4] p-3 border border-[#E6E0DA]">
                         <p className="text-[8px] text-[#6B6B6B] uppercase tracking-[0.15em] mb-1">Are you an Auction House?</p>
-                        <Link 
-                            to="/login/tenant" 
+                        <Link
+                            to="/login/tenant"
                             className="text-[9px] font-bold uppercase tracking-widest text-[#C9653B] hover:text-[#1F1F1F] transition-colors"
                         >
                             Sign in as Tenant →

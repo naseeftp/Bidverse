@@ -7,7 +7,7 @@ import authService from "../../services/auth.service";
 import { useAppDispatch } from "../../hooks/redux.hooks";
 import { setRegistrationData } from "../../redux/user/auth.slice";
 import toast from "react-hot-toast";
-
+const baseURL = import.meta.env.VITE_API_URL
 
 const schema = yup.object({
     name: yup.string().required('Full name is required'),
@@ -23,25 +23,28 @@ const schema = yup.object({
 const RegisterPage: React.FC = () => {
     const [serverError, setServerError] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
-    
+
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
 
     const { register, handleSubmit, formState: { errors } } = useForm({
         resolver: yupResolver(schema),
-        defaultValues: { role: 'user' } // Defaulted to user
+        defaultValues: { role: 'user' } 
     });
 
+    const handleGoogleSignup = (role: 'user' | 'tenant') => {
+        window.location.href = `${baseURL}/auth/google?role=${role}`;
+    };
     const onSubmit = async (data: any) => {
         setLoading(true);
         setServerError(null);
         const result = await authService.register(data);
         if (result && result.success) {
-            toast.success(result.message||"Regsitration is on Progress! Verify your email")
-            dispatch(setRegistrationData({ email: data.email, role: 'user',phone:data.phone }));
-            navigate('/verify-otp',{ state: { email: data.email,expiresAt: result.expiresAt } });
+            toast.success(result.message || "Regsitration is on Progress! Verify your email")
+            dispatch(setRegistrationData({ email: data.email, role: 'user', phone: data.phone }));
+            navigate('/verify-otp', { state: { email: data.email, expiresAt: result.expiresAt } });
         } else {
-            toast.error(result.message||"registration failed")
+            toast.error(result.message || "registration failed")
         }
         setLoading(false);
     };
@@ -104,6 +107,22 @@ const RegisterPage: React.FC = () => {
                         {loading ? 'Verifying...' : 'Create Bidder Account'}
                     </button>
                 </form>
+                {/* Place this right after your </form> tag */}
+                <div className="mt-6 space-y-4">
+                    <div className="relative flex items-center justify-center">
+                        <div className="absolute inset-0 flex items-center"><span className="w-full border-t border-[#E6E0DA]"></span></div>
+                        <span className="relative bg-white px-4 text-[9px] uppercase tracking-widest text-[#6B6B6B] font-bold">Or</span>
+                    </div>
+
+                    <button
+                        type="button"
+                        onClick={() => handleGoogleSignup('user')}
+                        className="w-full flex items-center justify-center gap-3 bg-white border border-black py-4 text-[10px] font-bold uppercase tracking-widest hover:bg-black hover:text-white transition-all duration-500 group"
+                    >
+                        <img src="https://www.gstatic.com/images/branding/product/1x/gsa_512dp.png" className="w-4 h-4 group-hover:invert transition-all" alt="G" />
+                        Signup with Google
+                    </button>
+                </div>
 
                 {/* --- FOOTER LINKS SECTION --- */}
                 <div className="mt-12 pt-8 border-t border-[#E6E0DA] space-y-6 text-center">
@@ -116,8 +135,8 @@ const RegisterPage: React.FC = () => {
                     {/* The "Become a Seller" CTA */}
                     <div className="bg-[#FFF9F4] p-6 border border-[#E6E0DA]">
                         <p className="text-[10px] text-[#6B6B6B] uppercase tracking-[0.15em] mb-3">Looking to sell rare items?</p>
-                        <Link 
-                            to="/register/tenant" 
+                        <Link
+                            to="/register/tenant"
                             className="inline-block text-[11px] font-bold uppercase tracking-widest border-b-2 border-[#C9653B] text-[#1F1F1F] hover:bg-[#C9653B] hover:text-white hover:border-transparent px-2 py-1 transition-all"
                         >
                             Become an Auction House

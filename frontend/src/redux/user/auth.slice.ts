@@ -42,15 +42,7 @@ const authSlice=createSlice({
         state.tempAuthData=action.payload;
         state.error=null
       } ,
-     //Call this after successful OTP verification
-      // setAuthSuccess:(state,action:PayloadAction<{user:JwtPayload,token:string}>)=>{
-      //   state.user=action.payload.user;
-      //   state.isAuthenticated=true;
-      //   state.tempAuthData=null;
-      //   state.error=null
-      //   state.loading=false
-      //   localStorage.setItem("accessToken",action.payload.token)
-      // },
+   
       setAuthSuccess:(state,action:PayloadAction<JwtPayload>)=>{
         state.user=action.payload;
         state.isAuthenticated=true;
