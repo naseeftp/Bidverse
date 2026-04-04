@@ -14,18 +14,22 @@ const schema = yup.object({
     email: yup.string().email('Invalid email').required('Email is required'),
     password: yup.string().required('Password is required')
 }).required();
-
+const baseURL = import.meta.env.VITE_API_URL
 const LoginPage: React.FC = () => {
     const [showPassword, setShowPassword] = useState(false);
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
 
-    // Pull global loading state from Redux
+   
     const { loading } = useAppSelector((state) => state.auth);
 
     const { register, handleSubmit, formState: { errors } } = useForm({
         resolver: yupResolver(schema),
+        
     });
+     const handleGoogleSignup = (role: 'user' | 'tenant') => {
+        window.location.href = `${baseURL}/auth/google?role=${role}`;
+    };
 
     const onSubmit = async (data: any) => {
         dispatch(setLoading(true));
@@ -128,7 +132,7 @@ const LoginPage: React.FC = () => {
 
                     <button
                         type="button"
-                        onClick={() => console.log("Google Login Clicked")}
+                         onClick={() => handleGoogleSignup('user')}
                         className="w-full bg-white border border-[#E6E0DA] flex items-center justify-center gap-3 py-2.5 text-[#1F1F1F] text-[10px] font-bold uppercase tracking-widest hover:bg-[#FFF9F4] transition-all"
                     >
                         <FcGoogle className="text-lg" />
