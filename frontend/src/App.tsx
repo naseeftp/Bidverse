@@ -7,6 +7,9 @@ import UserHomePage from './pages/users/homePage'
 import LoginPage from "./pages/users/loginPage";
 import AuthSuccessPage from "./pages/users/AuthSuccessPage";
 import ToastProvider from "./components/common/ToastProvider";
+import PublicRoute from '../src/routes/PublicRoute'
+import ProtectedRoute from "./routes/ProtectedRoute";
+
 function App() {
 
 
@@ -15,12 +18,22 @@ function App() {
       <ToastProvider />
       <MainLayout>
         <Routes>
-           <Route path="/" element={<LandingPage />} />
+           
+           <Route path="/auth-success" element={<AuthSuccessPage />} />
+           
+           <Route element={<PublicRoute/>}>
            <Route path="/register" element={<RegisterPage />} />
            <Route path="/verify-otp" element={<VerifyOtpPage />} />
-           <Route path="/home" element={<UserHomePage/>} />
            <Route path="/login" element={<LoginPage/>}/>
-           <Route path="/auth-success" element={<AuthSuccessPage />} />
+            <Route path="/" element={<LandingPage />} />
+           </Route>
+           
+           <Route element={<ProtectedRoute/>}>
+            <Route path="/home" element={<UserHomePage/>} />
+           </Route>
+           
+           
+           
         </Routes>
         </MainLayout>
      </Router>
