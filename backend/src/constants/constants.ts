@@ -66,6 +66,8 @@ export const MESSAGES = {
 
     INVALID_ACCESS_TOKEN: "Invalid Access token",
     INVALID_REFRESH_TOKEN: "Invalid Refresh token",
+    
+    GOOGLE_REGISTERED:'This account is registered with google authentication please try  google sign in',
 
 
     LOGOUT_SUCCESS: "Logout success",

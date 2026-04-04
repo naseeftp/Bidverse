@@ -5,7 +5,7 @@ import { IAuthService } from '../interface/IAuth.service'
 import { RegisterUserDTO, LoginDTO, VerifyotpDTO, ResendOtpDTO,  AuthResponseDTO, UserResponseDTO } from '../../dtos/Common.dto'
 import { IUserRepository } from '../../repositories/interfaces/iUser.repository'
 import { IOTPService } from '../interface/IOtp.service'
-import { ConflictError, UnauthorizedError, NotFoundError, ForbiddenError } from '../../errors/AppError'
+import { ConflictError, UnauthorizedError, NotFoundError,ValidationError, AppError } from '../../errors/AppError'
 import { UserMapper } from '../../mappers/user.mapper'
 import { ILoggerService } from '../interface/ILogger.service'
 import { oauth2Client } from '../../config/google.confing'
@@ -66,7 +66,11 @@ export class AuthService implements IAuthService {
 
     async login(data: LoginDTO): Promise<AuthResponseDTO<UserResponseDTO>> {
         const existingUser=await this._userRepository.findByEmail(data.email)
-       
+        this._logger.info('existing user',{existingUser})
+        if(existingUser&&existingUser.googleId){
+           throw new AppError(MESSAGES.GOOGLE_REGISTERED)
+        }
+        
         if(!existingUser){
             throw new NotFoundError(MESSAGES.USER_NOT_FOUND)
         }
