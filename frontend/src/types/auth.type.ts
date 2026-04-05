@@ -35,6 +35,10 @@ export interface LoginDto{
     password:string,
     role?:userRole
 }
+export interface ForgetPaswordDTO{
+    email:string,
+    role?:string
+}
 
 export interface ApiResponse<T=any>{
     success:boolean;

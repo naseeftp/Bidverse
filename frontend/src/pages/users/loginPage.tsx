@@ -92,7 +92,8 @@ const LoginPage: React.FC = () => {
                             <label className="block text-[9px] font-bold uppercase tracking-[0.2em] text-[#6B6B6B]">
                                 Password
                             </label>
-                            <Link to="/forgot-password" className="size-2 text-[9px] font-bold text-[#C9653B] uppercase tracking-widest hover:underline">                                Forgot?
+                            <Link to="/forgot-pass" className="text-[9px] font-bold text-[#C9653B] uppercase tracking-widest hover:text-[#1F1F1F] transition-colors">
+                             Forgot?
                             </Link>
                         </div>
                         <div className="relative">

@@ -126,12 +126,11 @@ const VerifyOtpPage: React.FC = () => {
         toast.success(result.message)
         navigate("/home");
       } else {
-        // setLocalError(result?.message || "Invalid Code");
+       
         toast.error(result.message || "invalid code")
 
       }
     } catch (err: any) {
-      // setLocalError("Verification failed.");
       toast.error("Vergication filed")
     } finally {
       setLoading(false);
