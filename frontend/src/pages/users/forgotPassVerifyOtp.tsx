@@ -100,7 +100,7 @@ const ForgotPassVerifyOtp: React.FC = () => {
       if (result && result.success) {
         toast.success("Email verified. Set your new password.");
         navigate("/reset-password", { 
-          state: { email, role, token: result.token } 
+          state: { email, role, resetToken: result.resetToken } 
         });
       } else {
         toast.error(result.message || "Invalid recovery code");

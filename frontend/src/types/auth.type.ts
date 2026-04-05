@@ -41,6 +41,13 @@ export interface ForgetPaswordDTO{
     role?:string
 }
 
+export interface ResetPasswordDTO {
+    email: string;
+    password: string;
+    confirmPassword: string;
+    resetToken: string;
+}
+
 export interface ApiResponse<T=any>{
     success:boolean;
     message:string;

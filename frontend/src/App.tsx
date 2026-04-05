@@ -12,6 +12,7 @@ import LoginPage from "./pages/users/loginPage";
 
 import ForgotPassPage from "./pages/users/forgotpassPage";
 import ForgotPassVeifyOtpPage from './pages/users/forgotPassVerifyOtp'
+import NewPasswordPage from "./pages/users/resetPassword";
 
 import AuthSuccessPage from "./pages/users/AuthSuccessPage";
 
@@ -33,6 +34,7 @@ function App() {
            <Route path="/" element={<LandingPage />} />
            <Route path='/forgot-pass' element={<ForgotPassPage/>}/>
            <Route path='/forgot-verify-otp' element={<ForgotPassVeifyOtpPage/>}/>
+           <Route path="/reset-password" element={<NewPasswordPage/>}/>
            </Route>
            
            <Route element={<ProtectedRoute/>}>

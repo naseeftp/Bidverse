@@ -7,7 +7,8 @@ import type {
     ResendOtpDTO,
     JwtPayload,
     ApiResponse,
-    ForgetPaswordDTO
+    ForgetPaswordDTO,
+    ResetPasswordDTO
 } from '../types/auth.type'
 import { apiErrorHandler } from '../utils/error.handle'
 
@@ -69,15 +70,23 @@ class AuthService {
             return apiErrorHandler(error, 'user login failed')
         }
     }
-    async forgotpass(emailData:ForgetPaswordDTO){
+    async forgotpass(emailData: ForgetPaswordDTO) {
         try {
-            const response=await axiosInstance.post<any,ApiResponse>(AUTH_ROUTES.FORGOT_PASS,emailData)
-            return {message:response.message,success:true,...response.data}
-        } catch (error:any) {
-            return apiErrorHandler(error,'failed to send otp')
+            const response = await axiosInstance.post<any, ApiResponse>(AUTH_ROUTES.FORGOT_PASS, emailData)
+            return { message: response.message, success: true, ...response.data }
+        } catch (error: any) {
+            return apiErrorHandler(error, 'failed to send otp')
         }
     }
-   
+    async resetPassword(resetData: ResetPasswordDTO) {
+        try {
+            const response = await axiosInstance.patch<any, ApiResponse>(AUTH_ROUTES.RESET_PASSWORD, resetData);
+            return {success: true,message: response.message, ...response.data};
+        } catch (error: any) {
+            return apiErrorHandler(error, "Failed to reset password. Please try again.");
+        }
+    }
+
 
 }
 
