@@ -38,6 +38,16 @@ isActive:{
     default:true,
 
 },
+passwordResetToken:{
+    type:String,
+    required:false,
+    default:null
+},
+passwordResetExpires:{
+   type:Date,
+   required:false,
+   default:null 
+},
 createdAt:{
     type:Date,
 },

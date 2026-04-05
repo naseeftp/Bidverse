@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { RegisterUserDTO, ResendOtpDTO,  VerifyotpDTO,LoginDTO, ForgetPaswordDTO} from "../../dtos/Common.dto";
+import { RegisterUserDTO, ResendOtpDTO,  VerifyotpDTO,LoginDTO, ForgetPaswordDTO, ResetPasswordDTO} from "../../dtos/Common.dto";
 import { IAuthController } from "../interfaces/IAuth.controller";
 import { HttpStatus, MESSAGES, Roles } from "../../constants/constants";
 import { SuccessResponse, ErrorResponse } from "../../utils/response.utility";
@@ -30,10 +30,8 @@ export class AuthController implements IAuthController {
 
     async verifyOtp(req: Request<Record<string, never>, unknown, VerifyotpDTO >, res: Response, next: NextFunction): Promise<void> {
         try {
-           console.log('content from fronend on verify otp',req.body)
            const result = await this._authService.verifyOtp(req.body)
-            
-            SuccessResponse(res, MESSAGES.REGISTRATION_COMPLETE, result, HttpStatus.CREATED)
+           SuccessResponse(res, MESSAGES.REGISTRATION_COMPLETE, result, HttpStatus.CREATED)
         } catch (error: unknown) {
             next(error)
         }
@@ -66,6 +64,16 @@ export class AuthController implements IAuthController {
         }
     }
 
+    async resetPassword(req: Request<Record<string, any>, unknown, ResetPasswordDTO>, res: Response, next: NextFunction): Promise<void> {
+        try {
+         
+         await this._authService.resetPassword(req.body)
+         return SuccessResponse(res,MESSAGES.PASSWORD_RESET_SUCCESS,null,HttpStatus.OK)
+        } catch (error) {
+            next(error)
+        }
+    }
+
    async redirectToGoogle(req: Request, res: Response): Promise<void> {
         const role = (req.query.role as string) || 'user';
         
@@ -91,7 +99,6 @@ export class AuthController implements IAuthController {
             );
             res.redirect(`${process.env.FRONTEND_URL}/auth-success?token=${result.token}`);
         } catch (error) {
-            console.error("Google Auth Error:", error);
             res.redirect(`${process.env.FRONTEND_URL}/login?error=auth_failed`);
         }
     }

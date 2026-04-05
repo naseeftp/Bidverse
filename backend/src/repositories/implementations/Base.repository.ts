@@ -32,6 +32,9 @@ export class BaseRepository<T extends Document> implements IBaseRepository<T> {
     async findOneByField(fieldName: string, value: unknown): Promise<T|null> {
         return await this.model.findOne({ [fieldName]: value }).exec();
     }
+    async updateByFilter(filter: mongoose.QueryFilter<T>, data: mongoose.UpdateQuery<T>): Promise<T | null> {
+        return await this.model.findOneAndUpdate(filter,data,{new:true}).exec()
+    }
     async count(filter?: mongoose.QueryFilter<T> | undefined): Promise<number> {
         return await this.model.countDocuments(filter)
     }

@@ -5,7 +5,8 @@ import {
     ResendOtpDTO,
     LoginDTO,
     ForgetPaswordDTO,
-    Role
+    Role,
+    ResetPasswordDTO
 } from "../../dtos/Common.dto";
 import { otpPurpose } from "../../constants/constants";
 
@@ -36,6 +37,12 @@ export interface IAuthController{
         res:Response,
         next:NextFunction
     ):Promise<void>
+    resetPassword(
+    req: Request<Record<string, any>, unknown, ResetPasswordDTO>,
+    res: Response,
+    next: NextFunction
+    ): Promise<void>;
+    
     redirectToGoogle(req: Request, res: Response): Promise<void>;
     googleCallback(req: Request, res: Response, next: NextFunction): Promise<void>;
 }

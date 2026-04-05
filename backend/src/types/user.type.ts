@@ -13,6 +13,8 @@ export interface IUser {
     profileImage?: string;
     googleId?: string;
     isActive: boolean;
+    passwordResetToken?:string;
+    passwordResetExpires:Date;
     createdAt?: Date;
     updatedAt?: Date;
 }

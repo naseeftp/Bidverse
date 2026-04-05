@@ -111,6 +111,16 @@ export const ForgetPaswordSchema=z.object({
   role:z.enum(['tenant', 'user'])
 })
 
+export const ResetPasswordSchema=z.object({
+  email:z.string().email('Invalid email Format'),
+  password:passwordRules,
+  confirmPassword:z.string(),
+  resetToken:z.string().min(1,'Reset Token Is Required')
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "Passwords do not match",
+  path: ["confirmPassword"],
+});
+
 export const GoogleCallbackSchema=z.object({
   code:z.string().min(1,'Authorization code is required'),
   state: z.enum(['admin', 'tenant', 'user']).default('user')
@@ -121,4 +131,5 @@ export type LoginDTO=z.infer<typeof LoginSchema>;
 export type VerifyotpDTO=z.infer<typeof VerifyOtpSchema>;
 export type ResendOtpDTO={email:string,purpose?:otpPurpose}
 export type ForgetPaswordDTO=z.infer<typeof ForgetPaswordSchema>
+export type ResetPasswordDTO=z.infer<typeof ResetPasswordSchema>
 export type GoogleCallbackDTO=z.infer<typeof GoogleCallbackSchema>
