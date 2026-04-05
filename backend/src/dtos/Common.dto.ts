@@ -74,7 +74,7 @@ export interface AuthResponseDTO<T = UserResponseDTO> {
     token: string;
     refreshToken?: string;
 }
-import {z} from 'zod'
+import {email, z} from 'zod'
 
 const passwordRules=z.string()
 .min(8,'Password Must be at least 8 charactors')
@@ -105,6 +105,11 @@ export const VerifyOtpSchema = z.object({
   otp: z.string().length(6, "OTP must be 6 digits"),
   role: z.string().optional()
 });
+export const ForgetPaswordSchema=z.object({
+  email:z.string().email(),
+  role:z.enum(['tenant', 'user'])
+})
+
 export const GoogleCallbackSchema=z.object({
   code:z.string().min(1,'Authorization code is required'),
   state: z.enum(['admin', 'tenant', 'user']).default('user')
@@ -114,4 +119,5 @@ export type RegisterUserDTO=z.infer<typeof RegisterUserSchema>;
 export type LoginDTO=z.infer<typeof LoginSchema>;
 export type VerifyotpDTO=z.infer<typeof VerifyOtpSchema>;
 export type ResendOtpDTO={email:string}
+export type ForgetPaswordDTO=z.infer<typeof ForgetPaswordSchema>
 export type GoogleCallbackDTO=z.infer<typeof GoogleCallbackSchema>

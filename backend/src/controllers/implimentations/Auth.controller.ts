@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { RegisterUserDTO, ResendOtpDTO,  VerifyotpDTO,LoginDTO} from "../../dtos/Common.dto";
+import { RegisterUserDTO, ResendOtpDTO,  VerifyotpDTO,LoginDTO, ForgetPaswordDTO} from "../../dtos/Common.dto";
 import { IAuthController } from "../interfaces/IAuth.controller";
 import { HttpStatus, MESSAGES, Roles } from "../../constants/constants";
 import { SuccessResponse, ErrorResponse } from "../../utils/response.utility";
@@ -19,8 +19,8 @@ export class AuthController implements IAuthController {
         next: NextFunction
     ): Promise<void> {
         try {
-            
-            const result = await this._authService.register(req.body)
+            const purpose='registration'
+            const result = await this._authService.register(req.body,purpose)
             SuccessResponse(res, MESSAGES.OTP_SENT, result, HttpStatus.OK)
 
         } catch (error: unknown) {
@@ -55,6 +55,18 @@ export class AuthController implements IAuthController {
         next(error)
        } 
     }
+
+    async forgotPass(req: Request<Record<string, any>, unknown, ForgetPaswordDTO>, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const purpose = 'forgot_password';
+            const result=await this._authService.forgotPassword(req.body,purpose)
+            
+            SuccessResponse(res,MESSAGES.PASSWORD_RESET_OTP,result,HttpStatus.OK)
+        } catch (error) {
+            next(error)
+        }
+    }
+
    async redirectToGoogle(req: Request, res: Response): Promise<void> {
         const role = (req.query.role as string) || 'user';
         
@@ -66,8 +78,7 @@ export class AuthController implements IAuthController {
         
         res.redirect(url);
     }
-
-    async googleCallback(req: Request, res: Response, next: NextFunction): Promise<void> {
+   async googleCallback(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
             const { code, state } = req.query;
 
@@ -75,7 +86,6 @@ export class AuthController implements IAuthController {
                 res.redirect(`${process.env.FRONTEND_URL}/login?error=no_code`);
                 return;
             }
-            // 'state' contains the role we passed in Step 1
             const result = await this._authService.googleAuth(
                 code as string, 
                 state as roles

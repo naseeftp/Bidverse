@@ -1,6 +1,6 @@
 import { IOTP } from '../types/otp.type'
 import { Schema, model, Model, Document } from 'mongoose'
-
+import { OtpPurpose } from '../constants/constants'
 const otpSchema = new Schema<IOTP>({
     email: {
         type: String,
@@ -10,6 +10,11 @@ const otpSchema = new Schema<IOTP>({
     otp: {
         type: String,
         required: true
+    },
+    purpose: {
+      type: String,
+      required: true,
+      enum: Object.values(OtpPurpose), 
     },
     userData:{
        name:String,

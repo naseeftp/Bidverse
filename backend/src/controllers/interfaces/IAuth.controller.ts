@@ -4,6 +4,7 @@ import {
     VerifyotpDTO,
     ResendOtpDTO,
     LoginDTO,
+    ForgetPaswordDTO,
     Role
 } from "../../dtos/Common.dto";
 
@@ -21,6 +22,16 @@ export interface IAuthController{
     ):Promise<void>
     resendOtp(
         req:Request<Record<string,never>,unknown,ResendOtpDTO>,
+        res:Response,
+        next:NextFunction
+    ):Promise<void>
+    login(
+        req: Request<Record<string, never>, unknown, LoginDTO>,
+        res: Response,
+        next: NextFunction
+    ): Promise<void>;
+    forgotPass(
+         req:Request<Record<string,any>,unknown,ForgetPaswordDTO>,
         res:Response,
         next:NextFunction
     ):Promise<void>

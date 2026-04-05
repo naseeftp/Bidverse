@@ -1,12 +1,14 @@
 import { Document,Types } from "mongoose";
-import { Roles } from "../constants/constants";
+import { otpPurpose, Roles } from "../constants/constants";
+import { OtpPurpose } from "../constants/constants";
+ 
+export type roles=typeof Roles[keyof typeof Roles]
 
- export type roles=typeof Roles[keyof typeof Roles]
-
-export interface IOTP extends Document {
+ export interface IOTP extends Document {
   _id:Types.ObjectId;
   email: string;
   otp: string;
+  purpose:otpPurpose;
   userData:OtpUserData
   expiresAt: Date;
   createdAt: Date;
@@ -25,6 +27,7 @@ export interface OtpUserData{
 export interface OtpData{
    email:string;
    otp:string;
+   purpose:otpPurpose;
    userData:OtpUserData;
    expireAt:Date;
    createdAt:Date

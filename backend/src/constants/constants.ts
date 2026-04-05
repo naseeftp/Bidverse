@@ -5,6 +5,13 @@ export const Roles = {
     USER: 'user'
 } as const;
 
+export const OtpPurpose = {
+    REGISTRATION: 'registration',
+    FORGOT_PASSWORD: 'forgot_password',
+} as const;
+
+export type otpPurpose = typeof OtpPurpose[keyof typeof OtpPurpose];
+
 export enum HttpStatus {
     OK = StatusCodes.OK,
     CREATED = StatusCodes.CREATED,

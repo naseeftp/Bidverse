@@ -3,7 +3,7 @@ import type {
     LoginDTO,
     VerifyotpDTO,
     ResendOtpDTO,
-    // ForgetPaswordDTO,
+    ForgetPaswordDTO,
     // ForgetPasswordVerifyOtpDTO,
     // ResetPasswordDTO,
     // changePasswordDTO,
@@ -13,12 +13,12 @@ import type {
 } from '../../dtos/Common.dto'
 
 export interface IAuthService {
-    register(data: RegisterUserDTO): Promise<{ email: string }>
+    register(data: RegisterUserDTO,purpose:string): Promise<{ email: string }>
     verifyOtp(data: VerifyotpDTO): Promise<AuthResponseDTO<UserResponseDTO>>
     resendOtp(data: ResendOtpDTO): Promise<{ email: string; expiresAt: Date }>
     login(data: LoginDTO): Promise<AuthResponseDTO<UserResponseDTO>>
     googleAuth(code:string,role:string):Promise<AuthResponseDTO<UserResponseDTO>>
-    // forgotPassword(data: ForgetPaswordDTO): Promise<void>
+    forgotPassword(data: ForgetPaswordDTO,purpose:string): Promise<{ email: string; expiresAt: Date }>
     // forgetPasswordVerifyOtp(data: ForgetPasswordVerifyOtpDTO): Promise<{ resetToken: string }>
     // resetPassword(data: ResetPasswordDTO): Promise<void>
     // changePassword(data: changePasswordDTO): Promise<void>

@@ -9,5 +9,6 @@ export const AUTH_ROUTES={
     RESEND_OTP:'/resend-otp',
     LOGIN:'/login',
     GOOGLE:'/google',
-    GOOGLE_CALLBACK:'/google/callback'
+    GOOGLE_CALLBACK:'/google/callback',
+    FORGOT_PASS:'/forgot-pass'
 }as const

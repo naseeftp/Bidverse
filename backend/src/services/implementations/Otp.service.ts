@@ -4,26 +4,42 @@ import { IOtpRepository } from "../../repositories/interfaces/IOtp.repository";
 import { OtpUserData, IOTP } from "../../types/otp.type";
 import { genarateOtp, getOtpExpiry, isOtpExpired } from '../../utils/otp.utils'
 import { AppError, ValidationError } from "../../errors/AppError";
-import { HttpStatus, MESSAGES } from "../../constants/constants";
+import { HttpStatus, MESSAGES, otpPurpose } from "../../constants/constants";
 import { ILoggerService } from "../interface/ILogger.service";
+
 
 export class OtpService implements IOTPService {
     constructor(private readonly _otpRepository: IOtpRepository,private _logger:ILoggerService,
         private readonly _emailService: IEmailService
     ) { }
-    async generateAndSaveOtp(email: string, name: string, userData: OtpUserData, expiryMinutes: number = 2): Promise<{ otp: string; expiresAt: Date }> {
+    async generateAndSaveOtp(email: string, name: string, userData: OtpUserData, expiryMinutes: number = 2,purpose:otpPurpose): Promise<{ otp: string; expiresAt: Date }> {
         const otp = genarateOtp(6)
         const expiresAt = getOtpExpiry(expiryMinutes)
         await this._otpRepository.create({
             email: userData.email,
             userData,
             otp,
-            expiresAt
+            expiresAt,
+            purpose
 
         } as any)
         await this._emailService.sendOtpEmail(userData.email, userData.name, otp)
         return {otp,expiresAt}
     }
+    async generateAndSaveForgotOtp(email: string, name: string, userData: OtpUserData, expiryMinutes: number=5, purpose:otpPurpose): Promise<{ otp: string; expiresAt: Date; }> {
+        const otp=genarateOtp(6)
+        const expiresAt=getOtpExpiry(expiryMinutes)
+        await this._otpRepository.create({
+            email:email,
+            purpose:purpose,
+            otp,
+            expiresAt
+          
+        })
+        await this._emailService.sendOtpEmail(email,name,otp,purpose)
+        return {otp,expiresAt}
+    }
+
     async verifyOtp(email: string, otp: string): Promise<OtpUserData> {
         const otprecord = await this._otpRepository.findByEmailAndOtp(email, otp)
         if (!otprecord) {

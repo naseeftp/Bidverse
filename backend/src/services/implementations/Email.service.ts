@@ -2,17 +2,17 @@ import nodemailer, { Transporter } from "nodemailer"
 import { env } from "../../config/env"
 import { IEmailService } from "../interface/IEmai.service"
 import { EmailConfig, SmtpConfig } from "../../types/email.type"
-import { CONFIG, HttpStatus, MESSAGES } from '../../constants/constants'
+import { CONFIG, HttpStatus, MESSAGES, otpPurpose } from '../../constants/constants'
 import { AppError } from "../../errors/AppError"
 import { getOtpTemplate } from "../../utils/emailTemplates"
 import { ILoggerService } from "../interface/ILogger.service";
-
+import { OtpPurpose } from "../../constants/constants"
 
 export class EmailService implements IEmailService {
     private _transporter: Transporter;
     private readonly _fromAddress: string;
 
-    constructor(private _logger:ILoggerService,config?: SmtpConfig) {
+    constructor(private _logger: ILoggerService, config?: SmtpConfig) {
         const emailConfig = config || this._getDefualtConfig()
         this._transporter = nodemailer.createTransport(emailConfig)
         this._fromAddress = `"BidVerse" <${env.SMTP_USER}>`
@@ -45,7 +45,7 @@ export class EmailService implements IEmailService {
             await this._transporter.verify()
             this._logger.info('Email Service: Connection Verified')
         } catch (error: unknown) {
-           this._logger.error('error while connecting email connection',error)
+            this._logger.error('error while connecting email connection', error)
         }
     }
     async sendEmail(config: EmailConfig): Promise<void> {
@@ -53,18 +53,25 @@ export class EmailService implements IEmailService {
             await this._transporter.sendMail({
                 from: this._fromAddress,
                 ...config
-                
+
             })
         } catch (error) {
-           throw new AppError(MESSAGES.EMAIL_SEND_FAILED, HttpStatus.INTERNAL_ERROR)
+            throw new AppError(MESSAGES.EMAIL_SEND_FAILED, HttpStatus.INTERNAL_ERROR)
         }
     }
-    async sendOtpEmail(email: string, name: string, otp: string): Promise<void> {
-        const htmlContent=getOtpTemplate(name,otp)
+    async sendOtpEmail(email: string, name: string, otp: string, purpose?: otpPurpose): Promise<void> {
+        let subject = 'Your Verification Code';
+        if (purpose === OtpPurpose.FORGOT_PASSWORD) {
+            subject = subject = 'Password Reset Recovery Code';
+        }
+        if (purpose === OtpPurpose.REGISTRATION) {
+            subject = 'Welcome to BidVerse - Verify Your Email';
+        }
+        const htmlContent = getOtpTemplate(name, otp)
         await this.sendEmail({
-            to:email,
-            subject:'Your OTP code',
-            html:htmlContent
+            to: email,
+            subject: subject,
+            html: htmlContent
         })
     }
 }

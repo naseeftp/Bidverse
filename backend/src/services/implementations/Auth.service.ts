@@ -1,8 +1,8 @@
 import { generateAccessToken, generateRefreshToken, verifyAccessToken, verifyRefreshToken } from '../../utils/jwt.utils'
 import { hashPassword, comparePassword} from '../../utils/password.util'
-import { MESSAGES, Roles, CONFIG } from '../../constants/constants'
+import { MESSAGES, Roles, CONFIG, otpPurpose } from '../../constants/constants'
 import { IAuthService } from '../interface/IAuth.service'
-import { RegisterUserDTO, LoginDTO, VerifyotpDTO, ResendOtpDTO,  AuthResponseDTO, UserResponseDTO } from '../../dtos/Common.dto'
+import { RegisterUserDTO, LoginDTO, VerifyotpDTO, ResendOtpDTO,  AuthResponseDTO, UserResponseDTO,ForgetPaswordDTO } from '../../dtos/Common.dto'
 import { IUserRepository } from '../../repositories/interfaces/iUser.repository'
 import { IOTPService } from '../interface/IOtp.service'
 import { ConflictError, UnauthorizedError, NotFoundError,ValidationError, AppError } from '../../errors/AppError'
@@ -11,10 +11,11 @@ import { ILoggerService } from '../interface/ILogger.service'
 import { oauth2Client } from '../../config/google.confing'
 import { google } from 'googleapis'
 import { roles } from '../../types/otp.type'
+
 export class AuthService implements IAuthService {
     constructor(private _userRepository: IUserRepository,private _logger:ILoggerService, private _otpService: IOTPService) { }
 
-    async register(data: RegisterUserDTO): Promise<{ email: string; expiresAt: Date }> {
+    async register(data: RegisterUserDTO,purpose:otpPurpose): Promise<{ email: string; expiresAt: Date }> {
         
         await this._checkUserDoesNotExist(data.email, data.phone)
         const passwordHash = await hashPassword(data.password)
@@ -29,7 +30,8 @@ export class AuthService implements IAuthService {
                 role: data.role || 'user'
 
             },
-            CONFIG.OTP_EXPIRY_MINUTES
+            CONFIG.OTP_EXPIRY_MINUTES,
+            purpose
         )
         return { email: data.email, expiresAt: otpresult.expiresAt }
 
@@ -91,6 +93,30 @@ export class AuthService implements IAuthService {
         }
         
     }
+    async  forgotPassword(data: ForgetPaswordDTO,purpose:string): Promise<{ email: string; expiresAt: Date }> {
+        const existingUser=await this._userRepository.findByEmail(data.email)
+        if(existingUser&&existingUser.googleId){
+            throw new AppError(MESSAGES.GOOGLE_REGISTERED)
+        }
+        if(!existingUser){
+            throw new NotFoundError(MESSAGES.NOT_FOUND)
+        }
+        const otpresult=await this._otpService.generateAndSaveForgotOtp(
+            existingUser.email,
+            existingUser.name,
+            {
+                name:existingUser.name,
+                email:existingUser.email,
+                phone:existingUser.phone,
+                password:"",
+                role:data.role
+            },
+            CONFIG.OTP_EXPIRY_MINUTES,
+            purpose
+        )
+        return { email:existingUser.email, expiresAt: otpresult.expiresAt }
+    }
+
     async googleAuth(code: string,role:roles): Promise<AuthResponseDTO<UserResponseDTO>> {
         const {tokens}=await oauth2Client.getToken(code)
         oauth2Client.setCredentials(tokens)
