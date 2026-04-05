@@ -8,5 +8,6 @@ export const AUTH_ROUTES={
     RESEND_OTP:'/auth/resend-otp',
     REFRESH:"/auth/refresh-token",
     LOGIN:'/auth/login',
-    FORGOT_PASS:'/auth/forgot-pass'
+    FORGOT_PASS:'/auth/forgot-pass',
+   
 }as const

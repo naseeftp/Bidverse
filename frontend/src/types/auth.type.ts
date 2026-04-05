@@ -16,7 +16,8 @@ export interface RegisterDTO {
 export interface VerifyOtpDTO {
     email: string,
     otp: string;
-    role: string
+    role: string,
+    purpose?:'registration' | 'forgot_password'
 }
 
 export interface ResendOtpDTO {

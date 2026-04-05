@@ -77,6 +77,7 @@ class AuthService {
             return apiErrorHandler(error,'failed to send otp')
         }
     }
+   
 
 }
 
