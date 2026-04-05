@@ -1,4 +1,4 @@
-import { Roles } from "../constants/constants";
+import { otpPurpose, Roles } from "../constants/constants";
 
 
 export enum Role {
@@ -103,7 +103,8 @@ export const LoginSchema = z.object({
 export const VerifyOtpSchema = z.object({
   email: z.string().email(),
   otp: z.string().length(6, "OTP must be 6 digits"),
-  role: z.string().optional()
+  role: z.string().optional(),
+  purpose: z.enum(['registration', 'forgot_password']).default('registration')
 });
 export const ForgetPaswordSchema=z.object({
   email:z.string().email(),
@@ -118,6 +119,6 @@ export const GoogleCallbackSchema=z.object({
 export type RegisterUserDTO=z.infer<typeof RegisterUserSchema>;
 export type LoginDTO=z.infer<typeof LoginSchema>;
 export type VerifyotpDTO=z.infer<typeof VerifyOtpSchema>;
-export type ResendOtpDTO={email:string}
+export type ResendOtpDTO={email:string,purpose?:otpPurpose}
 export type ForgetPaswordDTO=z.infer<typeof ForgetPaswordSchema>
 export type GoogleCallbackDTO=z.infer<typeof GoogleCallbackSchema>

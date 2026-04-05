@@ -26,7 +26,8 @@ export enum HttpStatus {
 
 export const CONFIG = {
     //   SESSION_MAX_AGE: env.SESSION_MAX_AGE,
-    OTP_EXPIRY_MINUTES: 2,
+    OTP_EXPIRY_MINUTES:1,
+    FORGOT_PASSWORD_EXPIRY:0.5,
     OTP_RESEND_DELAY_SECONDS: 30,
 } as const;
 

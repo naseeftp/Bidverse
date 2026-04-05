@@ -36,9 +36,16 @@ export class AuthService implements IAuthService {
         return { email: data.email, expiresAt: otpresult.expiresAt }
 
     }
-    async verifyOtp(data: VerifyotpDTO): Promise<AuthResponseDTO<UserResponseDTO>> {
+    async verifyOtp(data: VerifyotpDTO): Promise<AuthResponseDTO<UserResponseDTO>|{ email: string; message: string; verified: boolean }> {
         const userData = await this._otpService.verifyOtp(data.email, data.otp)
-
+        if(data.purpose==='forgot_password'){
+           await this._otpService.deleteOtp(data.email) 
+           return{
+            message: "OTP Verified. Proceed to reset password.",
+            email: data.email,
+            verified: true
+           }
+        }
         const user = await this._userRepository.create({
             name: userData.name,
             email: userData.email,
@@ -111,7 +118,7 @@ export class AuthService implements IAuthService {
                 password:"",
                 role:data.role
             },
-            CONFIG.OTP_EXPIRY_MINUTES,
+            CONFIG.FORGOT_PASSWORD_EXPIRY,
             purpose
         )
         return { email:existingUser.email, expiresAt: otpresult.expiresAt }

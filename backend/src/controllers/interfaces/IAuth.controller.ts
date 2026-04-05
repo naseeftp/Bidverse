@@ -7,6 +7,7 @@ import {
     ForgetPaswordDTO,
     Role
 } from "../../dtos/Common.dto";
+import { otpPurpose } from "../../constants/constants";
 
 export interface IAuthController{
     register(

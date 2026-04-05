@@ -31,6 +31,7 @@ router.post(
     validator(AuthValidators.validateForgotPassInput),
     (req,res,next)=>authController.forgotPass(req,res,next)
 )
+
 router.get(
     AUTH_ROUTES.GOOGLE, 
     (req, res) => authController.redirectToGoogle(req, res)

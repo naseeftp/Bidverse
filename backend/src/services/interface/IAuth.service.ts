@@ -14,7 +14,7 @@ import type {
 
 export interface IAuthService {
     register(data: RegisterUserDTO,purpose:string): Promise<{ email: string }>
-    verifyOtp(data: VerifyotpDTO): Promise<AuthResponseDTO<UserResponseDTO>>
+    verifyOtp(data: VerifyotpDTO): Promise<AuthResponseDTO<UserResponseDTO>| { email: string; message: string; verified: boolean }>
     resendOtp(data: ResendOtpDTO): Promise<{ email: string; expiresAt: Date }>
     login(data: LoginDTO): Promise<AuthResponseDTO<UserResponseDTO>>
     googleAuth(code:string,role:string):Promise<AuthResponseDTO<UserResponseDTO>>

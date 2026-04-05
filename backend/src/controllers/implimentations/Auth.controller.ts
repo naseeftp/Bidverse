@@ -30,8 +30,9 @@ export class AuthController implements IAuthController {
 
     async verifyOtp(req: Request<Record<string, never>, unknown, VerifyotpDTO >, res: Response, next: NextFunction): Promise<void> {
         try {
-           
-            const result = await this._authService.verifyOtp(req.body)
+           console.log('content from fronend on verify otp',req.body)
+           const result = await this._authService.verifyOtp(req.body)
+            
             SuccessResponse(res, MESSAGES.REGISTRATION_COMPLETE, result, HttpStatus.CREATED)
         } catch (error: unknown) {
             next(error)
@@ -41,8 +42,7 @@ export class AuthController implements IAuthController {
         try {
             const result = await this._authService.resendOtp(req.body)
             SuccessResponse(res, MESSAGES.OTP_RESENT, undefined, HttpStatus.OK)
-
-        } catch (error: unknown) {
+          } catch (error: unknown) {
             next(error)
         }
     }
@@ -60,7 +60,6 @@ export class AuthController implements IAuthController {
         try {
             const purpose = 'forgot_password';
             const result=await this._authService.forgotPassword(req.body,purpose)
-            
             SuccessResponse(res,MESSAGES.PASSWORD_RESET_OTP,result,HttpStatus.OK)
         } catch (error) {
             next(error)

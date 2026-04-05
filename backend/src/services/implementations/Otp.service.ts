@@ -26,12 +26,13 @@ export class OtpService implements IOTPService {
         await this._emailService.sendOtpEmail(userData.email, userData.name, otp)
         return {otp,expiresAt}
     }
-    async generateAndSaveForgotOtp(email: string, name: string, userData: OtpUserData, expiryMinutes: number=5, purpose:otpPurpose): Promise<{ otp: string; expiresAt: Date; }> {
+    async generateAndSaveForgotOtp(email: string, name: string, userData: OtpUserData, expiryMinutes: number, purpose:otpPurpose): Promise<{ otp: string; expiresAt: Date; }> {
         const otp=genarateOtp(6)
         const expiresAt=getOtpExpiry(expiryMinutes)
         await this._otpRepository.create({
             email:email,
             purpose:purpose,
+            userData,
             otp,
             expiresAt
           
@@ -60,7 +61,7 @@ export class OtpService implements IOTPService {
         if (!otprecord) {
             throw new AppError(MESSAGES.OTP_SESSION_EXPIRED_RESEND, HttpStatus.GONE)
         }
-        const sessionAge = Date.now() - new Date(otprecord.createdAt!).getTime() //! (non-null assertion) says that it has a creation time
+        const sessionAge = Date.now() - new Date(otprecord.createdAt!).getTime()
         const maxSessionAgeMs = maxSessionAge * 60 * 1000;
         if (sessionAge > maxSessionAgeMs) {
         await this._otpRepository.deleteByFilter({ email });
