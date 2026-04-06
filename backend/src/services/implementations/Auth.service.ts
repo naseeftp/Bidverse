@@ -84,7 +84,10 @@ export class AuthService implements IAuthService {
 
     async login(data: LoginDTO): Promise<AuthResponseDTO<UserResponseDTO>> {
         const existingUser = await this._userRepository.findByEmail(data.email)
-        this._logger.info('existing user', { existingUser })
+        if(existingUser?.role!=data.role)
+        {
+            throw new AppError(`this email registered as ${existingUser?.role} please use correct login portal`)
+        }
         if (existingUser && existingUser.googleId) {
             throw new AppError(MESSAGES.GOOGLE_REGISTERED)
         }
@@ -146,7 +149,7 @@ export class AuthService implements IAuthService {
         this._logger.info("User Found for Reset", { userId: user._id });
         const hashedPassword = await hashPassword(data.password)
         const result = await this._userRepository.updateByFilter(
-            {email:data.email},
+            { email: data.email },
             {
                 $set: { password: hashedPassword },
                 $unset: {
