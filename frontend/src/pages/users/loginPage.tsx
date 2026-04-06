@@ -36,8 +36,8 @@ const LoginPage: React.FC = () => {
         try {
             const loginData = { ...data, role: "user" };
             const result = await authService.login(loginData);
-            console.log(result)
             if (result && result.success) {
+                localStorage.setItem("accessToken", result.token);
                 dispatch(setAuthSuccess(result.user));
                 toast.success(result.message || "Welcome to BidVerse");
                 navigate('/home');
@@ -153,7 +153,7 @@ const LoginPage: React.FC = () => {
                     <div className="bg-[#FFF9F4] p-3 border border-[#E6E0DA]">
                         <p className="text-[8px] text-[#6B6B6B] uppercase tracking-[0.15em] mb-1">Are you an Auction House?</p>
                         <Link
-                            to="/login/tenant"
+                            to="/tenant/login"
                             className="text-[9px] font-bold uppercase tracking-widest text-[#C9653B] hover:text-[#1F1F1F] transition-colors"
                         >
                             Sign in as Tenant →

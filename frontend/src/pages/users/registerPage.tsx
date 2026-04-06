@@ -136,7 +136,7 @@ const RegisterPage: React.FC = () => {
                     <div className="bg-[#FFF9F4] p-6 border border-[#E6E0DA]">
                         <p className="text-[10px] text-[#6B6B6B] uppercase tracking-[0.15em] mb-3">Looking to sell rare items?</p>
                         <Link
-                            to="/register/tenant"
+                            to="/tenant/register"
                             className="inline-block text-[11px] font-bold uppercase tracking-widest border-b-2 border-[#C9653B] text-[#1F1F1F] hover:bg-[#C9653B] hover:text-white hover:border-transparent px-2 py-1 transition-all"
                         >
                             Become an Auction House

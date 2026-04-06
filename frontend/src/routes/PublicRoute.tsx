@@ -3,9 +3,9 @@ import {useAppSelector} from '../hooks/redux.hooks'
 
 
 const PublicRoute=()=>{
-    const {isAuthenticated}=useAppSelector((state)=>state.auth)
+    const {isAuthenticated,role}=useAppSelector((state)=>state.auth)
     if(isAuthenticated){
-        return <Navigate to='/home' replace/>
+        return <Navigate to={role === "tenant" ? "/tenant/dashboard" : "/home"} replace />;
     }
     return <Outlet/>
 }

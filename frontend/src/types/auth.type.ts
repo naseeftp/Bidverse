@@ -27,7 +27,7 @@ export interface ResendOtpDTO {
 export interface JwtPayload{
     userId:string;
     email:string;
-    role:string;
+    role:userRole;
     name:string;
     exp:number
 }
