@@ -88,7 +88,7 @@ export const RegisterUserSchema=z.object({
     password:passwordRules,
     confirmPassword:z.string(),
     phone:z.string().regex(/^\d{10}$/, "Phone must be 10 digits"),
-    role: z.enum(['admin', 'tenant', 'user']).optional().default('user'),
+    role: z.enum(['tenant', 'user']).optional().default('user'),
 }).refine((data) => data.password === data.confirmPassword, {
   message: "Passwords do not match",
   path: ["confirmPassword"], 
