@@ -1,10 +1,16 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import { LayoutDashboard, Gavel, ShieldCheck, Settings, LogOut } from "lucide-react";
-
+import { useAppDispatch } from "../../../hooks/redux.hooks";
+import { useNavigate } from "react-router-dom";
+import { logout } from "../../../redux/user/auth.slice";
 const Sidebar: React.FC = () => {
+  const dispatch=useAppDispatch();
+  const handleLogout=()=>{
+    dispatch(logout())
+  }
   const location = useLocation();
-
+  
   const menuItems = [
     { name: "Dashboard", path: "/tenant/dashboard", icon: <LayoutDashboard size={18} /> },
     { name: "My Auctions", path: "/tenant/auctions", icon: <Gavel size={18} /> },
@@ -46,9 +52,9 @@ const Sidebar: React.FC = () => {
         })}
       </nav>
 
-      {/* FOOTER / LOGOUT */}
+      
       <div className="p-6 border-t border-white/5">
-        <button className="flex items-center gap-4 px-4 py-3 text-[#FF4D4D] hover:bg-[#FF4D4D]/10 w-full rounded-sm transition-all">
+        <button onClick={handleLogout} className="flex items-center gap-4 px-4 py-3 text-[#FF4D4D] hover:bg-[#FF4D4D]/10 w-full rounded-sm transition-all">
           <LogOut size={18} />
           <span className="text-[10px] font-bold uppercase tracking-widest">Logout</span>
         </button>

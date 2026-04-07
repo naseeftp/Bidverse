@@ -23,8 +23,6 @@ const Navbar: React.FC = () => {
 
   const handleLogout = () => {
     dispatch(logout());
-    localStorage.removeItem("accessToken");
-    navigate("/login");
   };
 
   const navLinkStyle = "text-[10px] font-bold uppercase tracking-[0.2em] text-[#6B6B6B] hover:text-[#C9653B] transition-all duration-300";
