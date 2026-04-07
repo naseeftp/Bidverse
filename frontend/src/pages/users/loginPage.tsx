@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import React, { useState, useEffect, useRef } from "react";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from 'yup';
@@ -17,17 +17,44 @@ const schema = yup.object({
 const baseURL = import.meta.env.VITE_API_URL
 const LoginPage: React.FC = () => {
     const [showPassword, setShowPassword] = useState(false);
+    const [searchParams] = useSearchParams();
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
 
-   
-    const { loading } = useAppSelector((state) => state.auth);
 
+    const { loading } = useAppSelector((state) => state.auth);
+    // useEffect(() => {
+    //     const errorMsg = searchParams.get("error");
+    //     if (errorMsg) {
+    //         // decodeURIComponent handles the spaces and symbols in the message
+    //         const decodedError = decodeURIComponent(errorMsg);
+
+    //         toast.error(decodedError);
+    //         dispatch(setAuthError(decodedError));
+
+    //         // Clean up the URL so the error doesn't persist on refresh
+    //         navigate(window.location.pathname, { replace: true });
+    //     }
+    // }, [searchParams, navigate, dispatch]);
+
+    const toastShown = useRef(false);
+
+    useEffect(() => {
+        const errorMsg = searchParams.get("error");
+
+        if (errorMsg && !toastShown.current) {
+            const decodedError = decodeURIComponent(errorMsg);
+            toast.error(decodedError);
+            dispatch(setAuthError(decodedError));
+            toastShown.current = true;
+            navigate(window.location.pathname, { replace: true });
+        }
+    }, [searchParams, navigate, dispatch]);
     const { register, handleSubmit, formState: { errors } } = useForm({
         resolver: yupResolver(schema),
-        
+
     });
-     const handleGoogleSignup = (role: 'user' | 'tenant') => {
+    const handleGoogleSignup = (role: 'user' | 'tenant') => {
         window.location.href = `${baseURL}/auth/google?role=${role}`;
     };
 
@@ -42,7 +69,6 @@ const LoginPage: React.FC = () => {
                 toast.success(result.message || "Welcome to BidVerse");
                 navigate('/home');
             } else {
-                // This handles cases where the server returns 200 but success: false
                 const errorMsg = result?.message || "Invalid email or password";
                 dispatch(setAuthError(errorMsg));
                 toast.error(errorMsg);
@@ -93,7 +119,7 @@ const LoginPage: React.FC = () => {
                                 Password
                             </label>
                             <Link to="/forgot-pass" className="text-[9px] font-bold text-[#C9653B] uppercase tracking-widest hover:text-[#1F1F1F] transition-colors">
-                             Forgot?
+                                Forgot?
                             </Link>
                         </div>
                         <div className="relative">
@@ -133,7 +159,7 @@ const LoginPage: React.FC = () => {
 
                     <button
                         type="button"
-                         onClick={() => handleGoogleSignup('user')}
+                        onClick={() => handleGoogleSignup('user')}
                         className="w-full bg-white border border-[#E6E0DA] flex items-center justify-center gap-3 py-2.5 text-[#1F1F1F] text-[10px] font-bold uppercase tracking-widest hover:bg-[#FFF9F4] transition-all"
                     >
                         <FcGoogle className="text-lg" />
