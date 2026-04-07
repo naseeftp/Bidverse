@@ -176,7 +176,12 @@ export class AuthService implements IAuthService {
             throw new Error('google email is missing')
         }
         let user = await this._userRepository.findByEmail(data.email)
-        if (!user) {
+        if(user){
+          if(user.role!=role){
+            throw new UnauthorizedError(`Unauthorized: This account is registered as a ${user.role}`)
+          }
+        }
+        else {
             user = await this._userRepository.createOAuthUser({
                 email: data.email,
                 googleId: data.id!,

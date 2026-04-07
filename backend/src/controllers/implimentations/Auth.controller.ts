@@ -87,20 +87,23 @@ export class AuthController implements IAuthController {
         res.redirect(url);
     }
     async googleCallback(req: Request, res: Response, next: NextFunction): Promise<void> {
+        const { code, state } = req.query;
+        const role = (state as roles) || 'user'; // Fallback to user if state is missing
+        const loginPath = role === 'tenant' ? '/tenant/login' : '/login';
         try {
-            const { code, state } = req.query;
-
             if (!code) {
-                res.redirect(`${process.env.FRONTEND_URL}/login?error=no_code`);
+                res.redirect(`${process.env.FRONTEND_URL}${loginPath}?error=Authorization code missing`);
                 return;
             }
             const result = await this._authService.googleAuth(
                 code as string,
-                state as roles
+                role
             );
             res.redirect(`${process.env.FRONTEND_URL}/auth-success?token=${result.token}`);
-        } catch (error) {
-            res.redirect(`${process.env.FRONTEND_URL}/login?error=auth_failed`);
+
+        } catch (error: any) {
+            const errorMessage = encodeURIComponent(error.message || "Authentication failed");
+            res.redirect(`${process.env.FRONTEND_URL}${loginPath}?error=${errorMessage}`);
         }
     }
 }
