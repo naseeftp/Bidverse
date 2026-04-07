@@ -8,10 +8,10 @@ import authService from "../../services/auth.service";
 import type { ResetPasswordDTO } from "../../types/auth.type";
 import toast from "react-hot-toast";
 
-// The schema must include ALL fields in ResetPasswordDTO to avoid TS errors
+
 const resetSchema = yup.object({
   email: yup.string().email().required(),
-  resetToken: yup.string().required(), // Matches your new DTO key
+  resetToken: yup.string().required(), 
   password: yup
     .string()
     .min(8, "Password must be at least 8 characters")
@@ -25,8 +25,7 @@ const resetSchema = yup.object({
 const ResetPasswordPage: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-
-  // Grab data passed from the OTP verification page
+  
   const email = location.state?.email || "";
   const resetToken = location.state?.resetToken || "";
 

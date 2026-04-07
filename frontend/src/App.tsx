@@ -20,6 +20,9 @@ import AuthSuccessPage from "./pages/users/AuthSuccessPage";
 import TenantRegisterPage from "./pages/tenant/RegiterPage";
 import TenantVerifyOtpPage from "./pages/tenant/VerifyotpPage";
 import TenantLoginPage from "./pages/tenant/LoginPage";
+import TenantForgotPassPage from "./pages/tenant/ForgotpassPage";
+import TenantForgotPassVerifyOtp from "./pages/tenant/ForgotpassVerifyotp";
+import TenantResetPasswordPage from "./pages/tenant/ResetpassPage";
 import TenantDashboard from "./pages/tenant/Dashbord";
 function App() {
 
@@ -56,6 +59,9 @@ function App() {
                   <Route path="/tenant/register" element={<TenantRegisterPage />} />
                   <Route path="/tenant/verify-otp" element={<TenantVerifyOtpPage />} />
                   <Route path="/tenant/login" element={<TenantLoginPage />} />
+                  <Route path='/tenant/forgot-pass' element={<TenantForgotPassPage />} />
+                  <Route path='/tenant/forgot-verify-otp' element={<TenantForgotPassVerifyOtp />} />
+                  <Route path="/tenant/reset-password" element={<TenantResetPasswordPage/>} />
                </Route>
 
                <Route element={<ProtectedRoute allowedRoles={['tenant']} />}>

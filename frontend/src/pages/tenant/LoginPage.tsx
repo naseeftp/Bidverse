@@ -91,7 +91,7 @@ const TenantLoginPage: React.FC = () => {
                     <div className="space-y-2">
                         <div className="flex justify-between items-center">
                             <label className={labelStyle}>Password</label>
-                            <Link to="/forgot-pass" className="text-[10px] font-bold text-[#2F6FED] hover:underline">
+                            <Link to="/tenant/forgot-pass" className="text-[10px] font-bold text-[#2F6FED] hover:underline">
                                 Forgot?
                             </Link>
                         </div>
