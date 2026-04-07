@@ -2,7 +2,6 @@ import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import { LayoutDashboard, Gavel, ShieldCheck, Settings, LogOut } from "lucide-react";
 import { useAppDispatch } from "../../../hooks/redux.hooks";
-import { useNavigate } from "react-router-dom";
 import { logout } from "../../../redux/user/auth.slice";
 const Sidebar: React.FC = () => {
   const dispatch=useAppDispatch();
