@@ -24,6 +24,11 @@ import TenantForgotPassPage from "./pages/tenant/ForgotpassPage";
 import TenantForgotPassVerifyOtp from "./pages/tenant/ForgotpassVerifyotp";
 import TenantResetPasswordPage from "./pages/tenant/ResetpassPage";
 import TenantDashboard from "./pages/tenant/Dashbord";
+
+
+import AdminLoginPage from "./pages/admin/LoginPage";
+import AdminDashboard from "./pages/admin/Dashboard";
+
 function App() {
 
 
@@ -69,6 +74,11 @@ function App() {
                </Route>
 
             </Route>
+
+            <Route path="/admin" element={<AdminLoginPage/>}/>
+             <Route element={<ProtectedRoute allowedRoles={['admin']} />}>
+                  <Route path="/admin/dashboard" element={<AdminDashboard/>} />
+             </Route>
 
 
 

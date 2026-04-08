@@ -42,14 +42,12 @@ const TenantLoginPage: React.FC = () => {
     },[dispatch,searchParams,navigate])
 
     const handleGoogleLogin = () => {
-        
-        window.location.href = `${baseURL}/auth/google?role=tenant`;
+         window.location.href = `${baseURL}/auth/google?role=tenant`;
     };
 
     const onSubmit = async (data: any) => {
         dispatch(setLoading(true));
         try {
-            // Log in with role: tenant
             const loginData = { ...data, role: "tenant" };
             const result = await authService.login(loginData);
             
@@ -129,7 +127,7 @@ const TenantLoginPage: React.FC = () => {
                         )}
                     </div>
 
-                    {/* Login Button */}
+                   
                     <button
                         type="submit"
                         disabled={loading}
