@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom"
 import MainLayout from "./components/layout/MainLayout"
 import TenantLayout from "./components/layout/tenant/TenantLayout";
+import AdminLayout from "./components/layout/admin/AminLayout";
 import ToastProvider from "./components/common/ToastProvider";
 import PublicRoute from '../src/routes/PublicRoute'
 import ProtectedRoute from "./routes/ProtectedRoute";
@@ -40,7 +41,7 @@ function App() {
 
             <Route element={<MainLayout />}>
                <Route path="/auth-success" element={<AuthSuccessPage />} />
-               
+
 
                <Route element={<PublicRoute />}>
                   <Route path="/" element={<LandingPage />} />
@@ -66,7 +67,7 @@ function App() {
                   <Route path="/tenant/login" element={<TenantLoginPage />} />
                   <Route path='/tenant/forgot-pass' element={<TenantForgotPassPage />} />
                   <Route path='/tenant/forgot-verify-otp' element={<TenantForgotPassVerifyOtp />} />
-                  <Route path="/tenant/reset-password" element={<TenantResetPasswordPage/>} />
+                  <Route path="/tenant/reset-password" element={<TenantResetPasswordPage />} />
                </Route>
 
                <Route element={<ProtectedRoute allowedRoles={['tenant']} />}>
@@ -75,10 +76,13 @@ function App() {
 
             </Route>
 
-            <Route path="/admin" element={<AdminLoginPage/>}/>
-             <Route element={<ProtectedRoute allowedRoles={['admin']} />}>
-                  <Route path="/admin/dashboard" element={<AdminDashboard/>} />
-             </Route>
+            <Route element={<AdminLayout />}>
+               <Route path="/admin" element={<AdminLoginPage />} />
+               <Route element={<ProtectedRoute allowedRoles={['admin']} />}>
+                  <Route path="/admin/dashboard" element={<AdminDashboard />} />
+               </Route>
+            </Route>
+
 
 
 
