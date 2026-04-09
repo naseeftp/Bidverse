@@ -17,7 +17,7 @@ export interface IAuctionHouse{
     };
     contact:{
         primaryContactName:string;
-        bussinessEmail:string;
+        businessEmail:string;
         phone:string
     }
     legal:{
