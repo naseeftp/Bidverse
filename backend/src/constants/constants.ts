@@ -5,10 +5,18 @@ export const Roles = {
     USER: 'user'
 } as const;
 
+
 export const OtpPurpose = {
     REGISTRATION: 'registration',
     FORGOT_PASSWORD: 'forgot_password',
 } as const;
+ export const VerificationStatus={
+    PENDING:'pending',
+    APPROVED:'approved',
+    REJECTED:'rejected',
+    ACTION_REQUIRED:'action_required'
+ }
+ 
 
 export type otpPurpose = typeof OtpPurpose[keyof typeof OtpPurpose];
 
@@ -30,6 +38,7 @@ export const CONFIG = {
     FORGOT_PASSWORD_EXPIRY:0.5,
     OTP_RESEND_DELAY_SECONDS: 30,
 } as const;
+
 
 export const MESSAGES = {
     SERVER_ERROR: "Server error",

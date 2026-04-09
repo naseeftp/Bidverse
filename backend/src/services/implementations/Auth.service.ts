@@ -84,10 +84,7 @@ export class AuthService implements IAuthService {
 
     async login(data: LoginDTO): Promise<AuthResponseDTO<UserResponseDTO>> {
         const existingUser = await this._userRepository.findByEmail(data.email)
-        if(existingUser?.role!=data.role)
-        {
-            throw new AppError(`this email registered as ${existingUser?.role} please use correct login portal`)
-        }
+       
         if (existingUser && existingUser.googleId) {
             throw new AppError(MESSAGES.GOOGLE_REGISTERED)
         }
@@ -95,6 +92,7 @@ export class AuthService implements IAuthService {
         if (!existingUser) {
             throw new NotFoundError(MESSAGES.USER_NOT_FOUND)
         }
+        
         if (!existingUser.isActive) {
             throw new UnauthorizedError(MESSAGES.USER_NOT_ACTIVE)
         }
@@ -102,6 +100,10 @@ export class AuthService implements IAuthService {
         const passwordMatch = await comparePassword(data.password, existingUser.password!)
         if (!passwordMatch) {
             throw new UnauthorizedError(MESSAGES.INVALID_CREDENTIALS)
+        }
+         if(existingUser?.role!=data.role)
+        {
+            throw new AppError(`this email registered as ${existingUser?.role} please use correct login portal`)
         }
         const token = generateAccessToken(existingUser);
         const refreshToken = generateRefreshToken(existingUser)
