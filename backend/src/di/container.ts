@@ -16,3 +16,12 @@ const otpService = new OtpService(otpRepository,otpLogger,emailService)
 const authLogger=new LoggerService('AuthService')
 const authService = new AuthService(userRepository,authLogger,otpService)
 export const authController = new AuthController(authService)
+
+import { AuctionHouseRepository } from "../repositories/implementations/AuctionHouse.repository";
+import { AuctionHouseService } from "../services/implementations/AuctionHouse.service";
+import { AuctionHouseController } from "../controllers/implimentations/AuctionHouse.controller";
+
+const Logger=new LoggerService();
+const repo=new AuctionHouseRepository();
+const service=new AuctionHouseService(repo,Logger)
+export const auctionHouseController=new AuctionHouseController(service,Logger)

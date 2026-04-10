@@ -49,7 +49,7 @@ export const MESSAGES = {
     NOT_FOUND: "Not found",
     INVALID_ID_FORMAT: "Invalid ID format",
     ROUTE_NOT_FOUND: "Route not found",
-    VERIFICATION_SUBMITTED: "success",
+    
     USER_NOT_ACTIVE: "User is not active",
     USER_NOT_FOUND: "User not found",
     USER_BLOCKED: "Your account has been blocked",
@@ -85,8 +85,11 @@ export const MESSAGES = {
     INVALID_REFRESH_TOKEN: "Invalid Refresh token",
     
     GOOGLE_REGISTERED:'This account is registered with google authentication please try  google sign in',
-
-
+   
+    ALLREADY_VERIFIED:'This accout allready Verified',
+    UNDER_REVIEW:'This account currently under review',
+    VERIFICATION_SUBMITTED:'Verification request submitted successfully',
+    PROFILE_RETRIEVED: 'Profile Retrieved successfully',
     LOGOUT_SUCCESS: "Logout success",
     LOGOUT_FAILED: "Logout failed",
 

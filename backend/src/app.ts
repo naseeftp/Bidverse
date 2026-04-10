@@ -6,6 +6,7 @@ import cors from 'cors'
 import {errorHandler } from "./middlewares/error-handler.middleware";
 import { BASE_ROUTES } from "./constants/route.constant";
 import authRouter from './routes/auth.router'
+import auctionHouseRoutes from './routes/auctionHouse.routes'
 import {LoggerService } from "./services/implementations/Logger.service";
 
 
@@ -23,6 +24,7 @@ app.use(express.urlencoded({extended:true}))
 const PORT = env.PORT
 
 app.use(BASE_ROUTES.AUTH,authRouter)
+app.use(BASE_ROUTES.AUCTION_HOUSE,auctionHouseRoutes)
 
 
 app.use(errorHandler);

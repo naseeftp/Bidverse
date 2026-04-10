@@ -1,16 +1,22 @@
 
-export const BASE_ROUTES={
-    AUTH:'/auth'
+export const BASE_ROUTES = {
+    AUTH: '/auth',
+    AUCTION_HOUSE:'/auction-house'
 } as const
 
-export const AUTH_ROUTES={
-    REGISTER:'/register',
-    VERIFY_OTP:'/verify-otp',
-    RESEND_OTP:'/resend-otp',
-    LOGIN:'/login',
-    GOOGLE:'/google',
-    GOOGLE_CALLBACK:'/google/callback',
-    FORGOT_PASS:'/forgot-pass',
-    FORGOT_PASS_RESEND_OTP:'forgot-pass-resend',
-    FORGOT_PASS_RESET:'/forgot-pass-reset'
-}as const
+export const AUTH_ROUTES = {
+    REGISTER: '/register',
+    VERIFY_OTP: '/verify-otp',
+    RESEND_OTP: '/resend-otp',
+    LOGIN: '/login',
+    GOOGLE: '/google',
+    GOOGLE_CALLBACK: '/google/callback',
+    FORGOT_PASS: '/forgot-pass',
+    FORGOT_PASS_RESEND_OTP: 'forgot-pass-resend',
+    FORGOT_PASS_RESET: '/forgot-pass-reset'
+} as const
+
+export const AUCTION_HOUSE_ROUTES = {
+    VERIFY: '/verify',
+    PROFILE: '/profile'
+}
