@@ -13,11 +13,11 @@ export class UserRepository extends BaseRepository<IUserDocument> implements IUs
     async findByPhone(phone: string): Promise<IUserDocument | null> {
         return this.model.findOne({ phone })
     }
-   async createOAuthUser(data: Partial<IUserDocument>): Promise<IUserDocument> {
-    return await this.model.create({
-        ...data,
-        isActive: true,
-       
-    });
-}
+    async createOAuthUser(data: Partial<IUserDocument>): Promise<IUserDocument> {
+        return await this.model.create({
+            ...data,
+            isActive: true,
+
+        });
+    }
 }

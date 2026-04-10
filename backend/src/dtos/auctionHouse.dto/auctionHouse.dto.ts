@@ -1,4 +1,6 @@
 import { z } from "zod";
+import { TVerificationStatus } from "../../types/auctionhouse.type";
+import { VerificationStatus } from "../../constants/constants";
 
 export const AuctionHouseVerificationSchema = z.object({
     name: z.string()
@@ -42,5 +44,31 @@ export const AuctionHouseVerificationSchema = z.object({
     }),
 
 })
+
+export interface AuctionHouseResponseDTO {
+    id: string;
+    userId: string;
+    name: string;
+    yearEstablished: number;
+    briefDescription: string;
+    address: {
+        city: string;
+        state: string;
+        country: string;
+        fullAddress: string;
+    };
+    contact: {
+        primaryContactName: string;
+        businessEmail: string;
+        phone: string;
+    };
+    documents: {
+        registrationCertificateUrl: string;
+        identityProofUrl: string
+    };
+    status: TVerificationStatus;
+    isVerified: boolean;
+    createdAt: string | Date;
+}
 
 export type AuctionHouseVerificationDTO = z.infer<typeof AuctionHouseVerificationSchema>
