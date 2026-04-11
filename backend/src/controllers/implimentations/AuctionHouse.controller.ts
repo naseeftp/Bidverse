@@ -26,7 +26,7 @@ export class AuctionHouseController implements IAuctionHouseController {
     }
 
     async getProfile(req: Request, res: Response, next: NextFunction): Promise<void> {
-        try {
+       try {
             const userId = req.user.id;
             this._logger.info('fetching verification profile', { userId })
             const result = await this._auctionHouseService.getTenantVerificationProfile(userId)

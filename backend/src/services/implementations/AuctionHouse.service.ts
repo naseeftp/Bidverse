@@ -34,10 +34,10 @@ export class AuctionHouseService implements IAuctionService{
         this._logger.info('Verification request submitted successfully',{tenatId:userId,recordId:saveDoc._id})
         return AuctionHouseMapper.toResponseDTO(saveDoc)
     }  
-    async getTenantVerificationProfile(userId: string): Promise<AuctionHouseResponseDTO> {
+    async getTenantVerificationProfile(userId: string): Promise<AuctionHouseResponseDTO|null> {
         const doc=await this._auctionHouseRepository.findById(userId)
         if(!doc){
-           throw new NotFoundError("No verification profile found for this tenant.")
+        return null
         }
         return AuctionHouseMapper.toResponseDTO(doc);
     }

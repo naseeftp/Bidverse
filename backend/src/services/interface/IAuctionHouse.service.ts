@@ -2,5 +2,5 @@ import { AuctionHouseResponseDTO,AuctionHouseVerificationDTO } from "../../dtos/
 
 export interface IAuctionService{
     submitVerificationRequest(userId:string,data:AuctionHouseVerificationDTO):Promise<AuctionHouseResponseDTO>
-    getTenantVerificationProfile(userId:string):Promise<AuctionHouseResponseDTO>
+    getTenantVerificationProfile(userId:string):Promise<AuctionHouseResponseDTO|null>
 }
