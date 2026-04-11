@@ -1,5 +1,5 @@
-import React, { useState,useEffect,useRef} from "react";
-import { Link, useNavigate,useSearchParams} from "react-router-dom";
+import React, { useState, useEffect, useRef } from "react";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from 'yup';
@@ -21,28 +21,28 @@ const TenantLoginPage: React.FC = () => {
     const [showPassword, setShowPassword] = useState(false);
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
-    const [searchParams]=useSearchParams()
+    const [searchParams] = useSearchParams()
     const { loading } = useAppSelector((state) => state.auth);
-    const toastShown=useRef(false)
+    const toastShown = useRef(false)
 
     const { register, handleSubmit, formState: { errors } } = useForm({
         resolver: yupResolver(schema),
     });
-   
-    useEffect(()=>{
-     const errMessage=searchParams.get("error");
-     if(errMessage&&!toastShown.current){
-        const decodedError=decodeURIComponent(errMessage);
-        toast.error(decodedError);
-        setAuthError(decodedError)
-        toastShown.current=true;
-        navigate(window.location.pathname,{replace:true})
-     }
 
-    },[dispatch,searchParams,navigate])
+    useEffect(() => {
+        const errMessage = searchParams.get("error");
+        if (errMessage && !toastShown.current) {
+            const decodedError = decodeURIComponent(errMessage);
+            toast.error(decodedError);
+            setAuthError(decodedError)
+            toastShown.current = true;
+            navigate(window.location.pathname, { replace: true })
+        }
+
+    }, [dispatch, searchParams, navigate])
 
     const handleGoogleLogin = () => {
-         window.location.href = `${baseURL}/auth/google?role=tenant`;
+        window.location.href = `${baseURL}/auth/google?role=tenant`;
     };
 
     const onSubmit = async (data: any) => {
@@ -50,7 +50,7 @@ const TenantLoginPage: React.FC = () => {
         try {
             const loginData = { ...data, role: "tenant" };
             const result = await authService.login(loginData);
-            
+
             if (result && result.success) {
                 localStorage.setItem("accessToken", result.token);
                 dispatch(setAuthSuccess(result.user));
@@ -127,7 +127,7 @@ const TenantLoginPage: React.FC = () => {
                         )}
                     </div>
 
-                   
+
                     <button
                         type="submit"
                         disabled={loading}

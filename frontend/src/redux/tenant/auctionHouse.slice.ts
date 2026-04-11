@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
 import auctionHouseService from "../../services/auctionHouse.service";
-import type { AuctionHouseSubmissionDTO, AuctionHouseResponseDTO, VerificationStatus, TVerificationStatus } from "../../types/auctionHouse.type";
+import type { AuctionHouseSubmissionDTO, AuctionHouseResponseDTO,TVerificationStatus } from "../../types/auctionHouse.type";
 
 interface AuctionHouseState {
     profile: AuctionHouseResponseDTO | null;

@@ -1,15 +1,74 @@
-import React from "react";
+import React,{useEffect} from "react";
+import { useNavigate } from "react-router-dom";
+import { useAppDispatch,useAppSelector } from "../../hooks/redux.hooks";
+import { fetchAuctionProfile } from "../../redux/tenant/auctionHouse.slice";
+import { VerificationStatus } from "../../types/auctionHouse.type";
 import { 
   Gavel, 
   Users, 
   TrendingUp, 
   Clock, 
   ChevronRight,
-  MoreHorizontal
+  MoreHorizontal,
+  Loader2, ShieldCheck, Lock, ArrowRight
 } from "lucide-react";
 
 const TenantDashboard: React.FC = () => {
-  // SaaS Theme Styles
+  const navigate=useNavigate();
+  const dispatch=useAppDispatch()
+  const {status,loading,profile}=useAppSelector((state)=>state.auctionHouse)
+  
+  useEffect(()=>{
+    if(status==null){
+      dispatch(fetchAuctionProfile())
+    }
+  },[dispatch,status])
+
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[60vh]">
+        <Loader2 className="animate-spin text-[#2F6FED]" size={40} />
+        <p className="mt-4 text-[#475569] font-medium">Loading your house details...</p>
+      </div>
+    );
+  }
+  if (status !== "approved") {
+    return (
+      <div className="max-w-2xl mx-auto mt-12 animate-in fade-in slide-in-from-bottom-4 duration-700">
+        <div className="bg-white border border-[#E2E8F0] rounded-3xl p-12 text-center shadow-xl shadow-slate-200/50">
+          <div className="w-20 h-20 bg-[#F5F7FB] text-[#2F6FED] rounded-2xl flex items-center justify-center mx-auto mb-8 transform -rotate-6">
+            <Lock size={40} />
+          </div>
+          
+          <h1 className="text-3xl font-black text-[#0F172A] tracking-tight mb-4">
+            {status === "pending" ? "Review in Progress" : "Verification Required"}
+          </h1>
+          
+          <p className="text-[#475569] text-lg leading-relaxed mb-10">
+            {status === "pending" 
+              ? "We've received your documents. Our team is currently reviewing your business details. You'll get access to the full dashboard once approved."
+              : "To maintain the integrity of our auctions, all houses must be verified. Complete your business profile to start hosting live events."}
+          </p>
+
+          {status !== "pending" ? (
+            <button 
+              onClick={() => navigate("/verify-business")}
+              className="group bg-[#2F6FED] text-white px-10 py-4 rounded-2xl font-bold text-lg hover:bg-[#2557C8] transition-all flex items-center gap-3 mx-auto shadow-lg shadow-blue-500/25"
+            >
+              Start Verification
+              <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
+            </button>
+          ) : (
+            <div className="inline-flex items-center gap-2 bg-[#F0FDF4] text-[#166534] px-6 py-3 rounded-xl font-bold border border-[#DCFCE7]">
+              <ShieldCheck size={20} />
+              Application Submitted
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
+
   const cardStyle = "bg-white border border-[#E2E8F0] rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow";
   const statLabel = "text-[11px] font-bold text-[#475569] uppercase tracking-wider";
   const statValue = "text-2xl font-extrabold text-[#0F172A] mt-1";
