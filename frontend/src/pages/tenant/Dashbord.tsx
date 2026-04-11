@@ -2,7 +2,7 @@ import React,{useEffect} from "react";
 import { useNavigate } from "react-router-dom";
 import { useAppDispatch,useAppSelector } from "../../hooks/redux.hooks";
 import { fetchAuctionProfile } from "../../redux/tenant/auctionHouse.slice";
-import { VerificationStatus } from "../../types/auctionHouse.type";
+
 import { 
   Gavel, 
   Users, 
@@ -16,13 +16,14 @@ import {
 const TenantDashboard: React.FC = () => {
   const navigate=useNavigate();
   const dispatch=useAppDispatch()
-  const {status,loading,profile}=useAppSelector((state)=>state.auctionHouse)
+  const {isAuthenticated}=useAppSelector((state)=>state.auth)
+  const {status,loading}=useAppSelector((state)=>state.auctionHouse)
   
   useEffect(()=>{
-    if(status==null){
+    if(isAuthenticated&&status==null&&!loading){
       dispatch(fetchAuctionProfile())
     }
-  },[dispatch,status])
+  },[dispatch,status,status,isAuthenticated])
 
   if (loading) {
     return (
