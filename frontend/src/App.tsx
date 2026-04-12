@@ -25,6 +25,7 @@ import TenantForgotPassPage from "./pages/tenant/ForgotpassPage";
 import TenantForgotPassVerifyOtp from "./pages/tenant/ForgotpassVerifyotp";
 import TenantResetPasswordPage from "./pages/tenant/ResetpassPage";
 import TenantDashboard from "./pages/tenant/Dashbord";
+import TenantVerificationForm from "./pages/tenant/VerificationPage";
 
 
 import AdminLoginPage from "./pages/admin/LoginPage";
@@ -72,6 +73,7 @@ function App() {
 
                <Route element={<ProtectedRoute allowedRoles={['tenant']} />}>
                   <Route path="/tenant/dashboard" element={<TenantDashboard />} />
+                  <Route path='/tenant/verification-form' element={<TenantVerificationForm/>}></Route>
                </Route>
 
             </Route>

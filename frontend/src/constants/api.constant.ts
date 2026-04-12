@@ -13,5 +13,6 @@ export const AUTH_ROUTES={
 
 export const AUCTION_HOUSE_ROUTES={
     VERIFY_HOUSE:'/auction-house/verify',
-    GET_PROFILE:'/auction-house/profile'
+    GET_PROFILE:'/auction-house/profile',
+    GET_UPLOAD_SIGNATURE:'/auction-house/upload-signature'
 }

@@ -1,7 +1,7 @@
 import React,{useEffect} from "react";
-import { useNavigate } from "react-router-dom";
 import { useAppDispatch,useAppSelector } from "../../hooks/redux.hooks";
 import { fetchAuctionProfile } from "../../redux/tenant/auctionHouse.slice";
+import { Link } from "react-router-dom";
 
 import { 
   Gavel, 
@@ -14,7 +14,6 @@ import {
 } from "lucide-react";
 
 const TenantDashboard: React.FC = () => {
-  const navigate=useNavigate();
   const dispatch=useAppDispatch()
   const {isAuthenticated}=useAppSelector((state)=>state.auth)
   const {status,loading}=useAppSelector((state)=>state.auctionHouse)
@@ -52,13 +51,14 @@ const TenantDashboard: React.FC = () => {
           </p>
 
           {status !== "pending" ? (
-            <button 
-              onClick={() => navigate("/verify-business")}
+            <Link to='/tenant/verification-form'>
+             <button 
               className="group bg-[#2F6FED] text-white px-10 py-4 rounded-2xl font-bold text-lg hover:bg-[#2557C8] transition-all flex items-center gap-3 mx-auto shadow-lg shadow-blue-500/25"
             >
               Start Verification
               <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
             </button>
+            </Link>
           ) : (
             <div className="inline-flex items-center gap-2 bg-[#F0FDF4] text-[#166534] px-6 py-3 rounded-xl font-bold border border-[#DCFCE7]">
               <ShieldCheck size={20} />

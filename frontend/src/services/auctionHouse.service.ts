@@ -21,6 +21,7 @@ class AuctionHouseService{
             const response=await axiosInstance.get<any,ApiResponse>(
                 AUCTION_HOUSE_ROUTES.GET_PROFILE
             )
+            console.log('response from backemd',response)
             return {success:true,message:response.message,...response.data}
         } catch (error) {
             return apiErrorHandler(error, "Could not load profile");
