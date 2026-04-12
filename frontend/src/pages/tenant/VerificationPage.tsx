@@ -5,7 +5,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import toast from 'react-hot-toast';
 import { 
-  Building2, MapPin, PhoneCall, FileCheck,Info,Loader2 
+  Building2, MapPin, PhoneCall, FileCheck, Info, Loader2 
 } from 'lucide-react';
 
 import { useAppDispatch } from "../../hooks/redux.hooks";
@@ -13,7 +13,6 @@ import { submitVerification } from '../../redux/tenant/auctionHouse.slice'
 import uploadservice from '../../services/uploadservice';
 import type { AuctionHouseSubmissionDTO } from '../../types/auctionHouse.type';
 
-// Schema remains the same...
 const schema = yup.object({
   name: yup.string().required('Business name is required').trim(),
   yearEstablished: yup.number().typeError('Must be a year').required('Year is required').min(1800).max(new Date().getFullYear()),
@@ -46,19 +45,16 @@ const TenantVerificationForm: React.FC = () => {
   const { register, handleSubmit, setValue, watch, formState: { errors, isSubmitting } } = useForm<VerificationFormData>({
     resolver: yupResolver(schema),
   });
-
   const regCertFile = watch('registrationCertificate') as File | undefined;
   const idProofFile = watch('identityProof') as File | undefined;
 
   const onSubmit = async (data: VerificationFormData) => {
     try {
-    
       const [regCertUrl, idProofUrl] = await Promise.all([
         uploadservice.uploadSecurely(data.registrationCertificate as File),
         uploadservice.uploadSecurely(data.identityProof as File)
       ]);
 
-   
       const finalPayload: AuctionHouseSubmissionDTO = {
         name: data.name,
         yearEstablished: data.yearEstablished,
@@ -73,22 +69,17 @@ const TenantVerificationForm: React.FC = () => {
         },
       };
 
-    
-      // unwrap() allows us to handle the success/error in the component for the toast
       const result = await dispatch(submitVerification(finalPayload)).unwrap();
-      if(result&&result.success){
-        toast.success(result.message||'form sucess')
-        navigate('/tenant/dashboard')
+      if(result && result.success){
+        toast.success(result.message || 'Verification submitted successfully');
+        navigate('/tenant/dashboard');
+      } else {
+        toast.error(result.message || 'Submission failed');
       }
-      else{
-        toast.error(result.message)
-      }
-      } catch (error: any) {
-     
+    } catch (error: any) {
       toast.error(error || "SUBMISSION FAILED");
     }
   };
-
 
   const inputStyle = "w-full bg-[#FFFFFF] border border-[#E2E8F0] px-4 py-3 rounded-xl text-[#0F172A] text-sm focus:outline-none focus:ring-2 focus:ring-[#2F6FED]/20 focus:border-[#2F6FED] transition-all placeholder:text-[#94A3B8]";
   const labelStyle = "block text-[10px] font-bold uppercase tracking-widest text-[#475569] mb-1";
@@ -137,12 +128,24 @@ const TenantVerificationForm: React.FC = () => {
               <h2 className="text-[11px] font-bold uppercase tracking-widest text-[#0F172A]">Location</h2>
             </div>
             <div className="space-y-4">
-              <input {...register('address.city')} placeholder="City" className={inputStyle} />
-              <div className="grid grid-cols-2 gap-4">
-                <input {...register('address.state')} placeholder="State" className={inputStyle} />
-                <input {...register('address.country')} placeholder="Country" className={inputStyle} />
+              <div>
+                <input {...register('address.city')} placeholder="City" className={inputStyle} />
+                {errors.address?.city && <p className={errorStyle}>{errors.address.city.message}</p>}
               </div>
-              <input {...register('address.fullAddress')} placeholder="Street Address" className={inputStyle} />
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <input {...register('address.state')} placeholder="State" className={inputStyle} />
+                  {errors.address?.state && <p className={errorStyle}>{errors.address.state.message}</p>}
+                </div>
+                <div>
+                  <input {...register('address.country')} placeholder="Country" className={inputStyle} />
+                  {errors.address?.country && <p className={errorStyle}>{errors.address.country.message}</p>}
+                </div>
+              </div>
+              <div>
+                <input {...register('address.fullAddress')} placeholder="Street Address" className={inputStyle} />
+                {errors.address?.fullAddress && <p className={errorStyle}>{errors.address.fullAddress.message}</p>}
+              </div>
             </div>
           </div>
 
@@ -152,9 +155,18 @@ const TenantVerificationForm: React.FC = () => {
               <h2 className="text-[11px] font-bold uppercase tracking-widest text-[#0F172A]">Contact</h2>
             </div>
             <div className="space-y-4">
-              <input {...register('contact.primaryContactName')} placeholder="Primary Name" className={inputStyle} />
-              <input {...register('contact.businessEmail')} placeholder="Email" className={inputStyle} />
-              <input {...register('contact.phone')} placeholder="Phone" className={inputStyle} />
+              <div>
+                <input {...register('contact.primaryContactName')} placeholder="Primary Name" className={inputStyle} />
+                {errors.contact?.primaryContactName && <p className={errorStyle}>{errors.contact.primaryContactName.message}</p>}
+              </div>
+              <div>
+                <input {...register('contact.businessEmail')} placeholder="Email" className={inputStyle} />
+                {errors.contact?.businessEmail && <p className={errorStyle}>{errors.contact.businessEmail.message}</p>}
+              </div>
+              <div>
+                <input {...register('contact.phone')} placeholder="Phone" className={inputStyle} />
+                {errors.contact?.phone && <p className={errorStyle}>{errors.contact.phone.message}</p>}
+              </div>
             </div>
           </div>
         </div>
@@ -171,48 +183,54 @@ const TenantVerificationForm: React.FC = () => {
               <div>
                 <label className={labelStyle}>Registration Number</label>
                 <input {...register('legal.registrationNumber')} className={inputStyle} />
+                {errors.legal?.registrationNumber && <p className={errorStyle}>{errors.legal.registrationNumber.message}</p>}
               </div>
               <div>
                 <label className={labelStyle}>Tax ID</label>
                 <input {...register('legal.taxId')} className={inputStyle} />
+                {errors.legal?.taxId && <p className={errorStyle}>{errors.legal.taxId.message}</p>}
               </div>
             </div>
 
             <div className="space-y-4">
-               {/* Registration Certificate Upload */}
-               <div className="relative group">
-                <input 
-                  type="file" 
-                  accept=".pdf,.jpg,.jpeg,.png"
-                  onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    if (file) setValue('registrationCertificate', file, { shouldValidate: true });
-                  }}
-                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" 
-                />
-                <div className={`border-2 border-dashed rounded-xl p-4 text-center transition-all ${regCertFile ? 'border-[#10B981] bg-[#F0FDF4]' : 'border-[#E2E8F0] hover:border-[#2F6FED]'}`}>
-                  <p className="text-[10px] font-bold text-[#475569] uppercase tracking-widest">
-                    {regCertFile ? regCertFile.name : 'Upload Registration Cert'}
-                  </p>
+               <div>
+                <div className="relative group">
+                  <input 
+                    type="file" 
+                    accept=".pdf,.jpg,.jpeg,.png"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) setValue('registrationCertificate', file, { shouldValidate: true });
+                    }}
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" 
+                  />
+                  <div className={`border-2 border-dashed rounded-xl p-4 text-center transition-all ${regCertFile ? 'border-[#10B981] bg-[#F0FDF4]' : 'border-[#E2E8F0] hover:border-[#2F6FED]'}`}>
+                    <p className="text-[10px] font-bold text-[#475569] uppercase tracking-widest">
+                      {regCertFile ? regCertFile.name : 'Upload Registration Cert'}
+                    </p>
+                  </div>
                 </div>
+                {errors.registrationCertificate && <p className={errorStyle}>{errors.registrationCertificate.message}</p>}
               </div>
 
-              {/* ID Proof Upload */}
-              <div className="relative group">
-                <input 
-                  type="file" 
-                  accept=".pdf,.jpg,.jpeg,.png"
-                  onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    if (file) setValue('identityProof', file, { shouldValidate: true });
-                  }}
-                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" 
-                />
-                <div className={`border-2 border-dashed rounded-xl p-4 text-center transition-all ${idProofFile ? 'border-[#10B981] bg-[#F0FDF4]' : 'border-[#E2E8F0] hover:border-[#2F6FED]'}`}>
-                  <p className="text-[10px] font-bold text-[#475569] uppercase tracking-widest">
-                    {idProofFile ? idProofFile.name : 'Upload ID Proof'}
-                  </p>
+              <div>
+                <div className="relative group">
+                  <input 
+                    type="file" 
+                    accept=".pdf,.jpg,.jpeg,.png"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) setValue('identityProof', file, { shouldValidate: true });
+                    }}
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" 
+                  />
+                  <div className={`border-2 border-dashed rounded-xl p-4 text-center transition-all ${idProofFile ? 'border-[#10B981] bg-[#F0FDF4]' : 'border-[#E2E8F0] hover:border-[#2F6FED]'}`}>
+                    <p className="text-[10px] font-bold text-[#475569] uppercase tracking-widest">
+                      {idProofFile ? idProofFile.name : 'Upload ID Proof'}
+                    </p>
+                  </div>
                 </div>
+                {errors.identityProof && <p className={errorStyle}>{errors.identityProof.message}</p>}
               </div>
             </div>
           </div>
