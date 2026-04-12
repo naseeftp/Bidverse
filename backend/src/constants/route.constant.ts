@@ -1,7 +1,7 @@
 
 export const BASE_ROUTES = {
     AUTH: '/auth',
-    AUCTION_HOUSE:'/auction-house'
+    AUCTION_HOUSE: '/auction-house'
 } as const
 
 export const AUTH_ROUTES = {
@@ -18,5 +18,6 @@ export const AUTH_ROUTES = {
 
 export const AUCTION_HOUSE_ROUTES = {
     VERIFY: '/verify',
-    PROFILE: '/profile'
+    PROFILE: '/profile',
+    UPLOAD_SIGNATURE: '/upload-signature'
 }

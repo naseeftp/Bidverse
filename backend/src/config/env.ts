@@ -37,5 +37,14 @@ export const env = {
     },
     get GOOGLE_CALLBACK_URL(){
         return process.env.GOOGLE_CALLBACK_URL
+    },
+    get CLOUDINARY_NAME(){
+        return process.env.CLOUDINARY_NAME
+    },
+    get CLOUDINARY_SECRET(){
+        return process.env.CLOUDINARY_SECRET
+    },
+    get CLOUDINARY_KEY(){
+        return process.env.CLOUDINARY_KEY
     }
 }

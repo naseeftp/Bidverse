@@ -19,5 +19,10 @@ router.get(
     restrictTo('tenant'),
     (req, res, next) => auctionHouseController.getProfile(req, res, next)
 )
+router.get(
+    AUCTION_HOUSE_ROUTES.UPLOAD_SIGNATURE,
+    restrictTo("tenant"),
+    (req, res, next) => auctionHouseController.getUploadSignature(req, res, next)
+)
 
 export default router;

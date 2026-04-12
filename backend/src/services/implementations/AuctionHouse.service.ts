@@ -35,7 +35,7 @@ export class AuctionHouseService implements IAuctionService{
         return AuctionHouseMapper.toResponseDTO(saveDoc)
     }  
     async getTenantVerificationProfile(userId: string): Promise<AuctionHouseResponseDTO|null> {
-        const doc=await this._auctionHouseRepository.findById(userId)
+        const doc=await this._auctionHouseRepository.findByUserId(userId)
         if(!doc){
         return null
         }

@@ -13,4 +13,9 @@ export interface IAuctionHouseController {
         res: Response,
         next: NextFunction
     ): Promise<void>
+    getUploadSignature(
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<void>
 }
