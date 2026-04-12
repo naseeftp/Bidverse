@@ -90,6 +90,7 @@ export const MESSAGES = {
     UNDER_REVIEW:'This account currently under review',
     VERIFICATION_SUBMITTED:'Verification request submitted successfully',
     PROFILE_RETRIEVED: 'Profile Retrieved successfully',
+    LIST_RETRIEVED:'List Retrieved successfully',
     LOGOUT_SUCCESS: "Logout success",
     LOGOUT_FAILED: "Logout failed",
 

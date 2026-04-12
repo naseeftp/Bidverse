@@ -25,3 +25,10 @@ const Logger=new LoggerService();
 const repo=new AuctionHouseRepository();
 const service=new AuctionHouseService(repo,Logger)
 export const auctionHouseController=new AuctionHouseController(service,Logger)
+
+import { AdminService } from "../services/implementations/Admin.service";
+import { AdminController } from "../controllers/implimentations/Admin.controller";
+
+const adminRepo=new AuctionHouseRepository();
+const adminService=new AdminService(adminRepo,Logger);
+export const adminController=new AdminController(adminService,Logger)

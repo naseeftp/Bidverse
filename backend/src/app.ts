@@ -7,6 +7,7 @@ import {errorHandler } from "./middlewares/error-handler.middleware";
 import { BASE_ROUTES } from "./constants/route.constant";
 import authRouter from './routes/auth.router'
 import auctionHouseRoutes from './routes/auctionHouse.routes'
+import adminRoutes from './routes/admin.routes'
 import {LoggerService } from "./services/implementations/Logger.service";
 
 
@@ -25,6 +26,7 @@ const PORT = env.PORT
 
 app.use(BASE_ROUTES.AUTH,authRouter)
 app.use(BASE_ROUTES.AUCTION_HOUSE,auctionHouseRoutes)
+app.use(BASE_ROUTES.ADMIN,adminRoutes)
 
 
 app.use(errorHandler);
