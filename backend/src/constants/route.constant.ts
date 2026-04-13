@@ -26,5 +26,5 @@ export const AUCTION_HOUSE_ROUTES = {
 export const ADMIN_ROUTES = {
     GET_AUCTION_HOUSES: '/auction-houses',
     GET_AUCTION_HOUSE: '/auction-house/:id',
-    AUCTION_HOUSE_UPDATE_STATUS: '/auction-house-status'
+    AUCTION_HOUSE_UPDATE_STATUS: '/auction-house-status/:id'
 }
