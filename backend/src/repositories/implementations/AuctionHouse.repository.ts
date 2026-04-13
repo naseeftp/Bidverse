@@ -14,13 +14,15 @@ export class AuctionHouseRepository extends BaseRepository<IAuctionHouseDocument
         return await this.model.findOne({ "contact.businessEmail": email }).exec()
     }
     async findAllPaginated(page: number, limit: number): Promise<IPaginatedAuctionHouses> {
-        const skip=(page-1)*limit
-        const [houses,total]=await Promise.all([
-            this.model.find().sort({createdAt:-1}).skip(skip).limit(limit).exec(),
+        
+        const skip = (page - 1) * limit
+        const [houses, total] = await Promise.all([
+            this.model.find().sort({ createdAt: -1 }).skip(skip).limit(limit).exec(),
             this.model.countDocuments()
-        ]) 
-        return {houses,total}      
+        ])
+        console.log('total documrnts and counts',{houses,total})
+        return { houses, total }
     }
-    
+
 
 }

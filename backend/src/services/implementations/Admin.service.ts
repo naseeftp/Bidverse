@@ -14,7 +14,7 @@ export class AdminService implements IAdminService {
     async listAllAuctionHouses(page: number, limit: number): Promise<IPaginatedResponse<AuctionHouseResponseDTO>> {
         try {
             const activePage = Math.max(1, page);
-            const activeLimit = Math.max(1, Math.min(1, 100))
+            const activeLimit = Math.max(1, Math.min(limit, 100))
             this._logger.info('admin fetching all auctionhouses', { page: activePage, limit: activeLimit })
             const { houses, total } = await this._auctionHouseRepo.findAllPaginated(activePage, activeLimit)
             const mappedHouses = houses.map(house => AuctionHouseMapper.toResponseDTO(house))

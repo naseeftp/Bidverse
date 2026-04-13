@@ -10,13 +10,13 @@ export const OtpPurpose = {
     REGISTRATION: 'registration',
     FORGOT_PASSWORD: 'forgot_password',
 } as const;
- export const VerificationStatus={
-    PENDING:'pending',
-    APPROVED:'approved',
-    REJECTED:'rejected',
-    ACTION_REQUIRED:'action_required'
- }
- 
+export const VerificationStatus = {
+    PENDING: 'pending',
+    APPROVED: 'approved',
+    REJECTED: 'rejected',
+    ACTION_REQUIRED: 'action_required'
+}
+
 
 export type otpPurpose = typeof OtpPurpose[keyof typeof OtpPurpose];
 
@@ -34,8 +34,8 @@ export enum HttpStatus {
 
 export const CONFIG = {
     //   SESSION_MAX_AGE: env.SESSION_MAX_AGE,
-    OTP_EXPIRY_MINUTES:1,
-    FORGOT_PASSWORD_EXPIRY:0.5,
+    OTP_EXPIRY_MINUTES: 1,
+    FORGOT_PASSWORD_EXPIRY: 0.5,
     OTP_RESEND_DELAY_SECONDS: 30,
 } as const;
 
@@ -49,7 +49,7 @@ export const MESSAGES = {
     NOT_FOUND: "Not found",
     INVALID_ID_FORMAT: "Invalid ID format",
     ROUTE_NOT_FOUND: "Route not found",
-    
+
     USER_NOT_ACTIVE: "User is not active",
     USER_NOT_FOUND: "User not found",
     USER_BLOCKED: "Your account has been blocked",
@@ -83,14 +83,14 @@ export const MESSAGES = {
 
     INVALID_ACCESS_TOKEN: "Invalid Access token",
     INVALID_REFRESH_TOKEN: "Invalid Refresh token",
-    
-    GOOGLE_REGISTERED:'This account is registered with google authentication please try  google sign in',
-   
-    ALLREADY_VERIFIED:'This accout allready Verified',
-    UNDER_REVIEW:'This account currently under review',
-    VERIFICATION_SUBMITTED:'Verification request submitted successfully',
+
+    GOOGLE_REGISTERED: 'This account is registered with google authentication please try  google sign in',
+
+    ALLREADY_VERIFIED: 'This accout allready Verified',
+    UNDER_REVIEW: 'This account currently under review',
+    VERIFICATION_SUBMITTED: 'Verification request submitted successfully',
     PROFILE_RETRIEVED: 'Profile Retrieved successfully',
-    LIST_RETRIEVED:'List Retrieved successfully',
+    LIST_RETRIEVED: 'List Retrieved successfully',
     LOGOUT_SUCCESS: "Logout success",
     LOGOUT_FAILED: "Logout failed",
 

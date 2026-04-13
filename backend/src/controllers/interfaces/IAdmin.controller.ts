@@ -1,5 +1,5 @@
-import { Request,Response,NextFunction } from "express";
+import { Request, Response, NextFunction } from "express";
 
-export interface IAdminController{
-    getAuctionHouses(req:Request,res:Response,next:NextFunction):Promise<void>
+export interface IAdminController {
+    getAuctionHouses(req: Request, res: Response, next: NextFunction): Promise<void>
 }

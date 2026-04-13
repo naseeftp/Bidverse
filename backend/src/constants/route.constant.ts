@@ -2,7 +2,7 @@
 export const BASE_ROUTES = {
     AUTH: '/auth',
     AUCTION_HOUSE: '/auction-house',
-    ADMIN:'/admin'
+    ADMIN: '/admin'
 } as const
 
 export const AUTH_ROUTES = {
@@ -23,6 +23,6 @@ export const AUCTION_HOUSE_ROUTES = {
     UPLOAD_SIGNATURE: '/upload-signature'
 }
 
-export const ADMIN_ROUTES={
-    GET_AUCTION_HOUSES:'/auction-houses'
+export const ADMIN_ROUTES = {
+    GET_AUCTION_HOUSES: '/auction-houses'
 }
