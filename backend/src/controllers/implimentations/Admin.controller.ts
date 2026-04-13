@@ -36,6 +36,23 @@ export class AdminController implements IAdminController {
             next(error)
         }
     }
+    
+   async getAuctionHouseById(req: Request, res: Response, next: NextFunction): Promise<void> {
+       try {
+        const  id = req.params.id as string;
+        this._logger.info('Admin fetching single auction house details', { id });
+        const result = await this._adminService.getAuctionHouseById(id);
+        SuccessResponse(
+            res,
+            MESSAGES.HOUSE_RETRIEVED || "House details retrieved", // Ensure this exists in constants
+            result,
+            HttpStatus.OK
+        );
+    } catch (error) {
+        next(error);
+    }
+   }
+
      async updateAuctionHouseStatus(req: Request<ParamsDictionary, any, UpdateHouseStatusDTO>, res: Response, next: NextFunction): Promise<void> {
          try{
             const id=req.params.id as string  //service layer expect id as string

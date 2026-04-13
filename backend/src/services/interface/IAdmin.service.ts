@@ -13,6 +13,6 @@ export interface IPaginatedResponse<T> {
 }
 export interface IAdminService {
     listAllAuctionHouses(page: number, limit: number): Promise<IPaginatedResponse<AuctionHouseResponseDTO>>
-
+    getAuctionHouseById(id: string): Promise<AuctionHouseResponseDTO>
     updateAuctionHouseStatus( id:string,data:UpdateHouseStatusDTO):Promise<AuctionHouseResponseDTO>
 }

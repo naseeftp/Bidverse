@@ -37,17 +37,31 @@ export class AdminService implements IAdminService {
             throw new AppError("Failed to list auction houses for administrative review.");
         }
     }
-    async updateAuctionHouseStatus(id: string,data:UpdateHouseStatusDTO): Promise<AuctionHouseResponseDTO> {
+    async getAuctionHouseById(id: string): Promise<AuctionHouseResponseDTO> {
         try {
-            const {status,reason}=data
+            const house = await this._auctionHouseRepo.findById(id);
+            if (!house) {
+               throw new AppError("Auction House not found");
+            }
+            return house as unknown as AuctionHouseResponseDTO;
+
+        } catch (error) {
+           this._logger.error(`Service Error: Failed to fetch auction house with ID ${id}`, { error });
+           throw new AppError("Failed to get the auction house.");
+        }
+    }
+
+    async updateAuctionHouseStatus(id: string, data: UpdateHouseStatusDTO): Promise<AuctionHouseResponseDTO> {
+        try {
+            const { status, reason } = data
             this._logger.info('udatating status of the auction house', { Id: id, statusofhouse: status })
             const uodateData = {
                 status: status,
                 rejectionReason: status === VerificationStatus.REJECTED ? reason : null,
                 isVerified: status === VerificationStatus.APPROVED
             }
-            const updatedHouse=await this._auctionHouseRepo.updateById(id,uodateData)
-            if(!updatedHouse){
+            const updatedHouse = await this._auctionHouseRepo.updateById(id, uodateData)
+            if (!updatedHouse) {
                 throw new NotFoundError(MESSAGES.AUCTION_HOUSE_NOT_FOUND)
             }
             return AuctionHouseMapper.toResponseDTO(updatedHouse)
