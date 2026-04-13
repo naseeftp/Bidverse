@@ -22,9 +22,9 @@ const AdminSidebar: React.FC = () => {
 
  const navItems = [
        
-        { name: "Overview", path: "/admin/dashboard", icon: <FaThLarge /> },
+        { name: "Dashboard", path: "/admin/dashboard", icon: <FaThLarge /> },
         { name: "User Management", path: "/admin/users", icon: <FaUsers /> },
-        { name: "Auction Control", path: "/admin/auctions", icon: <FaGavel /> },
+        { name: "Auction Houses", path: "/admin/auction-houses", icon: <FaGavel /> },
         { name: "Financials", path: "/admin/reports", icon: <FaChartPie /> },
         { name: "System Settings", path: "/admin/settings", icon: <FaCog /> },
     ];

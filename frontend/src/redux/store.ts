@@ -1,11 +1,13 @@
 import { configureStore } from "@reduxjs/toolkit";
 import authReducer from './user/auth.slice'
-import auctionHouseReduce from './tenant/auctionHouse.slice'
+import auctionHouseReducer from './tenant/auctionHouse.slice'
+import adminReducer from './admin/admin.slice'
 
 export const store=configureStore({
     reducer:{
         auth:authReducer,
-        auctionHouse:auctionHouseReduce
+        auctionHouse:auctionHouseReducer,
+        admin:adminReducer
     }
 })
 

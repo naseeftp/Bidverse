@@ -16,3 +16,7 @@ export const AUCTION_HOUSE_ROUTES={
     GET_PROFILE:'/auction-house/profile',
     GET_UPLOAD_SIGNATURE:'/auction-house/upload-signature'
 }
+
+export const ADMIN_ROUTES={
+    GET_AUCTION_HOUSES: "/admin/auction-houses",
+}

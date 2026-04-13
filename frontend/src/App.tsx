@@ -30,6 +30,7 @@ import TenantVerificationForm from "./pages/tenant/VerificationPage";
 
 import AdminLoginPage from "./pages/admin/LoginPage";
 import AdminDashboard from "./pages/admin/Dashboard";
+import  AuctionHouseTable  from "./pages/admin/auctionHouseLits";
 
 function App() {
 
@@ -82,6 +83,7 @@ function App() {
                <Route path="/admin" element={<AdminLoginPage />} />
                <Route element={<ProtectedRoute allowedRoles={['admin']} />}>
                   <Route path="/admin/dashboard" element={<AdminDashboard />} />
+                  <Route path="/admin/auction-houses" element={<AuctionHouseTable />} />
                </Route>
             </Route>
 
