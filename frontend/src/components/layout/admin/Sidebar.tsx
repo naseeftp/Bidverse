@@ -9,11 +9,14 @@ import {
     FaSignOutAlt, 
     FaShieldAlt 
 } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 import { logout } from "../../../redux/user/auth.slice";
 import { useAppDispatch } from "../../../hooks/redux.hooks";
+
 const AdminSidebar: React.FC = () => {
     const location = useLocation();
     const dispatch=useAppDispatch();
+    const navigate=useNavigate()
     const handleLogout=()=>{
         dispatch(logout())
     }

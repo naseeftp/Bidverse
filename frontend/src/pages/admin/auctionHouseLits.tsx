@@ -2,9 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { useAppDispatch, useAppSelector } from '../../hooks/redux.hooks';
 import { fetchAllAuctionHouses } from '../../redux/admin/admin.slice';
 import { FaChevronLeft, FaChevronRight, FaExternalLinkAlt } from 'react-icons/fa';
-
+import { useNavigate } from 'react-router-dom';
 const AuctionHouseTable: React.FC = () => {
     const dispatch = useAppDispatch();
+    const navigate=useNavigate()
     const { houses, loading, pagination } = useAppSelector((state) => state.admin);
     const [page, setPage] = useState(1);
 
@@ -49,16 +50,18 @@ const AuctionHouseTable: React.FC = () => {
                                         </div>
                                     </td>
                                     <td className="px-6 py-4">
-                                        <span className={`px-2 py-1 text-[8px] font-black uppercase tracking-widest rounded-[2px] border ${
-                                            house.status === 'verified' 
-                                            ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500' 
-                                            : 'bg-amber-500/10 border-amber-500/20 text-amber-500'
-                                        }`}>
+                                        <span className={`px-2 py-1 text-[8px] font-black uppercase tracking-widest rounded-[2px] border ${house.status === 'verified'
+                                                ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500'
+                                                : 'bg-amber-500/10 border-amber-500/20 text-amber-500'
+                                            }`}>
                                             {house.status}
                                         </span>
                                     </td>
                                     <td className="px-6 py-4 text-right">
-                                        <button className="inline-flex items-center gap-2 text-[#D4AF37] text-[10px] font-bold uppercase tracking-widest hover:text-white transition-colors">
+                                        <button
+                                            onClick={() => navigate(`/admin/auction-house/${house.id || house._id}`)}
+                                            className="inline-flex items-center gap-2 text-[#D4AF37] text-[10px] font-bold uppercase tracking-widest hover:text-white transition-colors"
+                                        >
                                             Details <FaExternalLinkAlt size={8} />
                                         </button>
                                     </td>
@@ -81,14 +84,14 @@ const AuctionHouseTable: React.FC = () => {
                     Displaying Page <span className="text-[#D4AF37]">{page}</span> of {pagination.totalPages || 1}
                 </p>
                 <div className="flex gap-2">
-                    <button 
+                    <button
                         onClick={() => setPage(p => Math.max(1, p - 1))}
                         disabled={page === 1}
                         className="p-2 border border-white/10 rounded-sm text-gray-400 hover:text-[#D4AF37] hover:border-[#D4AF37]/50 disabled:opacity-20 disabled:cursor-not-allowed transition-all"
                     >
                         <FaChevronLeft size={10} />
                     </button>
-                    <button 
+                    <button
                         onClick={() => setPage(p => Math.min(pagination.totalPages, p + 1))}
                         disabled={page === pagination.totalPages || pagination.totalPages === 0}
                         className="p-2 border border-white/10 rounded-sm text-gray-400 hover:text-[#D4AF37] hover:border-[#D4AF37]/50 disabled:opacity-20 disabled:cursor-not-allowed transition-all"

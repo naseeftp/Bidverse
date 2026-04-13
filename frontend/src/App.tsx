@@ -30,7 +30,8 @@ import TenantVerificationForm from "./pages/tenant/VerificationPage";
 
 import AdminLoginPage from "./pages/admin/LoginPage";
 import AdminDashboard from "./pages/admin/Dashboard";
-import  AuctionHouseTable  from "./pages/admin/auctionHouseLits";
+import AuctionHouseTable from "./pages/admin/auctionHouseLits";
+import AuctionHouseDetailPage from './pages/admin/auctionHousedetailsPage'
 
 function App() {
 
@@ -74,7 +75,7 @@ function App() {
 
                <Route element={<ProtectedRoute allowedRoles={['tenant']} />}>
                   <Route path="/tenant/dashboard" element={<TenantDashboard />} />
-                  <Route path='/tenant/verification-form' element={<TenantVerificationForm/>}></Route>
+                  <Route path='/tenant/verification-form' element={<TenantVerificationForm />}></Route>
                </Route>
 
             </Route>
@@ -84,6 +85,7 @@ function App() {
                <Route element={<ProtectedRoute allowedRoles={['admin']} />}>
                   <Route path="/admin/dashboard" element={<AdminDashboard />} />
                   <Route path="/admin/auction-houses" element={<AuctionHouseTable />} />
+                  <Route path="/admin/auction-house/:id" element={<AuctionHouseDetailPage />} />
                </Route>
             </Route>
 

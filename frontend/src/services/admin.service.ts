@@ -16,5 +16,19 @@ class AdminService{
             return apiErrorHandler(error, "Failed to fetch auction houses");
         }
     }
+    async getAuctionHouseById(id: string) {
+    try {
+        const url = `/admin/auction-house/${id}`;
+        const response = await axiosInstance.get<any,ApiResponse>(url);
+        return {
+            success: true,
+            message: response.message,
+            data: response.data||response
+        }; 
+    } catch (error) {
+        return apiErrorHandler(error, 'Failed to fetch house details');
+    }
+}
+    
 }
 export default new AdminService();

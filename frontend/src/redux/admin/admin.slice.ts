@@ -23,7 +23,6 @@ export const fetchAllAuctionHouses = createAsyncThunk(
     'admin/fetchAllAuctionHouses',
     async ({ page, limit }: { page: number; limit: number }, { rejectWithValue }) => {
         const result = await adminService.listAllAuctionHouses(page, limit);
-        console.log(result)
         if (!result.success) return rejectWithValue(result.message);
         return result;
     }
