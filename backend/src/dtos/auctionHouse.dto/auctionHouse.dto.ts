@@ -67,6 +67,7 @@ export interface AuctionHouseResponseDTO {
         identityProofUrl: string
     };
     status: TVerificationStatus;
+    rejectionReason?: string | null;
     isVerified: boolean;
     createdAt: string | Date;
 }

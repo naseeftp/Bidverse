@@ -25,6 +25,7 @@ export class AuctionHouseMapper{
              identityProofUrl:doc.legal.registrationCertificateUrl
             },
             status:doc.status,
+            rejectionReason: doc.rejectionReason || null,
             isVerified:doc.isVerified,
             createdAt:doc.createdAt ? doc.createdAt.toISOString() : new Date().toISOString()
         }
