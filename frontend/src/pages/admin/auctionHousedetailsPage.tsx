@@ -2,6 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import adminService from '../../services/admin.service';
 import { FaArrowLeft, FaSearchPlus } from 'react-icons/fa';
+import { VerificationStatus } from '../../types/auctionHouse.type';
+import type { TVerificationStatus } from '../../types/auctionHouse.type';
+import type { updateAuctionHouseStatusRequestDTO } from '../../types/admin.dto';
 
 const AuctionHouseDetails: React.FC = () => {
     const { id } = useParams<{ id: string }>();
@@ -27,26 +30,54 @@ const AuctionHouseDetails: React.FC = () => {
         setLoading(false);
     };
 
-    const handleStatusUpdate = async (status: string) => {
-        if (status === 'rejected' && !rejectionReason) {
-            setShowRejectInput(true);
-            return;
+    const handleStatusUpdate = async (status: TVerificationStatus) => {
+        if (status === VerificationStatus.REJECTED) {
+            if (!showRejectInput) {
+                setShowRejectInput(true);
+                return;
+            }
+            if (!rejectionReason || rejectionReason.trim().length < 5) {
+                alert("A valid reason (minimum 5 characters) is required for rejection.");
+                return;
+            }
         }
+        const updateData: updateAuctionHouseStatusRequestDTO = {
+            status: status,
+            reason: status === VerificationStatus.REJECTED ? rejectionReason : null
+        };
+
         setActionLoading(true);
-        // Add your update logic here
-        setActionLoading(false);
+
+        try {
+
+            const res = await adminService.updateHouseStatus(id!, updateData);
+            if (res.success) {
+                setHouse((prev: any) => ({
+                    ...prev,
+                    status: status
+                }));
+                setShowRejectInput(false);
+                setRejectionReason('');
+                console.log("Registry updated successfully");
+            } else {
+                alert(res.message || "Failed to update registry status.");
+            }
+        } catch (error) {
+            console.error("Critical update error:", error);
+            alert("An error occurred. Please check your connection and try again.");
+        } finally {
+            setActionLoading(false);
+        }
     };
 
     if (loading) return <div className="p-20 text-center text-zinc-400 animate-pulse font-black uppercase tracking-widest">Verifying Registry...</div>;
 
-    if (!house) return <div className="p-20 text-center text-red-500">Record not found.</div>;
+    if (!house) return <div className="p-20 text-center text-red-500 font-black uppercase">Record not found.</div>;
 
     return (
         <div className="min-h-screen bg-[#F8F9FA] p-6 lg:p-12 text-zinc-900 font-sans">
-            
-            {/* Image Preview Modal */}
             {selectedImg && (
-                <div 
+                <div
                     className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-4 cursor-zoom-out"
                     onClick={() => setSelectedImg(null)}
                 >
@@ -55,7 +86,7 @@ const AuctionHouseDetails: React.FC = () => {
                 </div>
             )}
 
-            {/* Header */}
+
             <header className="mb-10 flex flex-col md:flex-row md:items-end justify-between border-b border-zinc-200 pb-8 gap-4">
                 <div className="space-y-4">
                     <button
@@ -70,17 +101,19 @@ const AuctionHouseDetails: React.FC = () => {
                     </div>
                 </div>
                 <div className="flex gap-4">
-                    <div className={`px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest ${house.status === 'pending' ? 'bg-amber-100 text-amber-700' : 'bg-emerald-100 text-emerald-700'}`}>
+                    <div className={`px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest 
+                        ${house.status === VerificationStatus.PENDING ? 'bg-amber-100 text-amber-700' :
+                            house.status === VerificationStatus.REJECTED ? 'bg-red-100 text-red-700' :
+                                'bg-emerald-100 text-emerald-700'}`}>
                         Status: {house.status}
                     </div>
                 </div>
             </header>
 
             <main className="grid grid-cols-1 lg:grid-cols-12 gap-10">
-                {/* Left Side: Info */}
+
                 <div className="lg:col-span-8 space-y-8">
-                    
-                    {/* Documentation Card */}
+
                     <section className="bg-white border border-zinc-200 p-8 rounded shadow-sm">
                         <h3 className="text-[11px] font-black uppercase tracking-[0.2em] text-zinc-400 mb-8">Verification Documents</h3>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -91,7 +124,7 @@ const AuctionHouseDetails: React.FC = () => {
                                 doc.url && (
                                     <div key={idx} className="group">
                                         <p className="text-[10px] font-bold text-zinc-400 uppercase mb-3 tracking-wide">{doc.label}</p>
-                                        <div 
+                                        <div
                                             className="relative aspect-video bg-zinc-50 border border-zinc-100 rounded overflow-hidden cursor-pointer group-hover:border-zinc-300 transition-all"
                                             onClick={() => setSelectedImg(doc.url)}
                                         >
@@ -106,7 +139,6 @@ const AuctionHouseDetails: React.FC = () => {
                         </div>
                     </section>
 
-                    {/* Detailed Data Grid */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                         <div className="bg-white border border-zinc-200 p-8 rounded shadow-sm">
                             <h4 className="text-[11px] font-black uppercase tracking-widest text-zinc-400 mb-6">Contact Registry</h4>
@@ -160,39 +192,44 @@ const AuctionHouseDetails: React.FC = () => {
                             <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-zinc-500 mb-6">Admin Decision</h3>
                             <div className="space-y-4">
                                 <button
-                                    onClick={() => handleStatusUpdate('approved')}
-                                    disabled={actionLoading}
-                                    className="w-full py-4 bg-emerald-500 text-black text-[11px] font-black uppercase tracking-[0.2em] hover:bg-white transition-all disabled:opacity-50"
+                                    onClick={() => handleStatusUpdate(VerificationStatus.APPROVED)}
+                                    disabled={actionLoading || house.status === VerificationStatus.APPROVED}
+                                    className="w-full py-4 bg-emerald-500 text-black text-[11px] font-black uppercase tracking-[0.2em] hover:bg-white transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
-                                    Approve House
+                                    {actionLoading ? 'Processing...' : 'Approve House'}
                                 </button>
 
                                 {!showRejectInput ? (
                                     <button
                                         onClick={() => setShowRejectInput(true)}
-                                        className="w-full py-4 border border-zinc-700 text-red-400 text-[11px] font-black uppercase tracking-[0.2em] hover:bg-red-500/10 transition-all"
+                                        disabled={house.status === VerificationStatus.REJECTED}
+                                        className="w-full py-4 border border-zinc-700 text-red-400 text-[11px] font-black uppercase tracking-[0.2em] hover:bg-red-500/10 transition-all disabled:opacity-30"
                                     >
                                         Reject House
                                     </button>
                                 ) : (
                                     <div className="space-y-3 pt-4 animate-in slide-in-from-top-2">
                                         <textarea
-                                            placeholder="REASON FOR REJECTION..."
+                                            placeholder="REASON FOR REJECTION (MIN 5 CHARS)..."
                                             className="w-full bg-black border border-zinc-700 p-4 text-[11px] font-mono text-white outline-none focus:border-red-500"
                                             rows={4}
                                             value={rejectionReason}
                                             onChange={(e) => setRejectionReason(e.target.value)}
                                         />
                                         <div className="flex gap-2">
-                                            <button 
-                                                onClick={() => handleStatusUpdate('rejected')}
-                                                className="flex-1 py-3 bg-red-600 text-[10px] font-black uppercase tracking-widest"
+                                            <button
+                                                onClick={() => handleStatusUpdate(VerificationStatus.REJECTED)}
+                                                disabled={actionLoading}
+                                                className="flex-1 py-3 bg-red-600 text-[10px] font-black uppercase tracking-widest hover:bg-red-700 transition-colors"
                                             >
-                                                Confirm
+                                                {actionLoading ? 'Updating...' : 'Confirm'}
                                             </button>
-                                            <button 
-                                                onClick={() => setShowRejectInput(false)}
-                                                className="px-4 py-3 bg-zinc-800 text-zinc-400 text-[10px] font-black uppercase"
+                                            <button
+                                                onClick={() => {
+                                                    setShowRejectInput(false);
+                                                    setRejectionReason('');
+                                                }}
+                                                className="px-4 py-3 bg-zinc-800 text-zinc-400 text-[10px] font-black uppercase hover:text-white transition-colors"
                                             >
                                                 Cancel
                                             </button>
@@ -201,10 +238,12 @@ const AuctionHouseDetails: React.FC = () => {
                                 )}
                             </div>
                         </div>
-                        
+
                         <div className="p-6 bg-zinc-100 rounded text-center">
                             <p className="text-[9px] font-black text-zinc-400 uppercase tracking-widest">Entry Date</p>
-                            <p className="text-xs font-mono font-bold text-zinc-600 mt-1">{new Date(house.createdAt).toLocaleDateString()}</p>
+                            <p className="text-xs font-mono font-bold text-zinc-600 mt-1">
+                                {house.createdAt ? new Date(house.createdAt).toLocaleDateString() : 'N/A'}
+                            </p>
                         </div>
                     </div>
                 </aside>

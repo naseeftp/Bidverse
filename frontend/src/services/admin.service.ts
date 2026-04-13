@@ -2,6 +2,7 @@ import axiosInstance from "../api/axios.instance";
 import { ADMIN_ROUTES } from "../constants/api.constant";
 import { apiErrorHandler } from "../utils/error.handle";
 import type { ApiResponse } from "../types/auth.type";
+import type {updateAuctionHouseStatusRequestDTO} from '../types/admin.dto'
 
 class AdminService{
     async listAllAuctionHouses(page: number = 1, limit: number = 10){
@@ -28,7 +29,21 @@ class AdminService{
     } catch (error) {
         return apiErrorHandler(error, 'Failed to fetch house details');
     }
-}
     
+}
+
+async updateHouseStatus(id: string, data: updateAuctionHouseStatusRequestDTO) {
+    try {
+        const url = `${ADMIN_ROUTES.UPDATE_HOUSE_STATUS}/${id}`;  
+        const response = await axiosInstance.patch<any, ApiResponse>(url, data);
+        return {
+            success: true,
+            message: response.message || "Status updated successfully",
+            data: response.data
+        };
+    } catch (error) {
+        return apiErrorHandler(error, 'Failed to update status');
+    }
+}
 }
 export default new AdminService();

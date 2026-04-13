@@ -1,6 +1,6 @@
 import type { TVerificationStatus } from "./auctionHouse.type";
 
-export interface updateAuctionHouseStatusRequest{
+export interface updateAuctionHouseStatusRequestDTO{
     status:TVerificationStatus,
     reason?:string|null
 }
