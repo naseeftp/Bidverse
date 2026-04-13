@@ -1,4 +1,5 @@
 import { StatusCodes } from "http-status-codes";
+import { AUCTION_HOUSE_ROUTES } from "./route.constant";
 export const Roles = {
     ADMIN: 'admin',
     TENANT: 'tenant',
@@ -89,7 +90,10 @@ export const MESSAGES = {
     ALLREADY_VERIFIED: 'This accout allready Verified',
     UNDER_REVIEW: 'This account currently under review',
     VERIFICATION_SUBMITTED: 'Verification request submitted successfully',
+    VALID_REJECT_RSN:"A valid reason is required for rejection.",
+    AUCTION_HOUSE_NOT_FOUND:'Auction house Not found',
     PROFILE_RETRIEVED: 'Profile Retrieved successfully',
+    AUC_HOUSE_STTS_UPDTD:'Auction house status updated successfully',
     LIST_RETRIEVED: 'List Retrieved successfully',
     LOGOUT_SUCCESS: "Logout success",
     LOGOUT_FAILED: "Logout failed",

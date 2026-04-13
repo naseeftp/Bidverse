@@ -4,6 +4,8 @@ import { IAdminService } from "../../services/interface/IAdmin.service";
 import { ILoggerService } from "../../services/interface/ILogger.service";
 import { HttpStatus, MESSAGES } from "../../constants/constants";
 import { SuccessResponse } from "../../utils/response.utility";
+import { ParamsDictionary } from "express-serve-static-core";
+import { UpdateHouseStatusDTO } from "../../dtos/admin.dto/updatestatus.dto";
 
 export class AdminController implements IAdminController {
     constructor(
@@ -34,4 +36,18 @@ export class AdminController implements IAdminController {
             next(error)
         }
     }
+     async updateAuctionHouseStatus(req: Request<ParamsDictionary, any, UpdateHouseStatusDTO>, res: Response, next: NextFunction): Promise<void> {
+         try{
+            const id=req.params.id as string  //service layer expect id as string
+            const result=await this._adminService.updateAuctionHouseStatus(id,req.body)
+            SuccessResponse(
+                res,
+                MESSAGES.AUC_HOUSE_STTS_UPDTD,
+                result,
+                HttpStatus.OK
+            )
+         }catch(error){
+            next(error)
+         }
+     }
 }

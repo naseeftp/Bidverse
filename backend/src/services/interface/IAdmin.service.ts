@@ -1,4 +1,5 @@
 import { AuctionHouseResponseDTO } from "../../dtos/auctionHouse.dto/auctionHouse.dto";
+import { UpdateHouseStatusDTO } from "../../dtos/admin.dto/updatestatus.dto";
 export interface IPaginatedResponse<T> {
     houses: T[];
     pagination: {
@@ -12,4 +13,6 @@ export interface IPaginatedResponse<T> {
 }
 export interface IAdminService {
     listAllAuctionHouses(page: number, limit: number): Promise<IPaginatedResponse<AuctionHouseResponseDTO>>
+
+    updateAuctionHouseStatus( id:string,data:UpdateHouseStatusDTO):Promise<AuctionHouseResponseDTO>
 }

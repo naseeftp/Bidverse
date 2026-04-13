@@ -2,8 +2,11 @@ import { IAdminService, IPaginatedResponse } from "../interface/IAdmin.service";
 import { IAuctionHouseRepository } from "../../repositories/interfaces/IAuctionHouse.repository";
 import { AuctionHouseMapper } from "../../mappers/auctionHouse.mapper";
 import { AuctionHouseResponseDTO } from "../../dtos/auctionHouse.dto/auctionHouse.dto";
+import { UpdateHouseStatusDTO } from "../../dtos/admin.dto/updatestatus.dto";
 import { ILoggerService } from "../interface/ILogger.service";
-import { AppError } from "../../errors/AppError";
+import { AppError, NotFoundError, ValidationError } from "../../errors/AppError";
+import { VerificationStatus } from "../../constants/constants";
+import { MESSAGES } from "../../constants/constants";
 
 
 export class AdminService implements IAdminService {
@@ -32,6 +35,25 @@ export class AdminService implements IAdminService {
         } catch (error) {
             this._logger.error("Error in listAllAuctionHouses service", { error });
             throw new AppError("Failed to list auction houses for administrative review.");
+        }
+    }
+    async updateAuctionHouseStatus(id: string,data:UpdateHouseStatusDTO): Promise<AuctionHouseResponseDTO> {
+        try {
+            const {status,reason}=data
+            this._logger.info('udatating status of the auction house', { Id: id, statusofhouse: status })
+            const uodateData = {
+                status: status,
+                rejectionReason: status === VerificationStatus.REJECTED ? reason : null,
+                isVerified: status === VerificationStatus.APPROVED
+            }
+            const updatedHouse=await this._auctionHouseRepo.updateById(id,uodateData)
+            if(!updatedHouse){
+                throw new NotFoundError(MESSAGES.AUCTION_HOUSE_NOT_FOUND)
+            }
+            return AuctionHouseMapper.toResponseDTO(updatedHouse)
+        } catch (error) {
+            this._logger.error("Error in updating status service", { error });
+            throw new AppError("Failed to update the status.");
         }
     }
 }
