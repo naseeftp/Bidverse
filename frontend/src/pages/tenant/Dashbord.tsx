@@ -1,5 +1,5 @@
-import React,{useEffect} from "react";
-import { useAppDispatch,useAppSelector } from "../../hooks/redux.hooks";
+import React, { useEffect } from "react";
+import { useAppDispatch, useAppSelector } from "../../hooks/redux.hooks";
 import { fetchAuctionProfile } from "../../redux/tenant/auctionHouse.slice";
 import { Link } from "react-router-dom";
 
@@ -10,19 +10,21 @@ import {
   Clock, 
   ChevronRight,
   MoreHorizontal,
-  Loader2, ShieldCheck, Lock, ArrowRight
+  Loader2, ShieldCheck, Lock, ArrowRight, AlertCircle, RefreshCcw
 } from "lucide-react";
 
 const TenantDashboard: React.FC = () => {
-  const dispatch=useAppDispatch()
-  const {isAuthenticated}=useAppSelector((state)=>state.auth)
-  const {status,loading}=useAppSelector((state)=>state.auctionHouse)
+  const dispatch = useAppDispatch();
+  const { isAuthenticated } = useAppSelector((state) => state.auth);
+  // Added 'reason' from your auctionHouse slice
+  const { status, loading, reason } = useAppSelector((state) => state.auctionHouse);
+  console.log('reason-------',reason)
   
-  useEffect(()=>{
-    if(isAuthenticated&&status==null&&!loading){
-      dispatch(fetchAuctionProfile())
+  useEffect(() => {
+    if (isAuthenticated && status == null && !loading) {
+      dispatch(fetchAuctionProfile());
     }
-  },[dispatch,status,status,isAuthenticated])
+  }, [dispatch, status, isAuthenticated, loading]);
 
   if (loading) {
     return (
@@ -32,44 +34,82 @@ const TenantDashboard: React.FC = () => {
       </div>
     );
   }
+
+  // --- REJECTED OR PENDING OR NOT STARTED VIEW ---
   if (status !== "approved") {
     return (
       <div className="max-w-2xl mx-auto mt-12 animate-in fade-in slide-in-from-bottom-4 duration-700">
         <div className="bg-white border border-[#E2E8F0] rounded-3xl p-12 text-center shadow-xl shadow-slate-200/50">
-          <div className="w-20 h-20 bg-[#F5F7FB] text-[#2F6FED] rounded-2xl flex items-center justify-center mx-auto mb-8 transform -rotate-6">
-            <Lock size={40} />
+          
+          {/* ICON LOGIC */}
+          <div className={`w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-8 transform -rotate-6 
+            ${status === "rejected" ? "bg-red-50 text-red-500" : "bg-[#F5F7FB] text-[#2F6FED]"}`}>
+            {status === "rejected" ? <AlertCircle size={40} /> : <Lock size={40} />}
           </div>
           
+          {/* TITLE LOGIC */}
           <h1 className="text-3xl font-black text-[#0F172A] tracking-tight mb-4">
-            {status === "pending" ? "Review in Progress" : "Verification Required"}
+            {status === "pending" && "Review in Progress"}
+            {status === "rejected" && "Application Rejected"}
+            {status === null && "Verification Required"}
           </h1>
           
-          <p className="text-[#475569] text-lg leading-relaxed mb-10">
-            {status === "pending" 
-              ? "We've received your documents. Our team is currently reviewing your business details. You'll get access to the full dashboard once approved."
-              : "To maintain the integrity of our auctions, all houses must be verified. Complete your business profile to start hosting live events."}
-          </p>
+          {/* MESSAGE LOGIC */}
+          <div className="text-[#475569] text-lg leading-relaxed mb-10">
+            {status === "pending" && (
+              <p>We've received your documents. Our team is currently reviewing your business details. You'll get access to the full dashboard once approved.</p>
+            )}
+            
+            {status === "rejected" && (
+              <div className="space-y-4">
+                <p>Unfortunately, your application could not be approved at this time.</p>
+                {reason && (
+                  <div className="bg-red-50 border border-red-100 rounded-xl p-4 text-left">
+                    <p className="text-[10px] font-black uppercase tracking-widest text-red-400 mb-1">Reason for Rejection</p>
+                    <p className="text-red-700 text-sm font-medium leading-relaxed">{reason}</p>
+                  </div>
+                )}
+                <p className="text-sm">Please update your information based on the feedback above and resubmit for review.</p>
+              </div>
+            )}
 
-          {status !== "pending" ? (
-            <Link to='/tenant/verification-form'>
-             <button 
-              className="group bg-[#2F6FED] text-white px-10 py-4 rounded-2xl font-bold text-lg hover:bg-[#2557C8] transition-all flex items-center gap-3 mx-auto shadow-lg shadow-blue-500/25"
-            >
-              Start Verification
-              <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
-            </button>
-            </Link>
-          ) : (
-            <div className="inline-flex items-center gap-2 bg-[#F0FDF4] text-[#166534] px-6 py-3 rounded-xl font-bold border border-[#DCFCE7]">
-              <ShieldCheck size={20} />
-              Application Submitted
-            </div>
-          )}
+            {status === null && (
+              <p>To maintain the integrity of our auctions, all houses must be verified. Complete your business profile to start hosting live events.</p>
+            )}
+          </div>
+
+          {/* ACTION BUTTONS */}
+          <div className="flex flex-col items-center gap-4">
+            {status === "pending" ? (
+              <div className="inline-flex items-center gap-2 bg-[#F0FDF4] text-[#166534] px-6 py-3 rounded-xl font-bold border border-[#DCFCE7]">
+                <ShieldCheck size={20} />
+                Application Submitted
+              </div>
+            ) : (
+              <Link to='/tenant/verification-form'>
+                <button 
+                  className={`group px-10 py-4 rounded-2xl font-bold text-lg transition-all flex items-center gap-3 mx-auto shadow-lg 
+                    ${status === 'rejected' 
+                      ? "bg-red-600 text-white hover:bg-red-700 shadow-red-500/25" 
+                      : "bg-[#2F6FED] text-white hover:bg-[#2557C8] shadow-blue-500/25"}`}
+                >
+                  {status === 'rejected' ? <><RefreshCcw size={20} /> Update & Resubmit</> : <><ArrowRight size={20} /> Start Verification</>}
+                </button>
+              </Link>
+            )}
+            
+            {status === 'rejected' && (
+              <button className="text-[#64748b] text-sm font-bold hover:text-[#0f172a] transition-colors">
+                Contact Support
+              </button>
+            )}
+          </div>
         </div>
       </div>
     );
   }
 
+  // ... rest of your code (stats, recentAuctions, etc.) for the APPROVED view ...
   const cardStyle = "bg-white border border-[#E2E8F0] rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow";
   const statLabel = "text-[11px] font-bold text-[#475569] uppercase tracking-wider";
   const statValue = "text-2xl font-extrabold text-[#0F172A] mt-1";
@@ -89,7 +129,6 @@ const TenantDashboard: React.FC = () => {
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
-      
       {/* WELCOME SECTION */}
       <div className="flex justify-between items-end">
         <div>
@@ -122,7 +161,6 @@ const TenantDashboard: React.FC = () => {
 
       {/* MAIN CONTENT GRID */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        
         {/* RECENT AUCTIONS TABLE */}
         <div className={`${cardStyle} lg:col-span-2 overflow-hidden`}>
           <div className="flex justify-between items-center mb-6">
@@ -131,7 +169,6 @@ const TenantDashboard: React.FC = () => {
               View All <ChevronRight size={14} />
             </button>
           </div>
-          
           <div className="overflow-x-auto">
             <table className="w-full text-left">
               <thead>
@@ -181,32 +218,9 @@ const TenantDashboard: React.FC = () => {
                 </div>
               </div>
             </div>
-            {/* Decorative Blue Glow */}
             <div className="absolute -bottom-10 -right-10 w-32 h-32 bg-[#2F6FED] rounded-full blur-[60px] opacity-20"></div>
           </div>
-
-          <div className={`${cardStyle}`}>
-             <h3 className="font-bold text-[#0F172A] mb-4">Verification Steps</h3>
-             <div className="space-y-4">
-               {[
-                 { title: "Business Profile", done: true },
-                 { title: "Bank Connection", done: true },
-                 { title: "Identity Check", done: false }
-               ].map((step, i) => (
-                 <div key={i} className="flex items-center gap-3">
-                   <div className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] 
-                     ${step.done ? 'bg-[#10B981] text-white' : 'border-2 border-[#E2E8F0] text-[#94A3B8]'}`}>
-                     {step.done ? "✓" : i + 1}
-                   </div>
-                   <span className={`text-xs font-medium ${step.done ? 'text-[#0F172A]' : 'text-[#94A3B8]'}`}>
-                     {step.title}
-                   </span>
-                 </div>
-               ))}
-             </div>
-          </div>
         </div>
-
       </div>
     </div>
   );

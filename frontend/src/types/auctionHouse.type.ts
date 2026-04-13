@@ -53,7 +53,8 @@ export interface AuctionHouseResponseDTO{
     };
     status:TVerificationStatus;
     isVerified:boolean;
-    createdAt:string|Date
+    createdAt:string|Date;
+    rejectionReason?: string | null;
     
 }
 export type AuctionHouseResponse = ApiResponse<AuctionHouseResponseDTO>;

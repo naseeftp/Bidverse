@@ -7,12 +7,14 @@ interface AuctionHouseState {
     profile: AuctionHouseResponseDTO | null;
     status: TVerificationStatus | null;
     loading: boolean;
+    reason: string | null|undefined
     error: string | null
 }
 const initialState: AuctionHouseState = {
     profile: null,
     status: null,
     loading: false,
+    reason: null,
     error: null
 }
 export const fetchAuctionProfile = createAsyncThunk(
@@ -20,6 +22,7 @@ export const fetchAuctionProfile = createAsyncThunk(
     async (_, { rejectWithValue }) => {
         try {
             const result = await auctionHouseService.getProfile()
+            console.log('result',result)
             if (!result.success) {
                 return rejectWithValue(result.message)
             }
@@ -66,10 +69,14 @@ const auctionHouseSlice = createSlice({
             if (action.payload.id) {
                 state.profile = action.payload;
                 state.status = action.payload.status
+                state.reason = action.payload.status === 'rejected'
+            ? (action.payload.rejectionReason ?? "No specific reason provided.")
+            : null;
             }
             else {
                 state.profile = null;
-                state.status = null
+                state.status = null;
+                state.reason = null;
             }
         });
         builder.addCase(fetchAuctionProfile.rejected, (state, action) => {
@@ -84,6 +91,7 @@ const auctionHouseSlice = createSlice({
             state.loading = false;
             state.profile = action.payload;
             state.status = action.payload.status;
+            state.reason = null;
         });
         builder.addCase(submitVerification.rejected, (state, action) => {
             state.loading = false;
@@ -92,5 +100,5 @@ const auctionHouseSlice = createSlice({
     }
 })
 
-export const {clearAuctionHouseError,resetAuctionHouseState}=auctionHouseSlice.actions;
+export const { clearAuctionHouseError, resetAuctionHouseState } = auctionHouseSlice.actions;
 export default auctionHouseSlice.reducer;
