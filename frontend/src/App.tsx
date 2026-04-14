@@ -81,7 +81,9 @@ function App() {
             </Route>
 
             <Route element={<AdminLayout />}>
-               <Route path="/admin" element={<AdminLoginPage />} />
+               <Route element={<PublicRoute />}>
+                  <Route path="/admin" element={<AdminLoginPage />} />
+               </Route>
                <Route element={<ProtectedRoute allowedRoles={['admin']} />}>
                   <Route path="/admin/dashboard" element={<AdminDashboard />} />
                   <Route path="/admin/auction-houses" element={<AuctionHouseTable />} />
