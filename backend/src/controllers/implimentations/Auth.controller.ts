@@ -67,7 +67,6 @@ export class AuthController implements IAuthController {
 
     async resetPassword(req: Request<Record<string, any>, unknown, ResetPasswordDTO>, res: Response, next: NextFunction): Promise<void> {
         try {
-
             await this._authService.resetPassword(req.body)
             return SuccessResponse(res, MESSAGES.PASSWORD_RESET_SUCCESS, null, HttpStatus.OK)
         } catch (error) {
