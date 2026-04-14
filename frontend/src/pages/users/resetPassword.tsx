@@ -11,7 +11,7 @@ import toast from "react-hot-toast";
 
 const resetSchema = yup.object({
   email: yup.string().email().required(),
-  resetToken: yup.string().required(), 
+  resetToken: yup.string().required(),
   password: yup
     .string()
     .min(8, "Password must be at least 8 characters")
@@ -25,7 +25,7 @@ const resetSchema = yup.object({
 const ResetPasswordPage: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  
+
   const email = location.state?.email || "";
   const resetToken = location.state?.resetToken || "";
 
@@ -69,19 +69,19 @@ const ResetPasswordPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-[#FFF9F4] flex items-center justify-center px-6 font-sans">
       <div className="bg-[#FFFFFF] border border-[#E6E0DA] w-full max-w-sm p-8 shadow-sm">
-        
+
         <div className="text-center mb-8">
           <h2 className="text-2xl font-bold text-[#1F1F1F] uppercase tracking-tighter italic underline decoration-[#C9653B] decoration-2 underline-offset-4">
             New Password
           </h2>
           <p className="text-[#6B6B6B] text-[10px] uppercase tracking-[0.2em] mt-3">
-            Account Recovery for <br/>
+            Account Recovery for <br />
             <span className="text-[#1F1F1F] font-bold">{email}</span>
           </p>
         </div>
 
         <form className="space-y-5" onSubmit={handleSubmit(onSubmit)}>
-          
+
           {/* We keep email and resetToken as hidden inputs so react-hook-form handles them */}
           <input type="hidden" {...register("email")} />
           <input type="hidden" {...register("resetToken")} />
@@ -139,7 +139,7 @@ const ResetPasswordPage: React.FC = () => {
 
         <div className="mt-8 pt-6 border-t border-[#E6E0DA] text-center">
           <Link to="/login" className="text-[10px] text-[#6B6B6B] uppercase tracking-[0.15em] font-medium hover:text-[#C9653B]">
-             Return to Login
+            Return to Login
           </Link>
         </div>
       </div>

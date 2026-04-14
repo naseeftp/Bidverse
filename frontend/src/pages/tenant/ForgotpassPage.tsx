@@ -27,10 +27,10 @@ const TenantForgotPassPage: React.FC = () => {
         try {
             const payload = {
                 email: data.email,
-                role: 'tenant' 
+                role: 'tenant'
             }
             const result = await authService.forgotpass(payload) as any;
-            
+
             if (result && result.success) {
                 toast.success(result.message || "Recovery code sent successfully");
                 navigate("/tenant/forgot-verify-otp", {
@@ -57,8 +57,8 @@ const TenantForgotPassPage: React.FC = () => {
     return (
         <div className="min-h-screen bg-[#F5F7FB] flex items-center justify-center px-6 font-sans">
             <div className="bg-[#FFFFFF] border border-[#E2E8F0] w-full max-w-sm p-10 rounded-2xl shadow-sm">
-                
-                
+
+
                 <div className="text-center mb-10">
                     <h2 className="text-2xl font-extrabold text-[#0F172A] tracking-tight">
                         Account Recovery
@@ -106,7 +106,7 @@ const TenantForgotPassPage: React.FC = () => {
                     </button>
                 </form>
 
-                
+
                 <div className="mt-10 pt-8 border-t border-[#E2E8F0] text-center">
                     <p className="text-[11px] text-[#475569] font-medium uppercase tracking-wider">
                         Found your credentials?

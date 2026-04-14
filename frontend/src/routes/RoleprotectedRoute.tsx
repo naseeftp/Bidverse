@@ -11,7 +11,7 @@ const RoleProtectedRoute = ({ allowedRole }: Props) => {
   if (!isAuthenticated) return <Navigate to="/login" />;
 
   if (user?.role !== allowedRole) {
-    
+
     return <Navigate to={user?.role === "tenant" ? "/tenant/dashboard" : "/home"} />;
   }
 

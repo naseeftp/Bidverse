@@ -2,7 +2,7 @@ import { Toaster } from "react-hot-toast";
 
 const ToastProvider = () => {
   return (
-    <Toaster 
+    <Toaster
       position="top-right"
       toastOptions={{
         style: {

@@ -4,7 +4,7 @@ export const apiErrorHandler = (error: unknown, defaultMessage: string) => {
   if (isAxiosError(error)) {
     const responseData = error.response?.data;
     if (responseData?.errors && Array.isArray(responseData.errors) && responseData.errors.length > 0) {
-     return {
+      return {
         success: false,
         message: responseData.errors[0].message,
       };

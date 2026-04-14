@@ -3,11 +3,11 @@ import { useAppDispatch, useAppSelector } from "../../hooks/redux.hooks";
 import { fetchAuctionProfile } from "../../redux/tenant/auctionHouse.slice";
 import { Link } from "react-router-dom";
 
-import { 
-  Gavel, 
-  Users, 
-  TrendingUp, 
-  Clock, 
+import {
+  Gavel,
+  Users,
+  TrendingUp,
+  Clock,
   ChevronRight,
   MoreHorizontal,
   Loader2, ShieldCheck, Lock, ArrowRight, AlertCircle, RefreshCcw
@@ -18,8 +18,8 @@ const TenantDashboard: React.FC = () => {
   const { isAuthenticated } = useAppSelector((state) => state.auth);
   // Added 'reason' from your auctionHouse slice
   const { status, loading, reason } = useAppSelector((state) => state.auctionHouse);
-  console.log('reason-------',reason)
-  
+
+
   useEffect(() => {
     if (isAuthenticated && status == null && !loading) {
       dispatch(fetchAuctionProfile());
@@ -35,31 +35,31 @@ const TenantDashboard: React.FC = () => {
     );
   }
 
-  // --- REJECTED OR PENDING OR NOT STARTED VIEW ---
+
   if (status !== "approved") {
     return (
       <div className="max-w-2xl mx-auto mt-12 animate-in fade-in slide-in-from-bottom-4 duration-700">
         <div className="bg-white border border-[#E2E8F0] rounded-3xl p-12 text-center shadow-xl shadow-slate-200/50">
-          
+
           {/* ICON LOGIC */}
           <div className={`w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-8 transform -rotate-6 
             ${status === "rejected" ? "bg-red-50 text-red-500" : "bg-[#F5F7FB] text-[#2F6FED]"}`}>
             {status === "rejected" ? <AlertCircle size={40} /> : <Lock size={40} />}
           </div>
-          
+
           {/* TITLE LOGIC */}
           <h1 className="text-3xl font-black text-[#0F172A] tracking-tight mb-4">
             {status === "pending" && "Review in Progress"}
             {status === "rejected" && "Application Rejected"}
             {status === null && "Verification Required"}
           </h1>
-          
+
           {/* MESSAGE LOGIC */}
           <div className="text-[#475569] text-lg leading-relaxed mb-10">
             {status === "pending" && (
               <p>We've received your documents. Our team is currently reviewing your business details. You'll get access to the full dashboard once approved.</p>
             )}
-            
+
             {status === "rejected" && (
               <div className="space-y-4">
                 <p>Unfortunately, your application could not be approved at this time.</p>
@@ -87,17 +87,17 @@ const TenantDashboard: React.FC = () => {
               </div>
             ) : (
               <Link to='/tenant/verification-form'>
-                <button 
+                <button
                   className={`group px-10 py-4 rounded-2xl font-bold text-lg transition-all flex items-center gap-3 mx-auto shadow-lg 
-                    ${status === 'rejected' 
-                      ? "bg-red-600 text-white hover:bg-red-700 shadow-red-500/25" 
+                    ${status === 'rejected'
+                      ? "bg-red-600 text-white hover:bg-red-700 shadow-red-500/25"
                       : "bg-[#2F6FED] text-white hover:bg-[#2557C8] shadow-blue-500/25"}`}
                 >
                   {status === 'rejected' ? <><RefreshCcw size={20} /> Update & Resubmit</> : <><ArrowRight size={20} /> Start Verification</>}
                 </button>
               </Link>
             )}
-            
+
             {status === 'rejected' && (
               <button className="text-[#64748b] text-sm font-bold hover:text-[#0f172a] transition-colors">
                 Contact Support
@@ -185,9 +185,9 @@ const TenantDashboard: React.FC = () => {
                     <td className="py-4 font-semibold text-[#0F172A] text-sm">{auc.item}</td>
                     <td className="py-4">
                       <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-tight
-                        ${auc.status === 'Live' ? 'bg-[#F0FDF4] text-[#166534]' : 
-                          auc.status === 'Pending' ? 'bg-[#FFFBEB] text-[#92400E]' : 
-                          'bg-[#F1F5F9] text-[#475569]'}`}>
+                        ${auc.status === 'Live' ? 'bg-[#F0FDF4] text-[#166534]' :
+                          auc.status === 'Pending' ? 'bg-[#FFFBEB] text-[#92400E]' :
+                            'bg-[#F1F5F9] text-[#475569]'}`}>
                         {auc.status}
                       </span>
                     </td>

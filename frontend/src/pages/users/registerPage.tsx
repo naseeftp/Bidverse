@@ -29,7 +29,7 @@ const RegisterPage: React.FC = () => {
 
     const { register, handleSubmit, formState: { errors } } = useForm({
         resolver: yupResolver(schema),
-        defaultValues: { role: 'user' } 
+        defaultValues: { role: 'user' }
     });
 
     const handleGoogleSignup = (role: 'user' | 'tenant') => {

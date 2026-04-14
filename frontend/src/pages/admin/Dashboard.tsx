@@ -74,7 +74,7 @@ const AdminDashboardContent: React.FC = () => {
                         Download Report
                     </button>
                 </div>
-                
+
                 <table className="w-full text-left border-collapse">
                     <thead>
                         <tr className="bg-[#F9FAFB] border-b border-[#E5E7EB]">
@@ -96,11 +96,10 @@ const AdminDashboardContent: React.FC = () => {
                                 <td className="px-6 py-4 text-xs font-bold text-[#0F172A]">{row.name}</td>
                                 <td className="px-6 py-4 text-xs text-[#0F172A]">{row.price}</td>
                                 <td className="px-6 py-4">
-                                    <span className={`text-[9px] font-bold uppercase px-2 py-1 rounded-full ${
-                                        row.status === 'Verified' ? 'bg-[#16A34A]/10 text-[#16A34A]' : 
-                                        row.status === 'Pending' ? 'bg-[#D4AF37]/10 text-[#D4AF37]' : 
-                                        'bg-[#DC2626]/10 text-[#DC2626]'
-                                    }`}>
+                                    <span className={`text-[9px] font-bold uppercase px-2 py-1 rounded-full ${row.status === 'Verified' ? 'bg-[#16A34A]/10 text-[#16A34A]' :
+                                            row.status === 'Pending' ? 'bg-[#D4AF37]/10 text-[#D4AF37]' :
+                                                'bg-[#DC2626]/10 text-[#DC2626]'
+                                        }`}>
                                         {row.status}
                                     </span>
                                 </td>

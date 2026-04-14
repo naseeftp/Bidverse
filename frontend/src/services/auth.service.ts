@@ -81,7 +81,7 @@ class AuthService {
     async resetPassword(resetData: ResetPasswordDTO) {
         try {
             const response = await axiosInstance.patch<any, ApiResponse>(AUTH_ROUTES.RESET_PASSWORD, resetData);
-            return {success: true,message: response.message, ...response.data};
+            return { success: true, message: response.message, ...response.data };
         } catch (error: any) {
             return apiErrorHandler(error, "Failed to reset password. Please try again.");
         }

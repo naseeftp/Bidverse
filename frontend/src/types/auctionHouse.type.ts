@@ -1,4 +1,4 @@
-import type{ ApiResponse } from "./auth.type";
+import type { ApiResponse } from "./auth.type";
 export const VerificationStatus = {
     PENDING: 'pending',
     APPROVED: 'approved',
@@ -7,22 +7,22 @@ export const VerificationStatus = {
 } as const
 
 export type TVerificationStatus = typeof VerificationStatus[keyof typeof VerificationStatus];
-export interface AuctionHouseSubmissionDTO{
-    name:string;
-    yearEstablished:number;
-    briefDescription:string;
-    address:{
-        city:string;
-        state:string;
-        country:string;
-        fullAddress:string
+export interface AuctionHouseSubmissionDTO {
+    name: string;
+    yearEstablished: number;
+    briefDescription: string;
+    address: {
+        city: string;
+        state: string;
+        country: string;
+        fullAddress: string
     };
-    contact:{
-      primaryContactName: string;
+    contact: {
+        primaryContactName: string;
         businessEmail: string;
-        phone: string;  
+        phone: string;
     };
-    legal:{
+    legal: {
         registrationNumber: string;
         taxId: string;
         registrationCertificateUrl: string;
@@ -30,19 +30,19 @@ export interface AuctionHouseSubmissionDTO{
     };
 
 }
-export interface AuctionHouseResponseDTO{
-    id:string;
-    userId:string;
-    name:string;
+export interface AuctionHouseResponseDTO {
+    id: string;
+    userId: string;
+    name: string;
     yearEstablished: number;
     briefDescription: string;
-    address:{
-        city:string;
-        state:string;
-        country:string;
-        fullAddress:string;
+    address: {
+        city: string;
+        state: string;
+        country: string;
+        fullAddress: string;
     };
-    contact:{
+    contact: {
         primaryContactName: string;
         businessEmail: string;
         phone: string
@@ -51,10 +51,10 @@ export interface AuctionHouseResponseDTO{
         registrationCertificateUrl: string;
         identityProofUrl: string;
     };
-    status:TVerificationStatus;
-    isVerified:boolean;
-    createdAt:string|Date;
+    status: TVerificationStatus;
+    isVerified: boolean;
+    createdAt: string | Date;
     rejectionReason?: string | null;
-    
+
 }
 export type AuctionHouseResponse = ApiResponse<AuctionHouseResponseDTO>;

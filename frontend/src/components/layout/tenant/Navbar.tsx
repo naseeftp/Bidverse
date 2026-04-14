@@ -1,14 +1,14 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { Bell, User, Search } from "lucide-react";
-import { useAppSelector } from '../../../hooks/redux.hooks' // Adjust path to your hooks
+import { useAppSelector } from '../../../hooks/redux.hooks'
 
 const TenantNavbar: React.FC = () => {
   const { isAuthenticated, user } = useAppSelector((state) => state.auth);
 
   return (
     <nav className="h-20 bg-white border-b border-[#E2E8F0] px-8 flex items-center justify-between sticky top-0 z-30">
-      
+
       {/* LEFT SIDE: Brand/Title (Always Visible or contextual) */}
       <div className="flex items-center">
         {!isAuthenticated && (
@@ -21,14 +21,14 @@ const TenantNavbar: React.FC = () => {
       {/* MIDDLE/RIGHT CONTENT: Conditional Rendering */}
       {isAuthenticated ? (
         <>
-          {/* AUTHENTICATED: SEARCH BAR */}
+
           <div className="relative w-96">
             <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-[#94A3B8]">
               <Search size={16} />
             </span>
-            <input 
-              type="text" 
-              placeholder="SEARCH AUCTIONS OR BIDDERS..." 
+            <input
+              type="text"
+              placeholder="SEARCH AUCTIONS OR BIDDERS..."
               className="w-full bg-[#F5F7FB] border border-[#E2E8F0] rounded-lg py-2 pl-10 pr-4 text-[11px] font-semibold tracking-wider text-[#0F172A] focus:ring-2 focus:ring-[#2F6FED]/10 focus:border-[#2F6FED] outline-none transition-all"
             />
           </div>
@@ -60,14 +60,14 @@ const TenantNavbar: React.FC = () => {
       ) : (
         /* GUEST: LOGIN & REGISTER BUTTONS */
         <div className="flex items-center gap-4">
-          <Link 
-            to="/tenant/login" 
+          <Link
+            to="/tenant/login"
             className="text-[12px] font-bold uppercase tracking-widest text-[#475569] hover:text-[#2F6FED] transition-colors px-4 py-2"
           >
             Login
           </Link>
-          <Link 
-            to="/tenant/register" 
+          <Link
+            to="/tenant/register"
             className="bg-[#2F6FED] text-white text-[12px] font-bold uppercase tracking-widest px-6 py-3 rounded-lg hover:bg-[#1E40AF] transition-all shadow-md shadow-blue-500/10"
           >
             Register House

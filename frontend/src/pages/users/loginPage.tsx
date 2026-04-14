@@ -23,20 +23,6 @@ const LoginPage: React.FC = () => {
 
 
     const { loading } = useAppSelector((state) => state.auth);
-    // useEffect(() => {
-    //     const errorMsg = searchParams.get("error");
-    //     if (errorMsg) {
-    //         // decodeURIComponent handles the spaces and symbols in the message
-    //         const decodedError = decodeURIComponent(errorMsg);
-
-    //         toast.error(decodedError);
-    //         dispatch(setAuthError(decodedError));
-
-    //         // Clean up the URL so the error doesn't persist on refresh
-    //         navigate(window.location.pathname, { replace: true });
-    //     }
-    // }, [searchParams, navigate, dispatch]);
-
     const toastShown = useRef(false);
 
     useEffect(() => {

@@ -1,8 +1,8 @@
 import React, { useState, useRef, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useAppSelector, useAppDispatch } from "../../hooks/redux.hooks";
-import { logout } from "../../redux/user/auth.slice"; // Ensure you have a logout action
-import { ChevronDown } from "lucide-react"; // Using lucide-react for the arrow
+import { logout } from "../../redux/user/auth.slice";
+import { ChevronDown } from "lucide-react";
 
 const Navbar: React.FC = () => {
   const { user, isAuthenticated } = useAppSelector((state) => state.auth);
@@ -29,7 +29,7 @@ const Navbar: React.FC = () => {
   return (
     <nav className="bg-[#FFFFFF] border-b border-[#E6E0DA] py-6 px-10 sticky top-0 z-50">
       <div className="grid grid-cols-3 items-center w-full">
-        
+
         {/* LEFT: BRAND LOGO */}
         <div className="flex justify-start">
           <Link to="/" className="text-2xl font-bold tracking-tighter uppercase text-[#1F1F1F]">
@@ -48,7 +48,7 @@ const Navbar: React.FC = () => {
         <div className="flex justify-end items-center">
           {isAuthenticated && user ? (
             <div className="relative" ref={dropdownRef}>
-              <button 
+              <button
                 onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                 className="flex items-center gap-2 group cursor-pointer"
               >
@@ -64,7 +64,7 @@ const Navbar: React.FC = () => {
                   <Link to="/profile" className={dropdownItemStyle} onClick={() => setIsDropdownOpen(false)}>
                     Profile
                   </Link>
-                  
+
                   <div className="h-[1px] bg-[#E6E0DA] my-1 mx-4"></div>
                   <button onClick={handleLogout} className={dropdownItemStyle}>
                     Logout
@@ -79,7 +79,7 @@ const Navbar: React.FC = () => {
             </div>
           )}
         </div>
-        
+
       </div>
     </nav>
   );

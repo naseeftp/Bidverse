@@ -17,28 +17,28 @@ export interface VerifyOtpDTO {
     email: string,
     otp: string;
     role: string,
-    purpose?:'registration' | 'forgot_password'
+    purpose?: 'registration' | 'forgot_password'
 }
 
 export interface ResendOtpDTO {
     email: string
 }
 
-export interface JwtPayload{
-    userId:string;
-    email:string;
-    role:userRole;
-    name:string;
-    exp:number
+export interface JwtPayload {
+    userId: string;
+    email: string;
+    role: userRole;
+    name: string;
+    exp: number
 }
-export interface LoginDto{
-    email:string,
-    password:string,
-    role?:userRole
+export interface LoginDto {
+    email: string,
+    password: string,
+    role?: userRole
 }
-export interface ForgetPaswordDTO{
-    email:string,
-    role?:string
+export interface ForgetPaswordDTO {
+    email: string,
+    role?: string
 }
 
 export interface ResetPasswordDTO {
@@ -48,8 +48,8 @@ export interface ResetPasswordDTO {
     resetToken: string;
 }
 
-export interface ApiResponse<T=any>{
-    success:boolean;
-    message:string;
-    data?:T
+export interface ApiResponse<T = any> {
+    success: boolean;
+    message: string;
+    data?: T
 }

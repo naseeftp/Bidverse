@@ -126,7 +126,7 @@ const VerifyOtpPage: React.FC = () => {
         toast.success(result.message)
         navigate("/home");
       } else {
-       
+
         toast.error(result.message || "invalid code")
 
       }

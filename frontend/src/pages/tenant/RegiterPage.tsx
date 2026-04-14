@@ -27,7 +27,7 @@ const TenantRegisterPage: React.FC = () => {
 
     const { register, handleSubmit, formState: { errors } } = useForm({
         resolver: yupResolver(schema),
-        defaultValues: { role: 'tenant' } 
+        defaultValues: { role: 'tenant' }
     });
 
     // SaaS Theme Styles

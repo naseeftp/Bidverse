@@ -4,16 +4,16 @@ import { FaSearch, FaBell, FaUserCircle, FaExpand } from "react-icons/fa";
 const AdminNavbar: React.FC = () => {
     return (
         <nav className="h-20 bg-white border-b border-[#E5E7EB] flex items-center justify-between px-8 sticky top-0 z-10 shadow-sm">
-            
+
             {/* Left Side: Search Bar */}
             <div className="flex items-center gap-4 w-1/3">
                 <div className="relative w-full group">
                     <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#6B7280] group-focus-within:text-[#D4AF37] transition-colors">
                         <FaSearch size={14} />
                     </span>
-                    <input 
-                        type="text" 
-                        placeholder="SEARCH SYSTEM..." 
+                    <input
+                        type="text"
+                        placeholder="SEARCH SYSTEM..."
                         className="w-full bg-[#F3F4F6] border border-transparent px-10 py-2.5 text-[10px] font-bold uppercase tracking-widest text-[#0F172A] focus:outline-none focus:bg-white focus:border-[#D4AF37] transition-all rounded-sm placeholder:text-[#94A3B8]"
                     />
                 </div>
@@ -21,7 +21,7 @@ const AdminNavbar: React.FC = () => {
 
             {/* Right Side: Actions & Profile */}
             <div className="flex items-center gap-6">
-                
+
                 {/* Utilities */}
                 <div className="flex items-center gap-4 pr-6 border-r border-[#E5E7EB]">
                     <button className="text-[#6B7280] hover:text-[#D4AF37] transition-colors relative">
@@ -43,7 +43,7 @@ const AdminNavbar: React.FC = () => {
                             Online
                         </p>
                     </div>
-                    
+
                     <div className="w-10 h-10 bg-[#111827] border-2 border-[#D4AF37] flex items-center justify-center text-[#D4AF37] group-hover:bg-[#D4AF37] group-hover:text-[#111827] transition-all duration-300">
                         <FaUserCircle size={24} />
                     </div>

@@ -6,7 +6,7 @@ import toast from "react-hot-toast";
 const TenantForgotPassVerifyOtp: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  
+
   // Extracting data from navigation state (passed from TenantForgotPassPage)
   const email = location.state?.email || "";
   const role = location.state?.role || "tenant";
@@ -29,7 +29,7 @@ const TenantForgotPassVerifyOtp: React.FC = () => {
     if (initialExpiry) {
       setExpiresAt(new Date(initialExpiry).getTime());
     } else {
-      setExpiresAt(Date.now() + 120000); 
+      setExpiresAt(Date.now() + 120000);
     }
   }, [email, navigate, initialExpiry]);
 
@@ -69,8 +69,8 @@ const TenantForgotPassVerifyOtp: React.FC = () => {
       const result = await authService.forgotpass({ email, role: 'tenant' }) as any;
       if (result && result.success) {
         const newExpiry = result.expiresAt
-          ? new Date(result.expiresAt).getTime() 
-          : Date.now() + 120000; 
+          ? new Date(result.expiresAt).getTime()
+          : Date.now() + 120000;
         setExpiresAt(newExpiry);
         toast.success("New business recovery code sent.");
       }
@@ -91,13 +91,13 @@ const TenantForgotPassVerifyOtp: React.FC = () => {
         email,
         otp: otpString,
         role: role as any,
-        purpose: 'forgot_password' 
+        purpose: 'forgot_password'
       }) as any;
 
       if (result && result.success) {
         toast.success("Identity verified. Update your password.");
-        navigate("/tenant/reset-password", { 
-          state: { email, role, resetToken: result.resetToken } 
+        navigate("/tenant/reset-password", {
+          state: { email, role, resetToken: result.resetToken }
         });
       } else {
         toast.error(result.message || "Invalid business code");
@@ -121,7 +121,7 @@ const TenantForgotPassVerifyOtp: React.FC = () => {
         <div className="text-center mb-10">
           <h2 className="text-2xl font-extrabold text-[#0F172A] tracking-tight">Security Verification</h2>
           <p className="text-[#475569] text-[11px] font-medium uppercase tracking-wider mt-3">
-            Enter the 6-digit code sent to <br/>
+            Enter the 6-digit code sent to <br />
             <span className="text-[#2F6FED] font-bold lowercase">{email}</span>
           </p>
         </div>

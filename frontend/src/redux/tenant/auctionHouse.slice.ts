@@ -7,7 +7,7 @@ interface AuctionHouseState {
     profile: AuctionHouseResponseDTO | null;
     status: TVerificationStatus | null;
     loading: boolean;
-    reason: string | null|undefined
+    reason: string | null | undefined
     error: string | null
 }
 const initialState: AuctionHouseState = {
@@ -22,7 +22,7 @@ export const fetchAuctionProfile = createAsyncThunk(
     async (_, { rejectWithValue }) => {
         try {
             const result = await auctionHouseService.getProfile()
-            console.log('result',result)
+            console.log('result', result)
             if (!result.success) {
                 return rejectWithValue(result.message)
             }
@@ -70,8 +70,8 @@ const auctionHouseSlice = createSlice({
                 state.profile = action.payload;
                 state.status = action.payload.status
                 state.reason = action.payload.status === 'rejected'
-            ? (action.payload.rejectionReason ?? "No specific reason provided.")
-            : null;
+                    ? (action.payload.rejectionReason ?? "No specific reason provided.")
+                    : null;
             }
             else {
                 state.profile = null;

@@ -5,7 +5,7 @@ import { FaChevronLeft, FaChevronRight, FaExternalLinkAlt } from 'react-icons/fa
 import { useNavigate } from 'react-router-dom';
 const AuctionHouseTable: React.FC = () => {
     const dispatch = useAppDispatch();
-    const navigate=useNavigate()
+    const navigate = useNavigate()
     const { houses, loading, pagination } = useAppSelector((state) => state.admin);
     const [page, setPage] = useState(1);
 
@@ -51,8 +51,8 @@ const AuctionHouseTable: React.FC = () => {
                                     </td>
                                     <td className="px-6 py-4">
                                         <span className={`px-2 py-1 text-[8px] font-black uppercase tracking-widest rounded-[2px] border ${house.status === 'verified'
-                                                ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500'
-                                                : 'bg-amber-500/10 border-amber-500/20 text-amber-500'
+                                            ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500'
+                                            : 'bg-amber-500/10 border-amber-500/20 text-amber-500'
                                             }`}>
                                             {house.status}
                                         </span>
