@@ -29,7 +29,7 @@ export const auctionHouseController = new AuctionHouseController(service, Logger
 import { AdminService } from "../services/implementations/Admin.service";
 import { AdminController } from "../controllers/implimentations/Admin.controller";
 
-const adminLogger=new LoggerService()
+const adminLogger = new LoggerService()
 const adminRepo = new AuctionHouseRepository();
-const adminService = new AdminService(adminRepo,adminLogger);
-export const adminController = new AdminController(adminService,adminLogger)
+const adminService = new AdminService(adminRepo, adminLogger);
+export const adminController = new AdminController(adminService, adminLogger)

@@ -16,7 +16,7 @@ export class LoggerService implements ILoggerService {
          fs.mkdirSync(this._logsDir, { recursive: true })
       }
    }
-   private _log(level: 'INFO' | 'WARN' | 'ERROR' | 'DEBUG', message: string, meta?:Record<string,unknown>): void {
+   private _log(level: 'INFO' | 'WARN' | 'ERROR' | 'DEBUG', message: string, meta?: Record<string, unknown>): void {
       const timeStamp = new Date().toISOString();
       const metaString = meta ? `|Meta: ${JSON.stringify(meta)} ` : ''
       const logEntry = `[${timeStamp}] [${level}] [${this._context}] ${message}${metaString}\n`
@@ -49,7 +49,7 @@ export class LoggerService implements ILoggerService {
       }
    }
    error(message: string, error?: Error | unknown, meta?: Record<string, unknown>): void {
-      const errorDetails = error instanceof Error ? { stack: error.stack, ...(meta||{}) } : { error, ...(meta||{}) }
+      const errorDetails = error instanceof Error ? { stack: error.stack, ...(meta || {}) } : { error, ...(meta || {}) }
       this._log('ERROR', message, errorDetails)
    }
 

@@ -84,7 +84,7 @@ export class AuthService implements IAuthService {
 
     async login(data: LoginDTO): Promise<AuthResponseDTO<UserResponseDTO>> {
         const existingUser = await this._userRepository.findByEmail(data.email)
-       
+
         if (existingUser && existingUser.googleId) {
             throw new AppError(MESSAGES.GOOGLE_REGISTERED)
         }
@@ -92,7 +92,7 @@ export class AuthService implements IAuthService {
         if (!existingUser) {
             throw new NotFoundError(MESSAGES.USER_NOT_FOUND)
         }
-        
+
         if (!existingUser.isActive) {
             throw new UnauthorizedError(MESSAGES.USER_NOT_ACTIVE)
         }
@@ -101,8 +101,7 @@ export class AuthService implements IAuthService {
         if (!passwordMatch) {
             throw new UnauthorizedError(MESSAGES.INVALID_CREDENTIALS)
         }
-         if(existingUser?.role!=data.role)
-        {
+        if (existingUser?.role != data.role) {
             throw new AppError(`this email registered as ${existingUser?.role} please use correct login portal`)
         }
         const token = generateAccessToken(existingUser);
@@ -116,7 +115,7 @@ export class AuthService implements IAuthService {
     }
     async forgotPassword(data: ForgetPaswordDTO, purpose: string): Promise<{ email: string; expiresAt: Date }> {
         const existingUser = await this._userRepository.findByEmail(data.email)
-        if(existingUser?.role!==data.role){
+        if (existingUser?.role !== data.role) {
             throw new AppError(`this email registered as ${existingUser?.role} please use correct forgot password portal`)
         }
         if (existingUser && existingUser.googleId) {
@@ -178,10 +177,10 @@ export class AuthService implements IAuthService {
             throw new Error('google email is missing')
         }
         let user = await this._userRepository.findByEmail(data.email)
-        if(user){
-          if(user.role!=role){
-            throw new UnauthorizedError(`Unauthorized: This account is registered as a ${user.role}`)
-          }
+        if (user) {
+            if (user.role != role) {
+                throw new UnauthorizedError(`Unauthorized: This account is registered as a ${user.role}`)
+            }
         }
         else {
             user = await this._userRepository.createOAuthUser({

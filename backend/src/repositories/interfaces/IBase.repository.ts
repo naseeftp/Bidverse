@@ -10,8 +10,8 @@ export interface IBaseRepository<T extends Document> {
     updateById(id: string | Types.ObjectId, data: UpdateQuery<T>): Promise<T | null>
     deleteById(id: string | Types.ObjectId): Promise<T | null>
     deleteByFilter(filter: QueryFilter<T>): Promise<DeleteResult>;
-    findOneByField(fieldName:string,value:unknown):Promise<T|null>
-    updateByFilter(filter:QueryFilter<T>,data:UpdateQuery<T>):Promise<T|null>
+    findOneByField(fieldName: string, value: unknown): Promise<T | null>
+    updateByFilter(filter: QueryFilter<T>, data: UpdateQuery<T>): Promise<T | null>
     count(filter?: QueryFilter<T>): Promise<number>
 
 }

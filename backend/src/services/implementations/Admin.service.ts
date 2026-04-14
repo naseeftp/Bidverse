@@ -41,13 +41,13 @@ export class AdminService implements IAdminService {
         try {
             const house = await this._auctionHouseRepo.findById(id);
             if (!house) {
-               throw new AppError("Auction House not found");
+                throw new AppError("Auction House not found");
             }
             return house as unknown as AuctionHouseResponseDTO;
 
         } catch (error) {
-           this._logger.error(`Service Error: Failed to fetch auction house with ID ${id}`, { error });
-           throw new AppError("Failed to get the auction house.");
+            this._logger.error(`Service Error: Failed to fetch auction house with ID ${id}`, { error });
+            throw new AppError("Failed to get the auction house.");
         }
     }
 
