@@ -40,7 +40,7 @@ export const protect = async (req: Request, res: Response, next: NextFunction) =
 
 }
 
-export const restrictTo = (...allowedRoles: string[]) => {
+export const allowedTo = (...allowedRoles: string[]) => {
     return (req: Request, res: Response, next: NextFunction) => {
         if (!req.user) {
             return next(new UnauthorizedError('Authentication Required'));

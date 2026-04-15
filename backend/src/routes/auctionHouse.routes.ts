@@ -1,27 +1,29 @@
 import { Router } from "express";
-import { protect, restrictTo } from "../middlewares/auth.middleware";
+import { protect,allowedTo} from "../middlewares/auth.middleware";
 import { validator } from "../middlewares/validation.middleware";
 import { AuctionHouseValidators } from "../validators/auctionHouse.validators";
 import { AUCTION_HOUSE_ROUTES } from '../constants/route.constant'
 import { auctionHouseController } from "../di/container";
+import { Roles } from "../constants/constants";
 
 const router = Router();
 router.use(protect);
 
 router.post(
     AUCTION_HOUSE_ROUTES.VERIFY,
-    restrictTo("tenant"),
+    allowedTo(Roles.TENANT),// try to change the name and use enum here intsd iof sttring
     validator(AuctionHouseValidators.validateVerificationInput),
     (req, res, next) => auctionHouseController.submitVerification(req as any, res, next)
 )
+
 router.get(
     AUCTION_HOUSE_ROUTES.PROFILE,
-    restrictTo('tenant'),
+    allowedTo(Roles.TENANT),
     (req, res, next) => auctionHouseController.getProfile(req, res, next)
 )
 router.get(
     AUCTION_HOUSE_ROUTES.UPLOAD_SIGNATURE,
-    restrictTo("tenant"),
+    allowedTo(Roles.TENANT),
     (req, res, next) => auctionHouseController.getUploadSignature(req, res, next)
 )
 

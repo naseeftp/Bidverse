@@ -7,8 +7,8 @@ export const AuctionHouseVerificationSchema = z.object({
         .trim()
         .min(3, 'Auction House name must be atleast 3 charactors')
         .max(100, "Name is too long"),
-
-    yearEstablished: z.coerce.number()
+        
+    yearEstablished: z.coerce.number() // try to use max
         .int()
         .min(1700, 'Invalid year')
         .max(new Date().getFullYear(), 'Year Cannot be future'),
