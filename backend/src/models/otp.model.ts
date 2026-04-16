@@ -1,5 +1,5 @@
 import { IOTP } from '../types/otp.type'
-import { Schema, model, Model, Document } from 'mongoose'
+import { Schema, model, Model} from 'mongoose'
 import { OtpPurpose } from '../constants/constants'
 const otpSchema = new Schema<IOTP>({
     email: {

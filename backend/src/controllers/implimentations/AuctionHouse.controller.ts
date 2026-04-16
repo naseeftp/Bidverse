@@ -7,12 +7,13 @@ import { SuccessResponse } from "../../utils/response.utility";
 import { AuctionHouseVerificationDTO } from "../../dtos/auctionHouse.dto/auctionHouse.dto";
 import { v2 as cloudinary } from "cloudinary";
 import { env } from '../../config/env'
+import { ParamsDictionary } from "express-serve-static-core";
 export class AuctionHouseController implements IAuctionHouseController {
     constructor(
         private _auctionHouseService: IAuctionService,
         private _logger: ILoggerService
     ) { }
-    async submitVerification(req: Request<Record<string, never>, unknown, AuctionHouseVerificationDTO>, res: Response, next: NextFunction): Promise<void> {
+    async submitVerification(req: Request<ParamsDictionary, unknown, AuctionHouseVerificationDTO>, res: Response, next: NextFunction): Promise<void> {
         try {
             const userId = req.user.id;
             this._logger.info('Verification submission started', { userId, email: req.user.email })

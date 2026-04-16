@@ -6,7 +6,7 @@ export interface IAdminController {
     getAuctionHouses(req: Request, res: Response, next: NextFunction): Promise<void>
     getAuctionHouseById(req: Request, res: Response, next: NextFunction): Promise<void>;
     updateAuctionHouseStatus(
-        req: Request<ParamsDictionary, any, UpdateHouseStatusDTO>,
+        req: Request<ParamsDictionary,unknown, UpdateHouseStatusDTO>,
         res: Response,
         next: NextFunction
     ): Promise<void>

@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { TVerificationStatus } from "../../types/auctionhouse.type";
-import { VerificationStatus } from "../../constants/constants";
+
 
 export const AuctionHouseVerificationSchema = z.object({
     name: z.string()

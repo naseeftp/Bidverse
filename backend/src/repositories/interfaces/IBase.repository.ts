@@ -1,4 +1,4 @@
-import mongoose, { Document, QueryFilter, UpdateQuery, DeleteResult, Types } from "mongoose";
+import { Document, QueryFilter, UpdateQuery, DeleteResult, Types } from "mongoose";
 
 
 

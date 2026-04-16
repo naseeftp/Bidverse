@@ -8,7 +8,7 @@ import {
     Role,
     ResetPasswordDTO
 } from "../../dtos/Common.dto";
-import { otpPurpose } from "../../constants/constants";
+
 
 export interface IAuthController {
     register(
@@ -33,12 +33,12 @@ export interface IAuthController {
         next: NextFunction
     ): Promise<void>;
     forgotPass(
-        req: Request<Record<string, any>, unknown, ForgetPaswordDTO>,
+        req: Request<Record<string,unknown>, unknown, ForgetPaswordDTO>,
         res: Response,
         next: NextFunction
     ): Promise<void>
     resetPassword(
-        req: Request<Record<string, any>, unknown, ResetPasswordDTO>,
+        req: Request<Record<string,unknown>, unknown, ResetPasswordDTO>,
         res: Response,
         next: NextFunction
     ): Promise<void>;

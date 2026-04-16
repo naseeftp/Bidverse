@@ -1,20 +1,24 @@
 import { Request, Response, NextFunction } from "express";
-import { UnauthorizedError, ForbiddenError } from "../errors/AppError";
+import { UnauthorizedError} from "../errors/AppError";
 import { verifyAccessToken } from "../utils/jwt.utils";
 import { MESSAGES } from "../constants/constants";
 
-
-declare global {
-    namespace Express {
-        interface Request {
-            user: {
-                id: string,
-                role: string,
-                name: string,
-                email: string
-            }
-        }
+declare module 'express-serve-static-core' {
+    interface Request {
+        user: {
+            id: string;
+            role: string;
+            name: string;
+            email: string;
+        };
     }
+}
+
+interface IDecodedToken {
+    userId: string;
+    role: string;
+    email: string;
+    name: string;
 }
 
 export const protect = async (req: Request, res: Response, next: NextFunction) => {
@@ -26,7 +30,7 @@ export const protect = async (req: Request, res: Response, next: NextFunction) =
         if (!token) {
             throw new UnauthorizedError(MESSAGES.INVALID_ACCESS_TOKEN)
         }
-        const decoded = verifyAccessToken(token) as any
+        const decoded = verifyAccessToken(token) as IDecodedToken
         req.user = {
             id: decoded.userId,
             role: decoded.role,
@@ -34,7 +38,7 @@ export const protect = async (req: Request, res: Response, next: NextFunction) =
             name: decoded.name
         }
         next()
-    } catch (error) {
+    } catch  {
         return next(new UnauthorizedError(MESSAGES.INVALID_ACCESS_TOKEN))
     }
 

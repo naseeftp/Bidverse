@@ -53,7 +53,7 @@ export class AdminController implements IAdminController {
         }
     }
 
-    async updateAuctionHouseStatus(req: Request<ParamsDictionary, any, UpdateHouseStatusDTO>, res: Response, next: NextFunction): Promise<void> {
+    async updateAuctionHouseStatus(req: Request<ParamsDictionary,Record<string, unknown>, UpdateHouseStatusDTO>, res: Response, next: NextFunction): Promise<void> {
         try {
             const id = req.params.id as string  //service layer expect id as string
             const result = await this._adminService.updateAuctionHouseStatus(id, req.body)

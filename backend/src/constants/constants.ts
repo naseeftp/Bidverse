@@ -1,5 +1,5 @@
 import { StatusCodes } from "http-status-codes";
-import { AUCTION_HOUSE_ROUTES } from "./route.constant";
+
 export const Roles = {
     ADMIN: 'admin',
     TENANT: 'tenant',

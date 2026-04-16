@@ -1,5 +1,5 @@
 import { otpPurpose } from "../../constants/constants";
-import { OtpUserData, IOTP } from "../../types/otp.type";
+import { OtpUserData} from "../../types/otp.type";
 
 export interface IOTPService {
     generateAndSaveOtp(email: string, name: string, userData: OtpUserData, expiryMinutes?: number, purpose?: otpPurpose): Promise<{ otp: string; expiresAt: Date }>

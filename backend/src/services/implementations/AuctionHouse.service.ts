@@ -4,7 +4,7 @@ import { ILoggerService } from "../interface/ILogger.service";
 import { AuctionHouseVerificationDTO, AuctionHouseResponseDTO } from "../../dtos/auctionHouse.dto/auctionHouse.dto";
 import { AuctionHouseMapper } from "../../mappers/auctionHouse.mapper";
 import { VerificationStatus } from "../../constants/constants";
-import { ConflictError, NotFoundError } from "../../errors/AppError";
+import { ConflictError} from "../../errors/AppError";
 import { MESSAGES } from "../../constants/constants";
 import { Types } from "mongoose";
 

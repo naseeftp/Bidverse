@@ -1,4 +1,4 @@
-import { otpPurpose, Roles } from "../constants/constants";
+import { otpPurpose} from "../constants/constants";
 
 
 export enum Role {
@@ -27,7 +27,7 @@ export interface AuthResponseDTO<T = UserResponseDTO> {
   token: string;
   refreshToken?: string;
 }
-import { email, z } from 'zod'
+import { z } from 'zod'
 
 const passwordRules = z.string()
   .min(8, 'Password Must be at least 8 charactors')

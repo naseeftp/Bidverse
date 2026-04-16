@@ -1,6 +1,6 @@
 import { Document, Types } from "mongoose";
 import { otpPurpose, Roles } from "../constants/constants";
-import { OtpPurpose } from "../constants/constants";
+
 
 export type roles = typeof Roles[keyof typeof Roles]
 

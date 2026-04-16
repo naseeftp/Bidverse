@@ -11,11 +11,11 @@ router.use(protect);
 
 router.post(
     AUCTION_HOUSE_ROUTES.VERIFY,
-    allowedTo(Roles.TENANT),// try to change the name and use enum here intsd iof sttring
+    allowedTo(Roles.TENANT),
     validator(AuctionHouseValidators.validateVerificationInput),
-    (req, res, next) => auctionHouseController.submitVerification(req as any, res, next)
+    (req, res, next) => auctionHouseController.submitVerification(req, res, next)
 )
-
+ 
 router.get(
     AUCTION_HOUSE_ROUTES.PROFILE,
     allowedTo(Roles.TENANT),

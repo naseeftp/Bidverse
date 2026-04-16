@@ -4,7 +4,7 @@ import { AuctionHouseMapper } from "../../mappers/auctionHouse.mapper";
 import { AuctionHouseResponseDTO } from "../../dtos/auctionHouse.dto/auctionHouse.dto";
 import { UpdateHouseStatusDTO } from "../../dtos/admin.dto/updatestatus.dto";
 import { ILoggerService } from "../interface/ILogger.service";
-import { AppError, NotFoundError, ValidationError } from "../../errors/AppError";
+import { AppError, NotFoundError} from "../../errors/AppError";
 import { VerificationStatus } from "../../constants/constants";
 import { MESSAGES } from "../../constants/constants";
 

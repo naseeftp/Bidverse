@@ -2,7 +2,7 @@ import nodemailer, { Transporter } from "nodemailer"
 import { env } from "../../config/env"
 import { IEmailService } from "../interface/IEmai.service"
 import { EmailConfig, SmtpConfig } from "../../types/email.type"
-import { CONFIG, HttpStatus, MESSAGES, otpPurpose } from '../../constants/constants'
+import { HttpStatus, MESSAGES, otpPurpose } from '../../constants/constants'
 import { AppError } from "../../errors/AppError"
 import { getOtpTemplate } from "../../utils/emailTemplates"
 import { ILoggerService } from "../interface/ILogger.service";
@@ -55,14 +55,14 @@ export class EmailService implements IEmailService {
                 ...config
 
             })
-        } catch (error) {
+        } catch{
             throw new AppError(MESSAGES.EMAIL_SEND_FAILED, HttpStatus.INTERNAL_ERROR)
         }
     }
     async sendOtpEmail(email: string, name: string, otp: string, purpose?: otpPurpose): Promise<void> {
         let subject = 'Your Verification Code';
         if (purpose === OtpPurpose.FORGOT_PASSWORD) {
-            subject = subject = 'Password Reset Recovery Code';
+            subject = 'Password Reset Recovery Code';
         }
         if (purpose === OtpPurpose.REGISTRATION) {
             subject = 'Welcome to BidVerse - Verify Your Email';

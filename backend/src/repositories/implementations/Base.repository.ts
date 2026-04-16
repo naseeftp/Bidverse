@@ -1,4 +1,4 @@
-import mongoose, { Document, Model, QueryFilter, UpdateQuery, DeleteResult } from "mongoose";
+import mongoose, { Document, Model,DeleteResult } from "mongoose";
 import { IBaseRepository } from "../interfaces/IBase.repository";
 
 

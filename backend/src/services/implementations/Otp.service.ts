@@ -1,7 +1,7 @@
 import { IOTPService } from "../interface/IOtp.service";
 import { IEmailService } from "../interface/IEmai.service";
 import { IOtpRepository } from "../../repositories/interfaces/IOtp.repository";
-import { OtpUserData, IOTP } from "../../types/otp.type";
+import { OtpUserData} from "../../types/otp.type";
 import { genarateOtp, getOtpExpiry, isOtpExpired } from '../../utils/otp.utils'
 import { AppError, ValidationError } from "../../errors/AppError";
 import { HttpStatus, MESSAGES, otpPurpose } from "../../constants/constants";
@@ -22,7 +22,7 @@ export class OtpService implements IOTPService {
             expiresAt,
             purpose
 
-        } as any)
+        })
         await this._emailService.sendOtpEmail(userData.email, userData.name, otp)
         return { otp, expiresAt }
     }
@@ -72,7 +72,7 @@ export class OtpService implements IOTPService {
         await this._otpRepository.updateById(otprecord._id.toString(), {
             otp: newOtp,
             expiresAt: newExpiresAt
-        } as any)
+        })
         await this._emailService.sendOtpEmail(email, otprecord.userData.name, newOtp);
         return { email, expiresAt: newExpiresAt };
     }

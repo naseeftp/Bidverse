@@ -48,7 +48,7 @@ export const verifyAccessToken = (token: string): JWTPayload => {
     }
     try {
         return jwt.verify(token, ACCESS_TOKEN_SECRET) as JWTPayload
-    } catch (error) {
+    } catch{
         throw new UnauthorizedError(MESSAGES.INVALID_ACCESS_TOKEN)
     }
 }
@@ -60,7 +60,7 @@ export const verifyRefreshToken = (token: string): JWTPayload => {
     }
     try {
         return jwt.verify(token, REFRESH_TOKEN_SECRET) as JWTPayload
-    } catch (error) {
+    } catch{
         throw new UnauthorizedError(MESSAGES.INVALID_REFRESH_TOKEN)
     }
 }
@@ -68,7 +68,7 @@ export const verifyRefreshToken = (token: string): JWTPayload => {
 export const decodeToken = (token: string): JWTPayload | null => {
     try {
         return jwt.decode(token) as JWTPayload;
-    } catch (error) {
+    } catch{
         return null
     }
 }

@@ -13,7 +13,7 @@ router.post(
 router.post(
     AUTH_ROUTES.VERIFY_OTP,
     validator(AuthValidators.validateVerifyOtpInput),
-    (req, res, next) => authController.verifyOtp(req as any, res, next)
+    (req, res, next) => authController.verifyOtp(req , res, next)
 )
 router.post(
     AUTH_ROUTES.RESEND_OTP,
