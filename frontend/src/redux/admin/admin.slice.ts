@@ -1,8 +1,19 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import adminService from "../../services/admin.service";
+import type { AuctionHouseResponseDTO } from "../../types/auctionHouse.type";
+
+// 1. Define the specific interface for the API payload
+interface FetchHousesResponse {
+    houses: AuctionHouseResponseDTO[];
+    pagination: {
+        totalItems: number;
+        totalPages: number;
+        currentPage: number;
+    };
+}
 
 interface AdminState {
-    houses: any[];
+    houses: AuctionHouseResponseDTO[]; // Fixed 'any' error
     loading: boolean;
     error: string | null;
     pagination: {
@@ -24,7 +35,7 @@ export const fetchAllAuctionHouses = createAsyncThunk(
     async ({ page, limit }: { page: number; limit: number }, { rejectWithValue }) => {
         const result = await adminService.listAllAuctionHouses(page, limit);
         if (!result.success) return rejectWithValue(result.message);
-        return result;
+        return result as unknown as FetchHousesResponse;
     }
 );
 

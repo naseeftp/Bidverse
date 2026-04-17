@@ -1,4 +1,4 @@
-import React, { useState } from "react"; // Added useState
+import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -6,9 +6,27 @@ import * as yup from "yup";
 import authService from "../../services/auth.service";
 import toast from "react-hot-toast";
 
+// 1. Define the specific response structure
+interface ForgotPassResponse {
+    success: boolean;
+    message: string;
+    expiresAt?: string;
+}
+
+// 2. Define the error structure
+interface ApiError {
+    response?: {
+        data?: {
+            message?: string;
+        };
+    };
+}
+
 const schema = yup.object({
     email: yup.string().email("Invalid email").required("Email is required"),
 }).required();
+
+type FormData = yup.InferType<typeof schema>;
 
 const ForgotPassPage: React.FC = () => {
     const navigate = useNavigate();
@@ -18,20 +36,23 @@ const ForgotPassPage: React.FC = () => {
         register,
         handleSubmit,
         formState: { errors },
-    } = useForm({
+    } = useForm<FormData>({
         resolver: yupResolver(schema),
     });
 
-    const onSubmit = async (data: { email: string }) => {
+    const onSubmit = async (data: FormData) => {
         setIsLoading(true);
         try {
             const payload = {
                 email: data.email,
-                role: 'user'
-            }
-            const result = await authService.forgotpass(payload) as any;
+                role: 'user' as const
+            };
+
+            // 3. Cast the result to our interface instead of 'any'
+            const result = (await authService.forgotpass(payload)) as ForgotPassResponse;
+
             if (result && result.success) {
-                toast.success(result.message)
+                toast.success(result.message);
                 navigate("/forgot-verify-otp", {
                     state: {
                         email: data.email,
@@ -41,10 +62,12 @@ const ForgotPassPage: React.FC = () => {
                     }
                 });
             } else {
-                toast.error(result.message || 'Failed to send recovery code')
+                toast.error(result.message || 'Failed to send recovery code');
             }
-        } catch (error: any) {
-            const errorMsg = error.response?.data?.message || "Something went wrong";
+        } catch (error: unknown) {
+            // 4. Narrow the error type safely
+            const err = error as ApiError;
+            const errorMsg = err.response?.data?.message || "Something went wrong";
             toast.error(errorMsg);
         } finally {
             setIsLoading(false);
@@ -71,7 +94,7 @@ const ForgotPassPage: React.FC = () => {
                         <input
                             {...register("email")}
                             type="email"
-                            disabled={isLoading} // Disable input while loading
+                            disabled={isLoading}
                             className="w-full bg-[#FFF9F4] border border-[#E6E0DA] px-4 py-2.5 text-sm text-[#1F1F1F] focus:outline-none focus:border-[#C9653B] transition-colors disabled:opacity-70"
                             placeholder="email@example.com"
                         />
@@ -84,7 +107,7 @@ const ForgotPassPage: React.FC = () => {
 
                     <button
                         type="submit"
-                        disabled={isLoading} // Prevent double clicks
+                        disabled={isLoading}
                         className="w-full bg-[#C9653B] text-white py-3.5 text-xs font-bold uppercase tracking-widest hover:bg-[#1F1F1F] transition-all duration-300 disabled:bg-[#6B6B6B] disabled:cursor-not-allowed flex items-center justify-center"
                     >
                         {isLoading ? (

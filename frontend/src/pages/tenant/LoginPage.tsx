@@ -7,8 +7,21 @@ import { FcGoogle } from "react-icons/fc";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { useAppDispatch, useAppSelector } from "../../hooks/redux.hooks";
 import { setAuthError, setAuthSuccess, setLoading } from "../../redux/user/auth.slice";
+import { Roles } from "../../types/auth.type";
 import authService from "../../services/auth.service";
 import toast from "react-hot-toast";
+
+interface LoginFormInputs {
+    email: string;
+    password: string;
+}
+interface AxiosErrorResponse {
+    response?: {
+        data?: {
+            message?: string;
+        };
+    };
+}
 
 const schema = yup.object({
     email: yup.string().email('Invalid business email').required('Email is required'),
@@ -21,11 +34,11 @@ const TenantLoginPage: React.FC = () => {
     const [showPassword, setShowPassword] = useState(false);
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
-    const [searchParams] = useSearchParams()
+    const [searchParams] = useSearchParams();
     const { loading } = useAppSelector((state) => state.auth);
-    const toastShown = useRef(false)
+    const toastShown = useRef(false);
 
-    const { register, handleSubmit, formState: { errors } } = useForm({
+    const { register, handleSubmit, formState: { errors } } = useForm<LoginFormInputs>({
         resolver: yupResolver(schema),
     });
 
@@ -34,21 +47,20 @@ const TenantLoginPage: React.FC = () => {
         if (errMessage && !toastShown.current) {
             const decodedError = decodeURIComponent(errMessage);
             toast.error(decodedError);
-            setAuthError(decodedError)
+            setAuthError(decodedError);
             toastShown.current = true;
-            navigate(window.location.pathname, { replace: true })
+            navigate(window.location.pathname, { replace: true });
         }
-
-    }, [dispatch, searchParams, navigate])
+    }, [dispatch, searchParams, navigate]);
 
     const handleGoogleLogin = () => {
         window.location.href = `${baseURL}/auth/google?role=tenant`;
     };
 
-    const onSubmit = async (data: any) => {
+    const onSubmit = async (data: LoginFormInputs) => {
         dispatch(setLoading(true));
         try {
-            const loginData = { ...data, role: "tenant" };
+            const loginData = { ...data, role:Roles.TENANT};
             const result = await authService.login(loginData);
 
             if (result && result.success) {
@@ -61,8 +73,9 @@ const TenantLoginPage: React.FC = () => {
                 dispatch(setAuthError(errorMsg));
                 toast.error(errorMsg);
             }
-        } catch (error: any) {
-            const serverMessage = error.response?.data?.message || "Login failed";
+        } catch (error: unknown) {
+            const err = error as AxiosErrorResponse;
+            const serverMessage = err.response?.data?.message || "Login failed";
             dispatch(setAuthError(serverMessage));
             toast.error(serverMessage);
         } finally {
@@ -70,7 +83,6 @@ const TenantLoginPage: React.FC = () => {
         }
     };
 
-    // SaaS Theme Classes
     const inputStyle = "w-full bg-[#FFFFFF] border border-[#E2E8F0] px-4 py-3 rounded-lg text-[#0F172A] text-sm focus:outline-none focus:ring-2 focus:ring-[#2F6FED]/20 focus:border-[#2F6FED] transition-all placeholder:text-[#94A3B8]";
     const labelStyle = "block text-[10px] font-bold uppercase tracking-widest text-[#475569]";
 
@@ -78,14 +90,12 @@ const TenantLoginPage: React.FC = () => {
         <div className="min-h-screen bg-[#F5F7FB] flex items-center justify-center px-6 font-sans">
             <div className="bg-[#FFFFFF] border border-[#E2E8F0] w-full max-w-sm p-10 rounded-2xl shadow-sm">
 
-                {/* Header */}
                 <div className="text-center mb-10">
                     <h2 className="text-2xl font-extrabold text-[#0F172A] tracking-tight">House Portal</h2>
                     <p className="text-[#475569] text-[11px] font-medium uppercase tracking-wider mt-2">Manage your auctions & bidders</p>
                 </div>
 
                 <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-                    {/* Email */}
                     <div className="space-y-2">
                         <label className={labelStyle}>Business Email</label>
                         <input
@@ -99,7 +109,6 @@ const TenantLoginPage: React.FC = () => {
                         )}
                     </div>
 
-                    {/* Password */}
                     <div className="space-y-2">
                         <div className="flex justify-between items-center">
                             <label className={labelStyle}>Password</label>
@@ -127,7 +136,6 @@ const TenantLoginPage: React.FC = () => {
                         )}
                     </div>
 
-
                     <button
                         type="submit"
                         disabled={loading}
@@ -152,7 +160,6 @@ const TenantLoginPage: React.FC = () => {
                     </button>
                 </form>
 
-                {/* Footer Section */}
                 <div className="mt-10 pt-8 border-t border-[#E2E8F0] text-center space-y-6">
                     <p className="text-[11px] text-[#475569] font-medium uppercase tracking-wider">
                         Not a registered house?

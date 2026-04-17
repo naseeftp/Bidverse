@@ -2,12 +2,24 @@ import React, { useState, useRef, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import authService from "../../services/auth.service";
 import toast from "react-hot-toast";
+interface AxiosErrorResponse {
+  response?: {
+    data?: {
+      message?: string;
+    };
+  };
+}
+interface AuthResponse {
+  success: boolean;
+  message?: string;
+  expiresAt?: string;
+  resetToken?: string;
+}
 
 const TenantForgotPassVerifyOtp: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Extracting data from navigation state (passed from TenantForgotPassPage)
   const email = location.state?.email || "";
   const role = location.state?.role || "tenant";
   const initialExpiry = location.state?.expiresAt;
@@ -66,7 +78,7 @@ const TenantForgotPassVerifyOtp: React.FC = () => {
     if (timeLeft > 0) return;
     setLoading(true);
     try {
-      const result = await authService.forgotpass({ email, role: 'tenant' }) as any;
+      const result = await authService.forgotpass({ email, role: 'tenant' }) as AuthResponse;
       if (result && result.success) {
         const newExpiry = result.expiresAt
           ? new Date(result.expiresAt).getTime()
@@ -74,7 +86,8 @@ const TenantForgotPassVerifyOtp: React.FC = () => {
         setExpiresAt(newExpiry);
         toast.success("New business recovery code sent.");
       }
-    } catch (err) {
+    } catch {
+      // Removed unused 'err' to satisfy no-unused-vars
       toast.error("Failed to resend code.");
     } finally {
       setLoading(false);
@@ -90,9 +103,9 @@ const TenantForgotPassVerifyOtp: React.FC = () => {
       const result = await authService.verifyOtp({
         email,
         otp: otpString,
-        role: role as any,
+        role: role as string,
         purpose: 'forgot_password'
-      }) as any;
+      }) as AuthResponse;
 
       if (result && result.success) {
         toast.success("Identity verified. Update your password.");
@@ -102,8 +115,11 @@ const TenantForgotPassVerifyOtp: React.FC = () => {
       } else {
         toast.error(result.message || "Invalid business code");
       }
-    } catch (err: any) {
-      toast.error("Verification failed. Please try again.");
+    } catch (error: unknown) {
+      // Typed error properly to avoid 'any'
+      const err = error as AxiosErrorResponse;
+      const errorMsg = err.response?.data?.message || "Verification failed. Please try again.";
+      toast.error(errorMsg);
     } finally {
       setLoading(false);
     }

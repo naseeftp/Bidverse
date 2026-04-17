@@ -6,6 +6,14 @@ import * as yup from "yup";
 import authService from "../../services/auth.service";
 import toast from "react-hot-toast";
 
+interface AxiosErrorResponse {
+    response?: {
+        data?: {
+            message?: string;
+        };
+    };
+}
+
 const schema = yup.object({
     email: yup.string().email("Invalid business email").required("Email is required"),
 }).required();
@@ -28,8 +36,8 @@ const TenantForgotPassPage: React.FC = () => {
             const payload = {
                 email: data.email,
                 role: 'tenant'
-            }
-            const result = await authService.forgotpass(payload) as any;
+            };
+            const result = await authService.forgotpass(payload);
 
             if (result && result.success) {
                 toast.success(result.message || "Recovery code sent successfully");
@@ -44,21 +52,22 @@ const TenantForgotPassPage: React.FC = () => {
             } else {
                 toast.error(result.message || 'Failed to send recovery code');
             }
-        } catch (error: any) {
-            const errorMsg = error.response?.data?.message || "Something went wrong";
+        } catch (error: unknown) {
+            // Replaced 'any' with 'unknown' and narrow the type
+            const err = error as AxiosErrorResponse;
+            const errorMsg = err.response?.data?.message || "Something went wrong";
             toast.error(errorMsg);
         } finally {
             setIsLoading(false);
         }
     };
+
     const inputStyle = "w-full bg-[#FFFFFF] border border-[#E2E8F0] px-4 py-3 rounded-lg text-[#0F172A] text-sm focus:outline-none focus:ring-2 focus:ring-[#2F6FED]/20 focus:border-[#2F6FED] transition-all placeholder:text-[#94A3B8]";
     const labelStyle = "block text-[10px] font-bold uppercase tracking-widest text-[#475569] mb-1.5";
 
     return (
         <div className="min-h-screen bg-[#F5F7FB] flex items-center justify-center px-6 font-sans">
             <div className="bg-[#FFFFFF] border border-[#E2E8F0] w-full max-w-sm p-10 rounded-2xl shadow-sm">
-
-
                 <div className="text-center mb-10">
                     <h2 className="text-2xl font-extrabold text-[#0F172A] tracking-tight">
                         Account Recovery
@@ -105,7 +114,6 @@ const TenantForgotPassPage: React.FC = () => {
                         )}
                     </button>
                 </form>
-
 
                 <div className="mt-10 pt-8 border-t border-[#E2E8F0] text-center">
                     <p className="text-[11px] text-[#475569] font-medium uppercase tracking-wider">

@@ -9,10 +9,11 @@ import {
 } from 'lucide-react';
 
 import { useAppDispatch } from "../../hooks/redux.hooks";
-import { submitVerification } from '../../redux/tenant/auctionHouse.slice'
+import { submitVerification } from '../../redux/tenant/auctionHouse.slice';
 import uploadservice from '../../services/uploadservice';
 import type { AuctionHouseSubmissionDTO } from '../../types/auctionHouse.type';
 
+// 1. Schema Definition
 const schema = yup.object({
   name: yup.string().required('Business name is required').trim(),
   yearEstablished: yup.number().typeError('Must be a year').required('Year is required').min(1800).max(new Date().getFullYear()),
@@ -45,9 +46,11 @@ const TenantVerificationForm: React.FC = () => {
   const { register, handleSubmit, setValue, watch, formState: { errors, isSubmitting } } = useForm<VerificationFormData>({
     resolver: yupResolver(schema),
   });
+
   const regCertFile = watch('registrationCertificate') as File | undefined;
   const idProofFile = watch('identityProof') as File | undefined;
 
+  // 2. Optimized onSubmit with safe error handling
   const onSubmit = async (data: VerificationFormData) => {
     try {
       const [regCertUrl, idProofUrl] = await Promise.all([
@@ -69,15 +72,22 @@ const TenantVerificationForm: React.FC = () => {
         },
       };
 
-      const result = await dispatch(submitVerification(finalPayload)).unwrap();
-      if(result && result.success){
-        toast.success(result.message || 'Verification submitted successfully');
-        navigate('/tenant/dashboard');
-      } else {
-        toast.error(result.message || 'Submission failed');
+      // Since we use .unwrap(), success is implied if it doesn't throw
+      await dispatch(submitVerification(finalPayload)).unwrap();
+      
+      toast.success('Verification submitted successfully');
+      navigate('/tenant/dashboard');
+
+    } catch (error: unknown) {
+      let errorMessage = "Submission failed. Please try again.";
+      
+      if (error && typeof error === 'object' && 'message' in error) {
+        errorMessage = String(error.message);
+      } else if (typeof error === 'string') {
+        errorMessage = error;
       }
-    } catch (error: any) {
-      toast.error(error || "SUBMISSION FAILED");
+
+      toast.error(errorMessage);
     }
   };
 
@@ -86,7 +96,7 @@ const TenantVerificationForm: React.FC = () => {
   const errorStyle = "text-[#EF4444] text-[9px] font-bold uppercase mt-1";
 
   return (
-    <div className="max-w-4xl mx-auto pb-20 px-6 pt-10">
+    <div className="max-w-4xl mx-auto pb-20 px-6 pt-10 font-sans">
       <div className="mb-10 text-center sm:text-left">
         <h1 className="text-3xl font-black text-[#0F172A] tracking-tight">Auction House Verification</h1>
         <p className="text-[#475569] mt-2 text-[11px] font-medium uppercase tracking-wider">Complete your profile to start hosting auctions</p>
@@ -205,12 +215,12 @@ const TenantVerificationForm: React.FC = () => {
                     className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" 
                   />
                   <div className={`border-2 border-dashed rounded-xl p-4 text-center transition-all ${regCertFile ? 'border-[#10B981] bg-[#F0FDF4]' : 'border-[#E2E8F0] hover:border-[#2F6FED]'}`}>
-                    <p className="text-[10px] font-bold text-[#475569] uppercase tracking-widest">
+                    <p className="text-[10px] font-bold text-[#475569] uppercase tracking-widest truncate">
                       {regCertFile ? regCertFile.name : 'Upload Registration Cert'}
                     </p>
                   </div>
                 </div>
-                {errors.registrationCertificate && <p className={errorStyle}>{errors.registrationCertificate.message}</p>}
+                {errors.registrationCertificate && <p className={errorStyle}>{errors.registrationCertificate.message as string}</p>}
               </div>
 
               <div>
@@ -225,12 +235,12 @@ const TenantVerificationForm: React.FC = () => {
                     className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" 
                   />
                   <div className={`border-2 border-dashed rounded-xl p-4 text-center transition-all ${idProofFile ? 'border-[#10B981] bg-[#F0FDF4]' : 'border-[#E2E8F0] hover:border-[#2F6FED]'}`}>
-                    <p className="text-[10px] font-bold text-[#475569] uppercase tracking-widest">
+                    <p className="text-[10px] font-bold text-[#475569] uppercase tracking-widest truncate">
                       {idProofFile ? idProofFile.name : 'Upload ID Proof'}
                     </p>
                   </div>
                 </div>
-                {errors.identityProof && <p className={errorStyle}>{errors.identityProof.message}</p>}
+                {errors.identityProof && <p className={errorStyle}>{errors.identityProof.message as string}</p>}
               </div>
             </div>
           </div>
@@ -240,9 +250,14 @@ const TenantVerificationForm: React.FC = () => {
           <button 
             type="submit" 
             disabled={isSubmitting}
-            className="w-full md:w-auto bg-[#2F6FED] text-white px-16 py-4 rounded-xl font-bold text-sm uppercase tracking-widest hover:bg-[#2557C8] transition-all flex items-center gap-3 shadow-lg shadow-blue-500/20 disabled:opacity-50"
+            className="w-full md:w-auto bg-[#2F6FED] text-white px-16 py-4 rounded-xl font-bold text-sm uppercase tracking-widest hover:bg-[#2557C8] transition-all flex items-center justify-center gap-3 shadow-lg shadow-blue-500/20 disabled:opacity-50"
           >
-            {isSubmitting ? <Loader2 size={18} className="animate-spin" /> : "Submit for Verification"}
+            {isSubmitting ? (
+              <>
+                <Loader2 size={18} className="animate-spin" />
+                <span>Uploading...</span>
+              </>
+            ) : "Submit for Verification"}
           </button>
           <div className="flex items-center gap-2 text-[#94A3B8]">
             <Info size={14} />

@@ -9,25 +9,45 @@ import { useAppDispatch, useAppSelector } from "../../hooks/redux.hooks";
 import { setAuthError, setAuthSuccess, setLoading } from "../../redux/user/auth.slice";
 import authService from "../../services/auth.service";
 import toast from "react-hot-toast";
+// Import the type from your slice or types file
+import type { JwtPayload } from "../../types/auth.type";
+
+// 1. Define the interface using your existing JwtPayload
+interface LoginResponse {
+    success: boolean;
+    message: string;
+    token: string;
+    user: JwtPayload; // No more 'any'
+}
+
+interface ApiError {
+    response?: {
+        data?: {
+            message?: string;
+        };
+    };
+}
 
 const schema = yup.object({
     email: yup.string().email('Invalid email').required('Email is required'),
     password: yup.string().required('Password is required')
 }).required();
-const baseURL = import.meta.env.VITE_API_URL
+
+type LoginFormData = yup.InferType<typeof schema>;
+
+const baseURL = import.meta.env.VITE_API_URL;
+
 const LoginPage: React.FC = () => {
     const [showPassword, setShowPassword] = useState(false);
     const [searchParams] = useSearchParams();
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
 
-
     const { loading } = useAppSelector((state) => state.auth);
     const toastShown = useRef(false);
 
     useEffect(() => {
         const errorMsg = searchParams.get("error");
-
         if (errorMsg && !toastShown.current) {
             const decodedError = decodeURIComponent(errorMsg);
             toast.error(decodedError);
@@ -36,22 +56,29 @@ const LoginPage: React.FC = () => {
             navigate(window.location.pathname, { replace: true });
         }
     }, [searchParams, navigate, dispatch]);
-    const { register, handleSubmit, formState: { errors } } = useForm({
-        resolver: yupResolver(schema),
 
+    const { register, handleSubmit, formState: { errors } } = useForm<LoginFormData>({
+        resolver: yupResolver(schema),
     });
+
     const handleGoogleSignup = (role: 'user' | 'tenant') => {
         window.location.href = `${baseURL}/auth/google?role=${role}`;
     };
 
-    const onSubmit = async (data: any) => {
+    const onSubmit = async (data: LoginFormData) => {
         dispatch(setLoading(true));
         try {
-            const loginData = { ...data, role: "user" };
-            const result = await authService.login(loginData);
+            const loginData =  {...data, role: "user" as const };
+            
+            // 2. Cast to the strict LoginResponse
+            const result = (await authService.login(loginData)) as LoginResponse;
+
             if (result && result.success) {
                 localStorage.setItem("accessToken", result.token);
+                
+                // 3. This now aligns perfectly with setAuthSuccess(state, action: PayloadAction<JwtPayload>)
                 dispatch(setAuthSuccess(result.user));
+                
                 toast.success(result.message || "Welcome to BidVerse");
                 navigate('/home');
             } else {
@@ -59,8 +86,9 @@ const LoginPage: React.FC = () => {
                 dispatch(setAuthError(errorMsg));
                 toast.error(errorMsg);
             }
-        } catch (error: any) {
-            const serverMessage = error.response?.data?.message || "Invalid email or password";
+        } catch (error: unknown) {
+            const err = error as ApiError;
+            const serverMessage = err.response?.data?.message || "Invalid email or password";
             dispatch(setAuthError(serverMessage));
             toast.error(serverMessage);
         } finally {
@@ -69,20 +97,14 @@ const LoginPage: React.FC = () => {
     };
 
     return (
-        <div className="min-h-screen bg-[#FFF9F4] flex items-center justify-center px-6">
+        <div className="min-h-screen bg-[#FFF9F4] flex items-center justify-center px-6 font-sans">
             <div className="bg-[#FFFFFF] border border-[#E6E0DA] w-full max-w-sm p-8 shadow-sm">
-
-                {/* Header Section */}
                 <div className="text-center mb-8">
                     <h2 className="text-2xl font-bold text-[#1F1F1F] uppercase tracking-tighter italic">Welcome Back</h2>
                     <p className="text-[#6B6B6B] text-[10px] uppercase tracking-[0.2em] mt-1">Access your bidder dashboard</p>
                 </div>
 
-                <form onSubmit={(e) => {
-                    e.preventDefault(); // Stop the reload first
-                    handleSubmit(onSubmit)(e);
-                }} className="space-y-5">
-                    {/* Email Input */}
+                <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
                     <div>
                         <label className="block text-[9px] font-bold uppercase tracking-[0.2em] text-[#6B6B6B] mb-1.5">
                             Email Address
@@ -98,7 +120,6 @@ const LoginPage: React.FC = () => {
                         )}
                     </div>
 
-                    {/* Password Input with Eye Toggler */}
                     <div>
                         <div className="flex justify-between items-center mb-1.5">
                             <label className="block text-[9px] font-bold uppercase tracking-[0.2em] text-[#6B6B6B]">
@@ -128,7 +149,6 @@ const LoginPage: React.FC = () => {
                         )}
                     </div>
 
-                    {/* Login Button - Syncs with Redux Loading */}
                     <button
                         type="submit"
                         disabled={loading}
@@ -153,7 +173,6 @@ const LoginPage: React.FC = () => {
                     </button>
                 </form>
 
-                {/* Footer Section */}
                 <div className="mt-8 pt-6 border-t border-[#E6E0DA] text-center space-y-5">
                     <p className="text-[9px] text-[#6B6B6B] uppercase tracking-[0.15em] font-medium">
                         New to the platform?

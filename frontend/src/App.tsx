@@ -12,6 +12,7 @@ import VerifyOtpPage from "./pages/users/verifyotpPage";
 import UserHomePage from './pages/users/homePage'
 import LoginPage from "./pages/users/loginPage";
 
+
 import ForgotPassPage from "./pages/users/forgotpassPage";
 import ForgotPassVeifyOtpPage from './pages/users/forgotPassVerifyOtp'
 import NewPasswordPage from "./pages/users/resetPassword";
@@ -58,6 +59,7 @@ function App() {
 
                <Route element={<ProtectedRoute allowedRoles={['user']} />}>
                   <Route path="/home" element={<UserHomePage />} />
+                  
                </Route>
             </Route>
 

@@ -3,7 +3,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import { FaEye, FaEyeSlash, FaLock } from "react-icons/fa";
+import { FaEye, FaEyeSlash} from "react-icons/fa";
 import authService from "../../services/auth.service";
 import type { ResetPasswordDTO } from "../../types/auth.type";
 import toast from "react-hot-toast";
@@ -53,14 +53,32 @@ const ResetPasswordPage: React.FC = () => {
     },
   });
 
-  const onSubmit = async (data: ResetPasswordDTO) => {
+ const onSubmit = async (data: ResetPasswordDTO) => {
     setIsSubmitting(true);
     try {
-      await authService.resetPassword(data);
-      toast.success("Security credentials updated. Please login.");
-      navigate("/login");
-    } catch (err: any) {
-      toast.error(err.response?.data?.message || "Failed to reset password.");
+      const result = await authService.resetPassword(data);
+      
+      if (result.success) {
+        toast.success(result.message || "Security credentials updated. Please login.");
+        navigate("/login");
+      } else {
+        toast.error(result.message || "Failed to reset password.");
+      }
+    } catch (err: unknown) {
+      
+      interface BackendError {
+        response?: {
+          data?: {
+            message?: string;
+          };
+        };
+      }
+
+      
+      const error = err as BackendError;
+      const errorMessage = error.response?.data?.message || "Failed to reset password.";
+      
+      toast.error(errorMessage);
     } finally {
       setIsSubmitting(false);
     }

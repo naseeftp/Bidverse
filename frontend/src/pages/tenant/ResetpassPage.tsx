@@ -8,6 +8,15 @@ import authService from "../../services/auth.service";
 import type { ResetPasswordDTO } from "../../types/auth.type";
 import toast from "react-hot-toast";
 
+// Typed error interface for Axios responses
+interface AxiosErrorResponse {
+  response?: {
+    data?: {
+      message?: string;
+    };
+  };
+}
+
 const resetSchema = yup.object({
   email: yup.string().email().required(),
   resetToken: yup.string().required(),
@@ -28,7 +37,6 @@ const TenantResetPasswordPage: React.FC = () => {
   // Data passed from TenantForgotPassVerifyOtp
   const email = location.state?.email || "";
   const resetToken = location.state?.resetToken || "";
-  const role = location.state?.role || "tenant";
 
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -56,12 +64,12 @@ const TenantResetPasswordPage: React.FC = () => {
   const onSubmit = async (data: ResetPasswordDTO) => {
     setIsSubmitting(true);
     try {
-      // Ensure we tell the backend we are resetting a tenant account
       await authService.resetPassword({ ...data });
       toast.success("Auction House credentials updated. Please login.");
       navigate("/tenant/login");
-    } catch (err: any) {
-      toast.error(err.response?.data?.message || "Failed to update password.");
+    } catch (err: unknown) {
+      const error = err as AxiosErrorResponse;
+      toast.error(error.response?.data?.message || "Failed to update password.");
     } finally {
       setIsSubmitting(false);
     }

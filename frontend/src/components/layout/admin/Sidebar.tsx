@@ -9,14 +9,13 @@ import {
     FaSignOutAlt,
     FaShieldAlt
 } from "react-icons/fa";
-import { useNavigate } from "react-router-dom";
+
 import { logout } from "../../../redux/user/auth.slice";
 import { useAppDispatch } from "../../../hooks/redux.hooks";
 
 const AdminSidebar: React.FC = () => {
     const location = useLocation();
     const dispatch = useAppDispatch();
-    const navigate = useNavigate()
     const handleLogout = () => {
         dispatch(logout())
     }
@@ -52,8 +51,8 @@ const AdminSidebar: React.FC = () => {
                         key={item.path}
                         to={item.path}
                         className={`flex items-center gap-4 px-4 py-3.5 rounded-sm text-[10px] font-bold uppercase tracking-[0.15em] transition-all duration-300 ${isActive(item.path)
-                                ? "bg-[#D4AF37] text-[#111827] shadow-lg shadow-[#D4AF37]/20"
-                                : "text-[#6B7280] hover:text-[#D4AF37] hover:bg-[#1f2937]"
+                            ? "bg-[#D4AF37] text-[#111827] shadow-lg shadow-[#D4AF37]/20"
+                            : "text-[#6B7280] hover:text-[#D4AF37] hover:bg-[#1f2937]"
                             }`}
                     >
                         <span className="text-base">{item.icon}</span>

@@ -21,7 +21,8 @@ const LandingPage: React.FC = () => {
 
         {/* PARAGRAPH: Secondary Text Color (#6B6B6B) */}
         <p className="max-w-2xl text-[#6B6B6B] text-lg md:text-xl mb-12 font-light leading-relaxed">
-          A premium multi-tenant auction platform designed for speed, security, and the world's most exclusive items.
+          {/* FIX: Wrapped in curly braces to handle the apostrophe safely */}
+          {"A premium multi-tenant auction platform designed for speed, security, and the world's most exclusive items."}
         </p>
 
         <div className="flex flex-col sm:flex-row gap-5">

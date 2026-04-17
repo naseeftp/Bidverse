@@ -8,11 +8,15 @@ import { useAppDispatch, useAppSelector } from "../../hooks/redux.hooks";
 import { setAuthError, setAuthSuccess, setLoading } from "../../redux/user/auth.slice";
 import authService from "../../services/auth.service";
 import toast from "react-hot-toast";
-
+import { Roles } from "../../types/auth.type";
 const schema = yup.object({
     email: yup.string().email('Invalid administrative email').required('Email is required'),
     password: yup.string().required('Password is required')
 }).required();
+interface IAdminLoginData {
+    email: string;
+    password: string
+}
 
 const AdminLoginPage: React.FC = () => {
     const [showPassword, setShowPassword] = useState(false);
@@ -24,10 +28,10 @@ const AdminLoginPage: React.FC = () => {
     });
 
 
-    const onSubmit = async (data: any) => {
+    const onSubmit = async (data: IAdminLoginData) => {
         dispatch(setLoading(true))
         try {
-            const loginData = { ...data, role: "admin" }
+            const loginData = { ...data, role: Roles.ADMIN }
             const result = await authService.login(loginData)
             if (result && result.success) {
                 dispatch(setAuthSuccess(result.user))
@@ -40,8 +44,13 @@ const AdminLoginPage: React.FC = () => {
                 dispatch(setAuthError(errorMessage));
                 toast.error(errorMessage)
             }
-        } catch (error: any) {
-            const serverMessage = error.response?.data?.message || "Login failed";
+        } catch (error: unknown) {
+            let serverMessage = "Login failed";
+            if (error && typeof error === 'object' && 'response' in error) {
+                const axiosError = error as { response?: { data?: { message?: string } } };
+                serverMessage = axiosError.response?.data?.message || serverMessage;
+            }
+
             dispatch(setAuthError(serverMessage));
             toast.error(serverMessage);
         } finally {

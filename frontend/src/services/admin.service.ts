@@ -7,11 +7,11 @@ import type { updateAuctionHouseStatusRequestDTO } from '../types/admin.dto'
 class AdminService {
     async listAllAuctionHouses(page: number = 1, limit: number = 10) {
         try {
-            const response = await axiosInstance.get<any, ApiResponse>(`${ADMIN_ROUTES.GET_AUCTION_HOUSES}?page=${page}&limit=${limit}`)
+            const response = await axiosInstance.get<unknown, ApiResponse>(`${ADMIN_ROUTES.GET_AUCTION_HOUSES}?page=${page}&limit=${limit}`)
             return {
                 success: true,
                 message: response.message,
-                ...response.data
+                ...(response.data||{})
             }
         } catch (error) {
             return apiErrorHandler(error, "Failed to fetch auction houses");
@@ -20,7 +20,7 @@ class AdminService {
     async getAuctionHouseById(id: string) {
         try {
             const url = `/admin/auction-house/${id}`;
-            const response = await axiosInstance.get<any, ApiResponse>(url);
+            const response = await axiosInstance.get<unknown, ApiResponse>(url);
             return {
                 success: true,
                 message: response.message,
@@ -35,7 +35,7 @@ class AdminService {
     async updateHouseStatus(id: string, data: updateAuctionHouseStatusRequestDTO) {
         try {
             const url = `${ADMIN_ROUTES.UPDATE_HOUSE_STATUS}/${id}`;
-            const response = await axiosInstance.patch<any, ApiResponse>(url, data);
+            const response = await axiosInstance.patch<unknown, ApiResponse>(url, data);
             return {
                 success: true,
                 message: response.message || "Status updated successfully",

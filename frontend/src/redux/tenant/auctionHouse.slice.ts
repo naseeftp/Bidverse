@@ -10,6 +10,7 @@ interface AuctionHouseState {
     reason: string | null | undefined
     error: string | null
 }
+
 const initialState: AuctionHouseState = {
     profile: null,
     status: null,
@@ -17,18 +18,19 @@ const initialState: AuctionHouseState = {
     reason: null,
     error: null
 }
+
 export const fetchAuctionProfile = createAsyncThunk(
     "auctionHouse/fetchProfile",
     async (_, { rejectWithValue }) => {
         try {
             const result = await auctionHouseService.getProfile()
-            console.log('result', result)
             if (!result.success) {
                 return rejectWithValue(result.message)
             }
-            return result
-        } catch (error: any) {
-            return rejectWithValue('Unexpected error happend')
+            
+            return result as unknown as AuctionHouseResponseDTO;
+        } catch {
+            return rejectWithValue('Unexpected error happened')
         }
     }
 )
@@ -41,8 +43,9 @@ export const submitVerification = createAsyncThunk(
             if (!result.success) {
                 return rejectWithValue(result.message)
             }
-            return result
-        } catch (error) {
+            // RETURN result.data to match AuctionHouseResponseDTO
+            return result as unknown as AuctionHouseResponseDTO;
+        } catch {
             return rejectWithValue('Failed to submit verification');
         }
     }
@@ -55,7 +58,7 @@ const auctionHouseSlice = createSlice({
         clearAuctionHouseError: (state) => {
             state.error = null;
         },
-        resetAuctionHouseState: (state) => {
+        resetAuctionHouseState: () => {
             return initialState
         }
     },
@@ -66,14 +69,13 @@ const auctionHouseSlice = createSlice({
         });
         builder.addCase(fetchAuctionProfile.fulfilled, (state, action: PayloadAction<AuctionHouseResponseDTO>) => {
             state.loading = false;
-            if (action.payload.id) {
+            if (action.payload && action.payload.id) {
                 state.profile = action.payload;
                 state.status = action.payload.status
                 state.reason = action.payload.status === 'rejected'
                     ? (action.payload.rejectionReason ?? "No specific reason provided.")
                     : null;
-            }
-            else {
+            } else {
                 state.profile = null;
                 state.status = null;
                 state.reason = null;
@@ -87,7 +89,7 @@ const auctionHouseSlice = createSlice({
             state.loading = true;
             state.error = null;
         });
-        builder.addCase(submitVerification.fulfilled, (state, action: PayloadAction<any>) => {
+        builder.addCase(submitVerification.fulfilled, (state, action: PayloadAction<AuctionHouseResponseDTO>) => {
             state.loading = false;
             state.profile = action.payload;
             state.status = action.payload.status;

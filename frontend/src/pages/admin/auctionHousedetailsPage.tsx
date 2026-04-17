@@ -1,34 +1,41 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import adminService from '../../services/admin.service';
 import { FaArrowLeft, FaSearchPlus } from 'react-icons/fa';
 import { VerificationStatus } from '../../types/auctionHouse.type';
-import type { TVerificationStatus } from '../../types/auctionHouse.type';
+import type { TVerificationStatus, AuctionHouseResponseDTO } from '../../types/auctionHouse.type';
 import type { updateAuctionHouseStatusRequestDTO } from '../../types/admin.dto';
+
+type AuctionHouseWithLegal = AuctionHouseResponseDTO & {
+    legal?: {
+        registrationCertificateUrl: string;
+        identityProofUrl: string;
+    }
+};
 
 const AuctionHouseDetails: React.FC = () => {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
 
-    const [house, setHouse] = useState<any>(null);
+    const [house, setHouse] = useState<AuctionHouseWithLegal | null>(null);
     const [loading, setLoading] = useState(true);
     const [actionLoading, setActionLoading] = useState(false);
     const [rejectionReason, setRejectionReason] = useState('');
     const [showRejectInput, setShowRejectInput] = useState(false);
     const [selectedImg, setSelectedImg] = useState<string | null>(null);
 
-    useEffect(() => {
-        if (id) fetchDetails();
-    }, [id]);
-
-    const fetchDetails = async () => {
+    const fetchDetails = useCallback(async () => {
         setLoading(true);
         const res = await adminService.getAuctionHouseById(id!);
         if (res.success && 'data' in res) {
-            setHouse(res.data);
+            setHouse(res.data as AuctionHouseWithLegal);
         }
         setLoading(false);
-    };
+    }, [id]);
+
+    useEffect(() => {
+        if (id) fetchDetails();
+    }, [id, fetchDetails]);
 
     const handleStatusUpdate = async (status: TVerificationStatus) => {
         if (status === VerificationStatus.REJECTED) {
@@ -41,29 +48,24 @@ const AuctionHouseDetails: React.FC = () => {
                 return;
             }
         }
+
         const updateData: updateAuctionHouseStatusRequestDTO = {
-            status: status,
+            status,
             reason: status === VerificationStatus.REJECTED ? rejectionReason : null
         };
 
         setActionLoading(true);
 
         try {
-
             const res = await adminService.updateHouseStatus(id!, updateData);
             if (res.success) {
-                setHouse((prev: any) => ({
-                    ...prev,
-                    status: status
-                }));
+                setHouse((prev) => prev ? ({ ...prev, status }) : null);
                 setShowRejectInput(false);
                 setRejectionReason('');
-                console.log("Registry updated successfully");
             } else {
                 alert(res.message || "Failed to update registry status.");
             }
-        } catch (error) {
-            console.error("Critical update error:", error);
+        } catch {
             alert("An error occurred. Please check your connection and try again.");
         } finally {
             setActionLoading(false);
@@ -71,7 +73,6 @@ const AuctionHouseDetails: React.FC = () => {
     };
 
     if (loading) return <div className="p-20 text-center text-zinc-400 animate-pulse font-black uppercase tracking-widest">Verifying Registry...</div>;
-
     if (!house) return <div className="p-20 text-center text-red-500 font-black uppercase">Record not found.</div>;
 
     return (
@@ -82,10 +83,9 @@ const AuctionHouseDetails: React.FC = () => {
                     onClick={() => setSelectedImg(null)}
                 >
                     <img src={selectedImg} className="max-w-full max-h-full rounded shadow-2xl" alt="Preview" />
-                    <button className="absolute top-10 right-10 text-white text-3xl">&times;</button>
+                    <button className="absolute top-10 right-10 text-white text-3xl" aria-label="Close">&times;</button>
                 </div>
             )}
-
 
             <header className="mb-10 flex flex-col md:flex-row md:items-end justify-between border-b border-zinc-200 pb-8 gap-4">
                 <div className="space-y-4">
@@ -97,7 +97,7 @@ const AuctionHouseDetails: React.FC = () => {
                     </button>
                     <div>
                         <h1 className="text-4xl font-black uppercase tracking-tight text-zinc-900">{house.name}</h1>
-                        <p className="text-zinc-500 font-mono text-xs mt-1 tracking-tighter uppercase">Registry ID: {house._id}</p>
+                        <p className="text-zinc-500 font-mono text-xs mt-1 tracking-tighter uppercase">Registry ID: {house.id}</p>
                     </div>
                 </div>
                 <div className="flex gap-4">
@@ -111,22 +111,26 @@ const AuctionHouseDetails: React.FC = () => {
             </header>
 
             <main className="grid grid-cols-1 lg:grid-cols-12 gap-10">
-
                 <div className="lg:col-span-8 space-y-8">
-
                     <section className="bg-white border border-zinc-200 p-8 rounded shadow-sm">
                         <h3 className="text-[11px] font-black uppercase tracking-[0.2em] text-zinc-400 mb-8">Verification Documents</h3>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                             {[
-                                { label: 'Registration Certificate', url: house.legal?.registrationCertificateUrl },
-                                { label: 'Identity Proof', url: house.legal?.identityProofUrl }
+                                { 
+                                    label: 'Registration Certificate', 
+                                    url: house.legal?.registrationCertificateUrl || house.documents?.registrationCertificateUrl 
+                                },
+                                { 
+                                    label: 'Identity Proof', 
+                                    url: house.legal?.identityProofUrl || house.documents?.identityProofUrl 
+                                }
                             ].map((doc, idx) => (
                                 doc.url && (
                                     <div key={idx} className="group">
                                         <p className="text-[10px] font-bold text-zinc-400 uppercase mb-3 tracking-wide">{doc.label}</p>
                                         <div
                                             className="relative aspect-video bg-zinc-50 border border-zinc-100 rounded overflow-hidden cursor-pointer group-hover:border-zinc-300 transition-all"
-                                            onClick={() => setSelectedImg(doc.url)}
+                                            onClick={() => setSelectedImg(doc.url!)}
                                         >
                                             <img src={doc.url} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt={doc.label} />
                                             <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 flex items-center justify-center transition-all">
@@ -181,11 +185,10 @@ const AuctionHouseDetails: React.FC = () => {
 
                     <section className="bg-white border border-zinc-200 p-8 rounded shadow-sm">
                         <h4 className="text-[11px] font-black uppercase tracking-widest text-zinc-400 mb-4">Brief Narrative</h4>
-                        <p className="text-sm text-zinc-600 leading-relaxed italic">"{house.briefDescription}"</p>
+                        <p className="text-sm text-zinc-600 leading-relaxed italic">&quot;{house.briefDescription}&quot;</p>
                     </section>
                 </div>
 
-                {/* Right Side: Decision Box */}
                 <aside className="lg:col-span-4">
                     <div className="sticky top-10 space-y-6">
                         <div className="bg-zinc-900 p-8 rounded-lg shadow-xl text-white">

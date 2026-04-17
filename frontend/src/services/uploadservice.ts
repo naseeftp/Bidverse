@@ -20,8 +20,7 @@ class UploadService {
             return result.secure_url
 
         }
-        catch (error) {
-            console.error("Cloudinary upload error:", error);
+        catch{
             throw new Error("Failed to upload document to cloud storage.");
         }
     }

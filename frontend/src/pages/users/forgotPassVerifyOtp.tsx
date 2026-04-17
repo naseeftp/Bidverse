@@ -2,14 +2,36 @@ import React, { useState, useRef, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import authService from "../../services/auth.service";
 import toast from "react-hot-toast";
+import type { userRole } from "../../types/auth.type";
+
+// 1. Define the specific shape of the data for this process
+interface ForgotPassData {
+  expiresAt: string;
+  resetToken?: string;
+}
+
+// 2. Define a strict structure for the service response envelope
+interface ServiceResponse {
+  success: boolean;
+  message: string;
+  data?: ForgotPassData;
+}
+
+interface ApiErrorResponse {
+  response?: {
+    data?: {
+      message?: string;
+    };
+  };
+}
 
 const ForgotPassVerifyOtp: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  // Extracting data from the navigation state sent by ForgotPassPage
-  const email = location.state?.email || "";
-  const role = location.state?.role || "user";
-  const initialExpiry = location.state?.expiresAt;
+
+  const email = (location.state?.email as string) || "";
+  const role = (location.state?.role as userRole) || "user";
+  const initialExpiry = location.state?.expiresAt as string | undefined;
 
   const [otp, setOtp] = useState<string[]>(new Array(6).fill(""));
   const [loading, setLoading] = useState(false);
@@ -18,7 +40,6 @@ const ForgotPassVerifyOtp: React.FC = () => {
 
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
-  
   useEffect(() => {
     if (!email) {
       toast.error("Session expired. Please start again.");
@@ -29,12 +50,10 @@ const ForgotPassVerifyOtp: React.FC = () => {
     if (initialExpiry) {
       setExpiresAt(new Date(initialExpiry).getTime());
     } else {
-      
-      setExpiresAt(Date.now() + 120000); 
+      setExpiresAt(Date.now() + 120000);
     }
   }, [email, navigate, initialExpiry]);
 
-  
   useEffect(() => {
     if (!expiresAt) return;
     const calculateTime = () => {
@@ -63,50 +82,59 @@ const ForgotPassVerifyOtp: React.FC = () => {
       inputRefs.current[index - 1]?.focus();
     }
   };
- const handleResend = async () => {
+
+  const handleResend = async () => {
     if (timeLeft > 0) return;
     setLoading(true);
     try {
-      const result = await authService.forgotpass({ email,role:'user'}) as any;
-      if (result && result.success) {
-        const newExpiry = result.expiresAt
-        ? new Date(result.expiresAt).getTime() 
-        : Date.now() + 900000; 
+      // FIX: Assert the function's return type instead of passing a generic argument
+      const result = (await authService.forgotpass({
+        email,
+        role: "user",
+      })) as ServiceResponse;
+
+      if (result.success && result.data) {
+        const newExpiry = new Date(result.data.expiresAt).getTime();
         setExpiresAt(newExpiry);
         toast.success("New recovery code sent.");
       }
-    } catch (err) {
-      toast.error("Failed to resend code.");
+    } catch (err: unknown) {
+      const error = err as ApiErrorResponse;
+      toast.error(error.response?.data?.message || "Failed to resend code.");
     } finally {
       setLoading(false);
     }
   };
 
-  
   const handleVerify = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     const otpString = otp.join("");
 
     try {
-      
-      const result = await authService.verifyOtp({
+      // FIX: Assert the function's return type
+      const result = (await authService.verifyOtp({
         email,
         otp: otpString,
-        role: role as any,
-        purpose: 'forgot_password' 
-        }) as any;
+        role: role,
+        purpose: "forgot_password",
+      })) as ServiceResponse;
 
-      if (result && result.success) {
+      if (result.success && result.data) {
         toast.success("Email verified. Set your new password.");
-        navigate("/reset-password", { 
-          state: { email, role, resetToken: result.resetToken } 
+        navigate("/reset-password", {
+          state: {
+            email,
+            role,
+            resetToken: result.data.resetToken,
+          },
         });
       } else {
         toast.error(result.message || "Invalid recovery code");
       }
-    } catch (err: any) {
-      toast.error("Verification failed. Please try again.");
+    } catch (err: unknown) {
+      const error = err as ApiErrorResponse;
+      toast.error(error.response?.data?.message || "Verification failed.");
     } finally {
       setLoading(false);
     }
@@ -119,12 +147,12 @@ const ForgotPassVerifyOtp: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#FFF9F4] p-4 font-sans">
+    <div className="min-h-screen flex items-center justify-center bg-[#FFF9F4] p-4 font-sans text-[#1F1F1F]">
       <div className="max-w-md w-full bg-white border border-[#E6E0DA] p-10 shadow-sm">
         <div className="text-center mb-10">
-          <h2 className="text-3xl font-bold text-[#1F1F1F] uppercase italic tracking-tighter">Identity Check</h2>
+          <h2 className="text-3xl font-bold uppercase italic tracking-tighter">Identity Check</h2>
           <p className="text-[#6B6B6B] text-[10px] uppercase tracking-[0.2em] mt-2">
-            Recovery code sent to <br/><span className="text-[#1F1F1F] font-bold">{email}</span>
+            Recovery code sent to <br /><span className="text-[#1F1F1F] font-bold">{email}</span>
           </p>
         </div>
 
@@ -139,14 +167,14 @@ const ForgotPassVerifyOtp: React.FC = () => {
                 value={data}
                 onChange={(e) => handleChange(e.target.value, index)}
                 onKeyDown={(e) => handleKeyDown(e, index)}
-                className="w-12 h-16 border border-[#E6E0DA] bg-[#FFF9F4] text-center text-xl font-bold text-[#1F1F1F] focus:outline-none focus:border-[#C9653B] transition-colors"
+                className="w-12 h-16 border border-[#E6E0DA] bg-[#FFF9F4] text-center text-xl font-bold focus:outline-none focus:border-[#C9653B] transition-colors"
               />
             ))}
           </div>
 
           <button
             type="submit"
-            disabled={loading || otp.includes("") || timeLeft === 0}
+            disabled={loading || otp.includes("") || (timeLeft === 0 && expiresAt !== null)}
             className="w-full bg-[#C9653B] text-white py-4 font-bold uppercase tracking-widest hover:brightness-110 transition-all disabled:opacity-50"
           >
             {loading ? "Verifying..." : "Verify Recovery Code"}
@@ -165,6 +193,7 @@ const ForgotPassVerifyOtp: React.FC = () => {
           ) : (
             <button
               onClick={handleResend}
+              type="button"
               disabled={loading}
               className="text-[11px] font-bold uppercase tracking-widest text-[#1F1F1F] border-b-2 border-[#C9653B] px-2 py-1 hover:bg-[#C9653B] hover:text-white transition-all disabled:opacity-50"
             >

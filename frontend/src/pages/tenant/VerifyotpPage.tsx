@@ -4,6 +4,26 @@ import { useAppDispatch, useAppSelector } from "../../hooks/redux.hooks";
 import { setAuthSuccess } from "../../redux/user/auth.slice";
 import authService from "../../services/auth.service";
 import toast from "react-hot-toast";
+import type { ApiResponse, JwtPayload } from '../../types/auth.type';
+
+// Local interfaces for strict typing
+// We omit 'exp' because the frontend state doesn't need the token expiry timestamp in the user object
+interface RegistrationResult {
+  token: string;
+  user:JwtPayload 
+}
+
+interface ResendResult {
+  expiresAt: string;
+}
+
+interface AxiosError {
+  response?: {
+    data?: {
+      message?: string;
+    };
+  };
+}
 
 const TenantVerifyOtpPage: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -22,10 +42,10 @@ const TenantVerifyOtpPage: React.FC = () => {
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
   // Theme Constants
-   const brandBlue = "#2F6FED";
-   const deepNavy = "#0F172A";
-   const slateGrey = "#475569";
-   const bgLight = "#F5F7FB";
+  const brandBlue = "#2F6FED";
+  const deepNavy = "#0F172A";
+  const slateGrey = "#475569";
+  const bgLight = "#F5F7FB";
 
   useEffect(() => {
     if (!email) {
@@ -38,7 +58,7 @@ const TenantVerifyOtpPage: React.FC = () => {
     } else if (!expiresAt) {
       setExpiresAt(Date.now() + 60000);
     }
-  }, [email, navigate, initialExpiry]);
+  }, [email, navigate, initialExpiry, expiresAt]);
 
   useEffect(() => {
     if (!expiresAt) return;
@@ -81,15 +101,16 @@ const TenantVerifyOtpPage: React.FC = () => {
     setLoading(true);
 
     try {
-      const result = await authService.resendOtp({ email }) as any;
+      const result: ApiResponse<ResendResult> = await authService.resendOtp({ email });
       if (result?.success) {
-        setExpiresAt(result.expiresAt ? new Date(result.expiresAt).getTime() : Date.now() + 60000);
+        setExpiresAt(result.data?.expiresAt ? new Date(result.data.expiresAt).getTime() : Date.now() + 60000);
         toast.success("New code sent to your email");
       } else {
         toast.error(result.message || 'Failed to resend OTP');
       }
-    } catch (err) {
-      toast.error("An error occurred while resending OTP.");
+    } catch (err: unknown) {
+      const error = err as AxiosError;
+      toast.error(error.response?.data?.message || "An error occurred while resending OTP.");
     } finally {
       setLoading(false);
     }
@@ -103,22 +124,26 @@ const TenantVerifyOtpPage: React.FC = () => {
     const otpString = otp.join("");
 
     try {
-      const result = await authService.verifyOtp({
+      const result: ApiResponse<RegistrationResult> = await authService.verifyOtp({
         email,
         otp: otpString,
-        role: role as any
-      }) as any;
+        role: role 
+      });
 
-      if (result?.success) {
-        localStorage.setItem("accessToken", result.token);
-        dispatch(setAuthSuccess(result.user));
+      if (result?.success && result.data) {
+        localStorage.setItem("accessToken", result.data.token);
+        
+        // The result.data.user now strictly follows your JwtPayload (userId, email, role, name)
+        dispatch(setAuthSuccess(result.data.user));
+        
         toast.success("Account Verified Successfully");
         navigate("/tenant/dashboard");
       } else {
         toast.error(result.message || "Invalid verification code");
       }
-    } catch (err) {
-      toast.error("Verification failed. Please try again.");
+    } catch (err: unknown) {
+      const error = err as AxiosError;
+      toast.error(error.response?.data?.message || "Verification failed. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -139,7 +164,7 @@ const TenantVerifyOtpPage: React.FC = () => {
             Verify your House
           </h2>
           <p className={`text-[${slateGrey}] text-sm mt-3 font-medium`}>
-            We've sent a 6-digit code to <br />
+            We&apos;ve sent a 6-digit code to <br />
             <span className={`text-[${deepNavy}] font-bold`}>{email}</span>
           </p>
         </div>

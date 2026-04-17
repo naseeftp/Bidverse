@@ -22,7 +22,7 @@ axiosInstance.interceptors.response.use(
     (response) => response.data,
 
     async (error) => {
-        const originalRequest = error.config as any;
+        const originalRequest = error.config ;
         if (!originalRequest) return Promise.reject(error);
         const isLoginRequest = originalRequest.url?.includes(AUTH_ROUTES.LOGIN);
         if (error.response?.status === 401 && !originalRequest._retry && !isLoginRequest) {

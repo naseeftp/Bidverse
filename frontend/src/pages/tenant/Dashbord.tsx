@@ -10,17 +10,21 @@ import {
   Clock,
   ChevronRight,
   MoreHorizontal,
-  Loader2, ShieldCheck, Lock, ArrowRight, AlertCircle, RefreshCcw
+  Loader2,
+  ShieldCheck,
+  Lock,
+  ArrowRight,
+  AlertCircle,
+  RefreshCcw,
 } from "lucide-react";
 
 const TenantDashboard: React.FC = () => {
   const dispatch = useAppDispatch();
   const { isAuthenticated } = useAppSelector((state) => state.auth);
-  // Added 'reason' from your auctionHouse slice
   const { status, loading, reason } = useAppSelector((state) => state.auctionHouse);
 
-
   useEffect(() => {
+    // Included 'loading' in dependencies to fix react-hooks/exhaustive-deps
     if (isAuthenticated && status == null && !loading) {
       dispatch(fetchAuctionProfile());
     }
@@ -35,29 +39,29 @@ const TenantDashboard: React.FC = () => {
     );
   }
 
-
   if (status !== "approved") {
     return (
       <div className="max-w-2xl mx-auto mt-12 animate-in fade-in slide-in-from-bottom-4 duration-700">
         <div className="bg-white border border-[#E2E8F0] rounded-3xl p-12 text-center shadow-xl shadow-slate-200/50">
-
-          {/* ICON LOGIC */}
-          <div className={`w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-8 transform -rotate-6 
-            ${status === "rejected" ? "bg-red-50 text-red-500" : "bg-[#F5F7FB] text-[#2F6FED]"}`}>
+          <div
+            className={`w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-8 transform -rotate-6 
+            ${status === "rejected" ? "bg-red-50 text-red-500" : "bg-[#F5F7FB] text-[#2F6FED]"}`}
+          >
             {status === "rejected" ? <AlertCircle size={40} /> : <Lock size={40} />}
           </div>
 
-          {/* TITLE LOGIC */}
           <h1 className="text-3xl font-black text-[#0F172A] tracking-tight mb-4">
             {status === "pending" && "Review in Progress"}
             {status === "rejected" && "Application Rejected"}
             {status === null && "Verification Required"}
           </h1>
 
-          {/* MESSAGE LOGIC */}
           <div className="text-[#475569] text-lg leading-relaxed mb-10">
             {status === "pending" && (
-              <p>We've received your documents. Our team is currently reviewing your business details. You'll get access to the full dashboard once approved.</p>
+              <p>
+                We&apos;ve received your documents. Our team is currently reviewing your business details. 
+                You&apos;ll get access to the full dashboard once approved.
+              </p>
             )}
 
             {status === "rejected" && (
@@ -65,7 +69,9 @@ const TenantDashboard: React.FC = () => {
                 <p>Unfortunately, your application could not be approved at this time.</p>
                 {reason && (
                   <div className="bg-red-50 border border-red-100 rounded-xl p-4 text-left">
-                    <p className="text-[10px] font-black uppercase tracking-widest text-red-400 mb-1">Reason for Rejection</p>
+                    <p className="text-[10px] font-black uppercase tracking-widest text-red-400 mb-1">
+                      Reason for Rejection
+                    </p>
                     <p className="text-red-700 text-sm font-medium leading-relaxed">{reason}</p>
                   </div>
                 )}
@@ -78,7 +84,6 @@ const TenantDashboard: React.FC = () => {
             )}
           </div>
 
-          {/* ACTION BUTTONS */}
           <div className="flex flex-col items-center gap-4">
             {status === "pending" ? (
               <div className="inline-flex items-center gap-2 bg-[#F0FDF4] text-[#166534] px-6 py-3 rounded-xl font-bold border border-[#DCFCE7]">
@@ -86,19 +91,27 @@ const TenantDashboard: React.FC = () => {
                 Application Submitted
               </div>
             ) : (
-              <Link to='/tenant/verification-form'>
+              <Link to="/tenant/verification-form">
                 <button
                   className={`group px-10 py-4 rounded-2xl font-bold text-lg transition-all flex items-center gap-3 mx-auto shadow-lg 
-                    ${status === 'rejected'
+                    ${status === "rejected"
                       ? "bg-red-600 text-white hover:bg-red-700 shadow-red-500/25"
                       : "bg-[#2F6FED] text-white hover:bg-[#2557C8] shadow-blue-500/25"}`}
                 >
-                  {status === 'rejected' ? <><RefreshCcw size={20} /> Update & Resubmit</> : <><ArrowRight size={20} /> Start Verification</>}
+                  {status === "rejected" ? (
+                    <>
+                      <RefreshCcw size={20} /> Update & Resubmit
+                    </>
+                  ) : (
+                    <>
+                      <ArrowRight size={20} /> Start Verification
+                    </>
+                  )}
                 </button>
               </Link>
             )}
 
-            {status === 'rejected' && (
+            {status === "rejected" && (
               <button className="text-[#64748b] text-sm font-bold hover:text-[#0f172a] transition-colors">
                 Contact Support
               </button>
@@ -109,7 +122,7 @@ const TenantDashboard: React.FC = () => {
     );
   }
 
-  // ... rest of your code (stats, recentAuctions, etc.) for the APPROVED view ...
+  // Dashboard styles
   const cardStyle = "bg-white border border-[#E2E8F0] rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow";
   const statLabel = "text-[11px] font-bold text-[#475569] uppercase tracking-wider";
   const statValue = "text-2xl font-extrabold text-[#0F172A] mt-1";
@@ -129,7 +142,6 @@ const TenantDashboard: React.FC = () => {
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
-      {/* WELCOME SECTION */}
       <div className="flex justify-between items-end">
         <div>
           <h1 className="text-2xl font-extrabold text-[#0F172A] tracking-tight">Dashboard</h1>
@@ -141,14 +153,11 @@ const TenantDashboard: React.FC = () => {
         </button>
       </div>
 
-      {/* STATS GRID */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {stats.map((stat, i) => (
           <div key={i} className={cardStyle}>
             <div className="flex justify-between items-start mb-4">
-              <div className="p-3 bg-[#F5F7FB] text-[#2F6FED] rounded-xl">
-                {stat.icon}
-              </div>
+              <div className="p-3 bg-[#F5F7FB] text-[#2F6FED] rounded-xl">{stat.icon}</div>
               <span className="text-[10px] font-bold text-[#10B981] bg-[#F0FDF4] px-2 py-1 rounded-lg">
                 {stat.trend}
               </span>
@@ -159,9 +168,7 @@ const TenantDashboard: React.FC = () => {
         ))}
       </div>
 
-      {/* MAIN CONTENT GRID */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* RECENT AUCTIONS TABLE */}
         <div className={`${cardStyle} lg:col-span-2 overflow-hidden`}>
           <div className="flex justify-between items-center mb-6">
             <h3 className="font-bold text-[#0F172A]">Recent Auctions</h3>
@@ -184,16 +191,24 @@ const TenantDashboard: React.FC = () => {
                   <tr key={auc.id} className="group hover:bg-[#F5F7FB]/50 transition-colors">
                     <td className="py-4 font-semibold text-[#0F172A] text-sm">{auc.item}</td>
                     <td className="py-4">
-                      <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-tight
-                        ${auc.status === 'Live' ? 'bg-[#F0FDF4] text-[#166534]' :
-                          auc.status === 'Pending' ? 'bg-[#FFFBEB] text-[#92400E]' :
-                            'bg-[#F1F5F9] text-[#475569]'}`}>
+                      <span
+                        className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-tight
+                        ${
+                          auc.status === "Live"
+                            ? "bg-[#F0FDF4] text-[#166534]"
+                            : auc.status === "Pending"
+                            ? "bg-[#FFFBEB] text-[#92400E]"
+                            : "bg-[#F1F5F9] text-[#475569]"
+                        }`}
+                      >
                         {auc.status}
                       </span>
                     </td>
                     <td className="py-4 text-right font-bold text-[#0F172A] text-sm">{auc.currentPrice}</td>
                     <td className="py-4 text-right text-[#94A3B8]">
-                      <button className="hover:text-[#2F6FED] transition-colors"><MoreHorizontal size={18} /></button>
+                      <button className="hover:text-[#2F6FED] transition-colors">
+                        <MoreHorizontal size={18} />
+                      </button>
                     </td>
                   </tr>
                 ))}
@@ -202,7 +217,6 @@ const TenantDashboard: React.FC = () => {
           </div>
         </div>
 
-        {/* QUICK ACTION CARD */}
         <div className="space-y-6">
           <div className="bg-[#0F172A] rounded-2xl p-6 text-white shadow-xl relative overflow-hidden">
             <div className="relative z-10">
