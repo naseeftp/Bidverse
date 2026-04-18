@@ -7,14 +7,34 @@ import { FcGoogle } from "react-icons/fc";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { useAppDispatch, useAppSelector } from "../../hooks/redux.hooks";
 import { setAuthError, setAuthSuccess, setLoading } from "../../redux/user/auth.slice";
-import { Roles } from "../../types/auth.type";
+// Note: Import Roles as a value and JwtPayload as a type
+import { Roles } from "../../types/auth.type"; 
+import type { JwtPayload } from "../../types/auth.type";
 import authService from "../../services/auth.service";
 import toast from "react-hot-toast";
+
+interface AuthSuccessData {
+    token: string;
+    refreshToken: string;
+    user: {
+        id: string;
+        name: string;
+        email: string;
+        role: string;
+        profileImage: string | null;
+        isActive: boolean;
+    };
+}
+
+type LoginResponse = 
+    | { success: true; message: string; data: AuthSuccessData }
+    | { success: false; message: string; data?: never };
 
 interface LoginFormInputs {
     email: string;
     password: string;
 }
+
 interface AxiosErrorResponse {
     response?: {
         data?: {
@@ -47,7 +67,7 @@ const TenantLoginPage: React.FC = () => {
         if (errMessage && !toastShown.current) {
             const decodedError = decodeURIComponent(errMessage);
             toast.error(decodedError);
-            setAuthError(decodedError);
+            dispatch(setAuthError(decodedError));
             toastShown.current = true;
             navigate(window.location.pathname, { replace: true });
         }
@@ -60,16 +80,31 @@ const TenantLoginPage: React.FC = () => {
     const onSubmit = async (data: LoginFormInputs) => {
         dispatch(setLoading(true));
         try {
-            const loginData = { ...data, role:Roles.TENANT};
-            const result = await authService.login(loginData);
+            // Use Roles.TENANT as the value
+            const loginData = { ...data, role: Roles.TENANT };
+            const result = await authService.login(loginData) as LoginResponse;
 
-            if (result && result.success) {
-                localStorage.setItem("accessToken", result.token);
-                dispatch(setAuthSuccess(result.user));
+            if (result.success && result.data) {
+                const { token, user, refreshToken } = result.data;
+
+                localStorage.setItem("accessToken", token);
+                localStorage.setItem("refreshToken", refreshToken);
+                
+                // MAPPER: Bridges the gap between Backend 'id' and Frontend 'userId'
+                // We cast the role to any first or use typeof Roles if the Enum is strict
+                const userPayload: JwtPayload = {
+                    userId: user.id,
+                    email: user.email,
+                    role: user.role as any, // Cast to any to bypass strict Enum-to-string checks
+                    name: user.name,
+                    exp: Math.floor(Date.now() / 1000) + (7 * 24 * 60 * 60)
+                };
+
+                dispatch(setAuthSuccess(userPayload));
                 toast.success(result.message || "Welcome to your House Dashboard");
                 navigate('/tenant/dashboard');
             } else {
-                const errorMsg = result?.message || "Invalid credentials for Auction House";
+                const errorMsg = result.message || "Invalid credentials for Auction House";
                 dispatch(setAuthError(errorMsg));
                 toast.error(errorMsg);
             }
@@ -89,7 +124,6 @@ const TenantLoginPage: React.FC = () => {
     return (
         <div className="min-h-screen bg-[#F5F7FB] flex items-center justify-center px-6 font-sans">
             <div className="bg-[#FFFFFF] border border-[#E2E8F0] w-full max-w-sm p-10 rounded-2xl shadow-sm">
-
                 <div className="text-center mb-10">
                     <h2 className="text-2xl font-extrabold text-[#0F172A] tracking-tight">House Portal</h2>
                     <p className="text-[#475569] text-[11px] font-medium uppercase tracking-wider mt-2">Manage your auctions & bidders</p>

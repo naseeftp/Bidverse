@@ -53,7 +53,7 @@ const TenantForgotPassPage: React.FC = () => {
                 toast.error(result.message || 'Failed to send recovery code');
             }
         } catch (error: unknown) {
-            // Replaced 'any' with 'unknown' and narrow the type
+          
             const err = error as AxiosErrorResponse;
             const errorMsg = err.response?.data?.message || "Something went wrong";
             toast.error(errorMsg);

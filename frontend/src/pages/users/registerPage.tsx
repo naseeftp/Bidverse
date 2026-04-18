@@ -10,8 +10,6 @@ import type { RegisterDTO } from "../../types/auth.type";
 import toast from "react-hot-toast";
 
 const baseURL = import.meta.env.VITE_API_URL;
-
-// 1. Strictly type the schema to match RegisterDTO
 const schema: yup.ObjectSchema<RegisterDTO> = yup.object({
     name: yup.string().required('Full name is required'),
     email: yup.string().email('Invalid email').required('Email is required'),
@@ -30,7 +28,7 @@ const RegisterPage: React.FC = () => {
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
 
-    // 2. Use RegisterDTO as the generic for useForm
+    
     const { register, handleSubmit, formState: { errors } } = useForm<RegisterDTO>({
         resolver: yupResolver(schema),
         defaultValues: { 
@@ -53,13 +51,9 @@ const RegisterPage: React.FC = () => {
         
         try {
             const result = await authService.register(data);
-            
             if (result && result.success) {
                 toast.success(result.message || "Registration in progress! Verify your email");
-                
-                // Extract expiresAt safely from the result
                 const expiresAt = (result as { expiresAt?: string }).expiresAt;
-                
                 dispatch(setRegistrationData({ 
                     email: data.email, 
                     role: 'user', 

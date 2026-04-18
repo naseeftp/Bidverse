@@ -88,12 +88,12 @@ const VerifyOtpPage: React.FC = () => {
     e.preventDefault();
     setLoading(true);
 
-    // Construct the payload using your VerifyOtpDTO structure
+   
     const payload: VerifyOtpDTO = {
       email,
       otp: otp.join(""),
       role: tempAuthData?.role || 'user',
-      purpose: 'registration' // Hardcoded for this specific page
+      purpose: 'registration' 
     };
 
     try {
@@ -102,7 +102,7 @@ const VerifyOtpPage: React.FC = () => {
       if (result?.success && result.data) {
         localStorage.setItem("accessToken", result.data.token);
         dispatch(setAuthSuccess(result.data.user));
-        toast.success("Account Verified!");
+        toast.success(result.message);
         navigate("/home");
       } else {
         toast.error(result.message || "Invalid code");

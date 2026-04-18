@@ -24,11 +24,10 @@ const TenantDashboard: React.FC = () => {
   const { status, loading, reason } = useAppSelector((state) => state.auctionHouse);
 
   useEffect(() => {
-    // Included 'loading' in dependencies to fix react-hooks/exhaustive-deps
-    if (isAuthenticated && status == null && !loading) {
+    if (isAuthenticated && status == null) {
       dispatch(fetchAuctionProfile());
     }
-  }, [dispatch, status, isAuthenticated, loading]);
+  }, [dispatch, status, isAuthenticated]);
 
   if (loading) {
     return (

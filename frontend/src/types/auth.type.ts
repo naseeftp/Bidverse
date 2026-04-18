@@ -21,7 +21,12 @@ export interface VerifyOtpDTO {
 }
 
 export interface ResendOtpDTO {
-    email: string
+    email: string;
+    role?:string
+}
+export interface OtpResponseData {
+    email: string;
+    expiresAt: string;
 }
 
 export interface JwtPayload {

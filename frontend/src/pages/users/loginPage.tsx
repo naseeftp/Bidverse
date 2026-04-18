@@ -9,15 +9,18 @@ import { useAppDispatch, useAppSelector } from "../../hooks/redux.hooks";
 import { setAuthError, setAuthSuccess, setLoading } from "../../redux/user/auth.slice";
 import authService from "../../services/auth.service";
 import toast from "react-hot-toast";
-// Import the type from your slice or types file
+
 import type { JwtPayload } from "../../types/auth.type";
 
-// 1. Define the interface using your existing JwtPayload
+
 interface LoginResponse {
     success: boolean;
     message: string;
-    token: string;
-    user: JwtPayload; // No more 'any'
+    data: {
+        user: JwtPayload;
+        token: string;
+        refreshToken: string;
+    };
 }
 
 interface ApiError {
@@ -66,35 +69,39 @@ const LoginPage: React.FC = () => {
     };
 
     const onSubmit = async (data: LoginFormData) => {
-        dispatch(setLoading(true));
-        try {
-            const loginData =  {...data, role: "user" as const };
-            
-            // 2. Cast to the strict LoginResponse
-            const result = (await authService.login(loginData)) as LoginResponse;
+    dispatch(setLoading(true));
+    try {
+        const loginData = { ...data, role: "user" as const };
+        
+        // Cast the result
+        const result = (await authService.login(loginData)) as LoginResponse;
 
-            if (result && result.success) {
-                localStorage.setItem("accessToken", result.token);
-                
-                // 3. This now aligns perfectly with setAuthSuccess(state, action: PayloadAction<JwtPayload>)
-                dispatch(setAuthSuccess(result.user));
-                
-                toast.success(result.message || "Welcome to BidVerse");
-                navigate('/home');
-            } else {
-                const errorMsg = result?.message || "Invalid email or password";
-                dispatch(setAuthError(errorMsg));
-                toast.error(errorMsg);
-            }
-        } catch (error: unknown) {
-            const err = error as ApiError;
-            const serverMessage = err.response?.data?.message || "Invalid email or password";
-            dispatch(setAuthError(serverMessage));
-            toast.error(serverMessage);
-        } finally {
-            dispatch(setLoading(false));
+        // 2. Access the nested 'data' property
+        if (result && result.success && result.data) {
+            const { token, user } = result.data;
+
+            localStorage.setItem("accessToken", token);
+            
+            
+            dispatch(setAuthSuccess(user));
+            
+            toast.success(result.message || "Welcome to BidVerse");
+            navigate('/home');
+        } else {
+            
+            const errorMsg = result?.message || "Invalid email or password";
+            dispatch(setAuthError(errorMsg));
+            toast.error(errorMsg);
         }
-    };
+    } catch (error: unknown) {
+        const err = error as ApiError;
+        const serverMessage = err.response?.data?.message || "Invalid email or password";
+        dispatch(setAuthError(serverMessage));
+        toast.error(serverMessage);
+    } finally {
+        dispatch(setLoading(false));
+    }
+};
 
     return (
         <div className="min-h-screen bg-[#FFF9F4] flex items-center justify-center px-6 font-sans">

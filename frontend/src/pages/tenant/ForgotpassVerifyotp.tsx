@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import authService from "../../services/auth.service";
 import toast from "react-hot-toast";
+
 interface AxiosErrorResponse {
   response?: {
     data?: {
@@ -9,11 +10,18 @@ interface AxiosErrorResponse {
     };
   };
 }
+
+// MATCHES YOUR JSON: { success: true, data: { resetToken: "..." } }
 interface AuthResponse {
   success: boolean;
   message?: string;
-  expiresAt?: string;
-  resetToken?: string;
+  data?: {
+    resetToken: string;
+    email: string;
+    verified: boolean;
+    message?: string;
+    expiresAt?: string;
+  };
 }
 
 const TenantForgotPassVerifyOtp: React.FC = () => {
@@ -22,15 +30,32 @@ const TenantForgotPassVerifyOtp: React.FC = () => {
 
   const email = location.state?.email || "";
   const role = location.state?.role || "tenant";
-  const initialExpiry = location.state?.expiresAt;
+  
+  // PERSISTENCE: Recover timer after reload
+  const [expiresAt, setExpiresAt] = useState<number | null>(() => {
+    const saved = sessionStorage.getItem("tenant_recovery_expiry");
+    return saved ? parseInt(saved, 10) : null;
+  });
 
   const [otp, setOtp] = useState<string[]>(new Array(6).fill(""));
   const [loading, setLoading] = useState(false);
-  const [expiresAt, setExpiresAt] = useState<number | null>(null);
   const [timeLeft, setTimeLeft] = useState<number>(0);
 
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
+  // 1. PREVENT RELOAD: Browser warning
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (timeLeft > 0) {
+        e.preventDefault();
+        e.returnValue = ""; 
+      }
+    };
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+  }, [timeLeft]);
+
+  // 2. Initial Setup
   useEffect(() => {
     if (!email) {
       toast.error("Session expired. Please restart recovery.");
@@ -38,25 +63,30 @@ const TenantForgotPassVerifyOtp: React.FC = () => {
       return;
     }
 
-    if (initialExpiry) {
-      setExpiresAt(new Date(initialExpiry).getTime());
-    } else {
-      setExpiresAt(Date.now() + 120000);
+    const initialExpiry = location.state?.expiresAt;
+    if (initialExpiry && !expiresAt) {
+      const time = new Date(initialExpiry).getTime();
+      setExpiresAt(time);
+      sessionStorage.setItem("tenant_recovery_expiry", time.toString());
+    } else if (!expiresAt) {
+      const fallback = Date.now() + 120000;
+      setExpiresAt(fallback);
+      sessionStorage.setItem("tenant_recovery_expiry", fallback.toString());
     }
-  }, [email, navigate, initialExpiry]);
+  }, [email, navigate, location.state, expiresAt]);
 
+  // 3. Timer Logic
   useEffect(() => {
     if (!expiresAt) return;
     const calculateTime = () => {
       const now = Date.now();
       const difference = Math.max(0, Math.floor((expiresAt - now) / 1000));
       setTimeLeft(difference);
+      if (difference <= 0) sessionStorage.removeItem("tenant_recovery_expiry");
       return difference;
     };
     calculateTime();
-    const interval = setInterval(() => {
-      if (calculateTime() <= 0) clearInterval(interval);
-    }, 1000);
+    const interval = setInterval(calculateTime, 1000);
     return () => clearInterval(interval);
   }, [expiresAt]);
 
@@ -78,16 +108,20 @@ const TenantForgotPassVerifyOtp: React.FC = () => {
     if (timeLeft > 0) return;
     setLoading(true);
     try {
+      // Cast as AuthResponse to handle nested data correctly
       const result = await authService.forgotpass({ email, role: 'tenant' }) as AuthResponse;
       if (result && result.success) {
-        const newExpiry = result.expiresAt
-          ? new Date(result.expiresAt).getTime()
+        // Look inside .data for the new expiry if provided by backend
+        const newExpiry = result.data?.expiresAt 
+          ? new Date(result.data.expiresAt).getTime() 
           : Date.now() + 120000;
+          
         setExpiresAt(newExpiry);
+        sessionStorage.setItem("tenant_recovery_expiry", newExpiry.toString());
+        setOtp(new Array(6).fill(""));
         toast.success("New business recovery code sent.");
       }
     } catch {
-      // Removed unused 'err' to satisfy no-unused-vars
       toast.error("Failed to resend code.");
     } finally {
       setLoading(false);
@@ -97,29 +131,33 @@ const TenantForgotPassVerifyOtp: React.FC = () => {
   const handleVerify = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    const otpString = otp.join("");
 
     try {
       const result = await authService.verifyOtp({
         email,
-        otp: otpString,
+        otp: otp.join(""),
         role: role as string,
         purpose: 'forgot_password'
       }) as AuthResponse;
 
-      if (result && result.success) {
+      // FIX: Access resetToken from result.data.resetToken
+      if (result && result.success && result.data?.resetToken) {
+        sessionStorage.removeItem("tenant_recovery_expiry");
         toast.success("Identity verified. Update your password.");
+        
         navigate("/tenant/reset-password", {
-          state: { email, role, resetToken: result.resetToken }
+          state: { 
+            email, 
+            role, 
+            resetToken: result.data.resetToken 
+          }
         });
       } else {
-        toast.error(result.message || "Invalid business code");
+        toast.error(result.message || "Verification failed. Check your code.");
       }
     } catch (error: unknown) {
-      // Typed error properly to avoid 'any'
       const err = error as AxiosErrorResponse;
-      const errorMsg = err.response?.data?.message || "Verification failed. Please try again.";
-      toast.error(errorMsg);
+      toast.error(err.response?.data?.message || "Invalid business code");
     } finally {
       setLoading(false);
     }
