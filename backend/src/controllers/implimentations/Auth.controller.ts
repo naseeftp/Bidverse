@@ -81,7 +81,7 @@ export class AuthController implements IAuthController {
                 throw new AppError(MESSAGES.REFRESH_TOKEN_MISSING, HttpStatus.UNAUTHORIZED)
             }
             const result = await this._authService.refreshToken(token);
-            SuccessResponse(res, result.accessToken, MESSAGES.TOKEN_REFRESHED, HttpStatus.OK)
+            SuccessResponse(res,MESSAGES.TOKEN_REFRESHED,result.accessToken, HttpStatus.OK)
         } catch (error: unknown) {
             next(error)
         }

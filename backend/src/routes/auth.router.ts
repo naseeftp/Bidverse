@@ -45,7 +45,7 @@ router.get(
     AUTH_ROUTES.GOOGLE_CALLBACK,
     (req, res, next) => authController.googleCallback(req, res, next)
 );
-router.get(
+router.post(
     AUTH_ROUTES.REFRESH_TOKEN,
     (req,res,next)=>authController.refreshToken(req,res,next)
 )
