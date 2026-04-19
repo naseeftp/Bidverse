@@ -9,6 +9,7 @@ import { useAppDispatch, useAppSelector } from "../../hooks/redux.hooks";
 import { setAuthError, setAuthSuccess, setLoading } from "../../redux/user/auth.slice";
 // Note: Import Roles as a value and JwtPayload as a type
 import { Roles } from "../../types/auth.type"; 
+import type{ userRole } from "../../types/auth.type";
 import type { JwtPayload } from "../../types/auth.type";
 import authService from "../../services/auth.service";
 import toast from "react-hot-toast";
@@ -80,7 +81,6 @@ const TenantLoginPage: React.FC = () => {
     const onSubmit = async (data: LoginFormInputs) => {
         dispatch(setLoading(true));
         try {
-            // Use Roles.TENANT as the value
             const loginData = { ...data, role: Roles.TENANT };
             const result = await authService.login(loginData) as LoginResponse;
 
@@ -89,13 +89,10 @@ const TenantLoginPage: React.FC = () => {
 
                 localStorage.setItem("accessToken", token);
                 localStorage.setItem("refreshToken", refreshToken);
-                
-                // MAPPER: Bridges the gap between Backend 'id' and Frontend 'userId'
-                // We cast the role to any first or use typeof Roles if the Enum is strict
                 const userPayload: JwtPayload = {
                     userId: user.id,
                     email: user.email,
-                    role: user.role as any, // Cast to any to bypass strict Enum-to-string checks
+                    role: user.role as userRole,
                     name: user.name,
                     exp: Math.floor(Date.now() / 1000) + (7 * 24 * 60 * 60)
                 };

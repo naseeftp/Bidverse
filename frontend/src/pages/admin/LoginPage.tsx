@@ -11,7 +11,6 @@ import toast from "react-hot-toast";
 import type{ JwtPayload } from "../../types/auth.type";
 import { Roles } from "../../types/auth.type";
 
-// 1. Define the correct nested structure for Admin
 interface IAdminLoginResponse {
     success: boolean;
     message: string;
@@ -53,13 +52,8 @@ const AdminLoginPage: React.FC = () => {
             // 3. Drill into result.data
             if (result && result.success && result.data) {
                 const { user, token } = result.data;
-
-                // Save token to localStorage
                 localStorage.setItem('accessToken', token);
-                
-                // Update Redux state with the user object
                 dispatch(setAuthSuccess(user));
-                
                 toast.success(result.message || "System Connection Established");
                 navigate('/admin/dashboard');
             } else {
