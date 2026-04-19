@@ -14,7 +14,8 @@ export const AUTH_ROUTES = {
     GOOGLE_CALLBACK: '/google/callback',
     FORGOT_PASS: '/forgot-pass',
     FORGOT_PASS_RESEND_OTP: 'forgot-pass-resend',
-    FORGOT_PASS_RESET: '/forgot-pass-reset'
+    FORGOT_PASS_RESET: '/forgot-pass-reset',
+    REFRESH_TOKEN: "/refresh-token"
 } as const
 
 export const AUCTION_HOUSE_ROUTES = {

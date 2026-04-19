@@ -3,12 +3,14 @@ import dotenv from "dotenv"
 import { env } from './config/env'
 import connectDB from "./config/db";
 import cors from 'cors'
+import cookieParser from "cookie-parser";
 import { errorHandler } from "./middlewares/error-handler.middleware";
 import { BASE_ROUTES } from "./constants/route.constant";
 import authRouter from './routes/auth.router'
 import auctionHouseRoutes from './routes/auctionHouse.routes'
 import adminRoutes from './routes/admin.routes'
 import { LoggerService } from "./services/implementations/Logger.service";
+
 
 
 dotenv.config()
@@ -22,6 +24,7 @@ app.use(cors({
 }))
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
+app.use(cookieParser())
 const PORT = env.PORT
 
 app.use(BASE_ROUTES.AUTH, authRouter)

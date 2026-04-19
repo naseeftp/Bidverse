@@ -1,11 +1,11 @@
-import { generateAccessToken, generateRefreshToken} from '../../utils/jwt.utils'
+import { generateAccessToken, generateRefreshToken,verifyRefreshToken} from '../../utils/jwt.utils'
 import { hashPassword, comparePassword } from '../../utils/password.util'
 import { MESSAGES, CONFIG, otpPurpose } from '../../constants/constants'
 import { IAuthService } from '../interface/IAuth.service'
 import { RegisterUserDTO, LoginDTO, VerifyotpDTO, ResendOtpDTO, AuthResponseDTO, UserResponseDTO, ForgetPaswordDTO, ResetPasswordDTO } from '../../dtos/Common.dto'
 import { IUserRepository } from '../../repositories/interfaces/iUser.repository'
 import { IOTPService } from '../interface/IOtp.service'
-import { ConflictError, UnauthorizedError, NotFoundError,AppError } from '../../errors/AppError'
+import { ConflictError, UnauthorizedError, NotFoundError,AppError, ForbiddenError } from '../../errors/AppError'
 import { UserMapper } from '../../mappers/user.mapper'
 import { ILoggerService } from '../interface/ILogger.service'
 import { oauth2Client } from '../../config/google.confing'
@@ -198,7 +198,25 @@ export class AuthService implements IAuthService {
             refreshToken: generateRefreshToken(user)
         };
     }
-
+    async refreshToken(token: string): Promise<{ accessToken: string }> {
+        try {
+            const decoded=verifyRefreshToken(token);
+            const user=await this._userRepository.findById(decoded.userId);
+            if(!user){
+                throw new UnauthorizedError(MESSAGES.USER_NOT_FOUND)
+            }
+            if(!user.isActive){
+                throw new ForbiddenError(MESSAGES.USER_BLOCKED )
+            }
+            const accessToken=generateAccessToken(user)
+            return {accessToken}
+        } catch (error) {
+            if(error instanceof ForbiddenError){
+                throw error
+            }
+            throw new UnauthorizedError(MESSAGES.INVALID_REFRESH_TOKEN)
+        }
+    }
 
     private async _checkUserDoesNotExist(email: string, phone: string): Promise<void> {
         const existingUser = await this._userRepository.findByEmail(email)

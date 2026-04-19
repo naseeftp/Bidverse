@@ -42,7 +42,7 @@ export interface IAuthController {
         res: Response,
         next: NextFunction
     ): Promise<void>;
-
+    refreshToken(req:Request,res:Response,next:NextFunction):Promise<void>
     redirectToGoogle(req: Request, res: Response): Promise<void>;
     googleCallback(req: Request, res: Response, next: NextFunction): Promise<void>;
 }

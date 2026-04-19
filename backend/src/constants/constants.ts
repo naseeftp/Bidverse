@@ -1,5 +1,5 @@
 import { StatusCodes } from "http-status-codes";
-
+import { env } from "../config/env";
 export const Roles = {
     ADMIN: 'admin',
     TENANT: 'tenant',
@@ -11,6 +11,7 @@ export const OtpPurpose = {
     REGISTRATION: 'registration',
     FORGOT_PASSWORD: 'forgot_password',
 } as const;
+
 export const VerificationStatus = {
     PENDING: 'pending',
     APPROVED: 'approved',
@@ -34,12 +35,19 @@ export enum HttpStatus {
 }
 
 export const CONFIG = {
-    //   SESSION_MAX_AGE: env.SESSION_MAX_AGE,
-    OTP_EXPIRY_MINUTES: 1,
-    FORGOT_PASSWORD_EXPIRY: 0.5,
+     OTP_EXPIRY_MINUTES: 1,
+    FORGOT_PASSWORD_EXPIRY: 1,
     OTP_RESEND_DELAY_SECONDS: 30,
 } as const;
 
+export const COOKIES_OPTIONS={
+REFRESH_TOKEN:'refreshToken',
+MAX_AGE:env.REFRESH_TOKEN_MAX_AGE,
+SAME_SITE_STRICT:'strict',
+SAME_SITE_LAX:'lax',
+SAME_SITE_NONE:'none',
+ENV_PRODUCTION:'production'
+} as const
 
 export const MESSAGES = {
     SERVER_ERROR: "Server error",
@@ -84,6 +92,8 @@ export const MESSAGES = {
 
     INVALID_ACCESS_TOKEN: "Invalid Access token",
     INVALID_REFRESH_TOKEN: "Invalid Refresh token",
+     TOKEN_REFRESHED: "Token refreshed successfully",
+     REFRESH_TOKEN_MISSING: "refresh token missing",
 
     GOOGLE_REGISTERED: 'This account is registered with google authentication please try  google sign in',
 
