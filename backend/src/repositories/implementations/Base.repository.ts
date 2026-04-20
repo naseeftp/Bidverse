@@ -34,6 +34,17 @@ export class BaseRepository<T extends Document> implements IBaseRepository<T> {
     async updateByFilter(filter: mongoose.QueryFilter<T>, data: mongoose.UpdateQuery<T>): Promise<T | null> {
         return await this.model.findOneAndUpdate(filter, data, { new: true }).exec()
     }
+    async updateByUserId(
+        userId: string | mongoose.Types.ObjectId, 
+        data: mongoose.UpdateQuery<T>
+    ): Promise<T | null> {
+        const filter = { userId: userId } as mongoose.QueryFilter<T>;
+        return await this.model.findOneAndUpdate(
+            filter, 
+            data, 
+            { new: true }
+        ).exec();
+    }
     async count(filter?: mongoose.QueryFilter<T> | undefined): Promise<number> {
         return await this.model.countDocuments(filter)
     }

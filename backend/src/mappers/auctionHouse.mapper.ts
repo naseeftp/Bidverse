@@ -22,8 +22,10 @@ export class AuctionHouseMapper {
             },
             documents: {
                 registrationCertificateUrl: doc.legal.registrationCertificateUrl,
-                identityProofUrl: doc.legal.registrationCertificateUrl
-            },
+                identityProofUrl: doc.legal.registrationCertificateUrl,
+                registerNumber:doc.legal.registrationNumber,
+                taxId:doc.legal.taxId
+           },
             status: doc.status,
             rejectionReason: doc.rejectionReason || null,
             isVerified: doc.isVerified,

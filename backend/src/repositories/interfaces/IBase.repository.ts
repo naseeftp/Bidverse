@@ -1,4 +1,4 @@
-import { Document, QueryFilter, UpdateQuery, DeleteResult, Types } from "mongoose";
+import mongoose,{ Document, QueryFilter, UpdateQuery, DeleteResult, Types } from "mongoose";
 
 
 
@@ -12,6 +12,7 @@ export interface IBaseRepository<T extends Document> {
     deleteByFilter(filter: QueryFilter<T>): Promise<DeleteResult>;
     findOneByField(fieldName: string, value: unknown): Promise<T | null>
     updateByFilter(filter: QueryFilter<T>, data: UpdateQuery<T>): Promise<T | null>
+    updateByUserId(userId: string | Types.ObjectId, data: mongoose.UpdateQuery<T>): Promise<T | null>;
     count(filter?: QueryFilter<T>): Promise<number>
 
 }

@@ -1,5 +1,7 @@
 import { IBaseRepository } from "./IBase.repository";
 import { IAuctionHouseDocument } from "../../types/auctionhouse.type";
+import {QueryFilter, UpdateQuery} from 'mongoose'
+
 
 export interface IPaginatedAuctionHouses {
     houses: IAuctionHouseDocument[];

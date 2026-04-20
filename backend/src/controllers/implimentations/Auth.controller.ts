@@ -10,7 +10,6 @@ import { oauth2Client, googleScopes } from "../../config/google.confing";
 import { env } from "../../config/env";
 import { AppError } from "../../errors/AppError";
 
-
 export class AuthController implements IAuthController {
     constructor(
         private _authService: IAuthService

@@ -64,7 +64,9 @@ export interface AuctionHouseResponseDTO {
     };
     documents: {
         registrationCertificateUrl: string;
-        identityProofUrl: string
+        identityProofUrl: string;
+        registerNumber:string;
+        taxId:string
     };
     status: TVerificationStatus;
     rejectionReason?: string | null;
