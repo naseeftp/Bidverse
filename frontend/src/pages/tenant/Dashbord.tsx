@@ -56,7 +56,8 @@ const TenantDashboard: React.FC = () => {
 
           <div className="text-[#475569] text-base font-medium leading-relaxed mb-10">
             {status === "pending" && (
-              <p>Our compliance team is reviewing your documents. You'll receive full access shortly.</p>
+              /* FIXED: Used &apos; instead of ' */
+              <p>Our compliance team is reviewing your documents. You&apos;ll receive full access shortly.</p>
             )}
 
             {status === "rejected" && (
@@ -64,7 +65,8 @@ const TenantDashboard: React.FC = () => {
                 <p className="text-sm">Your application was not approved. Please review the feedback below:</p>
                 {reason && (
                   <div className="bg-[#FEF2F2] border border-[#FEE2E2] rounded-2xl p-5 text-left">
-                    <p className="text-[#991B1B] text-sm font-semibold italic">"{reason}"</p>
+                    {/* FIXED: Wrapped quote marks in curly braces or used entities */}
+                    <p className="text-[#991B1B] text-sm font-semibold italic">&ldquo;{reason}&rdquo;</p>
                   </div>
                 )}
               </div>

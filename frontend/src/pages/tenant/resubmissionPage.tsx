@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm, type SubmitHandler, type Resolver } from 'react-hook-form';
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -50,7 +50,7 @@ type ResubmitFormData = yup.InferType<typeof resubmissionSchema>;
 const TenantVerificationResubmissionPage: React.FC = () => {
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
-    const { profile, reason, status, loading } = useAppSelector((state) => state.auctionHouse);
+    const { profile, status, loading, reason } = useAppSelector((state) => state.auctionHouse);
 
     const { register, handleSubmit, setValue, watch, reset, formState: { errors, isSubmitting } } = useForm<ResubmitFormData>({
         resolver: yupResolver(resubmissionSchema) as Resolver<ResubmitFormData>,
@@ -110,12 +110,12 @@ const TenantVerificationResubmissionPage: React.FC = () => {
             await dispatch(submitVerification(finalPayload)).unwrap();
             toast.success('Application updated successfully');
             navigate('/tenant/dashboard');
-        } catch (error: any) {
-            toast.error(error.message || "Submission failed");
+        } catch (err: unknown) {
+            const errorMessage = err instanceof Error ? err.message : "Submission failed";
+            toast.error(errorMessage);
         }
     };
 
-    // Shared Styles based on your SaaS palette
     const cardStyle = "bg-[#FFFFFF] rounded-2xl p-8 border border-[#E2E8F0] shadow-sm mb-6";
     const inputStyle = "w-full bg-[#FFFFFF] border border-[#E2E8F0] px-4 py-3 rounded-xl text-[#0F172A] text-sm focus:outline-none focus:ring-2 focus:ring-[#2F6FED]/10 focus:border-[#2F6FED] transition-all placeholder:text-[#94A3B8]";
     const labelStyle = "block text-[11px] font-bold uppercase tracking-wider text-[#475569] mb-2";
@@ -129,7 +129,12 @@ const TenantVerificationResubmissionPage: React.FC = () => {
         );
     }
 
-    const DocumentPreview = ({ label, currentUrl, selectedFile, onClear }: { label: string, currentUrl?: string, selectedFile?: File | null, onClear: () => void }) => (
+    const DocumentPreview = ({ label, currentUrl, selectedFile, onClear }: { 
+        label: string, 
+        currentUrl?: string, 
+        selectedFile?: File | null, 
+        onClear: (file: File) => void // eslint-disable-line no-unused-vars
+    }) => (
         <div className="space-y-2">
             <label className={labelStyle}>{label}</label>
             <div className="relative group border-2 border-dashed border-[#E2E8F0] rounded-2xl p-4 bg-[#FFFFFF] hover:bg-[#F5F7FB] transition-all">
@@ -139,7 +144,7 @@ const TenantVerificationResubmissionPage: React.FC = () => {
                             <CheckCircle2 size={18} className="text-[#22C55E]" />
                             <span className="text-xs font-semibold text-[#166534] truncate max-w-[150px]">{selectedFile.name}</span>
                         </div>
-                        <button onClick={onClear} className="p-1 hover:bg-[#DCFCE7] rounded-md text-[#166534]"><X size={14} /></button>
+                        <button type="button" className="p-1 hover:bg-[#DCFCE7] rounded-md text-[#166534]"><X size={14} /></button>
                     </div>
                 ) : currentUrl ? (
                     <div className="flex items-center gap-4">
@@ -155,9 +160,10 @@ const TenantVerificationResubmissionPage: React.FC = () => {
                             <input 
                                 type="file" 
                                 className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" 
-                                onChange={(e) => {
-                                    const file = e.target.files?.[0];
-                                    if (file) onClear(); // Trigger the setValue logic via parent
+                                onChange={(event) => {
+                                    if (event.target.files && event.target.files[0]) {
+                                        onClear(event.target.files[0]); 
+                                    }
                                 }}
                             />
                             <p className="text-[11px] text-[#475569]">Click to replace with new file</p>
@@ -167,10 +173,15 @@ const TenantVerificationResubmissionPage: React.FC = () => {
                     <div className="py-4 flex flex-col items-center gap-2">
                         <UploadCloud size={24} className="text-[#94A3B8]" />
                         <span className="text-[11px] font-bold text-[#475569] uppercase">Upload Document</span>
-                        <input type="file" className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" onChange={(e) => {
-                            const file = e.target.files?.[0];
-                            if (file) onClear(); 
-                        }}/>
+                        <input 
+                            type="file" 
+                            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" 
+                            onChange={(event) => {
+                                if (event.target.files && event.target.files[0]) {
+                                    onClear(event.target.files[0]); 
+                                }
+                            }}
+                        />
                     </div>
                 )}
             </div>
@@ -225,6 +236,7 @@ const TenantVerificationResubmissionPage: React.FC = () => {
                             <div className="md:col-span-2">
                                 <label className={labelStyle}>Brief Bio</label>
                                 <textarea rows={3} {...register('briefDescription')} className={`${inputStyle} resize-none`} />
+                                {errors.briefDescription && <p className={errorStyle}>{errors.briefDescription.message}</p>}
                             </div>
                         </div>
                     </div>
@@ -264,32 +276,18 @@ const TenantVerificationResubmissionPage: React.FC = () => {
 
                             <div className="space-y-6">
                                 <div className="grid grid-cols-1 gap-4">
-                                    <div className="relative">
-                                        <DocumentPreview 
-                                            label="Business Certificate"
-                                            currentUrl={profile?.documents.registrationCertificateUrl}
-                                            selectedFile={regCertFile}
-                                            onClear={() => {
-                                                const input = document.createElement('input');
-                                                input.type = 'file';
-                                                input.onchange = (e: any) => setValue('registrationCertificate', e.target.files[0]);
-                                                input.click();
-                                            }}
-                                        />
-                                    </div>
-                                    <div className="relative">
-                                        <DocumentPreview 
-                                            label="Owner Identity Proof"
-                                            currentUrl={profile?.documents.identityProofUrl}
-                                            selectedFile={idProofFile}
-                                            onClear={() => {
-                                                const input = document.createElement('input');
-                                                input.type = 'file';
-                                                input.onchange = (e: any) => setValue('identityProof', e.target.files[0]);
-                                                input.click();
-                                            }}
-                                        />
-                                    </div>
+                                    <DocumentPreview 
+                                        label="Business Certificate"
+                                        currentUrl={profile?.documents.registrationCertificateUrl}
+                                        selectedFile={regCertFile}
+                                        onClear={(file) => setValue('registrationCertificate', file)}
+                                    />
+                                    <DocumentPreview 
+                                        label="Owner Identity Proof"
+                                        currentUrl={profile?.documents.identityProofUrl}
+                                        selectedFile={idProofFile}
+                                        onClear={(file) => setValue('identityProof', file)}
+                                    />
                                 </div>
                             </div>
                         </div>
