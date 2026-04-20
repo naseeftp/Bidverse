@@ -50,7 +50,7 @@ const TenantVerificationForm: React.FC = () => {
   const regCertFile = watch('registrationCertificate') as File | undefined;
   const idProofFile = watch('identityProof') as File | undefined;
 
-  // 2. Optimized onSubmit with safe error handling
+  
   const onSubmit = async (data: VerificationFormData) => {
     try {
       const [regCertUrl, idProofUrl] = await Promise.all([
@@ -104,7 +104,7 @@ const TenantVerificationForm: React.FC = () => {
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
         
-        {/* Business Identity */}
+      
         <div className="bg-white rounded-2xl p-8 border border-[#E2E8F0] shadow-sm">
           <div className="flex items-center gap-3 mb-8 pb-4 border-b border-[#F5F7FB]">
             <Building2 size={18} className="text-[#2F6FED]" />
