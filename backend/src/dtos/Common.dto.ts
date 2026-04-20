@@ -31,15 +31,16 @@ import { z } from 'zod'
 
 const passwordRules = z.string()
   .min(8, 'Password Must be at least 8 charactors')
+  .max(32,'Password cannot exceed 32 characters')
   .regex(/[A-Z]/, 'Password Must Contai an upperCase Letter')
   .regex(/[0-9]/, 'Password Must Contain a  number')
   .regex(/[^A-Za-z0-9]/, 'Password Must contain A special charactor')
 
 export const RegisterUserSchema = z.object({
-  name: z.string().min(2, 'Name is too short').max(50),
-  email: z.string().email("Invalid email format"),
+  name: z.string().min(2, 'Name is too short').max(50,'Name cannot exceed 50 characters'),
+  email: z.string().email("Invalid email format").max(100,'Email is too long'),
   password: passwordRules,
-  confirmPassword: z.string(),
+  confirmPassword: z.string().max(32,'Confirm Password cannot too long'),
   phone: z.string().regex(/^\d{10}$/, "Phone must be 10 digits"),
   role: z.enum(['tenant', 'user']).optional().default('user'),
 }).refine((data) => data.password === data.confirmPassword, {
@@ -65,10 +66,10 @@ export const ForgetPaswordSchema = z.object({
 })
 
 export const ResetPasswordSchema = z.object({
-  email: z.string().email('Invalid email Format'),
+  email: z.string().email('Invalid email Format').max(100),
   password: passwordRules,
-  confirmPassword: z.string(),
-  resetToken: z.string().min(1, 'Reset Token Is Required')
+  confirmPassword: z.string().max(32),
+  resetToken: z.string().min(1, 'Reset Token Is Required').max(255, 'Reset token too long')
 }).refine((data) => data.password === data.confirmPassword, {
   message: "Passwords do not match",
   path: ["confirmPassword"],

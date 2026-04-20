@@ -3,47 +3,72 @@ import { TVerificationStatus } from "../../types/auctionhouse.type";
 
 
 export const AuctionHouseVerificationSchema = z.object({
-    name: z.string()
-        .trim()
-        .min(3, 'Auction House name must be atleast 3 charactors')
-        .max(100, "Name is too long"),
-        
-    yearEstablished: z.coerce.number() // try to use max
-        .int()
-        .min(1700, 'Invalid year')
-        .max(new Date().getFullYear(), 'Year Cannot be future'),
+  name: z.string()
+    .trim()
+    .min(3, 'Auction House name must be at least 3 characters')
+    .max(100, "Name is too long"),
 
-    briefDescription: z.string()
-        .min(20, "Please Provide a more detailed description (minimum 20 chars)")
-        .max(1000, 'Description is too long'),
+  yearEstablished: z.coerce.number()
+    .int()
+    .min(1700, 'Invalid year')
+    .max(new Date().getFullYear(), 'Year cannot be in the future'),
 
-    address: z.object({
-        city: z.string().min(1, 'City is Required'),
-        state: z.string().min(1, 'State is required'),
-        country: z.string().min(1, 'Country is Required'),
-        fullAddress: z.string().min(5, 'Full Address Required')
-    }),
+  briefDescription: z.string()
+    .min(20, "Provide at least 20 characters")
+    .max(1000, 'Description is too long'),
 
-    contact: z.object({
-        primaryContactName: z.string().min(2, "Primary contact name required"),
-        businessEmail: z.string().email('Invalid email format'),
-        phone: z.string().min(10, "Phone number should be 10 digits")
-    }),
+  address: z.object({
+    city: z.string()
+      .min(1, 'City is required')
+      .max(50, 'City name too long'),
 
-    legal: z.object({
-        registrationNumber: z.string().min(1, 'Bussiness Registration Number required'),
-        taxId: z.string().min(1, "Tax Id is required"),
+    state: z.string()
+      .min(1, 'State is required')
+      .max(50, 'State name too long'),
 
-        registrationCertificateUrl: z.string()
-            .url("Registration certificate link is required")
-            .includes("cloudinary.com", { message: "Document must be hosted on Cloudinary" }),
+    country: z.string()
+      .min(1, 'Country is required')
+      .max(50, 'Country name too long'),
 
-        identityProofUrl: z.string()
-            .url("Identity proof link is required")
-            .includes("cloudinary.com", { message: "Document must be hosted on Cloudinary" }),
-    }),
+    fullAddress: z.string()
+      .min(5, 'Full address required')
+      .max(255, 'Address is too long'),
+  }),
 
-})
+  contact: z.object({
+    primaryContactName: z.string()
+      .min(2, "Primary contact name required")
+      .max(100, "Name too long"), 
+
+    businessEmail: z.string()
+      .email('Invalid email format')
+      .max(100, 'Email too long'), 
+
+    phone: z.string()
+      .regex(/^\d{10}$/, "Phone number must be exactly 10 digits")
+      .max(10, "Phone cannot exceed 10 digits"),
+  }),
+
+  legal: z.object({
+    registrationNumber: z.string()
+      .min(1, 'Business registration number required')
+      .max(100, 'Registration number too long'), 
+
+    taxId: z.string()
+      .min(1, "Tax ID is required")
+      .max(50, "Tax ID too long"), 
+
+    registrationCertificateUrl: z.string()
+      .url("Registration certificate link is required")
+      .max(500, "URL too long") 
+      .includes("cloudinary.com", { message: "Must be hosted on Cloudinary" }),
+
+    identityProofUrl: z.string()
+      .url("Identity proof link is required")
+      .max(500, "URL too long") 
+      .includes("cloudinary.com", { message: "Must be hosted on Cloudinary" }),
+  }),
+});
 
 export interface AuctionHouseResponseDTO {
     id: string;
