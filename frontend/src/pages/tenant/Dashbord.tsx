@@ -109,7 +109,7 @@ const TenantDashboard: React.FC = () => {
     );
   }
 
-  // --- MAIN DASHBOARD (Approved State) ---
+
   const cardStyle = "bg-[#FFFFFF] border border-[#E2E8F0] rounded-2xl p-6 shadow-sm hover:border-[#2F6FED]/30 transition-all";
   const statLabel = "text-[10px] font-black text-[#475569] uppercase tracking-[0.15em]";
   const statValue = "text-2xl font-black text-[#0F172A] mt-1";
