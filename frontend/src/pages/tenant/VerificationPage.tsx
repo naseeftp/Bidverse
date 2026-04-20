@@ -13,28 +13,86 @@ import { submitVerification } from '../../redux/tenant/auctionHouse.slice';
 import uploadservice from '../../services/uploadservice';
 import type { AuctionHouseSubmissionDTO } from '../../types/auctionHouse.type';
 
-// 1. Schema Definition
 const schema = yup.object({
-  name: yup.string().required('Business name is required').trim(),
-  yearEstablished: yup.number().typeError('Must be a year').required('Year is required').min(1800).max(new Date().getFullYear()),
-  briefDescription: yup.string().required('Description is required').min(20, 'Please provide more detail'),
+  name: yup
+    .string()
+    .trim()
+    .max(100, 'Business name cannot exceed 100 characters') 
+    .required('Business name is required'),
+
+  yearEstablished: yup
+    .number()
+    .typeError('Must be a year')
+    .required('Year is required')
+    .min(1800, 'Year is too old')
+    .max(new Date().getFullYear(), 'Year cannot be in the future'),
+
+  briefDescription: yup
+    .string()
+    .min(20, 'Please provide more detail')
+    .max(1000, 'Description cannot exceed 1000 characters') 
+    .required('Description is required'),
+
   address: yup.object({
-    city: yup.string().required('City is required'),
-    state: yup.string().required('State is required'),
-    country: yup.string().required('Country is required'),
-    fullAddress: yup.string().required('Full address is required'),
+    city: yup
+      .string()
+      .max(50, 'City too long') 
+      .required('City is required'),
+
+    state: yup
+      .string()
+      .max(50, 'State too long') 
+      .required('State is required'),
+
+    country: yup
+      .string()
+      .max(50, 'Country too long') 
+      .required('Country is required'),
+
+    fullAddress: yup
+      .string()
+      .max(255, 'Address too long') 
+      .required('Full address is required'),
   }),
+
   contact: yup.object({
-    primaryContactName: yup.string().required('Contact name is required'),
-    businessEmail: yup.string().email('Invalid email').required('Email is required'),
-    phone: yup.string().required('Phone is required'),
+    primaryContactName: yup
+      .string()
+      .max(100, 'Name too long') 
+      .required('Contact name is required'),
+
+    businessEmail: yup
+      .string()
+      .email('Invalid email')
+      .max(100, 'Email too long') 
+      .required('Email is required'),
+
+    phone: yup
+      .string()
+      .matches(/^\d{10}$/, 'Phone must be exactly 10 digits') 
+      .max(10, 'Phone cannot exceed 10 digits') 
+      .required('Phone is required'),
   }),
+
   legal: yup.object({
-    registrationNumber: yup.string().required('Reg. number is required'),
-    taxId: yup.string().required('Tax ID is required'),
+    registrationNumber: yup
+      .string()
+      .max(100, 'Registration number too long') 
+      .required('Reg. number is required'),
+
+    taxId: yup
+      .string()
+      .max(50, 'Tax ID too long') 
+      .required('Tax ID is required'),
   }),
-  registrationCertificate: yup.mixed<File>().required('Certificate is required'),
-  identityProof: yup.mixed<File>().required('ID proof is required'),
+
+  registrationCertificate: yup
+    .mixed<File>()
+    .required('Certificate is required'),
+
+  identityProof: yup
+    .mixed<File>()
+    .required('ID proof is required'),
 }).required();
 
 type VerificationFormData = yup.InferType<typeof schema>;
@@ -72,7 +130,7 @@ const TenantVerificationForm: React.FC = () => {
         },
       };
 
-      // Since we use .unwrap(), success is implied if it doesn't throw
+      
       await dispatch(submitVerification(finalPayload)).unwrap();
       
       toast.success('Verification submitted successfully');

@@ -23,23 +23,23 @@ import uploadservice from "../../services/uploadservice";
 import type { AuctionHouseSubmissionDTO } from "../../types/auctionHouse.type";
 
 const resubmissionSchema = yup.object({
-    name: yup.string().min(3, 'Name must be at least 3 characters').required('Required'),
+    name: yup.string().min(3, 'Name must be at least 3 characters').max(100, 'Name cannot exceed 100 characters').required('Required'),
     yearEstablished: yup.number().typeError('Must be a year').required().min(1700).max(new Date().getFullYear()),
-    briefDescription: yup.string().min(20, 'Min 20 characters').required(),
+    briefDescription: yup.string().min(20, 'Min 20 characters').max(1000, 'Description cannot exceed 1000 characters').required(),
     address: yup.object({
-        city: yup.string().required('Required'),
-        state: yup.string().required('Required'),
-        country: yup.string().required('Required'),
-        fullAddress: yup.string().min(5, 'Address too short').required()
+        city: yup.string().max(50, 'City too long').required('Required'),
+        state: yup.string().max(50, 'State too long').required('Required'),
+        country: yup.string().max(50, 'Country too long').required('Required'),
+        fullAddress: yup.string().min(5, 'Address too short').max(255, 'Address too long').required()
     }),
     contact: yup.object({
-        primaryContactName: yup.string().required('Required'),
-        businessEmail: yup.string().email('Invalid email').required(),
-        phone: yup.string().min(10, 'Min 10 digits').required(),
+        primaryContactName: yup.string().max(100, 'Name too long').required('Required'),
+        businessEmail: yup.string().email('Invalid email').max(100, 'Email too long').required(),
+        phone: yup.string().matches(/^\d{10}$/, 'Phone must be exactly 10 digits').max(10, 'Phone cannot exceed 10 digits').required(),
     }),
     legal: yup.object({
-        registrationNumber: yup.string().required('Required'),
-        taxId: yup.string().required('Required'),
+        registrationNumber: yup.string().max(100, 'Registration number too long') .required('Required'),
+        taxId: yup.string().max(50, 'Tax ID too long').required('Required'),
     }),
     registrationCertificate: yup.mixed<File>().nullable().optional(),
     identityProof: yup.mixed<File>().nullable().optional(),

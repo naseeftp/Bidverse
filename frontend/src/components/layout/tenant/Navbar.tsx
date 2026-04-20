@@ -9,7 +9,7 @@ const TenantNavbar: React.FC = () => {
   return (
     <nav className="h-20 bg-white border-b border-[#E2E8F0] px-8 flex items-center justify-between sticky top-0 z-30">
 
-      {/* LEFT SIDE: Brand/Title (Always Visible or contextual) */}
+      
       <div className="flex items-center">
         {!isAuthenticated && (
           <Link to="/tenant/login" className="text-xl font-bold tracking-tight text-[#0F172A]">
@@ -18,7 +18,7 @@ const TenantNavbar: React.FC = () => {
         )}
       </div>
 
-      {/* MIDDLE/RIGHT CONTENT: Conditional Rendering */}
+      
       {isAuthenticated ? (
         <>
 

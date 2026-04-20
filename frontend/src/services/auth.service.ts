@@ -12,7 +12,6 @@ import type {
 } from '../types/auth.type'
 import { apiErrorHandler } from '../utils/error.handle'
 
-// 1. Define specific interfaces for your response data
 interface AuthSuccessData {
     token: string;
     user:JwtPayload;

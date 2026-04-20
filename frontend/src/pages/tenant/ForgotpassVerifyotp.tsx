@@ -10,8 +10,6 @@ interface AxiosErrorResponse {
     };
   };
 }
-
-// MATCHES YOUR JSON: { success: true, data: { resetToken: "..." } }
 interface AuthResponse {
   success: boolean;
   message?: string;
@@ -31,7 +29,7 @@ const TenantForgotPassVerifyOtp: React.FC = () => {
   const email = location.state?.email || "";
   const role = location.state?.role || "tenant";
   
-  // PERSISTENCE: Recover timer after reload
+
   const [expiresAt, setExpiresAt] = useState<number | null>(() => {
     const saved = sessionStorage.getItem("tenant_recovery_expiry");
     return saved ? parseInt(saved, 10) : null;
@@ -43,7 +41,7 @@ const TenantForgotPassVerifyOtp: React.FC = () => {
 
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
-  // 1. PREVENT RELOAD: Browser warning
+  
   useEffect(() => {
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
       if (timeLeft > 0) {
@@ -55,7 +53,7 @@ const TenantForgotPassVerifyOtp: React.FC = () => {
     return () => window.removeEventListener("beforeunload", handleBeforeUnload);
   }, [timeLeft]);
 
-  // 2. Initial Setup
+
   useEffect(() => {
     if (!email) {
       toast.error("Session expired. Please restart recovery.");
@@ -75,7 +73,7 @@ const TenantForgotPassVerifyOtp: React.FC = () => {
     }
   }, [email, navigate, location.state, expiresAt]);
 
-  // 3. Timer Logic
+ 
   useEffect(() => {
     if (!expiresAt) return;
     const calculateTime = () => {
@@ -139,8 +137,6 @@ const TenantForgotPassVerifyOtp: React.FC = () => {
         role: role as string,
         purpose: 'forgot_password'
       }) as AuthResponse;
-
-      // FIX: Access resetToken from result.data.resetToken
       if (result && result.success && result.data?.resetToken) {
         sessionStorage.removeItem("tenant_recovery_expiry");
         toast.success("Identity verified. Update your password.");

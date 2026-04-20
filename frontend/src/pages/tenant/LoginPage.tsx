@@ -7,7 +7,6 @@ import { FcGoogle } from "react-icons/fc";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { useAppDispatch, useAppSelector } from "../../hooks/redux.hooks";
 import { setAuthError, setAuthSuccess, setLoading } from "../../redux/user/auth.slice";
-// Note: Import Roles as a value and JwtPayload as a type
 import { Roles } from "../../types/auth.type"; 
 import type{ userRole } from "../../types/auth.type";
 import type { JwtPayload } from "../../types/auth.type";

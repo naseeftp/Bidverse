@@ -11,13 +11,13 @@ import toast from "react-hot-toast";
 
 const baseURL = import.meta.env.VITE_API_URL;
 
-// 1. Strictly type the schema to match RegisterDTO
 const schema: yup.ObjectSchema<RegisterDTO> = yup.object({
-    name: yup.string().required('Auction House name is required'),
-    email: yup.string().email('Invalid email').required('Email is required'),
-    phone: yup.string().required('Phone number is required'),
-    password: yup.string().min(8, 'Password must be minimum 8 characters').required(),
+    name: yup.string().max(50, 'Name cannot exceed 50 characters').required('Auction House name is required'),
+    email: yup.string().email('Invalid email').max(100, 'Email cannot exceed 100 characters').required('Email is required'),
+    phone: yup.string().matches(/^\d{10}$/, 'Phone must be exactly 10 digits').max(10, 'Phone cannot exceed 10 digits').required('Phone number is required'),
+    password: yup.string().min(8, 'Password must be minimum 8 characters').max(32, 'Password cannot exceed 32 characters').required(),
     confirmPassword: yup.string()
+        .max(32, 'Confirm password too long')
         .oneOf([yup.ref('password')], 'Passwords must match')
         .required('Please confirm your password'),
     role: yup.string().oneOf(['user', 'admin', 'tenant'] as const).default('tenant'),
@@ -28,7 +28,6 @@ const TenantRegisterPage: React.FC = () => {
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
 
-    // 2. Use RegisterDTO as the generic for useForm
     const { register, handleSubmit, formState: { errors } } = useForm<RegisterDTO>({
         resolver: yupResolver(schema),
         defaultValues: { 

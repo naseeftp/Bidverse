@@ -39,7 +39,7 @@ const authSlice = createSlice({
   name: "auth",
   initialState,
   reducers: {
-    // 1. Call this after successful registration
+    
     setRegistrationData: (state, action: PayloadAction<{ email: string, role: string, phone: string }>) => {
       state.tempAuthData = action.payload;
       state.error = null
