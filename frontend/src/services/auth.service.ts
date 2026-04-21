@@ -14,7 +14,7 @@ import { apiErrorHandler } from '../utils/error.handle'
 
 interface AuthSuccessData {
     token: string;
-    user:JwtPayload;
+    user: JwtPayload;
 }
 
 interface RegisterSuccessData {
@@ -40,7 +40,7 @@ class AuthService {
 
     async register(userData: RegisterDTO) {
         try {
-            
+
             const response = await axiosInstance.post<unknown, ApiResponse<RegisterSuccessData>>(AUTH_ROUTES.REGISTER, userData)
             return {
                 success: true,
@@ -54,10 +54,10 @@ class AuthService {
 
     async verifyOtp(otpData: VerifyOtpDTO) {
         try {
-            
+
             const response = await axiosInstance.post<unknown, ApiResponse<AuthSuccessData>>(AUTH_ROUTES.VERIFY_OTP, otpData)
             const data = response.data
-            
+
             if (data?.token) {
                 this.saveToken(data.token)
             }
@@ -84,10 +84,16 @@ class AuthService {
             return apiErrorHandler(error, 'user login failed')
         }
     }
-
+    async logout() {
+        try {
+            await axiosInstance.get(AUTH_ROUTES.LOGOUT)
+        } catch (error: unknown) {
+            return apiErrorHandler(error, 'Logout failed')
+        }
+    }
     async forgotpass(emailData: ForgetPaswordDTO) {
         try {
-           
+
             const response = await axiosInstance.post<unknown, ApiResponse<Record<string, never>>>(AUTH_ROUTES.FORGOT_PASS, emailData)
             return { message: response.message, success: true, data: response.data }
         } catch (error: unknown) {

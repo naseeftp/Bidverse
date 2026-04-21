@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { useAppSelector, useAppDispatch } from "../../hooks/redux.hooks";
 import { logout } from "../../redux/user/auth.slice";
 import { ChevronDown } from "lucide-react";
-
+import authService from "../../services/auth.service";
 const Navbar: React.FC = () => {
   const { user, isAuthenticated } = useAppSelector((state) => state.auth);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -19,7 +19,8 @@ const Navbar: React.FC = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const handleLogout = () => {
+  const handleLogout =async () => {
+    await authService.logout()
     dispatch(logout());
   };
 

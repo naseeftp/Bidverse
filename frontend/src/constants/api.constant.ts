@@ -8,7 +8,8 @@ export const AUTH_ROUTES = {
     REFRESH: "/auth/refresh-token",
     LOGIN: '/auth/login',
     FORGOT_PASS: '/auth/forgot-pass',
-    RESET_PASSWORD: '/auth/forgot-pass-reset'
+    RESET_PASSWORD: '/auth/forgot-pass-reset',
+    LOGOUT:'/auth/logout'
 } as const
 
 export const AUCTION_HOUSE_ROUTES = {

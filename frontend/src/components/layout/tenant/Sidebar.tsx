@@ -4,13 +4,15 @@ import { LayoutDashboard, Gavel, ShieldCheck, Settings, LogOut } from "lucide-re
 import { useAppDispatch, useAppSelector } from "../../../hooks/redux.hooks";
 import { logout } from "../../../redux/user/auth.slice";
 import { VerificationStatus } from "../../../types/auctionHouse.type";
+import authService from "../../../services/auth.service";
 
 const Sidebar: React.FC = () => {
   const dispatch = useAppDispatch();
   const location = useLocation();
   const { status } = useAppSelector((state) => state.auctionHouse);
 
-  const handleLogout = () => {
+  const handleLogout = async() => {
+    await authService.logout()
     dispatch(logout());
   };
 

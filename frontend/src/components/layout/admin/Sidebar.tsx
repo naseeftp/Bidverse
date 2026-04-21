@@ -12,11 +12,13 @@ import {
 
 import { logout } from "../../../redux/user/auth.slice";
 import { useAppDispatch } from "../../../hooks/redux.hooks";
+import authService from "../../../services/auth.service";
 
 const AdminSidebar: React.FC = () => {
     const location = useLocation();
     const dispatch = useAppDispatch();
-    const handleLogout = () => {
+    const handleLogout =async () => {
+        await authService.logout()
         dispatch(logout())
     }
 
