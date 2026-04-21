@@ -10,6 +10,7 @@ export const AUTH_ROUTES = {
     VERIFY_OTP: '/verify-otp',
     RESEND_OTP: '/resend-otp',
     LOGIN: '/login',
+    LOGOUT:'/logout',
     GOOGLE: '/google',
     GOOGLE_CALLBACK: '/google/callback',
     FORGOT_PASS: '/forgot-pass',

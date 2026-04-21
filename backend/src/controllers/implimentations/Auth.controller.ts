@@ -80,7 +80,7 @@ export class AuthController implements IAuthController {
                 throw new AppError(MESSAGES.REFRESH_TOKEN_MISSING, HttpStatus.UNAUTHORIZED)
             }
             const result = await this._authService.refreshToken(token);
-            SuccessResponse(res,MESSAGES.TOKEN_REFRESHED,result.accessToken, HttpStatus.OK)
+            SuccessResponse(res, MESSAGES.TOKEN_REFRESHED, result.accessToken, HttpStatus.OK)
         } catch (error: unknown) {
             next(error)
         }
@@ -139,6 +139,20 @@ export class AuthController implements IAuthController {
             const message = error instanceof Error ? error.message : "Authentication failed";
             const errorMessage = encodeURIComponent(message);
             res.redirect(`${process.env.FRONTEND_URL}${loginPath}?error=${errorMessage}`);
+            next(error)
+        }
+    }
+    async logout(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const isProduction = env.NODE_ENV === COOKIES_OPTIONS.ENV_PRODUCTION
+            res.clearCookie(COOKIES_OPTIONS.REFRESH_TOKEN, {
+                httpOnly: true,
+                secure: isProduction,
+                sameSite: isProduction ? COOKIES_OPTIONS.SAME_SITE_NONE : COOKIES_OPTIONS.SAME_SITE_LAX,
+                path: '/'
+            })
+            SuccessResponse(res, MESSAGES.LOGOUT_SUCCESS, null, HttpStatus.OK)
+        } catch (error) {
             next(error)
         }
     }

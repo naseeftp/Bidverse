@@ -25,6 +25,10 @@ router.post(
     validator(AuthValidators.validateLoginInput),
     (req, res, next) => authController.login(req, res, next)
 )
+router.get(
+    AUTH_ROUTES.LOGOUT,
+    (req,res,next)=>authController.logout(req,res,next)
+)
 router.patch(
     AUTH_ROUTES.FORGOT_PASS_RESET,
     validator(AuthValidators.validateResetPassInput),

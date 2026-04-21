@@ -33,16 +33,17 @@ export interface IAuthController {
         next: NextFunction
     ): Promise<void>;
     forgotPass(
-        req: Request<Record<string,unknown>, unknown, ForgetPaswordDTO>,
+        req: Request<Record<string, unknown>, unknown, ForgetPaswordDTO>,
         res: Response,
         next: NextFunction
     ): Promise<void>
     resetPassword(
-        req: Request<Record<string,unknown>, unknown, ResetPasswordDTO>,
+        req: Request<Record<string, unknown>, unknown, ResetPasswordDTO>,
         res: Response,
         next: NextFunction
     ): Promise<void>;
-    refreshToken(req:Request,res:Response,next:NextFunction):Promise<void>
+    refreshToken(req: Request, res: Response, next: NextFunction): Promise<void>
     redirectToGoogle(req: Request, res: Response): Promise<void>;
     googleCallback(req: Request, res: Response, next: NextFunction): Promise<void>;
+    logout(req: Request, res: Response, next: NextFunction): Promise<void>
 }
