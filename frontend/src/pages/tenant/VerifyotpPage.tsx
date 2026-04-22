@@ -132,10 +132,7 @@ const TenantVerifyOtpPage: React.FC = () => {
 
       if (result?.success && result.data) {
         localStorage.setItem("accessToken", result.data.token);
-        
-        // The result.data.user now strictly follows your JwtPayload (userId, email, role, name)
         dispatch(setAuthSuccess(result.data.user));
-        
         toast.success("Account Verified Successfully");
         navigate("/tenant/dashboard");
       } else {
@@ -192,7 +189,7 @@ const TenantVerifyOtpPage: React.FC = () => {
           >
             {loading ? "Verifying..." : "Confirm Verification"}
           </button>
-        </form>
+        </form> 
 
         <div className="mt-10 pt-8 border-t border-[#E2E8F0] text-center">
           <p className={`text-[11px] font-semibold uppercase tracking-wider text-[${slateGrey}] mb-3`}>

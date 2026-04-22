@@ -36,7 +36,6 @@ const TenantDashboard: React.FC = () => {
     );
   }
 
-  // --- VERIFICATION OVERLAY (Pending/Rejected/Null) ---
   if (status !== "approved") {
     return (
       <div className="min-h-screen bg-[#F5F7FB] flex items-center justify-center px-6">
@@ -56,7 +55,7 @@ const TenantDashboard: React.FC = () => {
 
           <div className="text-[#475569] text-base font-medium leading-relaxed mb-10">
             {status === "pending" && (
-              /* FIXED: Used &apos; instead of ' */
+              
               <p>Our compliance team is reviewing your documents. You&apos;ll receive full access shortly.</p>
             )}
 
@@ -65,7 +64,6 @@ const TenantDashboard: React.FC = () => {
                 <p className="text-sm">Your application was not approved. Please review the feedback below:</p>
                 {reason && (
                   <div className="bg-[#FEF2F2] border border-[#FEE2E2] rounded-2xl p-5 text-left">
-                    {/* FIXED: Wrapped quote marks in curly braces or used entities */}
                     <p className="text-[#991B1B] text-sm font-semibold italic">&ldquo;{reason}&rdquo;</p>
                   </div>
                 )}

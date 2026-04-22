@@ -2,7 +2,6 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import adminService from "../../services/admin.service";
 import type { AuctionHouseResponseDTO } from "../../types/auctionHouse.type";
 
-// 1. Define the specific interface for the API payload
 interface FetchHousesResponse {
     houses: AuctionHouseResponseDTO[];
     pagination: {
@@ -13,7 +12,7 @@ interface FetchHousesResponse {
 }
 
 interface AdminState {
-    houses: AuctionHouseResponseDTO[]; // Fixed 'any' error
+    houses: AuctionHouseResponseDTO[]; 
     loading: boolean;
     error: string | null;
     pagination: {
