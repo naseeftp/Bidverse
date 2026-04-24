@@ -1,5 +1,6 @@
 import { StatusCodes } from "http-status-codes";
 import { env } from "../config/env";
+
 export const Roles = {
     ADMIN: 'admin',
     TENANT: 'tenant',

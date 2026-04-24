@@ -10,4 +10,5 @@ export interface IAdminController {
         res: Response,
         next: NextFunction
     ): Promise<void>
+    getAllUsers(req:Request,res:Response,next:NextFunction):Promise<void>
 }

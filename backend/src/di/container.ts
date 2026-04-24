@@ -31,5 +31,6 @@ import { AdminController } from "../controllers/implimentations/Admin.controller
 
 const adminLogger = new LoggerService()
 const adminRepo = new AuctionHouseRepository();
-const adminService = new AdminService(adminRepo, adminLogger);
+const userRepo=new UserRepository()
+const adminService = new AdminService(adminRepo,userRepo, adminLogger);
 export const adminController = new AdminController(adminService, adminLogger)

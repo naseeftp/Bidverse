@@ -53,7 +53,7 @@ export class AdminController implements IAdminController {
         }
     }
 
-    async updateAuctionHouseStatus(req: Request<ParamsDictionary,Record<string, unknown>, UpdateHouseStatusDTO>, res: Response, next: NextFunction): Promise<void> {
+    async updateAuctionHouseStatus(req: Request<ParamsDictionary, Record<string, unknown>, UpdateHouseStatusDTO>, res: Response, next: NextFunction): Promise<void> {
         try {
             const id = req.params.id as string  //service layer expect id as string
             const result = await this._adminService.updateAuctionHouseStatus(id, req.body)
@@ -63,6 +63,24 @@ export class AdminController implements IAdminController {
                 result,
                 HttpStatus.OK
             )
+        } catch (error) {
+            next(error)
+        }
+    }
+    async getAllUsers(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const page = Number(req.query.page) || 1;
+            const limit = Number(req.query.limit) || 10;
+            const search = req.query.search as string;
+            const status = req.query.status as string;
+            this._logger.info('fetching all users by admin', {
+                adminId: req.user.id,
+                page,
+                limit,
+                status
+            })
+            const result = await this._adminService.listAllUsers(page, limit, search, status)
+            SuccessResponse(res,MESSAGES.LIST_RETRIEVED,result,HttpStatus.OK)
         } catch (error) {
             next(error)
         }
