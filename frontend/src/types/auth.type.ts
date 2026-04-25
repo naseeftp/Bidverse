@@ -52,9 +52,27 @@ export interface ResetPasswordDTO {
     confirmPassword: string;
     resetToken: string;
 }
+export interface IPaginationMeta{
+    totalItems:number;
+    itemsPerPage:number;
+    currentPage:number;
+    totalPages:number;
+    hasNextPage:boolean;
+    hasPrevPage:boolean;
+}
+export interface UserResponseDTO {
+    id: string;
+    name: string;
+    email: string;
+    phone: string;
+    role: userRole;
+    isActive: boolean;
+    profileImage: string | null;
+}
 
 export interface ApiResponse<T=unknown> {
     success: boolean;
     message: string;
     data?: T
+    pagination?:IPaginationMeta
 }

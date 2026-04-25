@@ -70,8 +70,7 @@ const AdminSidebar: React.FC = () => {
                         AD
                     </div>
                     <div className="overflow-hidden">
-                        <p className="text-white text-[10px] font-bold truncate">Root Administrator</p>
-                        <p className="text-[#6B7280] text-[8px] uppercase tracking-tighter">Level 10 Access</p>
+                        <p className="text-white text-[10px] font-bold truncate">Admin</p>
                     </div>
                 </div>
 
@@ -80,7 +79,7 @@ const AdminSidebar: React.FC = () => {
                     className="w-full flex items-center gap-3 px-4 py-3 text-[10px] font-bold text-red-500 uppercase tracking-widest hover:bg-red-500/10 transition-colors rounded-sm"
                 >
                     <FaSignOutAlt />
-                    Terminate Session
+                    Logout
                 </button>
             </div>
         </aside>

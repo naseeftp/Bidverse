@@ -34,6 +34,7 @@ import AdminLoginPage from "./pages/admin/LoginPage";
 import AdminDashboard from "./pages/admin/Dashboard";
 import AuctionHouseTable from "./pages/admin/auctionHouseLits";
 import AuctionHouseDetailPage from './pages/admin/auctionHousedetailsPage'
+import UsersListPage from "./pages/admin/usersList";
 
 function App() {
 
@@ -92,6 +93,7 @@ function App() {
                   <Route path="/admin/dashboard" element={<AdminDashboard />} />
                   <Route path="/admin/auction-houses" element={<AuctionHouseTable />} />
                   <Route path="/admin/auction-house/:id" element={<AuctionHouseDetailPage />} />
+                  <Route path='/admin/users' element={<UsersListPage />} />
                </Route>
             </Route>
 

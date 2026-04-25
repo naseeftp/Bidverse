@@ -17,5 +17,7 @@ export const apiErrorHandler = (error: unknown, defaultMessage: string) => {
   return {
     success: false,
     message: error instanceof Error ? error.message : defaultMessage,
+    data:undefined,
+    pagination:undefined
   };
 };
