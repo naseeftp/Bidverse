@@ -4,7 +4,7 @@ import { AuctionHouseMapper } from "../../mappers/auctionHouse.mapper";
 import { AuctionHouseResponseDTO } from "../../dtos/auctionHouse.dto/auctionHouse.dto";
 import { UpdateHouseStatusDTO } from "../../dtos/admin.dto/updatestatus.dto";
 import { ILoggerService } from "../interface/ILogger.service";
-import { AppError, NotFoundError} from "../../errors/AppError";
+import { AppError, NotFoundError } from "../../errors/AppError";
 import { VerificationStatus } from "../../constants/constants";
 import { MESSAGES } from "../../constants/constants";
 import { UserResponseDTO } from "../../dtos/Common.dto";
@@ -14,11 +14,11 @@ import { IUserDocument } from "../../types/user.type";
 import { Role } from "../../dtos/Common.dto";
 import { IUserRepository } from "../../repositories/interfaces/iUser.repository";
 import { UserMapper } from "../../mappers/user.mapper";
-
+import { isValidObjectId } from "mongoose";
 export class AdminService implements IAdminService {
     constructor(
         private _auctionHouseRepo: IAuctionHouseRepository,
-        private _userRepo:IUserRepository,
+        private _userRepo: IUserRepository,
         private _logger: ILoggerService
     ) { }
     async listAllAuctionHouses(page: number, limit: number): Promise<IPaginatedResponse<AuctionHouseResponseDTO>> {
@@ -78,31 +78,44 @@ export class AdminService implements IAdminService {
         }
     }
     async listAllUsers(page: number, limit: number, search?: string, status?: string): Promise<IGenericPaginatedResposnse<UserResponseDTO>> {
-        const filter:QueryFilter<IUserDocument>={role:Role.USER}
-        if(status==='blocked'){
-            filter.isActive=false
+        const filter: QueryFilter<IUserDocument> = { role: Role.USER }
+        if (status === 'blocked') {
+            filter.isActive = false
         }
-        else if(status==='active'){
-            filter.isActive=true
+        else if (status === 'active') {
+            filter.isActive = true
         }
 
-        if(search){
-            filter.$or=[
-                {name:{$regex:search,$options:'i'}},
-                {email:{$regex:search,$options:'i'}}
+        if (search) {
+            const isFullId = isValidObjectId(search)
+            filter.$or = [
+                { name:  { $regex: search, $options: 'i' } },
+                { email: { $regex: search, $options: 'i' } },
+                isFullId
+                    ? { _id: search } 
+
+                    : {  //partial search"
+                        $expr: {  //alws to use aggregation oprtrs in mngdb queries(eg:$toString)
+                            $regexMatch: {
+                                input: { $toString: "$_id" },
+                                regex: search,
+                                options: "i"
+                            }
+                        }
+                    }
             ]
         }
-        const {docs,total}=await this._userRepo.findAllPaginatedUsers(page,limit,filter)
-        const mappedUsers=docs.map(doc=>UserMapper.toDTO(doc))
+        const { docs, total } = await this._userRepo.findAllPaginatedUsers(page, limit, filter)
+        const mappedUsers = docs.map(doc => UserMapper.toDTO(doc))
         return {
-            data:mappedUsers,
-            pagination:{
-                totalItems:total,
-                itemsPerPage:limit,
-                currentPage:page,
-                totalPages:Math.ceil(total/limit),
-                hasNextPage:page*limit<total,
-                hasPrevPage:page>1
+            data: mappedUsers,
+            pagination: {
+                totalItems: total,
+                itemsPerPage: limit,
+                currentPage: page,
+                totalPages: Math.ceil(total / limit),
+                hasNextPage: page * limit < total,
+                hasPrevPage: page > 1
             }
         }
     }

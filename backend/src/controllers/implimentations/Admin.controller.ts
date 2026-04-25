@@ -81,7 +81,7 @@ export class AdminController implements IAdminController {
                 search
             })
             const result = await this._adminService.listAllUsers(page, limit, search, status)
-            SuccessResponse(res,MESSAGES.LIST_RETRIEVED,result,HttpStatus.OK)
+            SuccessResponse(res, MESSAGES.LIST_RETRIEVED, result, HttpStatus.OK)
         } catch (error) {
             next(error)
         }
