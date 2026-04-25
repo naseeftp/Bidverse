@@ -77,7 +77,8 @@ export class AdminController implements IAdminController {
                 adminId: req.user.id,
                 page,
                 limit,
-                status
+                status,
+                search
             })
             const result = await this._adminService.listAllUsers(page, limit, search, status)
             SuccessResponse(res,MESSAGES.LIST_RETRIEVED,result,HttpStatus.OK)
