@@ -28,7 +28,7 @@ class AdminService {
                 url += `&status=${status}`
             }
             const response = await axiosInstance.get<
-                ApiResponse<{ data: UserResponseDTO[]; pagination: IPaginationMeta }>,
+                UserResponseDTO,
                 ApiResponse<{ data: UserResponseDTO[]; pagination: IPaginationMeta }>>(url);
             const paginatedResult = response.data
             return {
@@ -56,7 +56,19 @@ class AdminService {
         }
 
     }
-
+    async getUserById(id:string){
+        try {
+            const url=`${ADMIN_ROUTES.GET_USER}/${id}`
+            const  response=await axiosInstance.get<UserResponseDTO,ApiResponse<UserResponseDTO>>(url) // Slot 1: The type of 'data' inside ApiResponse Slot 2: The final return type of the axios call (unwrapped by interceptor)
+              return {
+                success:true,
+                message:response.message,
+                data:response.data
+            }
+        } catch (error) {
+            return apiErrorHandler(error,'Failed To Fetch User Details')
+        }
+    }
     async updateHouseStatus(id: string, data: updateAuctionHouseStatusRequestDTO) {
         try {
             const url = `${ADMIN_ROUTES.UPDATE_HOUSE_STATUS}/${id}`;
@@ -70,5 +82,6 @@ class AdminService {
             return apiErrorHandler(error, 'Failed to update status');
         }
     }
+
 }
 export default new AdminService();

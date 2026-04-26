@@ -3,6 +3,7 @@ import adminService from "../../services/admin.service";
 import toast from "react-hot-toast";
 import type { UserResponseDTO, IPaginationMeta } from "../../types/auth.type";
 import { FaExternalLinkAlt, FaSearch, FaFilter } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 
 const UsersListPage: React.FC = () => {
   const [users, setUsers] = useState<UserResponseDTO[]>([]);
@@ -11,7 +12,7 @@ const UsersListPage: React.FC = () => {
   const [page, setPage] = useState(1);
   const [pagination, setPageination] = useState<IPaginationMeta | null>(null);
   const [loading, setLoading] = useState(true);
-
+  const navigate=useNavigate()
   const fetchUsers = useCallback(async () => {
     setLoading(true);
     try {
@@ -32,7 +33,7 @@ const UsersListPage: React.FC = () => {
       fetchUsers();
     }, 500);
     return () => clearTimeout(handler);
-  }, [fetchUsers, search, statusFilter]);
+  }, [fetchUsers, search, statusFilter,page]);
 
   return (
     <div className="space-y-6">
@@ -112,7 +113,7 @@ const UsersListPage: React.FC = () => {
                       </span>
                     </td>
                     <td className="px-6 py-4 text-right">
-                      <button className="inline-flex items-center gap-2 text-white text-[10px] font-bold uppercase tracking-widest hover:underline transition-all">
+                      <button onClick={()=>navigate(`/admin/user/${user.id}`)} className="inline-flex items-center gap-2 text-white text-[10px] font-bold uppercase tracking-widest hover:underline transition-all">
                         Details <FaExternalLinkAlt size={8} />
                       </button>
                     </td>

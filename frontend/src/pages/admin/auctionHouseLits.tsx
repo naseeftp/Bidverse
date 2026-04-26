@@ -43,7 +43,7 @@ const AuctionHouseTable: React.FC = () => {
                                         </div>
                                     </td>
                                     <td className="px-6 py-4 border-r border-white/5">
-                                        {/* Changed to text-white for visibility */}
+                                        
                                         <div className="text-white text-[11px] font-mono">
                                             {house.yearEstablished}
                                         </div>
