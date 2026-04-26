@@ -44,7 +44,7 @@ export class AdminController implements IAdminController {
             const result = await this._adminService.getAuctionHouseById(id);
             SuccessResponse(
                 res,
-                MESSAGES.HOUSE_RETRIEVED || "House details retrieved", // Ensure this exists in constants
+                MESSAGES.HOUSE_RETRIEVED,
                 result,
                 HttpStatus.OK
             );
@@ -82,6 +82,15 @@ export class AdminController implements IAdminController {
             })
             const result = await this._adminService.listAllUsers(page, limit, search, status)
             SuccessResponse(res, MESSAGES.LIST_RETRIEVED, result, HttpStatus.OK)
+        } catch (error) {
+            next(error)
+        }
+    }
+    async getUserById(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const id=req.params.id as string
+            const result=await this._adminService.getUserById(id);
+            SuccessResponse(res,MESSAGES.USER_RETRIEVED,result,HttpStatus.OK)
         } catch (error) {
             next(error)
         }

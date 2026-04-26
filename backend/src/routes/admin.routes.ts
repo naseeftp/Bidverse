@@ -29,4 +29,9 @@ router.get(
     allowedTo(Role.ADMIN),
     (req,res,next)=>adminController.getAllUsers(req,res,next)
 )
+router.get(
+    ADMIN_ROUTES.GET_USER,
+    allowedTo(Role.ADMIN),
+    (req,res,next)=>adminController.getUserById(req,res,next)
+)
 export default router

@@ -18,4 +18,5 @@ export interface IAdminService {
     getAuctionHouseById(id: string): Promise<AuctionHouseResponseDTO>
     updateAuctionHouseStatus(id: string, data: UpdateHouseStatusDTO): Promise<AuctionHouseResponseDTO>
     listAllUsers(page:number,limit:number,search?:string,status?:string):Promise<IGenericPaginatedResposnse<UserResponseDTO>>
+    getUserById(id:string):Promise<UserResponseDTO>
 }

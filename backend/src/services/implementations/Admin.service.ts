@@ -41,7 +41,7 @@ export class AdminService implements IAdminService {
             }
         } catch (error) {
             this._logger.error("Error in listAllAuctionHouses service", { error });
-            throw new AppError("Failed to list auction houses for administrative review.");
+            throw new AppError("Failed to list auction houses for administrative review");
         }
     }
     async getAuctionHouseById(id: string): Promise<AuctionHouseResponseDTO> {
@@ -119,5 +119,17 @@ export class AdminService implements IAdminService {
             }
         }
     }
-
+    async getUserById(id: string): Promise<UserResponseDTO> {
+        try {
+            const user=await this._userRepo.findById(id)
+            if(!user){
+                throw new NotFoundError(MESSAGES.USER_NOT_FOUND)
+            }
+            const mappedUsers=UserMapper.toDTO(user)
+            return mappedUsers
+        } catch (error) {
+            this._logger.error('Error in fetching user',{error})
+            throw new AppError('Failed to get User')
+        }
+    }
 }
