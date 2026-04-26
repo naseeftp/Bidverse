@@ -68,6 +68,7 @@ export interface UserResponseDTO {
     role: userRole;
     isActive: boolean;
     profileImage: string | null;
+    BlockingReson:string
 }
 
 export interface ApiResponse<T=unknown> {

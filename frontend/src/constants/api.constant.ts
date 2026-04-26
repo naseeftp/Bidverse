@@ -22,5 +22,6 @@ export const ADMIN_ROUTES = {
     GET_AUCTION_HOUSES: "/admin/auction-houses",
     UPDATE_HOUSE_STATUS: '/admin/auction-house-status',
     GET_USERS:'/admin/users',
-    GET_USER:'/admin/user'
+    GET_USER:'/admin/user',
+    UPDATE_USER_STATUS:'/admin/user-update-status'
 }

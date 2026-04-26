@@ -2,7 +2,7 @@ import axiosInstance from "../api/axios.instance";
 import { ADMIN_ROUTES } from "../constants/api.constant";
 import { apiErrorHandler } from "../utils/error.handle";
 import type { ApiResponse } from "../types/auth.type";
-import type { updateAuctionHouseStatusRequestDTO } from '../types/admin.dto'
+import type { updateAuctionHouseStatusRequestDTO, UpdateUserStatusDTO } from '../types/admin.dto'
 import type { IPaginationMeta, UserResponseDTO } from "../types/auth.type";
 
 class AdminService {
@@ -80,6 +80,19 @@ class AdminService {
             };
         } catch (error) {
             return apiErrorHandler(error, 'Failed to update status');
+        }
+    }
+    async updateUserStatus(id:string,data:UpdateUserStatusDTO){
+        try {
+            const url=`${ADMIN_ROUTES.UPDATE_USER_STATUS}/${id}`
+            const response=await axiosInstance.patch<UserResponseDTO,ApiResponse<UserResponseDTO>>(url,data)
+            return {
+                success:true,
+                message:response.message,
+                data:response.data
+            }
+        } catch (error) {
+            return apiErrorHandler(error,'failed to update user status')
         }
     }
 
