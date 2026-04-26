@@ -2,6 +2,7 @@ import { Schema, model, Model } from 'mongoose'
 import { IUserDocument } from '../types/user.type';
 import { Roles } from '../constants/constants';
 
+
 const UserSchema = new Schema<IUserDocument>({
     name: {
         type: String,
@@ -37,6 +38,11 @@ const UserSchema = new Schema<IUserDocument>({
         type: Boolean,
         default: true,
 
+    },
+    BlockingReson:{
+        type:String,
+        default:null,
+        required: false,
     },
     passwordResetToken: {
         type: String,

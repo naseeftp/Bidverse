@@ -10,7 +10,8 @@ export class UserMapper {
             phone: user.phone,
             role: user.role,
             profileImage: user.profileImage,
-            isActive: user.isActive
+            isActive: user.isActive,
+            BlockingReson:user.BlockingReson
         }
     }
 }

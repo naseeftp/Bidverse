@@ -34,4 +34,10 @@ router.get(
     allowedTo(Role.ADMIN),
     (req,res,next)=>adminController.getUserById(req,res,next)
 )
+router.patch(
+    ADMIN_ROUTES.USER_UPDATE_STATUS,
+    allowedTo(Role.ADMIN),
+    validator(adminValidators.validateUserStatusUpdateInput),
+    (req,res,next)=>adminController.updateUserStatus(req,res,next)
+)
 export default router

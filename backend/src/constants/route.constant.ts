@@ -30,5 +30,6 @@ export const ADMIN_ROUTES = {
     GET_AUCTION_HOUSE: '/auction-house/:id',
     AUCTION_HOUSE_UPDATE_STATUS: '/auction-house-status/:id',
     GET_USERS:'/users',
-    GET_USER:'/user/:id'
+    GET_USER:'/user/:id',
+    USER_UPDATE_STATUS:'/user-update-status/:id'
 }

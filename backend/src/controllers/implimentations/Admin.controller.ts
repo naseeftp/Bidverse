@@ -5,7 +5,7 @@ import { ILoggerService } from "../../services/interface/ILogger.service";
 import { HttpStatus, MESSAGES } from "../../constants/constants";
 import { SuccessResponse } from "../../utils/response.utility";
 import { ParamsDictionary } from "express-serve-static-core";
-import { UpdateHouseStatusDTO } from "../../dtos/admin.dto/updatestatus.dto";
+import { UpdateHouseStatusDTO, UpdateUserStatusDTO } from "../../dtos/admin.dto/updatestatus.dto";
 
 export class AdminController implements IAdminController {
     constructor(
@@ -94,5 +94,14 @@ export class AdminController implements IAdminController {
         } catch (error) {
             next(error)
         }
+    }
+    async updateUserStatus(req: Request<ParamsDictionary, unknown, UpdateUserStatusDTO>, res: Response, next: NextFunction): Promise<void> {
+       try {
+           const id=req.params.id as string;
+           const result=await this._adminService.updateUserStatus(id,req.body)
+           SuccessResponse(res,MESSAGES.USER_STTS_UPDTD,result,HttpStatus.OK)
+       } catch (error) {
+         next(error)
+       }
     }
 }

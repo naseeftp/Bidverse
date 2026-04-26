@@ -108,6 +108,7 @@ export const MESSAGES = {
     LIST_RETRIEVED: 'List Retrieved successfully',
     HOUSE_RETRIEVED: 'House Retrieved successfully',
     USER_RETRIEVED: 'User Retrieved successfully',
+    USER_STTS_UPDTD: 'User status updated successfully',
     LOGOUT_SUCCESS: "Logout success",
     LOGOUT_FAILED : "Logout failed",
 

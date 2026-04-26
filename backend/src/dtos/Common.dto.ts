@@ -19,7 +19,8 @@ export interface UserResponseDTO {
   phone?: string;
   role: string;
   profileImage?: string | null;
-  isActive: boolean
+  isActive: boolean;
+  BlockingReson?:string
 }
 
 export interface AuthResponseDTO<T = UserResponseDTO> {

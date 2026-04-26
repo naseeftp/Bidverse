@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { UpdateHouseStatusDTO } from "../../dtos/admin.dto/updatestatus.dto";
+import { UpdateHouseStatusDTO, UpdateUserStatusDTO } from "../../dtos/admin.dto/updatestatus.dto";
 import { ParamsDictionary } from 'express-serve-static-core'
 
 export interface IAdminController {
@@ -12,4 +12,9 @@ export interface IAdminController {
     ): Promise<void>
     getAllUsers(req:Request,res:Response,next:NextFunction):Promise<void>
     getUserById(req:Request,res:Response,next:NextFunction):Promise<void>
+    updateUserStatus(
+        req:Request<ParamsDictionary,unknown,UpdateUserStatusDTO>,
+        res:Response,
+        next:NextFunction
+    ):Promise<void>
 }

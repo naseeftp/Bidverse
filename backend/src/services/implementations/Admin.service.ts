@@ -2,7 +2,7 @@ import { IAdminService, IPaginatedResponse } from "../interface/IAdmin.service";
 import { IAuctionHouseRepository } from "../../repositories/interfaces/IAuctionHouse.repository";
 import { AuctionHouseMapper } from "../../mappers/auctionHouse.mapper";
 import { AuctionHouseResponseDTO } from "../../dtos/auctionHouse.dto/auctionHouse.dto";
-import { UpdateHouseStatusDTO } from "../../dtos/admin.dto/updatestatus.dto";
+import { UpdateHouseStatusDTO, UpdateUserStatusDTO } from "../../dtos/admin.dto/updatestatus.dto";
 import { ILoggerService } from "../interface/ILogger.service";
 import { AppError, NotFoundError } from "../../errors/AppError";
 import { VerificationStatus } from "../../constants/constants";
@@ -130,6 +130,30 @@ export class AdminService implements IAdminService {
         } catch (error) {
             this._logger.error('Error in fetching user',{error})
             throw new AppError('Failed to get User')
+        }
+    }
+    async updateUserStatus(id: string, data: UpdateUserStatusDTO): Promise<UserResponseDTO> {
+        try {
+            const {isActive,reason}=data;
+            this._logger.info('updating the user  status',{
+                id:id,
+                newStatus:isActive?'ACTIVE':'FALSE',
+                reason:reason
+            })
+            const updatedData={
+                isActive:isActive,
+                BlockingReson:isActive?null:reason,
+                updatedAt:new Date()
+            }
+            const updatedUser=await this._userRepo.updateById(id,updatedData)
+            if(!updatedUser){
+                throw new NotFoundError(MESSAGES.USER_NOT_FOUND)
+            }
+            const mappedUser=UserMapper.toDTO(updatedUser)
+            return mappedUser
+        } catch (error) {
+            this._logger.error('Error while updating user',{error})
+            throw new AppError('Error while Updating User')
         }
     }
 }

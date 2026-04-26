@@ -1,5 +1,6 @@
-import { UpdateHouseStatusSchema } from "../dtos/admin.dto/updatestatus.dto";
+import { UpdateHouseStatusSchema,updateUserStatusSchema} from "../dtos/admin.dto/updatestatus.dto";
 
 export const adminValidators = {
-    validateAuctionHouseStatusInput: UpdateHouseStatusSchema
+    validateAuctionHouseStatusInput: UpdateHouseStatusSchema,
+    validateUserStatusUpdateInput:updateUserStatusSchema
 }
