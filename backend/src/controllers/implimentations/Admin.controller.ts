@@ -1,0 +1,107 @@
+import { Request, Response, NextFunction } from "express";
+import { IAdminController } from "../interfaces/IAdmin.controller";
+import { IAdminService } from "../../services/interface/IAdmin.service";
+import { ILoggerService } from "../../services/interface/ILogger.service";
+import { HttpStatus, MESSAGES } from "../../constants/constants";
+import { SuccessResponse } from "../../utils/response.utility";
+import { ParamsDictionary } from "express-serve-static-core";
+import { UpdateHouseStatusDTO, UpdateUserStatusDTO } from "../../dtos/admin.dto/updatestatus.dto";
+
+export class AdminController implements IAdminController {
+    constructor(
+        private _adminService: IAdminService,
+        private _logger: ILoggerService
+    ) { }
+    async getAuctionHouses(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const page = Number(req.query.page) || 1;
+            const limit = Number(req.query.limit) || 10;
+            this._logger.info('admin fetching auction houses list', {
+                adminId: req.user?.id,
+                page,
+                limit
+            })
+            const result = await this._adminService.listAllAuctionHouses(page, limit);
+            SuccessResponse(
+                res,
+                MESSAGES.LIST_RETRIEVED,
+                result,
+                HttpStatus.OK
+            )
+        } catch (error) {
+            this._logger.error('admin controller failed to list auction house', {
+                adminId: req.user?.id.charAt,
+                error
+            })
+            next(error)
+        }
+    }
+
+    async getAuctionHouseById(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const id = req.params.id as string;
+            this._logger.info('Admin fetching single auction house details', { id });
+            const result = await this._adminService.getAuctionHouseById(id);
+            SuccessResponse(
+                res,
+                MESSAGES.HOUSE_RETRIEVED,
+                result,
+                HttpStatus.OK
+            );
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    async updateAuctionHouseStatus(req: Request<ParamsDictionary, Record<string, unknown>, UpdateHouseStatusDTO>, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const id = req.params.id as string  //service layer expect id as string
+            const result = await this._adminService.updateAuctionHouseStatus(id, req.body)
+            SuccessResponse(
+                res,
+                MESSAGES.AUC_HOUSE_STTS_UPDTD,
+                result,
+                HttpStatus.OK
+            )
+        } catch (error) {
+            next(error)
+        }
+    }
+    async getAllUsers(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const page = Number(req.query.page) || 1;
+            const limit = Number(req.query.limit) || 10;
+            const search = req.query.search as string;
+            const status = req.query.status as string;
+            this._logger.info('fetching all users by admin', {
+                adminId: req.user.id,
+                page,
+                limit,
+                status,
+                search
+            })
+            const result = await this._adminService.listAllUsers(page, limit, search, status)
+            SuccessResponse(res, MESSAGES.LIST_RETRIEVED, result, HttpStatus.OK)
+        } catch (error) {
+            next(error)
+        }
+    }
+    async getUserById(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const id=req.params.id as string
+            const result=await this._adminService.getUserById(id);
+            SuccessResponse(res,MESSAGES.USER_RETRIEVED,result,HttpStatus.OK)
+        } catch (error) {
+            next(error)
+        }
+    }
+    async updateUserStatus(req: Request<ParamsDictionary, unknown, UpdateUserStatusDTO>, res: Response, next: NextFunction): Promise<void> {
+       try {
+           const id=req.params.id as string;
+           const result=await this._adminService.updateUserStatus(id,req.body)
+           SuccessResponse(res,MESSAGES.USER_STTS_UPDTD,result,HttpStatus.OK)
+       } catch (error) {
+         next(error)
+       }
+    }
+}
