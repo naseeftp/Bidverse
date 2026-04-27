@@ -26,6 +26,9 @@ axiosInstance.interceptors.response.use(
         const originalRequest = error.config ;
         if (!originalRequest) return Promise.reject(error);
         const isLoginRequest = originalRequest.url?.includes(AUTH_ROUTES.LOGIN);
+        if(isLoginRequest){
+            return Promise.reject(error)
+        }
         if(error.response?.status===403){
             const message=error.response.data?.message;
             if(message.toLowerCase().includes('blocked')){
