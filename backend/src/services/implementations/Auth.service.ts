@@ -94,7 +94,7 @@ export class AuthService implements IAuthService {
         }
 
         if (!existingUser.isActive) {
-            throw new UnauthorizedError(MESSAGES.USER_NOT_ACTIVE)
+            throw new ForbiddenError(MESSAGES.USER_BLOCKED)
         }
 
         const passwordMatch = await comparePassword(data.password, existingUser.password!)
