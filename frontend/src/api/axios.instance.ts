@@ -1,5 +1,6 @@
 import axios from "axios";
 import { API_BASE_URL, AUTH_ROUTES } from "../constants/api.constant";
+import toast from "react-hot-toast";
 
 
 const axiosInstance = axios.create({
@@ -25,6 +26,16 @@ axiosInstance.interceptors.response.use(
         const originalRequest = error.config ;
         if (!originalRequest) return Promise.reject(error);
         const isLoginRequest = originalRequest.url?.includes(AUTH_ROUTES.LOGIN);
+        if(error.response?.status===403){
+            const message=error.response.data?.message;
+            if(message.toLowerCase().includes('blocked')){
+              const reason=error.response.data?.reason;
+              toast.error(`Access Revoked Due to: ${reason}`)
+            }
+            localStorage.removeItem("accessToken")
+            window.location.href='/login'
+            return Promise.reject(error)
+        }
         if (error.response?.status === 401 && !originalRequest._retry && !isLoginRequest) {
             originalRequest._retry = true
             try {

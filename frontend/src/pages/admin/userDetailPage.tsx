@@ -10,10 +10,10 @@ const UserDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
 
-
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<UserResponseDTO | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalMode, setModalMode] = useState<"BLOCK" | "UNBLOCK">("BLOCK");
   const [blockReason, setBlockReason] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -32,16 +32,21 @@ const UserDetailPage: React.FC = () => {
     fetchUser();
   }, [fetchUser]);
 
-  const handleToggleStatus = async (targetActiveState: boolean) => {
+  const handleOpenModal = (mode: "BLOCK" | "UNBLOCK") => {
+    setModalMode(mode);
+    setIsModalOpen(true);
+  };
+
+  const handleToggleStatus = async () => {
     if (!id) return;
 
+    const targetActiveState = modalMode === "UNBLOCK";
     const payload = {
       isActive: targetActiveState,
       reason: targetActiveState ? undefined : blockReason,
     };
 
     try {
-
       await updateUserStatusSchema.validate(payload);
 
       setIsSubmitting(true);
@@ -74,7 +79,7 @@ const UserDetailPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-[#F3F4F6] p-6 lg:p-12 font-sans relative">
-
+     
       <div className="max-w-4xl mx-auto mb-8 flex items-center justify-between">
         <button
           onClick={() => navigate(-1)}
@@ -83,15 +88,16 @@ const UserDetailPage: React.FC = () => {
           ← Back to Registry
         </button>
 
-        <span className={`px-4 py-1 text-[10px] font-black uppercase tracking-widest border ${user?.isActive ? "bg-[#16A34A] text-white border-[#16A34A]" : "bg-[#DC2626] text-white border-[#DC2626]"
-          }`}>
+        <span className={`px-4 py-1 text-[10px] font-black uppercase tracking-widest border ${
+          user?.isActive ? "bg-[#16A34A] text-white border-[#16A34A]" : "bg-[#DC2626] text-white border-[#DC2626]"
+        }`}>
           {user?.isActive ? 'Authorized Access' : 'Access Revoked'}
         </span>
       </div>
 
       <div className="max-w-4xl mx-auto bg-white border border-[#E5E7EB] shadow-sm">
-
-        <div className="h-40 bg-[#111827] relative px-8 border-b-4 border-[#111827]">
+       
+        <div className="h-40 bg-[#111827] relative px-8 border-b-4 border-[#D4AF37]">
           <div className="absolute -bottom-12 left-8 flex items-end gap-6">
             <div className="w-32 h-32 bg-white border-4 border-white shadow-lg overflow-hidden flex-shrink-0">
               {user?.profileImage ? (
@@ -103,7 +109,7 @@ const UserDetailPage: React.FC = () => {
               )}
             </div>
             <div className="mb-2 pb-1">
-              <h1 className="text-3xl font-black uppercase tracking-tighter text-[#D4AF37] leading-none">
+              <h1 className="text-3xl font-black uppercase tracking-tighter text-white leading-none">
                 {user?.name}
               </h1>
               <p className="text-[#D4AF37] text-[11px] font-bold uppercase tracking-widest mt-1">
@@ -113,7 +119,7 @@ const UserDetailPage: React.FC = () => {
           </div>
         </div>
 
-       
+        
         <div className="pt-20 pb-12 px-10 grid grid-cols-1 md:grid-cols-2 gap-y-10 gap-x-16">
           <DetailSection label="Database ID" value={user?.id} isMono />
           <DetailSection label="Contact Number" value={user?.phone || "Not Provided"} />
@@ -127,40 +133,48 @@ const UserDetailPage: React.FC = () => {
               <p className="text-[10px] text-[#DC2626] mt-1 font-medium italic">Reason: {user.BlockingReson}</p>
             )}
           </div>
-           <div className="col-span-full pt-10 mt-4 border-t border-[#E5E7EB] flex justify-end gap-4">
+
+          <div className="col-span-full pt-10 mt-4 border-t border-[#E5E7EB] flex justify-end gap-4">
             {user?.isActive ? (
               <button
-                onClick={() => setIsModalOpen(true)}
+                onClick={() => handleOpenModal("BLOCK")}
                 className="px-8 py-3 text-[10px] font-black uppercase tracking-[0.2em] border border-[#DC2626] text-[#DC2626] hover:bg-[#DC2626] hover:text-white transition-all shadow-md"
               >
                 Block User
               </button>
             ) : (
               <button
-                onClick={() => handleToggleStatus(true)}
-                disabled={isSubmitting}
-                className="px-8 py-3 text-[10px] font-black uppercase tracking-[0.2em] border border-[#16A34A] text-[#16A34A] hover:bg-[#16A34A] hover:text-white transition-all shadow-md disabled:opacity-50"
+                onClick={() => handleOpenModal("UNBLOCK")}
+                className="px-8 py-3 text-[10px] font-black uppercase tracking-[0.2em] border border-[#16A34A] text-[#16A34A] hover:bg-[#16A34A] hover:text-white transition-all shadow-md"
               >
-                {isSubmitting ? "Processing..." : "Unblock User"}
+                Unblock User
               </button>
             )}
           </div>
         </div>
       </div>
 
-      
+     
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#111827]/80 backdrop-blur-sm p-4">
-          <div className="bg-white w-full max-w-md p-8 border-t-4 border-[#DC2626] shadow-2xl">
-            <h2 className="text-xl font-black uppercase tracking-tighter text-[#111827] mb-2">Restrict Access</h2>
-            <p className="text-[10px] font-bold uppercase tracking-widest text-[#6B7280] mb-6">Enter the official reason for blocking this account.</p>
+          <div className={`bg-white w-full max-w-md p-8 border-t-4 shadow-2xl ${modalMode === 'BLOCK' ? 'border-[#DC2626]' : 'border-[#16A34A]'}`}>
+            <h2 className="text-xl font-black uppercase tracking-tighter text-[#111827] mb-2">
+              {modalMode === "BLOCK" ? "Restrict Access" : "Restore Access"}
+            </h2>
+            <p className="text-[10px] font-bold uppercase tracking-widest text-[#6B7280] mb-6">
+              {modalMode === "BLOCK" 
+                ? "Enter the official reason for blocking this account." 
+                : "Are you sure you want to re-authorize this user to the BidVerse platform?"}
+            </p>
 
-            <textarea
-              className="w-full h-32 bg-[#F3F4F6] border border-[#E5E7EB] p-4 text-xs font-bold text-[#111827] focus:outline-none focus:border-[#D4AF37] transition-all resize-none mb-6"
-              placeholder="Minimum 5 characters required..."
-              value={blockReason}
-              onChange={(e) => setBlockReason(e.target.value)}
-            />
+            {modalMode === "BLOCK" && (
+              <textarea
+                className="w-full h-32 bg-[#F3F4F6] border border-[#E5E7EB] p-4 text-xs font-bold text-[#111827] focus:outline-none focus:border-[#D4AF37] transition-all resize-none mb-6"
+                placeholder="Minimum 5 characters required..."
+                value={blockReason}
+                onChange={(e) => setBlockReason(e.target.value)}
+              />
+            )}
 
             <div className="flex justify-end gap-4">
               <button
@@ -171,10 +185,12 @@ const UserDetailPage: React.FC = () => {
               </button>
               <button
                 disabled={isSubmitting}
-                onClick={() => handleToggleStatus(false)}
-                className="px-6 py-3 bg-[#111827] text-white text-[10px] font-black uppercase tracking-[0.2em] hover:bg-[#DC2626] transition-all shadow-lg"
+                onClick={handleToggleStatus}
+                className={`px-6 py-3 text-white text-[10px] font-black uppercase tracking-[0.2em] transition-all shadow-lg ${
+                  modalMode === "BLOCK" ? "bg-[#111827] hover:bg-[#DC2626]" : "bg-[#16A34A] hover:bg-[#16A34A]/90"
+                }`}
               >
-                {isSubmitting ? "Blocking..." : "Confirm Block"}
+                {isSubmitting ? "Processing..." : modalMode === "BLOCK" ? "Confirm Block" : "Confirm Unblock"}
               </button>
             </div>
           </div>
