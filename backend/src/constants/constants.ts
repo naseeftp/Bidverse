@@ -36,18 +36,18 @@ export enum HttpStatus {
 }
 
 export const CONFIG = {
-     OTP_EXPIRY_MINUTES: 1,
+    OTP_EXPIRY_MINUTES: 1,
     FORGOT_PASSWORD_EXPIRY: 1,
     OTP_RESEND_DELAY_SECONDS: 30,
 } as const;
 
-export const COOKIES_OPTIONS={
-REFRESH_TOKEN:'refreshToken',
-MAX_AGE:env.REFRESH_TOKEN_MAX_AGE,
-SAME_SITE_STRICT:'strict',
-SAME_SITE_LAX:'lax',
-SAME_SITE_NONE:'none',
-ENV_PRODUCTION:'production'
+export const COOKIES_OPTIONS = {
+    REFRESH_TOKEN: 'refreshToken',
+    MAX_AGE: env.REFRESH_TOKEN_MAX_AGE,
+    SAME_SITE_STRICT: 'strict',
+    SAME_SITE_LAX: 'lax',
+    SAME_SITE_NONE: 'none',
+    ENV_PRODUCTION: 'production'
 } as const
 
 export const MESSAGES = {
@@ -93,8 +93,8 @@ export const MESSAGES = {
 
     INVALID_ACCESS_TOKEN: "Invalid Access token",
     INVALID_REFRESH_TOKEN: "Invalid Refresh token",
-     TOKEN_REFRESHED: "Token refreshed successfully",
-     REFRESH_TOKEN_MISSING: "refresh token missing",
+    TOKEN_REFRESHED: "Token refreshed successfully",
+    REFRESH_TOKEN_MISSING: "refresh token missing",
 
     GOOGLE_REGISTERED: 'This account is registered with google authentication please try  google sign in',
 
@@ -110,7 +110,7 @@ export const MESSAGES = {
     USER_RETRIEVED: 'User Retrieved successfully',
     USER_STTS_UPDTD: 'User status updated successfully',
     LOGOUT_SUCCESS: "Logout success",
-    LOGOUT_FAILED : "Logout failed",
+    LOGOUT_FAILED: "Logout failed",
 
 
 };

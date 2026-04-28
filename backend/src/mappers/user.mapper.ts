@@ -11,7 +11,8 @@ export class UserMapper {
             role: user.role,
             profileImage: user.profileImage,
             isActive: user.isActive,
-            BlockingReson:user.BlockingReson
+            BlockingReson:user.BlockingReson,
+            provider:user.googleId===null?'local':'google'
         }
     }
 }

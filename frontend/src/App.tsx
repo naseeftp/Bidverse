@@ -11,6 +11,7 @@ import RegisterPage from "./pages/users/registerPage";
 import VerifyOtpPage from "./pages/users/verifyotpPage";
 import UserHomePage from './pages/users/homePage'
 import LoginPage from "./pages/users/loginPage";
+import ProfilePage from "./pages/users/ProfilePage";
 
 
 import ForgotPassPage from "./pages/users/forgotpassPage";
@@ -62,7 +63,7 @@ function App() {
 
                <Route element={<ProtectedRoute allowedRoles={['user']} />}>
                   <Route path="/home" element={<UserHomePage />} />
-                  
+                  <Route path="/profile" element={<ProfilePage />} />
                </Route>
             </Route>
 

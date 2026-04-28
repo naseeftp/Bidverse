@@ -3,7 +3,7 @@ import { authController } from "../di/container";
 import { AuthValidators } from "../validators/auth.validators";
 import { validator } from "../middlewares/validation.middleware";
 import { AUTH_ROUTES } from "../constants/route.constant";
-import { CheckUserBlocked } from "../middlewares/check-user-blocked-middleware";
+// import { CheckUserBlocked } from "../middlewares/check-user-blocked-middleware";
 
 const router = Router()
 router.post(
@@ -52,8 +52,7 @@ router.get(
 );
 router.post(
     AUTH_ROUTES.REFRESH_TOKEN,
-    CheckUserBlocked ,
-    (req,res,next)=>authController.refreshToken(req,res,next)
+   (req,res,next)=>authController.refreshToken(req,res,next)
 )
 
 export default router

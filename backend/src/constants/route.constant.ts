@@ -2,7 +2,8 @@
 export const BASE_ROUTES = {
     AUTH: '/auth',
     AUCTION_HOUSE: '/auction-house',
-    ADMIN: '/admin'
+    ADMIN: '/admin',
+    PROFILE_MANAGEMENT:'/profile'
 } as const
 
 export const AUTH_ROUTES = {
@@ -32,4 +33,8 @@ export const ADMIN_ROUTES = {
     GET_USERS:'/users',
     GET_USER:'/user/:id',
     USER_UPDATE_STATUS:'/user-update-status/:id'
+}
+
+export const PROFILE_ROUTES={
+    GET_PROFILE:'/get-profile'
 }

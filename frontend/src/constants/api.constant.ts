@@ -1,6 +1,9 @@
 
 
 export const API_BASE_URL = import.meta.env.VITE_API_URL
+export const BASE_ROUTES={
+    PROFILE_MANAGEMENT:'/profile'
+}
 export const AUTH_ROUTES = {
     REGISTER: "/auth/register",
     VERIFY_OTP: "/auth/verify-otp",
@@ -24,4 +27,8 @@ export const ADMIN_ROUTES = {
     GET_USERS:'/admin/users',
     GET_USER:'/admin/user',
     UPDATE_USER_STATUS:'/admin/user-update-status'
+}
+
+export const PROFILE_ROUTES={
+    GET_PROFILE:'/get-profile'
 }

@@ -21,6 +21,7 @@ export interface UserResponseDTO {
   profileImage?: string | null;
   isActive: boolean;
   BlockingReson?:string
+  provider:'google'|'local'
 }
 
 export interface AuthResponseDTO<T = UserResponseDTO> {

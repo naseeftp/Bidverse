@@ -1,5 +1,5 @@
 import { generateAccessToken, generateRefreshToken,verifyRefreshToken} from '../../utils/jwt.utils'
-import { hashPassword, comparePassword } from '../../utils/password.util'
+import { hashPassword, comparePassword } from '../../utils/Password.util'
 import { MESSAGES, CONFIG, otpPurpose } from '../../constants/constants'
 import { IAuthService } from '../interface/IAuth.service'
 import { RegisterUserDTO, LoginDTO, VerifyotpDTO, ResendOtpDTO, AuthResponseDTO, UserResponseDTO, ForgetPaswordDTO, ResetPasswordDTO } from '../../dtos/Common.dto'
@@ -12,6 +12,7 @@ import { oauth2Client } from '../../config/google.confing'
 import { google } from 'googleapis'
 import { roles } from '../../types/otp.type'
 import crypto from 'crypto';
+
 export class AuthService implements IAuthService {
     constructor(private _userRepository: IUserRepository, private _logger: ILoggerService, private _otpService: IOTPService) { }
 
@@ -200,8 +201,11 @@ export class AuthService implements IAuthService {
     }
     async refreshToken(token: string): Promise<{ accessToken: string }> {
         try {
+            this._logger.info('call for refresh token ',{token:token})
             const decoded=verifyRefreshToken(token);
+            this._logger.info('decoded token',{decoded:decoded})
             const user=await this._userRepository.findById(decoded.userId);
+            this._logger.info('user founded',{user:user})
             if(!user){
                 throw new UnauthorizedError(MESSAGES.USER_NOT_FOUND)
             }
@@ -209,6 +213,7 @@ export class AuthService implements IAuthService {
                 throw new ForbiddenError(MESSAGES.USER_BLOCKED )
             }
             const accessToken=generateAccessToken(user)
+            this._logger.info('this is the accesstoken',{accessToken})
             return {accessToken}
         } catch (error) {
             if(error instanceof ForbiddenError){

@@ -16,7 +16,7 @@ next:NextFunction
                 success:false,
                 message:MESSAGES.UNAUTHORIZED
             })
-            return
+            return next ()
          }
          const user=await UserModel.findById(userId).select("isActive BlockingReson")
          if(!user){

@@ -68,7 +68,8 @@ export interface UserResponseDTO {
     role: userRole;
     isActive: boolean;
     profileImage: string | null;
-    BlockingReson:string
+    BlockingReson:string;
+    provider:'google'|'local'
 }
 
 export interface ApiResponse<T=unknown> {
