@@ -1,8 +1,8 @@
 
 
 export const API_BASE_URL = import.meta.env.VITE_API_URL
-export const BASE_ROUTES={
-    PROFILE_MANAGEMENT:'/profile'
+export const BASE_ROUTES = {
+    PROFILE_MANAGEMENT: '/profile'
 }
 export const AUTH_ROUTES = {
     REGISTER: "/auth/register",
@@ -12,7 +12,7 @@ export const AUTH_ROUTES = {
     LOGIN: '/auth/login',
     FORGOT_PASS: '/auth/forgot-pass',
     RESET_PASSWORD: '/auth/forgot-pass-reset',
-    LOGOUT:'/auth/logout'
+    LOGOUT: '/auth/logout'
 } as const
 
 export const AUCTION_HOUSE_ROUTES = {
@@ -24,11 +24,12 @@ export const AUCTION_HOUSE_ROUTES = {
 export const ADMIN_ROUTES = {
     GET_AUCTION_HOUSES: "/admin/auction-houses",
     UPDATE_HOUSE_STATUS: '/admin/auction-house-status',
-    GET_USERS:'/admin/users',
-    GET_USER:'/admin/user',
-    UPDATE_USER_STATUS:'/admin/user-update-status'
+    GET_USERS: '/admin/users',
+    GET_USER: '/admin/user',
+    UPDATE_USER_STATUS: '/admin/user-update-status'
 }
 
-export const PROFILE_ROUTES={
-    GET_PROFILE:'/get-profile'
+export const PROFILE_ROUTES = {
+    GET_PROFILE: '/get-profile',
+    CHANGE_DETAILS: '/change-details'
 }

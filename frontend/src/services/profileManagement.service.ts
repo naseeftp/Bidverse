@@ -1,25 +1,39 @@
 import axiosInstance from "../api/axios.instance";
 import { PROFILE_ROUTES, BASE_ROUTES } from "../constants/api.constant";
 import { apiErrorHandler } from "../utils/error.handle";
-import type { ApiResponse} from "../types/auth.type";
+import type { ApiResponse } from "../types/auth.type";
 import type { UserResponseDTO } from "../types/auth.type";
+import type { ProfileDetailChangeFormData } from '../types/profile.dto'
 
 
-class profileService{
-   async getProfile(){
-    try {
-        const url=`${BASE_ROUTES.PROFILE_MANAGEMENT}${PROFILE_ROUTES.GET_PROFILE}`
-        const response=await axiosInstance.get<UserResponseDTO,ApiResponse<UserResponseDTO>>(url)
-        return {
-            success:true,
-            message:response.message,
-            data:response.data
+class profileService {
+    async getProfile() {
+        try {
+            const url = `${BASE_ROUTES.PROFILE_MANAGEMENT}${PROFILE_ROUTES.GET_PROFILE}`
+            const response = await axiosInstance.get<UserResponseDTO, ApiResponse<UserResponseDTO>>(url)
+            return {
+                success: true,
+                message: response.message,
+                data: response.data
+            }
+
+        } catch (error) {
+            return apiErrorHandler(error, 'Failed to get ProfileData')
         }
-
-    } catch (error) {
-        return apiErrorHandler(error,'Failed to get ProfileData')
     }
-   }
+    async changeProfileDetails(data: ProfileDetailChangeFormData) {
+        try {
+            const url = `${BASE_ROUTES.PROFILE_MANAGEMENT}${PROFILE_ROUTES.CHANGE_DETAILS}`
+            const response = await axiosInstance.patch<UserResponseDTO, ApiResponse<UserResponseDTO>>(url, data)
+            return {
+                success: true,
+                message: response.message,
+                data: response.data
+            }
+        } catch (error) {
+            return apiErrorHandler(error, 'Failed to change ProfileData')
+        }
+    }
 }
 
 export default new profileService()

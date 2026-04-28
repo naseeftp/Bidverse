@@ -1,4 +1,4 @@
-import { otpPurpose} from "../constants/constants";
+import { otpPurpose } from "../constants/constants";
 
 
 export enum Role {
@@ -12,6 +12,7 @@ export enum Role {
 //     newPassword: string;
 //     confirmPassword: string
 // }
+
 export interface UserResponseDTO {
   id: string,
   name: string;
@@ -20,8 +21,8 @@ export interface UserResponseDTO {
   role: string;
   profileImage?: string | null;
   isActive: boolean;
-  BlockingReson?:string
-  provider:'google'|'local'
+  BlockingReson?: string
+  provider: 'google' | 'local'
 }
 
 export interface AuthResponseDTO<T = UserResponseDTO> {
@@ -33,16 +34,16 @@ import { z } from 'zod'
 
 const passwordRules = z.string()
   .min(8, 'Password Must be at least 8 charactors')
-  .max(32,'Password cannot exceed 32 characters')
+  .max(32, 'Password cannot exceed 32 characters')
   .regex(/[A-Z]/, 'Password Must Contai an upperCase Letter')
   .regex(/[0-9]/, 'Password Must Contain a  number')
   .regex(/[^A-Za-z0-9]/, 'Password Must contain A special charactor')
 
 export const RegisterUserSchema = z.object({
-  name: z.string().min(2, 'Name is too short').max(50,'Name cannot exceed 50 characters'),
-  email: z.string().email("Invalid email format").max(100,'Email is too long'),
+  name: z.string().min(2, 'Name is too short').max(50, 'Name cannot exceed 50 characters'),
+  email: z.string().email("Invalid email format").max(100, 'Email is too long'),
   password: passwordRules,
-  confirmPassword: z.string().max(32,'Confirm Password cannot too long'),
+  confirmPassword: z.string().max(32, 'Confirm Password cannot too long'),
   phone: z.string().regex(/^\d{10}$/, "Phone must be 10 digits"),
   role: z.enum(['tenant', 'user']).optional().default('user'),
 }).refine((data) => data.password === data.confirmPassword, {
@@ -82,6 +83,11 @@ export const GoogleCallbackSchema = z.object({
   state: z.enum(['admin', 'tenant', 'user']).default('user')
 });
 
+export const profileDetailChangeSchema = z.object({
+  name: z.string().min(2, 'Name is too short').max(50, 'Name cannot exceed 50 characters').optional(),
+  phone: z.string().regex(/^\d{10}$/, "Phone must be 10 digits").optional()
+})
+
 export type RegisterUserDTO = z.infer<typeof RegisterUserSchema>;
 export type LoginDTO = z.infer<typeof LoginSchema>;
 export type VerifyotpDTO = z.infer<typeof VerifyOtpSchema>;
@@ -89,3 +95,4 @@ export type ResendOtpDTO = { email: string, purpose?: otpPurpose }
 export type ForgetPaswordDTO = z.infer<typeof ForgetPaswordSchema>
 export type ResetPasswordDTO = z.infer<typeof ResetPasswordSchema>
 export type GoogleCallbackDTO = z.infer<typeof GoogleCallbackSchema>
+export type profileDetailChangeDTO = z.infer<typeof profileDetailChangeSchema>

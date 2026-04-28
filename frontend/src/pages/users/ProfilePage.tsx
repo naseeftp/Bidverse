@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import profileService from '../../services/profileManagement.service';
-import type{ UserResponseDTO } from "../../types/auth.type";
-import { Mail, Lock,User as UserIcon, Trash2, Camera, Check, Pencil} from "lucide-react";
+import type { UserResponseDTO } from "../../types/auth.type";
+import { Mail, Lock, User as UserIcon, Trash2, Camera, Check, Pencil } from "lucide-react";
 import toast from "react-hot-toast";
 
 const ProfilePage: React.FC = () => {
@@ -20,37 +20,56 @@ const ProfilePage: React.FC = () => {
         fetchData();
     }, []);
 
-    const handleSave = () => {
-        setIsEditing(false);
-        toast.success("Profile updated successfully");
+    const handleSave = async () => {
+        const isChanged = user?.name !== formData.name || user.phone != formData.phone;
+        if (!isChanged) {
+            setIsEditing(false);
+            toast.error('No changes Made')
+            return
+        }
+        try {
+            const response = await profileService.changeProfileDetails(formData);
+            if (response.success && response.data) {
+                setIsEditing(false);
+                setUser({ ...user!, ...formData });
+                toast.success(response.message)
+
+            }
+            else {
+                toast.error(response.message)
+            }
+        } catch (error) {
+            toast.error('Unexpected Error in Updating Details',error!)
+        }
+
     };
 
     return (
         <div className="min-h-screen bg-[#FFF9F4] text-[#1F1F1F] font-sans selection:bg-[#C9653B] selection:text-white">
             <div className="max-w-4xl mx-auto py-12 px-6">
-                
-                
+
+
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
                     <div>
                         <h1 className="text-3xl font-bold tracking-tight">Account Settings</h1>
                         <p className="text-[#6B6B6B] text-sm mt-1">Manage your personal information and security preferences.</p>
                     </div>
-                    {user?.provider=='local'&&
-                     <div className="flex gap-3">
-                        <button className="px-4 py-2 bg-white border border-[#E6E0DA] rounded-lg text-sm font-semibold hover:bg-[#FFF9F4] transition-colors flex items-center gap-2">
-                            <Lock size={16} /> Change Password
-                        </button>
-                        <button className="px-4 py-2 bg-[#C9653B] text-white rounded-lg text-sm font-semibold hover:opacity-90 transition-opacity flex items-center gap-2 shadow-sm">
-                            <Mail size={16} /> Change Email
-                        </button>
-                    </div>
+                    {user?.provider == 'local' &&
+                        <div className="flex gap-3">
+                            <button className="px-4 py-2 bg-white border border-[#E6E0DA] rounded-lg text-sm font-semibold hover:bg-[#FFF9F4] transition-colors flex items-center gap-2">
+                                <Lock size={16} /> Change Password
+                            </button>
+                            <button className="px-4 py-2 bg-[#C9653B] text-white rounded-lg text-sm font-semibold hover:opacity-90 transition-opacity flex items-center gap-2 shadow-sm">
+                                <Mail size={16} /> Change Email
+                            </button>
+                        </div>
                     }
-                   
+
                 </div>
 
                 <div className="space-y-6">
-                    
-                   
+
+
                     <section className="bg-white rounded-xl border border-[#E6E0DA] p-8 shadow-sm">
                         <div className="flex flex-col sm:flex-row items-center gap-8">
                             <div className="relative group">
@@ -62,7 +81,7 @@ const ProfilePage: React.FC = () => {
                                     )}
                                 </div>
                             </div>
-                            
+
                             <div className="flex flex-col gap-2">
                                 <h3 className="text-lg font-bold">Profile Picture</h3>
                                 <div className="flex flex-wrap gap-2">
@@ -87,44 +106,44 @@ const ProfilePage: React.FC = () => {
                     <section className="bg-white rounded-xl border border-[#E6E0DA] shadow-sm overflow-hidden">
                         <div className="px-8 py-5 border-b border-[#E6E0DA] flex justify-between items-center bg-white">
                             <h3 className="font-bold">Personal Information</h3>
-                            <button 
+                            <button
                                 onClick={() => isEditing ? handleSave() : setIsEditing(true)}
                                 className="px-3 py-1 text-xs font-bold bg-[#FFF9F4] border border-[#E6E0DA] rounded text-[#C9653B] hover:bg-[#C9653B] hover:text-white transition-all flex items-center gap-1.5"
                             >
                                 {isEditing ? <><Check size={14} /> Save Changes</> : <><Pencil size={14} /> Edit Details</>}
                             </button>
                         </div>
-                        
+
                         <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
-                           
+
                             <div className="space-y-2">
                                 <label className="text-[11px] font-bold text-[#6B6B6B] uppercase">Full Name</label>
                                 {isEditing ? (
-                                    <input 
+                                    <input
                                         className="w-full border border-[#E6E0DA] rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-[#C9653B]"
                                         value={formData.name}
-                                        onChange={(e) => setFormData({...formData, name: e.target.value})}
+                                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                                     />
                                 ) : (
                                     <p className="text-sm font-medium">{user?.name}</p>
                                 )}
                             </div>
 
-                          
+
                             <div className="space-y-2">
                                 <label className="text-[11px] font-bold text-[#6B6B6B] uppercase">Phone Number</label>
                                 {isEditing ? (
-                                    <input 
+                                    <input
                                         className="w-full border border-[#E6E0DA] rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-[#C9653B]"
                                         value={formData.phone}
-                                        onChange={(e) => setFormData({...formData, phone: e.target.value})}
+                                        onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                                     />
                                 ) : (
                                     <p className="text-sm font-medium">{user?.phone || 'Not connected'}</p>
                                 )}
                             </div>
 
-                           
+
                             <div className="space-y-2 opacity-80">
                                 <label className="text-[11px] font-bold text-[#6B6B6B] uppercase">Email Address</label>
                                 <div className="flex items-center gap-2">
@@ -137,7 +156,7 @@ const ProfilePage: React.FC = () => {
                             </div>
                         </div>
                     </section>
-                  </div>
+                </div>
             </div>
         </div>
     );

@@ -25,4 +25,14 @@ export class ProfileController implements IprofileController {
             next(error)
         }
     }
+    async changeProfileDetails(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const id = req.user.id as string;
+            const formData = req.body
+            const result = await this._profileService.changeProfileDetails(id, formData)
+            SuccessResponse(res, MESSAGES.USER_DETAILS_UPDTD, result, HttpStatus.OK)
+        } catch (error) {
+            next(error)
+        }
+    }
 }
