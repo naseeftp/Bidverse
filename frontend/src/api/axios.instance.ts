@@ -23,20 +23,21 @@ axiosInstance.interceptors.response.use(
     (response) => response.data,
 
     async (error) => {
-        const originalRequest = error.config ;
+        const originalRequest = error.config;
         if (!originalRequest) return Promise.reject(error);
         const isLoginRequest = originalRequest.url?.includes(AUTH_ROUTES.LOGIN);
-        if(isLoginRequest){
+        if (isLoginRequest) {
             return Promise.reject(error)
         }
-        if(error.response?.status===403){
-            const message=error.response.data?.message;
-            if(message.toLowerCase().includes('blocked')){
-              const reason=error.response.data?.reason;
-              toast.error(`Access Revoked Due to: ${reason}`)
+        if (error.response?.status === 403) {
+            const message = error.response.data?.message;
+            if (message.toLowerCase().includes('blocked')) {
+                const reason = encodeURIComponent(error.response.data?.reason);
+                toast.error(`Access Revoked Due to: ${reason}`)
+                localStorage.removeItem("accessToken")
+                window.location.href = `/?auth_error=blocked&reason=${reason}`;
             }
-            localStorage.removeItem("accessToken")
-            window.location.href='/login'
+
             return Promise.reject(error)
         }
         if (error.response?.status === 401 && !originalRequest._retry && !isLoginRequest) {
@@ -51,7 +52,7 @@ axiosInstance.interceptors.response.use(
                 }
             } catch (refreshError) {
                 localStorage.removeItem("accessToken");
-                window.location.href = '/login'
+                window.location.href = '/?auth_error=expired'
                 return Promise.reject(refreshError)
             }
         }
