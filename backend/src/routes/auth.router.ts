@@ -14,7 +14,7 @@ router.post(
 router.post(
     AUTH_ROUTES.VERIFY_OTP,
     validator(AuthValidators.validateVerifyOtpInput),
-    (req, res, next) => authController.verifyOtp(req , res, next)
+    (req, res, next) => authController.verifyOtp(req, res, next)
 )
 router.post(
     AUTH_ROUTES.RESEND_OTP,
@@ -28,7 +28,7 @@ router.post(
 )
 router.get(
     AUTH_ROUTES.LOGOUT,
-    (req,res,next)=>authController.logout(req,res,next)
+    (req, res, next) => authController.logout(req, res, next)
 )
 router.patch(
     AUTH_ROUTES.FORGOT_PASS_RESET,
@@ -52,7 +52,7 @@ router.get(
 );
 router.post(
     AUTH_ROUTES.REFRESH_TOKEN,
-   (req,res,next)=>authController.refreshToken(req,res,next)
+    (req, res, next) => authController.refreshToken(req, res, next)
 )
 
 export default router

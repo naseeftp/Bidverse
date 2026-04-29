@@ -109,4 +109,4 @@ export type ForgetPaswordDTO = z.infer<typeof ForgetPaswordSchema>
 export type ResetPasswordDTO = z.infer<typeof ResetPasswordSchema>
 export type GoogleCallbackDTO = z.infer<typeof GoogleCallbackSchema>
 export type profileDetailChangeDTO = z.infer<typeof profileDetailChangeSchema>
-export type changePasswordDTO=z.infer<typeof changePasswordSchema>
+export type changePasswordDTO = z.infer<typeof changePasswordSchema>

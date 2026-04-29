@@ -1,11 +1,11 @@
-import { generateAccessToken, generateRefreshToken,verifyRefreshToken} from '../../utils/jwt.utils'
+import { generateAccessToken, generateRefreshToken, verifyRefreshToken } from '../../utils/jwt.utils'
 import { hashPassword, comparePassword } from '../../utils/Password.util'
 import { MESSAGES, CONFIG, otpPurpose } from '../../constants/constants'
 import { IAuthService } from '../interface/IAuth.service'
 import { RegisterUserDTO, LoginDTO, VerifyotpDTO, ResendOtpDTO, AuthResponseDTO, UserResponseDTO, ForgetPaswordDTO, ResetPasswordDTO } from '../../dtos/Common.dto'
 import { IUserRepository } from '../../repositories/interfaces/iUser.repository'
 import { IOTPService } from '../interface/IOtp.service'
-import { ConflictError, UnauthorizedError, NotFoundError,AppError, ForbiddenError } from '../../errors/AppError'
+import { ConflictError, UnauthorizedError, NotFoundError, AppError, ForbiddenError } from '../../errors/AppError'
 import { UserMapper } from '../../mappers/user.mapper'
 import { ILoggerService } from '../interface/ILogger.service'
 import { oauth2Client } from '../../config/google.confing'
@@ -201,22 +201,22 @@ export class AuthService implements IAuthService {
     }
     async refreshToken(token: string): Promise<{ accessToken: string }> {
         try {
-            this._logger.info('call for refresh token ',{token:token})
-            const decoded=verifyRefreshToken(token);
-            this._logger.info('decoded token',{decoded:decoded})
-            const user=await this._userRepository.findById(decoded.userId);
-            this._logger.info('user founded',{user:user})
-            if(!user){
+            this._logger.info('call for refresh token ', { token: token })
+            const decoded = verifyRefreshToken(token);
+            this._logger.info('decoded token', { decoded: decoded })
+            const user = await this._userRepository.findById(decoded.userId);
+            this._logger.info('user founded', { user: user })
+            if (!user) {
                 throw new UnauthorizedError(MESSAGES.USER_NOT_FOUND)
             }
-            if(!user.isActive){
-                throw new ForbiddenError(MESSAGES.USER_BLOCKED )
+            if (!user.isActive) {
+                throw new ForbiddenError(MESSAGES.USER_BLOCKED)
             }
-            const accessToken=generateAccessToken(user)
-            this._logger.info('this is the accesstoken',{accessToken})
-            return {accessToken}
+            const accessToken = generateAccessToken(user)
+            this._logger.info('this is the accesstoken', { accessToken })
+            return { accessToken }
         } catch (error) {
-            if(error instanceof ForbiddenError){
+            if (error instanceof ForbiddenError) {
                 throw error
             }
             throw new UnauthorizedError(MESSAGES.INVALID_REFRESH_TOKEN)

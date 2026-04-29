@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { UnauthorizedError} from "../errors/AppError";
+import { UnauthorizedError } from "../errors/AppError";
 import { verifyAccessToken } from "../utils/jwt.utils";
 import { MESSAGES } from "../constants/constants";
 
@@ -38,7 +38,7 @@ export const protect = async (req: Request, res: Response, next: NextFunction) =
             name: decoded.name
         }
         next()
-    } catch  {
+    } catch {
         return next(new UnauthorizedError(MESSAGES.INVALID_ACCESS_TOKEN))
     }
 

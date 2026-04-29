@@ -37,9 +37,9 @@ export class ProfileController implements IprofileController {
     }
     async changePassword(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
-            const id=req.user.id as string;
-            const formData=req.body;
-            const result=await this._profileService.changePassword(id,formData)
+            const id = req.user.id as string;
+            const formData = req.body;
+            const result = await this._profileService.changePassword(id, formData)
             SuccessResponse(res, MESSAGES.PASSWORD_CHANGE_SUCCESS, result, HttpStatus.OK)
         } catch (error) {
             next(error)

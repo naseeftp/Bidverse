@@ -89,10 +89,10 @@ export class AdminService implements IAdminService {
         if (search) {
             const isFullId = isValidObjectId(search)
             filter.$or = [
-                { name:  { $regex: search, $options: 'i' } },
+                { name: { $regex: search, $options: 'i' } },
                 { email: { $regex: search, $options: 'i' } },
                 isFullId
-                    ? { _id: search } 
+                    ? { _id: search }
 
                     : {  //partial search"
                         $expr: {  //alws to use aggregation oprtrs in mngdb queries(eg:$toString)
@@ -121,38 +121,38 @@ export class AdminService implements IAdminService {
     }
     async getUserById(id: string): Promise<UserResponseDTO> {
         try {
-            const user=await this._userRepo.findById(id)
-            if(!user){
+            const user = await this._userRepo.findById(id)
+            if (!user) {
                 throw new NotFoundError(MESSAGES.USER_NOT_FOUND)
             }
-            const mappedUsers=UserMapper.toDTO(user)
+            const mappedUsers = UserMapper.toDTO(user)
             return mappedUsers
         } catch (error) {
-            this._logger.error('Error in fetching user',{error})
+            this._logger.error('Error in fetching user', { error })
             throw new AppError('Failed to get User')
         }
     }
     async updateUserStatus(id: string, data: UpdateUserStatusDTO): Promise<UserResponseDTO> {
         try {
-            const {isActive,reason}=data;
-            this._logger.info('updating the user  status',{
-                id:id,
-                newStatus:isActive?'ACTIVE':'FALSE',
-                reason:reason
+            const { isActive, reason } = data;
+            this._logger.info('updating the user  status', {
+                id: id,
+                newStatus: isActive ? 'ACTIVE' : 'FALSE',
+                reason: reason
             })
-            const updatedData={
-                isActive:isActive,
-                BlockingReson:isActive?null:reason,
-                updatedAt:new Date()
+            const updatedData = {
+                isActive: isActive,
+                BlockingReson: isActive ? null : reason,
+                updatedAt: new Date()
             }
-            const updatedUser=await this._userRepo.updateById(id,updatedData)
-            if(!updatedUser){
+            const updatedUser = await this._userRepo.updateById(id, updatedData)
+            if (!updatedUser) {
                 throw new NotFoundError(MESSAGES.USER_NOT_FOUND)
             }
-            const mappedUser=UserMapper.toDTO(updatedUser)
+            const mappedUser = UserMapper.toDTO(updatedUser)
             return mappedUser
         } catch (error) {
-            this._logger.error('Error while updating user',{error})
+            this._logger.error('Error while updating user', { error })
             throw new AppError('Error while Updating User')
         }
     }

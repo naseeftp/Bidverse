@@ -55,7 +55,7 @@ export class EmailService implements IEmailService {
                 ...config
 
             })
-        } catch{
+        } catch {
             throw new AppError(MESSAGES.EMAIL_SEND_FAILED, HttpStatus.INTERNAL_ERROR)
         }
     }

@@ -12,7 +12,7 @@ const UsersListPage: React.FC = () => {
   const [page, setPage] = useState(1);
   const [pagination, setPageination] = useState<IPaginationMeta | null>(null);
   const [loading, setLoading] = useState(true);
-  const navigate=useNavigate()
+  const navigate = useNavigate()
   const fetchUsers = useCallback(async () => {
     setLoading(true);
     try {
@@ -33,7 +33,7 @@ const UsersListPage: React.FC = () => {
       fetchUsers();
     }, 500);
     return () => clearTimeout(handler);
-  }, [fetchUsers, search, statusFilter,page]);
+  }, [fetchUsers, search, statusFilter, page]);
 
   return (
     <div className="space-y-6">
@@ -80,7 +80,7 @@ const UsersListPage: React.FC = () => {
         </div>
       </div>
 
-     
+
       <div className="bg-[#111827] rounded-sm border border-white/10 shadow-xl overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
@@ -113,7 +113,7 @@ const UsersListPage: React.FC = () => {
                       </span>
                     </td>
                     <td className="px-6 py-4 text-right">
-                      <button onClick={()=>navigate(`/admin/user/${user.id}`)} className="inline-flex items-center gap-2 text-white text-[10px] font-bold uppercase tracking-widest hover:underline transition-all">
+                      <button onClick={() => navigate(`/admin/user/${user.id}`)} className="inline-flex items-center gap-2 text-white text-[10px] font-bold uppercase tracking-widest hover:underline transition-all">
                         Details <FaExternalLinkAlt size={8} />
                       </button>
                     </td>
@@ -128,7 +128,7 @@ const UsersListPage: React.FC = () => {
           </table>
         </div>
 
-       
+
         <div className="px-6 py-4 border-t border-white/10 flex items-center justify-between">
           <p className="text-[9px] font-bold text-white uppercase tracking-[0.2em]">
             Displaying Page <span className="underline">{page}</span> OF {pagination?.totalPages || 1}

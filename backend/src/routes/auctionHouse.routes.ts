@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { protect,allowedTo} from "../middlewares/auth.middleware";
+import { protect, allowedTo } from "../middlewares/auth.middleware";
 import { validator } from "../middlewares/validation.middleware";
 import { AuctionHouseValidators } from "../validators/auctionHouse.validators";
 import { AUCTION_HOUSE_ROUTES } from '../constants/route.constant'
@@ -16,7 +16,7 @@ router.post(
     validator(AuctionHouseValidators.validateVerificationInput),
     (req, res, next) => auctionHouseController.submitVerification(req, res, next)
 )
- 
+
 router.get(
     AUCTION_HOUSE_ROUTES.PROFILE,
     allowedTo(Role.TENANT),

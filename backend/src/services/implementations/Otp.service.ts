@@ -1,7 +1,7 @@
 import { IOTPService } from "../interface/IOtp.service";
 import { IEmailService } from "../interface/IEmai.service";
 import { IOtpRepository } from "../../repositories/interfaces/IOtp.repository";
-import { OtpUserData} from "../../types/otp.type";
+import { OtpUserData } from "../../types/otp.type";
 import { genarateOtp, getOtpExpiry, isOtpExpired } from '../../utils/otp.utils'
 import { AppError, ValidationError } from "../../errors/AppError";
 import { HttpStatus, MESSAGES, otpPurpose } from "../../constants/constants";

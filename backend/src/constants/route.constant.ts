@@ -3,7 +3,7 @@ export const BASE_ROUTES = {
     AUTH: '/auth',
     AUCTION_HOUSE: '/auction-house',
     ADMIN: '/admin',
-    PROFILE_MANAGEMENT:'/profile'
+    PROFILE_MANAGEMENT: '/profile'
 } as const
 
 export const AUTH_ROUTES = {
@@ -11,7 +11,7 @@ export const AUTH_ROUTES = {
     VERIFY_OTP: '/verify-otp',
     RESEND_OTP: '/resend-otp',
     LOGIN: '/login',
-    LOGOUT:'/logout',
+    LOGOUT: '/logout',
     GOOGLE: '/google',
     GOOGLE_CALLBACK: '/google/callback',
     FORGOT_PASS: '/forgot-pass',
@@ -30,13 +30,13 @@ export const ADMIN_ROUTES = {
     GET_AUCTION_HOUSES: '/auction-houses',
     GET_AUCTION_HOUSE: '/auction-house/:id',
     AUCTION_HOUSE_UPDATE_STATUS: '/auction-house-status/:id',
-    GET_USERS:'/users',
-    GET_USER:'/user/:id',
-    USER_UPDATE_STATUS:'/user-update-status/:id'
+    GET_USERS: '/users',
+    GET_USER: '/user/:id',
+    USER_UPDATE_STATUS: '/user-update-status/:id'
 }
 
-export const PROFILE_ROUTES={
-    GET_PROFILE:'/get-profile',
-    CHANGE_DETAILS:'/change-details',
-    CHANGE_PASSWORD:'/change-password'
+export const PROFILE_ROUTES = {
+    GET_PROFILE: '/get-profile',
+    CHANGE_DETAILS: '/change-details',
+    CHANGE_PASSWORD: '/change-password'
 }

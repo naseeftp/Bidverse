@@ -5,7 +5,7 @@ import { ILoggerService } from "../interface/ILogger.service";
 import { MESSAGES } from "../../constants/constants";
 import { AppError, NotFoundError } from "../../errors/AppError";
 import { UserMapper } from "../../mappers/user.mapper";
-import { comparePassword,hashPassword} from "../../utils/Password.util";
+import { comparePassword, hashPassword } from "../../utils/Password.util";
 export class ProfileService implements IProfileService {
     constructor(
         private _userRepo: IUserRepository,
@@ -60,19 +60,19 @@ export class ProfileService implements IProfileService {
     }
     async changePassword(id: string, data: changePasswordDTO): Promise<UserResponseDTO> {
         try {
-            const existingUser=await this._userRepo.findById(id)
-            if(!existingUser){
+            const existingUser = await this._userRepo.findById(id)
+            if (!existingUser) {
                 throw new NotFoundError(MESSAGES.USER_NOT_FOUND)
             }
-            const passwordMatch=await comparePassword(data.oldPassword,existingUser.password!)
-            if(!passwordMatch){
+            const passwordMatch = await comparePassword(data.oldPassword, existingUser.password!)
+            if (!passwordMatch) {
                 throw new AppError(MESSAGES.OLD_PASSWORDS_NOT_MATCH)
             }
-            const hashedPassword=await hashPassword(data.newPassword)
-            const formData={
-                password:hashedPassword
+            const hashedPassword = await hashPassword(data.newPassword)
+            const formData = {
+                password: hashedPassword
             }
-            const updatedUser=await this._userRepo.updateById(id,formData)
+            const updatedUser = await this._userRepo.updateById(id, formData)
             if (!updatedUser) {
                 throw new NotFoundError(MESSAGES.USER_NOT_FOUND)
             }

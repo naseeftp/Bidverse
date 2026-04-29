@@ -6,15 +6,15 @@ export interface IAdminController {
     getAuctionHouses(req: Request, res: Response, next: NextFunction): Promise<void>
     getAuctionHouseById(req: Request, res: Response, next: NextFunction): Promise<void>;
     updateAuctionHouseStatus(
-        req: Request<ParamsDictionary,unknown, UpdateHouseStatusDTO>,
+        req: Request<ParamsDictionary, unknown, UpdateHouseStatusDTO>,
         res: Response,
         next: NextFunction
     ): Promise<void>
-    getAllUsers(req:Request,res:Response,next:NextFunction):Promise<void>
-    getUserById(req:Request,res:Response,next:NextFunction):Promise<void>
+    getAllUsers(req: Request, res: Response, next: NextFunction): Promise<void>
+    getUserById(req: Request, res: Response, next: NextFunction): Promise<void>
     updateUserStatus(
-        req:Request<ParamsDictionary,unknown,UpdateUserStatusDTO>,
-        res:Response,
-        next:NextFunction
-    ):Promise<void>
+        req: Request<ParamsDictionary, unknown, UpdateUserStatusDTO>,
+        res: Response,
+        next: NextFunction
+    ): Promise<void>
 }

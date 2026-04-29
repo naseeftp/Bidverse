@@ -18,6 +18,6 @@ export interface IAuthService {
     googleAuth(code: string, role: string): Promise<AuthResponseDTO<UserResponseDTO>>
     forgotPassword(data: ForgetPaswordDTO, purpose: string): Promise<{ email: string; expiresAt: Date }>
     resetPassword(data: ResetPasswordDTO): Promise<void>
-    refreshToken(token:string):Promise<{accessToken:string}>
+    refreshToken(token: string): Promise<{ accessToken: string }>
 
 }   

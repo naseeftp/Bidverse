@@ -1,4 +1,4 @@
-import mongoose, { Document, Model,DeleteResult } from "mongoose";
+import mongoose, { Document, Model, DeleteResult } from "mongoose";
 import { IBaseRepository } from "../interfaces/IBase.repository";
 
 
@@ -35,13 +35,13 @@ export class BaseRepository<T extends Document> implements IBaseRepository<T> {
         return await this.model.findOneAndUpdate(filter, data, { new: true }).exec()
     }
     async updateByUserId(
-        userId: string | mongoose.Types.ObjectId, 
+        userId: string | mongoose.Types.ObjectId,
         data: mongoose.UpdateQuery<T>
     ): Promise<T | null> {
         const filter = { userId: userId } as mongoose.QueryFilter<T>;
         return await this.model.findOneAndUpdate(
-            filter, 
-            data, 
+            filter,
+            data,
             { new: true }
         ).exec();
     }

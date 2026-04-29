@@ -26,6 +26,6 @@ router.patch(
     PROFILE_ROUTES.CHANGE_PASSWORD,
     allowedTo(Role.USER),
     validator(ProfileValidators.changePasswordValidator),
-    (req,res,next)=>profileController.changePassword(req,res,next)
+    (req, res, next) => profileController.changePassword(req, res, next)
 )
 export default router

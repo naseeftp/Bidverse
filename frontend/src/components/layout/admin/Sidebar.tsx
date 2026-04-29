@@ -4,8 +4,6 @@ import {
     FaThLarge,
     FaUsers,
     FaGavel,
-    FaChartPie,
-    FaCog,
     FaSignOutAlt,
     FaShieldAlt
 } from "react-icons/fa";
@@ -17,7 +15,7 @@ import authService from "../../../services/auth.service";
 const AdminSidebar: React.FC = () => {
     const location = useLocation();
     const dispatch = useAppDispatch();
-    const handleLogout =async () => {
+    const handleLogout = async () => {
         await authService.logout()
         dispatch(logout())
     }
@@ -29,7 +27,7 @@ const AdminSidebar: React.FC = () => {
         { name: "Dashboard", path: "/admin/dashboard", icon: <FaThLarge /> },
         { name: "User Management", path: "/admin/users", icon: <FaUsers /> },
         { name: "Auction Houses", path: "/admin/auction-houses", icon: <FaGavel /> },
-     
+
     ];
 
     return (

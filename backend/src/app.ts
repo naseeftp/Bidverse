@@ -31,7 +31,7 @@ const PORT = env.PORT
 app.use(BASE_ROUTES.AUTH, authRouter)
 app.use(BASE_ROUTES.AUCTION_HOUSE, auctionHouseRoutes)
 app.use(BASE_ROUTES.ADMIN, adminRoutes)
-app.use(BASE_ROUTES.PROFILE_MANAGEMENT,profileRoutes)
+app.use(BASE_ROUTES.PROFILE_MANAGEMENT, profileRoutes)
 
 
 app.use(errorHandler);

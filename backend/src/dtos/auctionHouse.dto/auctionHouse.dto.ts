@@ -38,11 +38,11 @@ export const AuctionHouseVerificationSchema = z.object({
   contact: z.object({
     primaryContactName: z.string()
       .min(2, "Primary contact name required")
-      .max(100, "Name too long"), 
+      .max(100, "Name too long"),
 
     businessEmail: z.string()
       .email('Invalid email format')
-      .max(100, 'Email too long'), 
+      .max(100, 'Email too long'),
 
     phone: z.string()
       .regex(/^\d{10}$/, "Phone number must be exactly 10 digits")
@@ -52,51 +52,51 @@ export const AuctionHouseVerificationSchema = z.object({
   legal: z.object({
     registrationNumber: z.string()
       .min(1, 'Business registration number required')
-      .max(100, 'Registration number too long'), 
+      .max(100, 'Registration number too long'),
 
     taxId: z.string()
       .min(1, "Tax ID is required")
-      .max(50, "Tax ID too long"), 
+      .max(50, "Tax ID too long"),
 
     registrationCertificateUrl: z.string()
       .url("Registration certificate link is required")
-      .max(500, "URL too long") 
+      .max(500, "URL too long")
       .includes("cloudinary.com", { message: "Must be hosted on Cloudinary" }),
 
     identityProofUrl: z.string()
       .url("Identity proof link is required")
-      .max(500, "URL too long") 
+      .max(500, "URL too long")
       .includes("cloudinary.com", { message: "Must be hosted on Cloudinary" }),
   }),
 });
 
 export interface AuctionHouseResponseDTO {
-    id: string;
-    userId: string;
-    name: string;
-    yearEstablished: number;
-    briefDescription: string;
-    address: {
-        city: string;
-        state: string;
-        country: string;
-        fullAddress: string;
-    };
-    contact: {
-        primaryContactName: string;
-        businessEmail: string;
-        phone: string;
-    };
-    documents: {
-        registrationCertificateUrl: string;
-        identityProofUrl: string;
-        registerNumber:string;
-        taxId:string
-    };
-    status: TVerificationStatus;
-    rejectionReason?: string | null;
-    isVerified: boolean;
-    createdAt: string | Date;
+  id: string;
+  userId: string;
+  name: string;
+  yearEstablished: number;
+  briefDescription: string;
+  address: {
+    city: string;
+    state: string;
+    country: string;
+    fullAddress: string;
+  };
+  contact: {
+    primaryContactName: string;
+    businessEmail: string;
+    phone: string;
+  };
+  documents: {
+    registrationCertificateUrl: string;
+    identityProofUrl: string;
+    registerNumber: string;
+    taxId: string
+  };
+  status: TVerificationStatus;
+  rejectionReason?: string | null;
+  isVerified: boolean;
+  createdAt: string | Date;
 }
 
 export type AuctionHouseVerificationDTO = z.infer<typeof AuctionHouseVerificationSchema>

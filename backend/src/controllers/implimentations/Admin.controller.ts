@@ -88,20 +88,20 @@ export class AdminController implements IAdminController {
     }
     async getUserById(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
-            const id=req.params.id as string
-            const result=await this._adminService.getUserById(id);
-            SuccessResponse(res,MESSAGES.USER_RETRIEVED,result,HttpStatus.OK)
+            const id = req.params.id as string
+            const result = await this._adminService.getUserById(id);
+            SuccessResponse(res, MESSAGES.USER_RETRIEVED, result, HttpStatus.OK)
         } catch (error) {
             next(error)
         }
     }
     async updateUserStatus(req: Request<ParamsDictionary, unknown, UpdateUserStatusDTO>, res: Response, next: NextFunction): Promise<void> {
-       try {
-           const id=req.params.id as string;
-           const result=await this._adminService.updateUserStatus(id,req.body)
-           SuccessResponse(res,MESSAGES.USER_STTS_UPDTD,result,HttpStatus.OK)
-       } catch (error) {
-         next(error)
-       }
+        try {
+            const id = req.params.id as string;
+            const result = await this._adminService.updateUserStatus(id, req.body)
+            SuccessResponse(res, MESSAGES.USER_STTS_UPDTD, result, HttpStatus.OK)
+        } catch (error) {
+            next(error)
+        }
     }
 }
