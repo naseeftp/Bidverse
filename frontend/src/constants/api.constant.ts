@@ -31,5 +31,6 @@ export const ADMIN_ROUTES = {
 
 export const PROFILE_ROUTES = {
     GET_PROFILE: '/get-profile',
-    CHANGE_DETAILS: '/change-details'
+    CHANGE_DETAILS: '/change-details',
+    CHANGE_PASSWORD:'/change-password',
 }

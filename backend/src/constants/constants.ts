@@ -73,6 +73,8 @@ export const MESSAGES = {
     PASSWORD_RESET_OTP: "OTP sent to your email for password reset.",
     OTP_VERIFIED: "OTP verified successfully",
     PASSWORD_RESET_SUCCESS: "Password reset successful. You can now login with your new password.",
+    PASSWORD_CHANGE_SUCCESS:'Password  Changing successful',
+    PASSWORD_CHANGE_FAILED:'Password  Changing Failed',
     USER_EXISTS_EMAIL: "User with this email already exists",
     USER_EXISTS_PHONE: "User with this phone number already exists",
     OTP_INVALID_OR_EXPIRED: "Invalid or expired OTP",
@@ -84,7 +86,8 @@ export const MESSAGES = {
     EMAIL_CREDENTIALS_NOT_CONFIGURED: "Email credentials not configured. Please set SMTP_USER and SMTP_PASS in your .env file",
     EMAIL_SEND_FAILED: "Failed to send email: {error}",
     GOOGLE_PROFILE_EMAIL_MISSING: "No email in Google profile",
-
+    
+    OLD_PASSWORDS_NOT_MATCH: "Old Passwords do not match",
     PASSWORDS_NOT_MATCH: "Passwords do not match",
     PASSWORD_TOO_WEAK: "Password must be at least 8 characters and include one uppercase letter and one number",
     INVALID_EMAIL_FORMAT: "Invalid email format",

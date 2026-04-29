@@ -3,7 +3,7 @@ import { PROFILE_ROUTES, BASE_ROUTES } from "../constants/api.constant";
 import { apiErrorHandler } from "../utils/error.handle";
 import type { ApiResponse } from "../types/auth.type";
 import type { UserResponseDTO } from "../types/auth.type";
-import type { ProfileDetailChangeFormData } from '../types/profile.dto'
+import type { ProfileDetailChangeFormData,changePasswordDTO} from '../types/profile.dto'
 
 
 class profileService {
@@ -32,6 +32,19 @@ class profileService {
             }
         } catch (error) {
             return apiErrorHandler(error, 'Failed to change ProfileData')
+        }
+    }
+    async changePassword(data:changePasswordDTO){
+        try {
+           const url=`${BASE_ROUTES.PROFILE_MANAGEMENT}${PROFILE_ROUTES.CHANGE_PASSWORD}` 
+           const response=await axiosInstance.patch<UserResponseDTO, ApiResponse<UserResponseDTO>>(url, data)
+            return {
+                success: true,
+                message: response.message,
+                data: response.data
+            }
+        } catch (error) {
+            return apiErrorHandler(error, 'Failed to change Password')
         }
     }
 }

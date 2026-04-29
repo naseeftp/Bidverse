@@ -6,12 +6,6 @@ export enum Role {
   TENANT = 'tenant',
   USER = 'user'
 }
-// export interface changePasswordDTO {
-//     userId: string;
-//     oldPassword: string;
-//     newPassword: string;
-//     confirmPassword: string
-// }
 
 export interface UserResponseDTO {
   id: string,
@@ -51,6 +45,13 @@ export const RegisterUserSchema = z.object({
   path: ["confirmPassword"],
 });
 
+// export interface changePasswordDTO {
+//     oldPassword: string;
+//     newPassword: string;
+//     confirmPassword: string
+// }
+
+
 export const LoginSchema = z.object({
   email: z.string().email("Invalid email format"),
   password: z.string().min(1, "Password is required"),
@@ -88,6 +89,18 @@ export const profileDetailChangeSchema = z.object({
   phone: z.string().regex(/^\d{10}$/, "Phone must be 10 digits").optional()
 })
 
+export const changePasswordSchema = z.object({
+  oldPassword: z.string().min(8, 'Old password contain atleast 8 charcters'),
+  newPassword: passwordRules,
+  confirmPassword: z.string()
+    .min(8, 'Confirm Password must contain at least 8 characters')
+    .max(32, 'Confirm Password cannot too long'),
+}).refine((data) => data.newPassword === data.confirmPassword, {
+  message: "Passwords do not match",
+  path: ["confirmPassword"],
+});
+
+
 export type RegisterUserDTO = z.infer<typeof RegisterUserSchema>;
 export type LoginDTO = z.infer<typeof LoginSchema>;
 export type VerifyotpDTO = z.infer<typeof VerifyOtpSchema>;
@@ -96,3 +109,4 @@ export type ForgetPaswordDTO = z.infer<typeof ForgetPaswordSchema>
 export type ResetPasswordDTO = z.infer<typeof ResetPasswordSchema>
 export type GoogleCallbackDTO = z.infer<typeof GoogleCallbackSchema>
 export type profileDetailChangeDTO = z.infer<typeof profileDetailChangeSchema>
+export type changePasswordDTO=z.infer<typeof changePasswordSchema>

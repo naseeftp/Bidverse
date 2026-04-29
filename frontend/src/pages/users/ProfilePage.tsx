@@ -3,6 +3,7 @@ import profileService from '../../services/profileManagement.service';
 import type { UserResponseDTO } from "../../types/auth.type";
 import { Mail, Lock, User as UserIcon, Trash2, Camera, Check, Pencil } from "lucide-react";
 import toast from "react-hot-toast";
+import { Link } from "react-router-dom";
 
 const ProfilePage: React.FC = () => {
     const [user, setUser] = useState<UserResponseDTO | null>(null);
@@ -39,7 +40,7 @@ const ProfilePage: React.FC = () => {
                 toast.error(response.message)
             }
         } catch (error) {
-            toast.error('Unexpected Error in Updating Details',error!)
+            toast.error('Unexpected Error in Updating Details', error!)
         }
 
     };
@@ -56,12 +57,16 @@ const ProfilePage: React.FC = () => {
                     </div>
                     {user?.provider == 'local' &&
                         <div className="flex gap-3">
-                            <button className="px-4 py-2 bg-white border border-[#E6E0DA] rounded-lg text-sm font-semibold hover:bg-[#FFF9F4] transition-colors flex items-center gap-2">
-                                <Lock size={16} /> Change Password
-                            </button>
+                            <Link to='/change-password'>
+                                <button className="px-4 py-2 bg-white border border-[#E6E0DA] rounded-lg text-sm font-semibold hover:bg-[#FFF9F4] transition-colors flex items-center gap-2">
+                                    <Lock size={16} /> Change Password
+                                </button>
+                            </Link>
+
                             <button className="px-4 py-2 bg-[#C9653B] text-white rounded-lg text-sm font-semibold hover:opacity-90 transition-opacity flex items-center gap-2 shadow-sm">
                                 <Mail size={16} /> Change Email
                             </button>
+
                         </div>
                     }
 

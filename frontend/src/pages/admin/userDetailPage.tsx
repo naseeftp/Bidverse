@@ -97,7 +97,7 @@ const UserDetailPage: React.FC = () => {
 
       <div className="max-w-4xl mx-auto bg-white border border-[#E5E7EB] shadow-sm">
        
-        <div className="h-40 bg-[#111827] relative px-8 border-b-4 border-[#D4AF37]">
+        <div className="h-40 bg-[#111827] relative px-8">
           <div className="absolute -bottom-12 left-8 flex items-end gap-6">
             <div className="w-32 h-32 bg-white border-4 border-white shadow-lg overflow-hidden flex-shrink-0">
               {user?.profileImage ? (
@@ -109,8 +109,8 @@ const UserDetailPage: React.FC = () => {
               )}
             </div>
             <div className="mb-2 pb-1">
-              <h1 className="text-3xl font-black uppercase tracking-tighter text-white leading-none">
-                {user?.name}
+              <h1 className="text-3xl font-black uppercase tracking-tighter text-[#D4AF37] leading-none">
+                {user?.name} 
               </h1>
               <p className="text-[#D4AF37] text-[11px] font-bold uppercase tracking-widest mt-1">
                 {user?.email}

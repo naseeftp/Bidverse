@@ -1,10 +1,11 @@
-import { profileDetailChangeDTO, UserResponseDTO } from "../../dtos/Common.dto";
+import { changePasswordDTO, profileDetailChangeDTO, UserResponseDTO } from "../../dtos/Common.dto";
 import { IProfileService } from "../interface/IProfile.service";
 import { IUserRepository } from "../../repositories/interfaces/iUser.repository";
 import { ILoggerService } from "../interface/ILogger.service";
 import { MESSAGES } from "../../constants/constants";
 import { AppError, NotFoundError } from "../../errors/AppError";
 import { UserMapper } from "../../mappers/user.mapper";
+import { comparePassword,hashPassword} from "../../utils/Password.util";
 export class ProfileService implements IProfileService {
     constructor(
         private _userRepo: IUserRepository,
@@ -55,6 +56,33 @@ export class ProfileService implements IProfileService {
             }
             this._logger.error('failed to updated user details', error)
             throw new AppError(MESSAGES.USER_DETAILS_UPDTD_FAILED)
+        }
+    }
+    async changePassword(id: string, data: changePasswordDTO): Promise<UserResponseDTO> {
+        try {
+            const existingUser=await this._userRepo.findById(id)
+            if(!existingUser){
+                throw new NotFoundError(MESSAGES.USER_NOT_FOUND)
+            }
+            const passwordMatch=await comparePassword(data.oldPassword,existingUser.password!)
+            if(!passwordMatch){
+                throw new AppError(MESSAGES.OLD_PASSWORDS_NOT_MATCH)
+            }
+            const hashedPassword=await hashPassword(data.newPassword)
+            const formData={
+                password:hashedPassword
+            }
+            const updatedUser=await this._userRepo.updateById(id,formData)
+            if (!updatedUser) {
+                throw new NotFoundError(MESSAGES.USER_NOT_FOUND)
+            }
+            return UserMapper.toDTO(updatedUser)
+        } catch (error) {
+            this._logger.error('failed to change updated user password', error)
+            if (error instanceof AppError || error instanceof NotFoundError) {
+                throw error;
+            }
+            throw new AppError(MESSAGES.PASSWORD_CHANGE_FAILED)
         }
     }
 

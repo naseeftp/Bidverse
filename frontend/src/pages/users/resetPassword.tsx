@@ -100,11 +100,11 @@ const ResetPasswordPage: React.FC = () => {
 
         <form className="space-y-5" onSubmit={handleSubmit(onSubmit)}>
 
-          {/* We keep email and resetToken as hidden inputs so react-hook-form handles them */}
+         
           <input type="hidden" {...register("email")} />
           <input type="hidden" {...register("resetToken")} />
 
-          {/* New Password Input */}
+          
           <div>
             <label className="block text-[10px] font-bold uppercase tracking-[0.2em] text-[#6B6B6B] mb-2">New Password</label>
             <div className="relative">
@@ -125,7 +125,7 @@ const ResetPasswordPage: React.FC = () => {
             {errors.password && <p className="text-[#D98880] text-[10px] mt-1 uppercase font-bold">{errors.password.message}</p>}
           </div>
 
-          {/* Confirm Password Input */}
+          
           <div>
             <label className="block text-[10px] font-bold uppercase tracking-[0.2em] text-[#6B6B6B] mb-2">Confirm Password</label>
             <div className="relative">
