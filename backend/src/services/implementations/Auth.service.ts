@@ -5,7 +5,7 @@ import { IAuthService } from '../interface/IAuth.service'
 import { RegisterUserDTO, LoginDTO, VerifyotpDTO, ResendOtpDTO, AuthResponseDTO, UserResponseDTO, ForgetPaswordDTO, ResetPasswordDTO } from '../../dtos/Common.dto'
 import { IUserRepository } from '../../repositories/interfaces/iUser.repository'
 import { IOTPService } from '../interface/IOtp.service'
-import { ConflictError, UnauthorizedError, NotFoundError, AppError, ForbiddenError } from '../../errors/AppError'
+import { ConflictError, UnauthorizedError, NotFoundError, AppError, ForbiddenError, ValidationError } from '../../errors/AppError'
 import { UserMapper } from '../../mappers/user.mapper'
 import { ILoggerService } from '../interface/ILogger.service'
 import { oauth2Client } from '../../config/google.confing'
@@ -17,7 +17,9 @@ export class AuthService implements IAuthService {
     constructor(private _userRepository: IUserRepository, private _logger: ILoggerService, private _otpService: IOTPService) { }
 
     async register(data: RegisterUserDTO, purpose: otpPurpose): Promise<{ email: string; expiresAt: Date }> {
-
+        if(data.name.trim().length===0){
+            throw new ValidationError(MESSAGES.VALID_NAME)
+        }
         await this._checkUserDoesNotExist(data.email, data.phone)
         const passwordHash = await hashPassword(data.password)
         const otpresult = await this._otpService.generateAndSaveOtp(

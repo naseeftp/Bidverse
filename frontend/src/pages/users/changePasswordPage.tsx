@@ -83,7 +83,7 @@ const ChangePasswordPage: React.FC = () => {
                         <div className="flex justify-end mt-1">
                             <button
                                 type="button"
-                                onClick={() => navigate("")}
+                                onClick={() => navigate("/forgot-pass")}
                                 className="text-[9px] text-[#C9653B] uppercase font-bold tracking-wider hover:underline underline-offset-2"
                             >
                                 Forgot current password?

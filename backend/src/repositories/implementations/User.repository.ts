@@ -32,5 +32,5 @@ export class UserRepository extends BaseRepository<IUserDocument> implements IUs
         ])
         return { docs, total }
     }
-
+   
 }

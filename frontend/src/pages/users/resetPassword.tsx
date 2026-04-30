@@ -3,11 +3,11 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import { FaEye, FaEyeSlash} from "react-icons/fa";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 import authService from "../../services/auth.service";
 import type { ResetPasswordDTO } from "../../types/auth.type";
 import toast from "react-hot-toast";
-
+import { useAppSelector } from "../../hooks/redux.hooks";
 
 const resetSchema = yup.object({
   email: yup.string().email().required(),
@@ -25,7 +25,7 @@ const resetSchema = yup.object({
 const ResetPasswordPage: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-
+  const { isAuthenticated } = useAppSelector((state) => state.auth)
   const email = location.state?.email || "";
   const resetToken = location.state?.resetToken || "";
 
@@ -53,19 +53,26 @@ const ResetPasswordPage: React.FC = () => {
     },
   });
 
- const onSubmit = async (data: ResetPasswordDTO) => {
+  const onSubmit = async (data: ResetPasswordDTO) => {
     setIsSubmitting(true);
     try {
       const result = await authService.resetPassword(data);
-      
+
       if (result.success) {
-        toast.success(result.message || "Security credentials updated. Please login.");
-        navigate("/login");
+        if (isAuthenticated) {
+          toast.success("Your password changed");
+          navigate('/profile')
+        }
+        else {
+          toast.success(result.message || "Security credentials updated. Please login.");
+          navigate("/login");
+        }
+
       } else {
         toast.error(result.message || "Failed to reset password.");
       }
     } catch (err: unknown) {
-      
+
       interface BackendError {
         response?: {
           data?: {
@@ -74,10 +81,10 @@ const ResetPasswordPage: React.FC = () => {
         };
       }
 
-      
+
       const error = err as BackendError;
       const errorMessage = error.response?.data?.message || "Failed to reset password.";
-      
+
       toast.error(errorMessage);
     } finally {
       setIsSubmitting(false);
@@ -100,11 +107,11 @@ const ResetPasswordPage: React.FC = () => {
 
         <form className="space-y-5" onSubmit={handleSubmit(onSubmit)}>
 
-         
+
           <input type="hidden" {...register("email")} />
           <input type="hidden" {...register("resetToken")} />
 
-          
+
           <div>
             <label className="block text-[10px] font-bold uppercase tracking-[0.2em] text-[#6B6B6B] mb-2">New Password</label>
             <div className="relative">
@@ -125,7 +132,7 @@ const ResetPasswordPage: React.FC = () => {
             {errors.password && <p className="text-[#D98880] text-[10px] mt-1 uppercase font-bold">{errors.password.message}</p>}
           </div>
 
-          
+
           <div>
             <label className="block text-[10px] font-bold uppercase tracking-[0.2em] text-[#6B6B6B] mb-2">Confirm Password</label>
             <div className="relative">

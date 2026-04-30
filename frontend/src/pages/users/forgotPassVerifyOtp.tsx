@@ -87,7 +87,7 @@ const ForgotPassVerifyOtp: React.FC = () => {
     if (timeLeft > 0) return;
     setLoading(true);
     try {
-      // FIX: Assert the function's return type instead of passing a generic argument
+      
       const result = (await authService.forgotpass({
         email,
         role: "user",

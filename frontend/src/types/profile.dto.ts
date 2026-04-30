@@ -1,8 +1,14 @@
 import * as yup from 'yup';
 
 export const profileDetailChangeSchema = yup.object({
-  name: yup
+    name: yup
     .string()
+    .trim()
+    .test(
+      'not-empty',
+      'Name cannot contain only spaces',
+      value => !value || value.trim().length > 0
+    )
     .min(2, 'Name is too short')
     .max(50, 'Name cannot exceed 50 characters')
     .optional(),

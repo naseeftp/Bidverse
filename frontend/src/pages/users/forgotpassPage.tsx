@@ -5,15 +5,15 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import authService from "../../services/auth.service";
 import toast from "react-hot-toast";
+import { useAppSelector } from "../../hooks/redux.hooks";
 
-// 1. Define the specific response structure
 interface ForgotPassResponse {
     success: boolean;
     message: string;
     expiresAt?: string;
 }
 
-// 2. Define the error structure
+
 interface ApiError {
     response?: {
         data?: {
@@ -31,7 +31,7 @@ type FormData = yup.InferType<typeof schema>;
 const ForgotPassPage: React.FC = () => {
     const navigate = useNavigate();
     const [isLoading, setIsLoading] = useState(false);
-
+    const { isAuthenticated } = useAppSelector((state) => state.auth)
     const {
         register,
         handleSubmit,
@@ -48,7 +48,7 @@ const ForgotPassPage: React.FC = () => {
                 role: 'user' as const
             };
 
-            // 3. Cast the result to our interface instead of 'any'
+
             const result = (await authService.forgotpass(payload)) as ForgotPassResponse;
 
             if (result && result.success) {
@@ -65,7 +65,7 @@ const ForgotPassPage: React.FC = () => {
                 toast.error(result.message || 'Failed to send recovery code');
             }
         } catch (error: unknown) {
-            // 4. Narrow the error type safely
+
             const err = error as ApiError;
             const errorMsg = err.response?.data?.message || "Something went wrong";
             toast.error(errorMsg);
@@ -127,12 +127,22 @@ const ForgotPassPage: React.FC = () => {
                 <div className="mt-8 pt-6 border-t border-[#E6E0DA] text-center">
                     <p className="text-[9px] text-[#6B6B6B] uppercase tracking-[0.15em] font-medium">
                         Remembered your password?
-                        <Link
-                            to="/login"
-                            className="text-[#1F1F1F] font-bold hover:text-[#C9653B] transition-colors ml-1 text-[10px]"
-                        >
-                            Back to Sign In
-                        </Link>
+                        {isAuthenticated ? (
+                            <Link
+                                to="/profile"
+                                className="text-[#1F1F1F] font-bold hover:text-[#C9653B] transition-colors ml-1 text-[10px]"
+                            >
+                                Back to Profile
+                            </Link>
+                        )
+                            : (<Link
+                                to="/login"
+                                className="text-[#1F1F1F] font-bold hover:text-[#C9653B] transition-colors ml-1 text-[10px]"
+                            >
+                                Back to Sign In
+                            </Link>)
+                        }
+
                     </p>
                 </div>
             </div>

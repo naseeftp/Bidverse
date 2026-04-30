@@ -60,6 +60,7 @@ export const MESSAGES = {
     INVALID_ID_FORMAT: "Invalid ID format",
     ROUTE_NOT_FOUND: "Route not found",
 
+    VALID_NAME:'Please enter a valid Name',
     USER_NOT_ACTIVE: "User is not active",
     USER_NOT_FOUND: "User not found",
     USER_BLOCKED: "Your account has been blocked",
