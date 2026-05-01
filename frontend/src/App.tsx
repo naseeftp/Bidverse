@@ -17,7 +17,8 @@ import ChangePasswordPage from "./pages/users/changePasswordPage";
 import ForgotPassPage from "./pages/users/forgotpassPage";
 import ForgotPassVeifyOtpPage from './pages/users/forgotPassVerifyOtp'
 import NewPasswordPage from "./pages/users/resetPassword";
-
+import ChangeEmailPage from "./pages/users/changeEmailPage";
+import ChangeEmailVerifyPage from "./pages/users/changeEmailVerify";
 import AuthSuccessPage from "./pages/users/AuthSuccessPage";
 
 import TenantRegisterPage from "./pages/tenant/RegiterPage";
@@ -37,6 +38,7 @@ import AuctionHouseTable from "./pages/admin/auctionHouseLits";
 import AuctionHouseDetailPage from './pages/admin/auctionHousedetailsPage'
 import UsersListPage from "./pages/admin/usersList";
 import UserDetailPage from "./pages/admin/userDetailPage";
+
 
 function App() {
 
@@ -65,6 +67,8 @@ function App() {
                   <Route path="/home" element={<UserHomePage />} />
                   <Route path="/profile" element={<ProfilePage />} />
                   <Route path="/change-password" element={<ChangePasswordPage />} />
+                  <Route path="/change-email" element={<ChangeEmailPage/>}/>
+                  <Route path="/change-email-verify" element={<ChangeEmailVerifyPage/>}/>
                </Route>
             </Route>
 

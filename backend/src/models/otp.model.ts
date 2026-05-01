@@ -13,7 +13,7 @@ const otpSchema = new Schema<IOTP>({
     },
     purpose: {
         type: String,
-        required: true,
+        required:false,
         enum: Object.values(OtpPurpose),
     },
     userData: {

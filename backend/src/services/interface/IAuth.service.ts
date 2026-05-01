@@ -19,5 +19,4 @@ export interface IAuthService {
     forgotPassword(data: ForgetPaswordDTO, purpose: string): Promise<{ email: string; expiresAt: Date }>
     resetPassword(data: ResetPasswordDTO): Promise<void>
     refreshToken(token: string): Promise<{ accessToken: string }>
-
 }   

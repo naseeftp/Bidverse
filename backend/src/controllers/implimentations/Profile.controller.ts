@@ -45,4 +45,22 @@ export class ProfileController implements IprofileController {
             next(error)
         }
     }
+    async changeEmail(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const formData = req.body;
+            const result = await this._profileService.changeEmail(formData)
+            SuccessResponse(res, MESSAGES.CHANGE_EMAIL_OTP, result, HttpStatus.OK)
+        } catch (error) {
+            next(error)
+        }
+    }
+    async changeEmailVerification(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const userId=req.user.id;
+            const result=await this._profileService.changeEmailVerification(userId,req.body)
+            SuccessResponse(res,MESSAGES.EMAIL_UPDATED,result,HttpStatus.OK)
+        } catch (error) {
+            next(error)
+        }
+    }
 }

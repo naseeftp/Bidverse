@@ -91,11 +91,11 @@ const RegisterPage: React.FC = () => {
                     <p className="text-[#6B6B6B] text-[10px] uppercase tracking-[0.2em] mt-4">Create your bidder account</p>
                 </div>
 
-                {/* {serverError && (
+                {serverError && (
                     <div className="mb-6 p-4 bg-[#D98880]/5 border border-[#D98880] text-[#D98880] text-[10px] font-bold uppercase tracking-widest text-center">
                         {serverError}
                     </div>
-                )} */}
+                )}
         
                 <form onSubmit={handleSubmit(onSubmit)} className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <input type="hidden" {...register('role')} />

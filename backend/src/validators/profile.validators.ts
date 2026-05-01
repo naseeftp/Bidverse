@@ -1,7 +1,14 @@
-import { profileDetailChangeSchema } from '../dtos/Common.dto'
-import { changePasswordSchema } from '../dtos/Common.dto'
+import {
+    profileDetailChangeSchema,
+    changePasswordSchema,
+    changeEmailSchema,
+    changeEmailVerificationSchema
+} from '../dtos/Common.dto'
+
 
 export const ProfileValidators = {
     profileDeatailsChangeValidator: profileDetailChangeSchema,
-    changePasswordValidator: changePasswordSchema
+    changePasswordValidator: changePasswordSchema,
+    changeEmailValidator:changeEmailSchema,
+    changeEmailVerificationValidator:changeEmailVerificationSchema
 }

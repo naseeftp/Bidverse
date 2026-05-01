@@ -28,4 +28,16 @@ router.patch(
     validator(ProfileValidators.changePasswordValidator),
     (req, res, next) => profileController.changePassword(req, res, next)
 )
+router.patch(
+    PROFILE_ROUTES.CHANGE_EMAIL,
+    allowedTo(Role.USER),
+    validator(ProfileValidators.changeEmailValidator),
+    (req,res,next)=>profileController.changeEmail(req,res,next)
+)
+router.post(
+    PROFILE_ROUTES.CHANGE_EMAIL_VERIFY,
+    allowedTo(Role.USER),
+    validator(ProfileValidators.changeEmailVerificationValidator),
+    (req,res,next)=>profileController.changeEmailVerification(req,res,next)
+)
 export default router

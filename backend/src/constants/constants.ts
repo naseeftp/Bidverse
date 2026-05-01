@@ -72,6 +72,7 @@ export const MESSAGES = {
     OTP_RESENT: "OTP resent to your email.",
     REGISTRATION_COMPLETE: "Registration complete!",
     PASSWORD_RESET_OTP: "OTP sent to your email for password reset.",
+    CHANGE_EMAIL_OTP:"OTP sent to your email for change Email",
     OTP_VERIFIED: "OTP verified successfully",
     PASSWORD_RESET_SUCCESS: "Password reset successful. You can now login with your new password.",
     PASSWORD_CHANGE_SUCCESS: 'Password  Changing successful',
@@ -115,6 +116,7 @@ export const MESSAGES = {
     USER_STTS_UPDTD: 'User status updated successfully',
     USER_DETAILS_UPDTD: 'Details updated successfully',
     USER_DETAILS_UPDTD_FAILED: 'Details updation Failed',
+    EMAIL_UPDATED:'Email updated successfully',
 
     LOGOUT_SUCCESS: "Logout success",
     LOGOUT_FAILED: "Logout failed",

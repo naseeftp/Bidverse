@@ -37,5 +37,23 @@ export const changePasswordSchema = yup.object({
     .oneOf([yup.ref('newPassword')], 'Passwords must match')
     .required('Please confirm your password'),
 });
+
+export const  changeEmailSchema=yup.object({
+   oldEmail:yup.string().email().required('old email  is required'),
+   newEmail:yup.string().email().required('new email is required'),
+   password:yup.string().min(8,'password contain minimum 8 charactors').required('password is required')
+})
+
+export interface ChangeEmaiLResponseDTO{
+  email:string,
+  expiresAt:Date
+}
+
+export const changeEmailVerificationSchema=yup.object({
+  email:yup.string().email().required('Email is required'),
+  otp:yup.string()
+})
 export type ProfileDetailChangeFormData = yup.InferType<typeof profileDetailChangeSchema>;
 export type changePasswordDTO = yup.InferType<typeof changePasswordSchema>
+export type changeEmailDTO=yup.InferType<typeof changeEmailSchema>
+export type changeEmailVerificationDTO=yup.InferType<typeof changeEmailVerificationSchema>

@@ -62,11 +62,11 @@ const ProfilePage: React.FC = () => {
                                     <Lock size={16} /> Change Password
                                 </button>
                             </Link>
-
-                            <button className="px-4 py-2 bg-[#C9653B] text-white rounded-lg text-sm font-semibold hover:opacity-90 transition-opacity flex items-center gap-2 shadow-sm">
+                            <Link to='/change-email'>
+                             <button className="px-4 py-2 bg-[#C9653B] text-white rounded-lg text-sm font-semibold hover:opacity-90 transition-opacity flex items-center gap-2 shadow-sm">
                                 <Mail size={16} /> Change Email
                             </button>
-
+                            </Link>
                         </div>
                     }
 

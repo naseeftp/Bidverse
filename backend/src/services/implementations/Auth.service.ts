@@ -36,7 +36,7 @@ export class AuthService implements IAuthService {
             CONFIG.OTP_EXPIRY_MINUTES,
             purpose
         )
-        return { email: data.email, expiresAt: otpresult.expiresAt }
+        return { email: data.email, expiresAt: otpresult.expiresAt}
 
     }
     async verifyOtp(data: VerifyotpDTO): Promise<AuthResponseDTO<UserResponseDTO> | { email: string; message: string; verified: boolean; resetToken: string }> {

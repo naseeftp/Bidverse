@@ -3,7 +3,13 @@ import { PROFILE_ROUTES, BASE_ROUTES } from "../constants/api.constant";
 import { apiErrorHandler } from "../utils/error.handle";
 import type { ApiResponse } from "../types/auth.type";
 import type { UserResponseDTO } from "../types/auth.type";
-import type { ProfileDetailChangeFormData,changePasswordDTO} from '../types/profile.dto'
+import type {
+    ChangeEmaiLResponseDTO,
+    ProfileDetailChangeFormData,
+    changeEmailDTO,
+    changeEmailVerificationDTO,
+    changePasswordDTO
+} from '../types/profile.dto'
 
 
 class profileService {
@@ -34,10 +40,10 @@ class profileService {
             return apiErrorHandler(error, 'Failed to change ProfileData')
         }
     }
-    async changePassword(data:changePasswordDTO){
+    async changePassword(data: changePasswordDTO) {
         try {
-           const url=`${BASE_ROUTES.PROFILE_MANAGEMENT}${PROFILE_ROUTES.CHANGE_PASSWORD}` 
-           const response=await axiosInstance.patch<UserResponseDTO, ApiResponse<UserResponseDTO>>(url, data)
+            const url = `${BASE_ROUTES.PROFILE_MANAGEMENT}${PROFILE_ROUTES.CHANGE_PASSWORD}`
+            const response = await axiosInstance.patch<UserResponseDTO, ApiResponse<UserResponseDTO>>(url, data)
             return {
                 success: true,
                 message: response.message,
@@ -45,6 +51,32 @@ class profileService {
             }
         } catch (error) {
             return apiErrorHandler(error, 'Failed to change Password')
+        }
+    }
+    async changeEmail(data: changeEmailDTO) {
+        try {
+            const url = `${BASE_ROUTES.PROFILE_MANAGEMENT}${PROFILE_ROUTES.CHANGE_EMAIL}`
+            const response = await axiosInstance.patch<ChangeEmaiLResponseDTO, ApiResponse<ChangeEmaiLResponseDTO>>(url, data)
+            return {
+                success: true,
+                message: response.message,
+                data: response.data
+            }
+        } catch (error) {
+            return apiErrorHandler(error, 'Failed to changeEmail')
+        }
+    }
+    async changeEmailVerification(data: changeEmailVerificationDTO){
+        try {
+            const url=`${BASE_ROUTES.PROFILE_MANAGEMENT}${PROFILE_ROUTES.CHANGE_EMAIL_VERIFY}`
+            const response=await axiosInstance.post<UserResponseDTO,ApiResponse<UserResponseDTO>>(url,data)
+            return {
+                success:true,
+                message:response.message,
+                data:response.data
+            }
+        } catch (error) {
+            return apiErrorHandler(error, 'Otp Verification failed')
         }
     }
 }
