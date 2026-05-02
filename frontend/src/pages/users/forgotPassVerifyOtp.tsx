@@ -4,13 +4,11 @@ import authService from "../../services/auth.service";
 import toast from "react-hot-toast";
 import type { userRole } from "../../types/auth.type";
 
-// 1. Define the specific shape of the data for this process
 interface ForgotPassData {
   expiresAt: string;
   resetToken?: string;
 }
 
-// 2. Define a strict structure for the service response envelope
 interface ServiceResponse {
   success: boolean;
   message: string;
@@ -112,7 +110,6 @@ const ForgotPassVerifyOtp: React.FC = () => {
     const otpString = otp.join("");
 
     try {
-      // FIX: Assert the function's return type
       const result = (await authService.verifyOtp({
         email,
         otp: otpString,

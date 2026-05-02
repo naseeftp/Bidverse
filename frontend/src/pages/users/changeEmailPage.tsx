@@ -27,6 +27,13 @@ const ChangeEmailPage: React.FC = () => {
                 password: data.password
             })
             if (result.success) {
+                localStorage.setItem(
+                    "changeEmailVerificationData",
+                    JSON.stringify({
+                        email: result.data?.email,
+                        expiresAt: result.data?.expiresAt
+                    })
+                )
                 toast.success(result.message)
                 navigate('/change-email-verify')
             }
@@ -58,7 +65,7 @@ const ChangeEmailPage: React.FC = () => {
 
                 <form className="space-y-5" onSubmit={handleSubmit(onSubmit)}>
 
-                
+
                     <div>
                         <label className="block text-[10px] font-bold uppercase tracking-[0.2em] text-[#6B6B6B] mb-2">
                             Current Email
@@ -79,7 +86,7 @@ const ChangeEmailPage: React.FC = () => {
                         )}
                     </div>
 
-                 
+
                     <div>
                         <label className="block text-[10px] font-bold uppercase tracking-[0.2em] text-[#6B6B6B] mb-2">
                             New Email
@@ -102,7 +109,7 @@ const ChangeEmailPage: React.FC = () => {
 
                     <div className="h-[1px] bg-[#E6E0DA] w-full my-2"></div>
 
-                  
+
                     <div>
                         <label className="block text-[10px] font-bold uppercase tracking-[0.2em] text-[#6B6B6B] mb-2">
                             Account Password

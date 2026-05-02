@@ -10,6 +10,7 @@ import type {
     changeEmailVerificationDTO,
     changePasswordDTO
 } from '../types/profile.dto'
+import type {ResendOtpDTO} from '../types/auth.type'
 
 
 class profileService {
@@ -78,6 +79,19 @@ class profileService {
         } catch (error) {
             return apiErrorHandler(error, 'Otp Verification failed')
         }
+    }
+    async changeEmailResendOtp(data:ResendOtpDTO){
+      try {
+        const url=`${BASE_ROUTES.PROFILE_MANAGEMENT}${PROFILE_ROUTES.CHANGE_EMAIL_RESEND}`;
+        const response=await axiosInstance.post<ChangeEmaiLResponseDTO,ApiResponse<ChangeEmaiLResponseDTO>>(url,data);
+        return {
+            success:true,
+            message:response.message,
+            data:response.data
+        }
+      } catch (error) {
+         return apiErrorHandler(error, 'Resend otp failed')
+      }
     }
 }
 

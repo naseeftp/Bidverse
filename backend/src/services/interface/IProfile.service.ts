@@ -4,7 +4,8 @@ import {
     changePasswordDTO,
     changeEmailDTO,
     changeEmailResponseDto,
-    changeEmailVerificationDTO
+    changeEmailVerificationDTO,
+    ResendOtpDTO
 } from "../../dtos/Common.dto";
 
 export interface IProfileService {
@@ -13,4 +14,5 @@ export interface IProfileService {
     changePassword(id: string, data: changePasswordDTO): Promise<UserResponseDTO>
     changeEmail(data:changeEmailDTO):Promise<changeEmailResponseDto>
     changeEmailVerification(userId:string,data:changeEmailVerificationDTO):Promise<UserResponseDTO>
+    changeEmailResendOtp(data:ResendOtpDTO):Promise<changeEmailResponseDto>
 }

@@ -63,4 +63,12 @@ export class ProfileController implements IprofileController {
             next(error)
         }
     }
+    async changeEmailResendOtp(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const result=await this._profileService.changeEmailResendOtp(req.body);
+            SuccessResponse(res,MESSAGES.OTP_RESENT,result,HttpStatus.OK)
+        } catch (error) {
+            next(error)
+        }
+    }
 }

@@ -100,7 +100,6 @@ class AuthService {
             return apiErrorHandler(error, 'failed to send otp')
         }
     }
-
     async resetPassword(resetData: ResetPasswordDTO) {
         try {
             const response = await axiosInstance.patch<unknown, ApiResponse<Record<string, never>>>(AUTH_ROUTES.RESET_PASSWORD, resetData);

@@ -37,7 +37,7 @@ export enum HttpStatus {
 
 export const CONFIG = {
     OTP_EXPIRY_MINUTES: 1,
-    FORGOT_PASSWORD_EXPIRY: 1,
+    FORGOT_PASSWORD_EXPIRY: 2,
     OTP_RESEND_DELAY_SECONDS: 30,
 } as const;
 

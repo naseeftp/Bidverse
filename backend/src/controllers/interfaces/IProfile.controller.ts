@@ -6,4 +6,5 @@ export interface IprofileController {
     changePassword(req: Request, res: Response, next: NextFunction): Promise<void>
     changeEmail(req:Request,res:Response,next:NextFunction):Promise<void>
     changeEmailVerification(req:Request,res:Response,next:NextFunction):Promise<void>
+    changeEmailResendOtp(req:Request,res:Response,next:NextFunction):Promise<void>
 }

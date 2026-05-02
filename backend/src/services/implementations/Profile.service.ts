@@ -1,4 +1,4 @@
-import { changeEmailDTO, changePasswordDTO, profileDetailChangeDTO, UserResponseDTO,changeEmailResponseDto, changeEmailVerificationDTO} from "../../dtos/Common.dto";
+import { changeEmailDTO, changePasswordDTO, profileDetailChangeDTO, UserResponseDTO,changeEmailResponseDto, changeEmailVerificationDTO, ResendOtpDTO} from "../../dtos/Common.dto";
 import { IProfileService } from "../interface/IProfile.service";
 import { IUserRepository } from "../../repositories/interfaces/iUser.repository";
 import { ILoggerService } from "../interface/ILogger.service";
@@ -115,7 +115,12 @@ export class ProfileService implements IProfileService {
         if(!updatedUser){
             throw new NotFoundError(MESSAGES.USER_NOT_FOUND)
         }
+        await this._otpService.deleteOtp(data.email)
         return UserMapper.toDTO(updatedUser)
+    }
+    async changeEmailResendOtp(data: ResendOtpDTO): Promise<changeEmailResponseDto> {
+        const otpresult=await this._otpService.resendOtp(data.email,CONFIG.FORGOT_PASSWORD_EXPIRY,CONFIG.OTP_RESEND_DELAY_SECONDS)
+        return {email:otpresult.email,expiresAt:otpresult.expiresAt}
     }
 
 }

@@ -6,6 +6,7 @@ import { PROFILE_ROUTES } from "../constants/route.constant";
 import { CheckUserBlocked } from "../middlewares/check-user-blocked-middleware";
 import { ProfileValidators } from "../validators/profile.validators";
 import { validator } from "../middlewares/validation.middleware";
+import { AuthValidators } from "../validators/auth.validators";
 
 const router = Router()
 router.use(protect)
@@ -39,5 +40,11 @@ router.post(
     allowedTo(Role.USER),
     validator(ProfileValidators.changeEmailVerificationValidator),
     (req,res,next)=>profileController.changeEmailVerification(req,res,next)
+)
+router.post(
+    PROFILE_ROUTES.CHANGE_EMAIL_RESEND,
+    allowedTo(Role.USER),
+    validator(AuthValidators.validateResendOtpInput),
+    (req,res,next)=>profileController.changeEmailResendOtp(req,res,next)
 )
 export default router
