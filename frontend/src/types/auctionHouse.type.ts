@@ -59,4 +59,42 @@ export interface AuctionHouseResponseDTO {
     rejectionReason?: string | null;
 
 }
+export interface AdminAuctionHouseDetailDTO {
+   
+    userId: string;
+    userEmail: string;
+    userName: string;
+    isAccountBlocked: boolean;
+
+   
+    houseId: string | null;
+    businessName: string | null;
+    yearEstablished: number | null;
+    briefDescription: string | null;
+    
+    address: {
+        city: string;
+        state: string;
+        country: string;
+        fullAddress: string;
+    } | null;
+
+    contact: {
+        primaryContactName: string;
+        businessEmail: string;
+        phone: string;
+    } | null;
+
+    documents: {
+        registrationCertificateUrl: string;
+        identityProofUrl: string;
+        registerNumber: string;
+        taxId: string;
+    } | null;
+
+    status:TVerificationStatus
+    rejectionReason: string | null;
+    isVerified: boolean;
+    createdAt: string | Date;
+}
 export type AuctionHouseResponse = ApiResponse<AuctionHouseResponseDTO>;

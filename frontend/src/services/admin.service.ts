@@ -4,15 +4,25 @@ import { apiErrorHandler } from "../utils/error.handle";
 import type { ApiResponse } from "../types/auth.type";
 import type { updateAuctionHouseStatusRequestDTO, UpdateUserStatusDTO } from '../types/admin.dto'
 import type { IPaginationMeta, UserResponseDTO } from "../types/auth.type";
+import type{AdminAuctionHouseDetailDTO} from '../types/auctionHouse.type'
 
 class AdminService {
-    async listAllAuctionHouses(page: number = 1, limit: number = 10) {
+    async listAllAuctionHouses(page: number = 1, limit: number = 10,search?:string,status?:string) {
         try {
-            const response = await axiosInstance.get<unknown, ApiResponse>(`${ADMIN_ROUTES.GET_AUCTION_HOUSES}?page=${page}&limit=${limit}`)
-            return {
-                success: true,
-                message: response.message,
-                ...(response.data || {})
+            let url=`${ADMIN_ROUTES.GET_AUCTION_HOUSES}?page=${page}&limit=${limit}`;
+            if(search){
+                url+=`&search=${encodeURIComponent(search)}`
+            }
+            if(status&&status!='all'){
+                url+=`&status=${status}`
+            }
+            const response=await axiosInstance.get<AdminAuctionHouseDetailDTO,ApiResponse<{data:AdminAuctionHouseDetailDTO[],pagination:IPaginationMeta}>>(url)
+            const paginatedResult=response.data;
+            return{
+                success:true,
+                message:response.message,
+                data:paginatedResult?.data||[],
+                pagination:paginatedResult?.pagination
             }
         } catch (error) {
             return apiErrorHandler(error, "Failed to fetch auction houses");

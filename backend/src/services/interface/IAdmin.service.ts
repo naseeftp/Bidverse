@@ -1,7 +1,8 @@
-import { AuctionHouseResponseDTO } from "../../dtos/auctionHouse.dto/auctionHouse.dto";
+import { AuctionHouseResponseDTO,AdminAuctionHouseDetailDTO} from "../../dtos/auctionHouse.dto/auctionHouse.dto";
 import { UpdateHouseStatusDTO, UpdateUserStatusDTO } from "../../dtos/admin.dto/updatestatus.dto";
 import { IGenericPaginatedResposnse } from "../../types/response.type";
 import { UserResponseDTO } from "../../dtos/Common.dto";
+
 export interface IPaginatedResponse<T> {
     houses: T[];
     pagination: {
@@ -14,8 +15,8 @@ export interface IPaginatedResponse<T> {
     }
 }
 export interface IAdminService {
-    listAllAuctionHouses(page: number, limit: number): Promise<IPaginatedResponse<AuctionHouseResponseDTO>>
-    getAuctionHouseById(id: string): Promise<AuctionHouseResponseDTO>
+    listAllAuctionHouses(page: number, limit: number,search?:string,status?:string): Promise<IGenericPaginatedResposnse<AdminAuctionHouseDetailDTO>>
+    getAuctionHouseById(id: string): Promise<AdminAuctionHouseDetailDTO>
     updateAuctionHouseStatus(id: string, data: UpdateHouseStatusDTO): Promise<AuctionHouseResponseDTO>
     listAllUsers(page: number, limit: number, search?: string, status?: string): Promise<IGenericPaginatedResposnse<UserResponseDTO>>
     getUserById(id: string): Promise<UserResponseDTO>

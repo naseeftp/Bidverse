@@ -1,7 +1,7 @@
-import { IAdminService, IPaginatedResponse } from "../interface/IAdmin.service";
+import { IAdminService} from "../interface/IAdmin.service";
 import { IAuctionHouseRepository } from "../../repositories/interfaces/IAuctionHouse.repository";
 import { AuctionHouseMapper } from "../../mappers/auctionHouse.mapper";
-import { AuctionHouseResponseDTO } from "../../dtos/auctionHouse.dto/auctionHouse.dto";
+import { AuctionHouseResponseDTO,AdminAuctionHouseDetailDTO } from "../../dtos/auctionHouse.dto/auctionHouse.dto";
 import { UpdateHouseStatusDTO, UpdateUserStatusDTO } from "../../dtos/admin.dto/updatestatus.dto";
 import { ILoggerService } from "../interface/ILogger.service";
 import { AppError, NotFoundError } from "../../errors/AppError";
@@ -21,36 +21,37 @@ export class AdminService implements IAdminService {
         private _userRepo: IUserRepository,
         private _logger: ILoggerService
     ) { }
-    async listAllAuctionHouses(page: number, limit: number): Promise<IPaginatedResponse<AuctionHouseResponseDTO>> {
+    async listAllAuctionHouses(page: number, limit: number,search?:string,status?:string): Promise<IGenericPaginatedResposnse<AdminAuctionHouseDetailDTO>> {
         try {
-            const activePage = Math.max(1, page);
-            const activeLimit = Math.max(1, Math.min(limit, 100))
-            this._logger.info('admin fetching all auctionhouses', { page: activePage, limit: activeLimit })
-            const { houses, total } = await this._auctionHouseRepo.findAllPaginated(activePage, activeLimit)
-            const mappedHouses = houses.map(house => AuctionHouseMapper.toResponseDTO(house))
-            return {
-                houses: mappedHouses,
-                pagination: {
-                    totalItems: total,
-                    itemsPerPage: activeLimit,
-                    currentPage: activePage,
-                    totalPages: Math.ceil(total / activeLimit),
-                    hasNextPage: activePage * activeLimit < total,
-                    hasPrevPage: activePage > 1
-                }
+           const { houses, total } = await this._auctionHouseRepo.listAllTenantsWithHouseStatus(
+            page, 
+            limit, 
+            search, 
+            status
+        );
+       return {
+            data: houses,
+            pagination: {
+                totalItems: total,
+                itemsPerPage: limit,
+                currentPage: page,
+                totalPages: Math.ceil(total / limit),
+                hasNextPage: page * limit < total,
+                hasPrevPage: page > 1
             }
+        };
         } catch (error) {
             this._logger.error("Error in listAllAuctionHouses service", { error });
             throw new AppError("Failed to list auction houses for administrative review");
         }
     }
-    async getAuctionHouseById(id: string): Promise<AuctionHouseResponseDTO> {
+    async getAuctionHouseById(id: string): Promise<AdminAuctionHouseDetailDTO> {
         try {
-            const house = await this._auctionHouseRepo.findById(id);
+            const house = await this._auctionHouseRepo.findcombinedData(id);
             if (!house) {
                 throw new AppError("Auction House not found");
             }
-            return house as unknown as AuctionHouseResponseDTO;
+            return house as unknown as AdminAuctionHouseDetailDTO;
 
         } catch (error) {
             this._logger.error(`Service Error: Failed to fetch auction house with ID ${id}`, { error });

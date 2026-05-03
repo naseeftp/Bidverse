@@ -27,6 +27,7 @@ const AuctionHouseDetails: React.FC = () => {
     const fetchDetails = useCallback(async () => {
         setLoading(true);
         const res = await adminService.getAuctionHouseById(id!);
+        console.log(res)
         if (res.success && 'data' in res) {
             setHouse(res.data as AuctionHouseWithLegal);
         }
