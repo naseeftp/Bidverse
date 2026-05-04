@@ -54,12 +54,12 @@ class AdminService {
     }
     async getAuctionHouseById(id: string) {
         try {
-            const url = `/admin/auction-house/${id}`;
-            const response = await axiosInstance.get<unknown, ApiResponse>(url);
+            const url = `${ADMIN_ROUTES.GET_AUCTION_HOUSE}/${id}`;
+            const response = await axiosInstance.get<AdminAuctionHouseDetailDTO, ApiResponse<AdminAuctionHouseDetailDTO>>(url);
             return {
                 success: true,
                 message: response.message,
-                data: response.data || response
+                data: response.data || null
             };
         } catch (error) {
             return apiErrorHandler(error, 'Failed to fetch house details');

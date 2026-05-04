@@ -3,7 +3,8 @@ export const VerificationStatus = {
     PENDING: 'pending',
     APPROVED: 'approved',
     REJECTED: 'rejected',
-    ACTION_REQUIRED: 'action_required'
+    ACTION_REQUIRED: 'action_required',
+    NOT_SUBMITTED:'not_submitted'
 } as const
 
 export type TVerificationStatus = typeof VerificationStatus[keyof typeof VerificationStatus];
