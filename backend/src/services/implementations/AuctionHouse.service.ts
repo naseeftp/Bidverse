@@ -1,7 +1,7 @@
 import { IAuctionService } from "../interface/IAuctionHouse.service";
 import { IAuctionHouseRepository } from "../../repositories/interfaces/IAuctionHouse.repository";
 import { ILoggerService } from "../interface/ILogger.service";
-import { AuctionHouseVerificationDTO, AuctionHouseResponseDTO } from "../../dtos/auctionHouse.dto/auctionHouse.dto";
+import { AuctionHouseVerificationDTO, AuctionHouseResponseDTO,AdminAuctionHouseDetailDTO} from "../../dtos/auctionHouse.dto/auctionHouse.dto";
 import { AuctionHouseMapper } from "../../mappers/auctionHouse.mapper";
 import { VerificationStatus } from "../../constants/constants";
 import { ConflictError } from "../../errors/AppError";
@@ -50,12 +50,12 @@ export class AuctionHouseService implements IAuctionService {
         this._logger.info('Verification request submitted successfully', { tenatId: userId, recordId: saveDoc._id })
         return AuctionHouseMapper.toResponseDTO(saveDoc)
     }
-    async getTenantVerificationProfile(userId: string): Promise<AuctionHouseResponseDTO | null> {
-        const doc = await this._auctionHouseRepository.findByUserId(userId)
+    async getTenantVerificationProfile(userId: string): Promise<AdminAuctionHouseDetailDTO| null> {
+        const doc = await this._auctionHouseRepository.findcombinedData(userId)
         if (!doc) {
             return null
         }
-        return AuctionHouseMapper.toResponseDTO(doc);
+        return doc;
     }
 
 }

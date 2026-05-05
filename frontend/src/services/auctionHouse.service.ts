@@ -1,7 +1,7 @@
 import axiosInstance from "../api/axios.instance";
 import { AUCTION_HOUSE_ROUTES } from "../constants/api.constant";
 import { apiErrorHandler } from "../utils/error.handle";
-import type { AuctionHouseResponseDTO, AuctionHouseSubmissionDTO } from "../types/auctionHouse.type";
+import type { AuctionHouseResponseDTO, AuctionHouseSubmissionDTO,AdminAuctionHouseDetailDTO } from "../types/auctionHouse.type";
 import type { ApiResponse } from "../types/auth.type";
 
 class AuctionHouseService {
@@ -18,10 +18,10 @@ class AuctionHouseService {
     }
     async getProfile() {
         try {
-            const response = await axiosInstance.get<unknown, ApiResponse>(
+            const response = await axiosInstance.get<AdminAuctionHouseDetailDTO, ApiResponse<AdminAuctionHouseDetailDTO>>(
                 AUCTION_HOUSE_ROUTES.GET_PROFILE
             )
-            return { success: true, message: response.message, ...(response.data||{}) }
+            return { success: true, message: response.message,data:response.data}
         } catch (error) {
             return apiErrorHandler(error, "Could not load profile");
         }

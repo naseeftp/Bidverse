@@ -22,18 +22,6 @@ const TenantNavbar: React.FC = () => {
       {isAuthenticated ? (
         <>
 
-          <div className="relative w-96">
-            <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-[#94A3B8]">
-              <Search size={16} />
-            </span>
-            <input
-              type="text"
-              placeholder="SEARCH AUCTIONS OR BIDDERS..."
-              className="w-full bg-[#F5F7FB] border border-[#E2E8F0] rounded-lg py-2 pl-10 pr-4 text-[11px] font-semibold tracking-wider text-[#0F172A] focus:ring-2 focus:ring-[#2F6FED]/10 focus:border-[#2F6FED] outline-none transition-all"
-            />
-          </div>
-
-          {/* AUTHENTICATED: ACTIONS */}
           <div className="flex items-center gap-8">
             <button className="text-[#64748B] hover:text-[#2F6FED] transition-colors relative">
               <Bell size={20} strokeWidth={2} />
@@ -47,9 +35,7 @@ const TenantNavbar: React.FC = () => {
                 <span className="text-[11px] font-bold tracking-tight text-[#0F172A]">
                   {user?.name || "Auction Admin"}
                 </span>
-                <span className="text-[10px] font-medium text-[#64748B]">
-                  ID: #AH-9921
-                </span>
+               
               </div>
               <div className="w-10 h-10 bg-[#2F6FED] rounded-xl flex items-center justify-center text-white group-hover:bg-[#1E40AF] transition-all shadow-lg shadow-blue-500/20">
                 <User size={20} />
@@ -58,7 +44,7 @@ const TenantNavbar: React.FC = () => {
           </div>
         </>
       ) : (
-        /* GUEST: LOGIN & REGISTER BUTTONS */
+       
         <div className="flex items-center gap-4">
           <Link
             to="/tenant/login"

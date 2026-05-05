@@ -105,6 +105,8 @@ export interface AdminAuctionHouseDetailDTO {
     userId: string;
     userEmail: string;
     userName: string;
+    userPhone:string,
+    profileImage:string;
     isAccountBlocked: boolean;
 
    

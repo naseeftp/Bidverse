@@ -1,20 +1,35 @@
-import React from "react";
+import React,{useState,useEffect} from "react";
 import { Link, useLocation } from "react-router-dom";
 import { LayoutDashboard, Gavel, ShieldCheck, Settings, LogOut } from "lucide-react";
-import { useAppDispatch, useAppSelector } from "../../../hooks/redux.hooks";
+import { useAppDispatch} from "../../../hooks/redux.hooks";
 import { logout } from "../../../redux/user/auth.slice";
 import { VerificationStatus } from "../../../types/auctionHouse.type";
+import auctionHouseService from "../../../services/auctionHouse.service";
 import authService from "../../../services/auth.service";
+import type {AdminAuctionHouseDetailDTO} from '../../../types/auctionHouse.type'
+ 
 
 const Sidebar: React.FC = () => {
+  const [house,setHouse]=useState<AdminAuctionHouseDetailDTO|null>(null)
   const dispatch = useAppDispatch();
   const location = useLocation();
-  const { status } = useAppSelector((state) => state.auctionHouse);
-
+ 
   const handleLogout = async() => {
     await authService.logout()
     dispatch(logout());
   };
+  
+   const fetchAuctionProfile=async ()=>{
+    const response=await auctionHouseService.getProfile();
+    if(response.success&&response.data){
+      setHouse(response.data)
+    }
+    
+   }
+   const status=house?.status
+   useEffect(()=>{
+    fetchAuctionProfile()
+   },[])
 
   const publicItems = [
     { name: "Dashboard", path: "/tenant/dashboard", icon: <LayoutDashboard size={18} /> },
@@ -23,7 +38,7 @@ const Sidebar: React.FC = () => {
 
   const verifiedItems = [
     { name: "My Auctions", path: "/tenant/auctions", icon: <Gavel size={18} /> },
-    { name: "Settings", path: "/tenant/settings", icon: <Settings size={18} /> },
+    { name: "Profile Settings", path: "/tenant/profile", icon: <Settings size={18} /> },
   ];
 
   const menuItems = [
@@ -32,10 +47,8 @@ const Sidebar: React.FC = () => {
   ];
 
   return (
-    // Background set to Card Background (#FFFFFF) with a Slate Border (#E2E8F0)
+   
     <aside className="w-64 h-screen bg-white border-r border-[#E2E8F0] text-[#475569] flex flex-col sticky top-0 overflow-hidden">
-
-      {/* BRANDING SECTION */}
       <div className="p-8">
         <Link to="/" className="text-xl font-black tracking-tighter uppercase text-[#0F172A]">
           BidVerse<span className="text-[#2F6FED]">.</span>
@@ -45,7 +58,7 @@ const Sidebar: React.FC = () => {
         </Link>
       </div>
 
-      {/* NAVIGATION */}
+     
       <nav className="flex-grow py-4 px-4 space-y-1.5">
         {menuItems.map((item) => {
           const isActive = location.pathname === item.path;
@@ -58,7 +71,7 @@ const Sidebar: React.FC = () => {
                   ? "bg-[#F5F7FB] text-[#2F6FED]"
                   : "text-[#475569] hover:bg-[#F5F7FB] hover:text-[#0F172A]"}`}
             >
-              {/* Icon logic: Active uses Royal Blue, Inactive uses Slate */}
+              
               <span className={`${isActive ? "text-[#2F6FED]" : "text-[#94A3B8] group-hover:text-[#475569]"}`}>
                 {item.icon}
               </span>
@@ -69,7 +82,7 @@ const Sidebar: React.FC = () => {
           );
         })}
 
-        {/* LOCKED FEATURES FEEDBACK */}
+        
         {status !== VerificationStatus.APPROVED && (
           <div className="mt-8 mx-2 px-4 py-4 bg-[#F5F7FB] rounded-2xl border border-[#E2E8F0] border-dashed">
             <p className="text-[9px] text-[#475569] uppercase tracking-widest font-extrabold">
@@ -82,11 +95,11 @@ const Sidebar: React.FC = () => {
         )}
       </nav>
 
-      {/* FOOTER / LOGOUT */}
+      
       <div className="p-6 border-t border-[#E2E8F0]">
         <button
           onClick={handleLogout}
-          // Using Soft Red for Logout text
+         
           className="flex items-center gap-4 px-4 py-3 text-[#EF4444] hover:bg-[#FEF2F2] w-full rounded-xl transition-all group"
         >
           <LogOut size={18} className="group-hover:translate-x-1 transition-transform" />

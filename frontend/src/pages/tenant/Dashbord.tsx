@@ -1,6 +1,5 @@
-import React, { useEffect } from "react";
-import { useAppDispatch, useAppSelector } from "../../hooks/redux.hooks";
-import { fetchAuctionProfile } from "../../redux/tenant/auctionHouse.slice";
+import React, { useEffect, useState } from "react";
+import type {AdminAuctionHouseDetailDTO} from '../../types/auctionHouse.type'
 import { Link } from "react-router-dom";
 
 import {
@@ -8,34 +7,44 @@ import {
   Users,
   TrendingUp,
   Clock,
-  Loader2,
   ShieldCheck,
   Lock,
   ArrowRight,
   AlertCircle,
   RefreshCcw,
 } from "lucide-react";
+import auctionHouseService from "../../services/auctionHouse.service";
 
 const TenantDashboard: React.FC = () => {
-  const dispatch = useAppDispatch();
-  const { isAuthenticated } = useAppSelector((state) => state.auth);
-  const { status, loading, reason } = useAppSelector((state) => state.auctionHouse);
+  const [house,setHouse]=useState<AdminAuctionHouseDetailDTO|null>(null)
+  
+  // const { status, loading, reason } = useAppSelector((state) => state.auctionHouse);
 
-  useEffect(() => {
-    if (isAuthenticated && status == null) {
-      dispatch(fetchAuctionProfile());
-    }
-  }, [dispatch, status, isAuthenticated]);
+  // useEffect(() => {
+  //   if (isAuthenticated && status == null) {
+  //     dispatch(fetchAuctionProfile());
+  //   }
+  // }, [dispatch, status, isAuthenticated]);
 
-  if (loading) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-screen bg-[#F5F7FB]">
-        <Loader2 className="animate-spin text-[#2F6FED]" size={40} />
-        <p className="mt-4 text-[#475569] font-semibold tracking-wide uppercase text-[10px]">Syncing House Data...</p>
-      </div>
-    );
+  // if (loading) {
+  //   return (
+  //     <div className="flex flex-col items-center justify-center min-h-screen bg-[#F5F7FB]">
+  //       <Loader2 className="animate-spin text-[#2F6FED]" size={40} />
+  //       <p className="mt-4 text-[#475569] font-semibold tracking-wide uppercase text-[10px]">Syncing House Data...</p>
+  //     </div>
+  //   );
+  // }
+
+ const fetchAuctionProfile=async ()=>{
+  const response=await auctionHouseService.getProfile();
+  if(response.success&&response.data){
+    setHouse(response.data)
   }
-
+ }
+ const status=house?.status
+ useEffect(()=>{
+  fetchAuctionProfile()
+ },[])
   if (status !== "approved") {
     return (
       <div className="min-h-screen bg-[#F5F7FB] flex items-center justify-center px-6">
@@ -62,9 +71,9 @@ const TenantDashboard: React.FC = () => {
             {status === "rejected" && (
               <div className="space-y-4">
                 <p className="text-sm">Your application was not approved. Please review the feedback below:</p>
-                {reason && (
+                {house?.rejectionReason&& (
                   <div className="bg-[#FEF2F2] border border-[#FEE2E2] rounded-2xl p-5 text-left">
-                    <p className="text-[#991B1B] text-sm font-semibold italic">&ldquo;{reason}&rdquo;</p>
+                    <p className="text-[#991B1B] text-sm font-semibold italic">&ldquo;{house.rejectionReason}&rdquo;</p>
                   </div>
                 )}
               </div>
@@ -125,7 +134,7 @@ const TenantDashboard: React.FC = () => {
     <div className="min-h-screen bg-[#F5F7FB] pt-8 pb-16 px-6 lg:px-12 font-sans">
       <div className="max-w-[1400px] mx-auto space-y-8 animate-in fade-in duration-700">
         
-        {/* Header */}
+        
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
             <h1 className="text-3xl font-black text-[#0F172A] tracking-tight">House Console</h1>
@@ -137,7 +146,7 @@ const TenantDashboard: React.FC = () => {
           </button>
         </div>
 
-        {/* Stats Grid */}
+        
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {stats.map((stat, i) => (
             <div key={i} className={cardStyle}>
@@ -155,7 +164,7 @@ const TenantDashboard: React.FC = () => {
           ))}
         </div>
 
-        {/* Bottom Sections */}
+        
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className={`${cardStyle} lg:col-span-2 min-h-[400px]`}>
             <div className="flex justify-between items-center mb-8 pb-4 border-b border-[#F5F7FB]">
@@ -171,7 +180,7 @@ const TenantDashboard: React.FC = () => {
           </div>
 
           <div className="space-y-6">
-            {/* House Standing Card */}
+           
             <div className="bg-[#0F172A] rounded-[2rem] p-8 text-white shadow-2xl relative overflow-hidden">
               <div className="relative z-10">
                 <h3 className="font-black text-xs uppercase tracking-[0.2em] text-white/60">House Standing</h3>
