@@ -5,6 +5,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import authService from "../../services/auth.service";
 import toast from "react-hot-toast";
+import { useAppSelector } from "../../hooks/redux.hooks";
 
 interface AxiosErrorResponse {
     response?: {
@@ -21,7 +22,7 @@ const schema = yup.object({
 const TenantForgotPassPage: React.FC = () => {
     const navigate = useNavigate();
     const [isLoading, setIsLoading] = useState(false);
-
+    const { isAuthenticated } = useAppSelector((state) => state.auth)
     const {
         register,
         handleSubmit,
@@ -53,7 +54,7 @@ const TenantForgotPassPage: React.FC = () => {
                 toast.error(result.message || 'Failed to send recovery code');
             }
         } catch (error: unknown) {
-          
+
             const err = error as AxiosErrorResponse;
             const errorMsg = err.response?.data?.message || "Something went wrong";
             toast.error(errorMsg);
@@ -118,12 +119,26 @@ const TenantForgotPassPage: React.FC = () => {
                 <div className="mt-10 pt-8 border-t border-[#E2E8F0] text-center">
                     <p className="text-[11px] text-[#475569] font-medium uppercase tracking-wider">
                         Found your credentials?
-                        <Link
-                            to="/tenant/login"
-                            className="text-[#2F6FED] font-extrabold hover:underline ml-1"
-                        >
-                            Return to Login
-                        </Link>
+                        {isAuthenticated ?
+                            (
+                                <Link
+                                    to="/tenant/profile"
+                                    className="text-[#2F6FED] font-extrabold hover:underline ml-1"
+                                >
+                                    Return to Profile
+                                </Link>
+
+                            ) : (
+                                <Link
+                                    to="/tenant/login"
+                                    className="text-[#2F6FED] font-extrabold hover:underline ml-1"
+                                >
+                                    Return to Login
+                                </Link>
+
+                            )
+
+                        }
                     </p>
                 </div>
             </div>

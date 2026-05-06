@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { Bell, User, Search } from "lucide-react";
+import { Bell, User} from "lucide-react";
 import { useAppSelector } from '../../../hooks/redux.hooks'
 
 const TenantNavbar: React.FC = () => {

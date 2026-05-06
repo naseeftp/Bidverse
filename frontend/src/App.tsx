@@ -30,7 +30,8 @@ import TenantResetPasswordPage from "./pages/tenant/ResetpassPage";
 import TenantDashboard from "./pages/tenant/Dashbord";
 import TenantVerificationForm from "./pages/tenant/VerificationPage";
 import TenantVerificationResubmissionPage from './pages/tenant/resubmissionPage'
-import TenantProfilePag from './pages/tenant/ProfilePage'
+import TenantProfilePage from './pages/tenant/ProfilePage'
+import TenantChangePasswordPage from "./pages/tenant/changePassword";
 
 
 import AdminLoginPage from "./pages/admin/LoginPage";
@@ -89,7 +90,8 @@ function App() {
                   <Route path="/tenant/dashboard" element={<TenantDashboard />} />
                   <Route path='/tenant/verification-form' element={<TenantVerificationForm />}></Route>
                   <Route path="/tenant/resubmit-verification" element={<TenantVerificationResubmissionPage/>}/>
-                  <Route path="/tenant/profile" element={<TenantProfilePag/>}/>
+                  <Route path="/tenant/profile" element={<TenantProfilePage/>}/>
+                  <Route path="/tenant/changePassword" element={<TenantChangePasswordPage/>}/>
                </Route>
 
             </Route>

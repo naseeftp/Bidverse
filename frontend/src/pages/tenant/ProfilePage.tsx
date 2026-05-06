@@ -123,7 +123,7 @@ const TenantProfilePage: React.FC = () => {
                         <p className="text-[#475569] text-sm mt-1">Manage your personal account and business credentials.</p>
                     </div>
                     <div className="flex flex-wrap gap-3">
-                        <Link to='/change-password'>
+                        <Link to='/tenant/changePassword'>
                             <button className="px-4 py-2 bg-white border border-[#E2E8F0] rounded-lg text-sm font-semibold hover:bg-[#F1F5F9] transition-colors flex items-center gap-2">
                                 <Lock size={16} /> Password
                             </button>

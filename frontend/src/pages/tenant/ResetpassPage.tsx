@@ -7,8 +7,9 @@ import { FaEye, FaEyeSlash } from "react-icons/fa";
 import authService from "../../services/auth.service";
 import type { ResetPasswordDTO } from "../../types/auth.type";
 import toast from "react-hot-toast";
+import { useAppSelector } from "../../hooks/redux.hooks";
 
-// Typed error interface for Axios responses
+
 interface AxiosErrorResponse {
   response?: {
     data?: {
@@ -33,8 +34,8 @@ const resetSchema = yup.object({
 const TenantResetPasswordPage: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { isAuthenticated } = useAppSelector((state) => state.auth)
 
-  // Data passed from TenantForgotPassVerifyOtp
   const email = location.state?.email || "";
   const resetToken = location.state?.resetToken || "";
 
@@ -64,9 +65,19 @@ const TenantResetPasswordPage: React.FC = () => {
   const onSubmit = async (data: ResetPasswordDTO) => {
     setIsSubmitting(true);
     try {
-      await authService.resetPassword({ ...data });
-      toast.success("Auction House credentials updated. Please login.");
-      navigate("/tenant/login");
+      const result = await authService.resetPassword({ ...data });
+      if (result.success) {
+        if (isAuthenticated) {
+          toast.success("Auction House credentials updated");
+          navigate("/tenant/profile");
+        }
+        else {
+          toast.success("Auction House credentials updated. Please login.");
+          navigate("/tenant/login");
+        }
+
+      }
+
     } catch (err: unknown) {
       const error = err as AxiosErrorResponse;
       toast.error(error.response?.data?.message || "Failed to update password.");
@@ -81,23 +92,23 @@ const TenantResetPasswordPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-[#F5F7FB] flex items-center justify-center px-6 font-sans">
       <div className="bg-[#FFFFFF] border border-[#E2E8F0] w-full max-w-sm p-10 rounded-3xl shadow-sm">
-        
+
         <div className="text-center mb-10">
           <h2 className="text-2xl font-extrabold text-[#0F172A] tracking-tight">
             Update Credentials
           </h2>
           <p className="text-[#475569] text-[11px] font-medium uppercase tracking-wider mt-3">
-            Secure access for <br/>
+            Secure access for <br />
             <span className="text-[#2F6FED] font-bold lowercase">{email}</span>
           </p>
         </div>
 
         <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
-          
+
           <input type="hidden" {...register("email")} />
           <input type="hidden" {...register("resetToken")} />
 
-          {/* New Password */}
+
           <div>
             <label className={labelStyle}>New Business Password</label>
             <div className="relative">
@@ -118,7 +129,7 @@ const TenantResetPasswordPage: React.FC = () => {
             {errors.password && <p className="text-red-500 text-[10px] mt-1 font-bold">{errors.password.message}</p>}
           </div>
 
-          {/* Confirm Password */}
+
           <div>
             <label className={labelStyle}>Confirm New Password</label>
             <div className="relative">
@@ -149,12 +160,24 @@ const TenantResetPasswordPage: React.FC = () => {
         </form>
 
         <div className="mt-10 pt-8 border-t border-[#E2E8F0] text-center">
-          <Link 
-            to="/tenant/login" 
-            className="text-[11px] text-[#475569] font-bold uppercase tracking-widest hover:text-[#2F6FED] transition-colors"
-          >
-             Back to Merchant Login
-          </Link>
+          {isAuthenticated ?
+            (
+              <Link
+                to="/tenant/profile"
+                className="text-[11px] text-[#475569] font-bold uppercase tracking-widest hover:text-[#2F6FED] transition-colors"
+              >
+                Back to Profile
+              </Link>
+            ) : (
+
+              <Link
+                to="/tenant/login"
+                className="text-[11px] text-[#475569] font-bold uppercase tracking-widest hover:text-[#2F6FED] transition-colors"
+              >
+                Back to Merchant Login
+              </Link>
+            )}
+
         </div>
       </div>
     </div>

@@ -25,7 +25,7 @@ router.patch(
 )
 router.patch(
     PROFILE_ROUTES.CHANGE_PASSWORD,
-    allowedTo(Role.USER),
+    allowedTo(Role.USER,Role.TENANT),
     validator(ProfileValidators.changePasswordValidator),
     (req, res, next) => profileController.changePassword(req, res, next)
 )

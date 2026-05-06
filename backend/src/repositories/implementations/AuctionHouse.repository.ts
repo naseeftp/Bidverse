@@ -1,4 +1,4 @@
-import { IAuctionHouseRepository, IPaginatedAuctionHouses } from "../interfaces/IAuctionHouse.repository";
+import { IAuctionHouseRepository} from "../interfaces/IAuctionHouse.repository";
 import { IAuctionHouseDocument } from "../../types/auctionhouse.type";
 import { BaseRepository } from "./Base.repository";
 import { AuctionHouse } from "../../models/auctionHouse.model";
