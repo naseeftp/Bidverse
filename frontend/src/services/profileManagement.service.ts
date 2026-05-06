@@ -6,11 +6,13 @@ import type { UserResponseDTO } from "../types/auth.type";
 import type {
     ChangeEmaiLResponseDTO,
     ProfileDetailChangeFormData,
+    changeBussinessDetailsDTO,
     changeEmailDTO,
     changeEmailVerificationDTO,
     changePasswordDTO
 } from '../types/profile.dto'
 import type {ResendOtpDTO} from '../types/auth.type'
+import type { AuctionHouseResponseDTO } from "../types/auctionHouse.type";
 
 
 class profileService {
@@ -92,6 +94,20 @@ class profileService {
       } catch (error) {
          return apiErrorHandler(error, 'Resend otp failed')
       }
+    }
+    async changeBusinessDetails(data:changeBussinessDetailsDTO){
+        try {
+            const url=`${BASE_ROUTES.PROFILE_MANAGEMENT}${PROFILE_ROUTES.CHANGE_BUSINESS_DETAILS}`
+            const response=await axiosInstance.patch<AuctionHouseResponseDTO,ApiResponse<AuctionHouseResponseDTO>>(url,data)
+            return {
+                success:true,
+                message:response.message,
+                data:response.data
+            }
+
+        } catch (error) {
+             return apiErrorHandler(error, 'Resend otp failed')
+        }
     }
 }
 
