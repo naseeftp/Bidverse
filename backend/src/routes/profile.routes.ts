@@ -19,7 +19,7 @@ router.get(
 )
 router.patch(
     PROFILE_ROUTES.CHANGE_DETAILS,
-    allowedTo(Role.USER),
+    allowedTo(Role.USER,Role.TENANT),
     validator(ProfileValidators.profileDeatailsChangeValidator),
     (req, res, next) => profileController.changeProfileDetails(req, res, next)
 )
@@ -46,5 +46,11 @@ router.post(
     allowedTo(Role.USER),
     validator(AuthValidators.validateResendOtpInput),
     (req,res,next)=>profileController.changeEmailResendOtp(req,res,next)
+)
+router.patch(
+    PROFILE_ROUTES.CHANGE_BUSINESS_DETAILS,
+    allowedTo(Role.TENANT),
+    validator(ProfileValidators.changeBusinessDetailsValidator),
+    (req,res,next)=>profileController.changeBusinessDetails(req,res,next)
 )
 export default router

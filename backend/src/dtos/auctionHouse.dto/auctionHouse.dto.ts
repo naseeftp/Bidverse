@@ -70,7 +70,39 @@ export const AuctionHouseVerificationSchema = z.object({
   }),
 });
 
+export const changeBusinessDetailsSchema = z.object({
+  businessName: z.string()
+    .trim()
+    .min(3, 'Auction House name must be at least 3 characters')
+    .max(100, "Name is too long"),
 
+  briefDescription: z.string()
+    .trim()
+    .min(20, "Provide at least 20 characters")
+    .max(1000, 'Description is too long'),
+
+  primaryContactName: z.string()
+    .trim()
+    .min(2, "Primary contact name required")
+    .max(100, "Name too long"),
+
+  businessEmail: z.string()
+    .email('Invalid email format')
+    .max(100, 'Email too long'),
+
+  phone: z.string()
+    .regex(/^\d{10}$/, "Phone number must be exactly 10 digits")
+    .max(10, "Phone cannot exceed 10 digits"),
+
+  city: z.string()
+    .min(1, 'City is required')
+    .max(50, 'City name too long'),
+
+  fullAddress: z.string()
+      .min(5, 'Full address required')
+      .max(255, 'Address is too long'),
+
+})
 
 export interface AuctionHouseResponseDTO {
   id: string;
@@ -101,44 +133,45 @@ export interface AuctionHouseResponseDTO {
   createdAt: string | Date;
 }
 export interface AdminAuctionHouseDetailDTO {
-   
-    userId: string;
-    userEmail: string;
-    userName: string;
-    userPhone:string,
-    profileImage:string;
-    isAccountBlocked: boolean;
 
-   
-    houseId: string | null;
-    businessName: string | null;
-    yearEstablished: number | null;
-    briefDescription: string | null;
-    
-    address: {
-        city: string;
-        state: string;
-        country: string;
-        fullAddress: string;
-    } | null;
+  userId: string;
+  userEmail: string;
+  userName: string;
+  userPhone: string,
+  profileImage: string;
+  isAccountBlocked: boolean;
 
-    contact: {
-        primaryContactName: string;
-        businessEmail: string;
-        phone: string;
-    } | null;
 
-    documents: {
-        registrationCertificateUrl: string;
-        identityProofUrl: string;
-        registerNumber: string;
-        taxId: string;
-    } | null;
+  houseId: string | null;
+  businessName: string | null;
+  yearEstablished: number | null;
+  briefDescription: string | null;
 
-    status:TVerificationStatus
-    rejectionReason: string | null;
-    isVerified: boolean;
-    createdAt: string | Date;
+  address: {
+    city: string;
+    state: string;
+    country: string;
+    fullAddress: string;
+  } | null;
+
+  contact: {
+    primaryContactName: string;
+    businessEmail: string;
+    phone: string;
+  } | null;
+
+  documents: {
+    registrationCertificateUrl: string;
+    identityProofUrl: string;
+    registerNumber: string;
+    taxId: string;
+  } | null;
+
+  status: TVerificationStatus
+  rejectionReason: string | null;
+  isVerified: boolean;
+  createdAt: string | Date;
 }
 
 export type AuctionHouseVerificationDTO = z.infer<typeof AuctionHouseVerificationSchema>
+export type ChangeBusinessDetailsDTO=z.infer<typeof changeBusinessDetailsSchema>

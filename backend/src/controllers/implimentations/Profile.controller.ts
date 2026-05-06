@@ -71,4 +71,14 @@ export class ProfileController implements IprofileController {
             next(error)
         }
     }
+
+    async changeBusinessDetails(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const userId=req.user.id 
+            const result=await this._profileService.changeBusinessDetails(userId,req.body)
+            SuccessResponse(res,MESSAGES.USER_DETAILS_UPDTD,result,HttpStatus.OK)
+        } catch (error) {
+            next(error)
+        }
+    }
 }

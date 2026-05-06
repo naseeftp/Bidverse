@@ -1,18 +1,20 @@
 import {
     UserResponseDTO
-    , profileDetailChangeDTO,
+    ,profileDetailChangeDTO,
     changePasswordDTO,
     changeEmailDTO,
     changeEmailResponseDto,
     changeEmailVerificationDTO,
     ResendOtpDTO
 } from "../../dtos/Common.dto";
-
+import { AuctionHouseResponseDTO, ChangeBusinessDetailsDTO } from "../../dtos/auctionHouse.dto/auctionHouse.dto";
 export interface IProfileService {
     getProfileData(id: string): Promise<UserResponseDTO>
     changeProfileDetails(id: string, data: profileDetailChangeDTO): Promise<UserResponseDTO>
     changePassword(id: string, data: changePasswordDTO): Promise<UserResponseDTO>
     changeEmail(data:changeEmailDTO):Promise<changeEmailResponseDto>
     changeEmailVerification(userId:string,data:changeEmailVerificationDTO):Promise<UserResponseDTO>
-    changeEmailResendOtp(data:ResendOtpDTO):Promise<changeEmailResponseDto>
+    changeEmailResendOtp(data:ResendOtpDTO):Promise<changeEmailResponseDto>;
+    changeBusinessDetails(userId:string,data:ChangeBusinessDetailsDTO):Promise<AuctionHouseResponseDTO>
+    
 }

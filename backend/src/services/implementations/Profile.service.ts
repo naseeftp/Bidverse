@@ -1,16 +1,21 @@
 import { changeEmailDTO, changePasswordDTO, profileDetailChangeDTO, UserResponseDTO,changeEmailResponseDto, changeEmailVerificationDTO, ResendOtpDTO} from "../../dtos/Common.dto";
 import { IProfileService } from "../interface/IProfile.service";
 import { IUserRepository } from "../../repositories/interfaces/iUser.repository";
+import { IAuctionHouseRepository } from "../../repositories/interfaces/IAuctionHouse.repository";
 import { ILoggerService } from "../interface/ILogger.service";
 import { CONFIG, MESSAGES } from "../../constants/constants";
 import { AppError, ConflictError, NotFoundError, UnauthorizedError, ValidationError } from "../../errors/AppError";
 import { UserMapper } from "../../mappers/user.mapper";
+import {AuctionHouseMapper} from '../../mappers/auctionHouse.mapper'
 import { comparePassword, hashPassword } from "../../utils/Password.util";
 import { IOTPService } from "../interface/IOtp.service";
+import { ChangeBusinessDetailsDTO, AuctionHouseResponseDTO } from "../../dtos/auctionHouse.dto/auctionHouse.dto";
+import {IAuctionHouseDocument} from '../../types/auctionhouse.type'
 
 export class ProfileService implements IProfileService {
     constructor(
         private _userRepo: IUserRepository,
+        private _auctionRepo:IAuctionHouseRepository,
         private _logger: ILoggerService,
         private _otpService:IOTPService
     ) { }
@@ -57,6 +62,7 @@ export class ProfileService implements IProfileService {
 
 
     }
+    
     async changePassword(id: string, data: changePasswordDTO): Promise<UserResponseDTO> {
 
         const existingUser = await this._userRepo.findById(id)
@@ -121,6 +127,37 @@ export class ProfileService implements IProfileService {
     async changeEmailResendOtp(data: ResendOtpDTO): Promise<changeEmailResponseDto> {
         const otpresult=await this._otpService.resendOtp(data.email,CONFIG.FORGOT_PASSWORD_EXPIRY,CONFIG.OTP_RESEND_DELAY_SECONDS)
         return {email:otpresult.email,expiresAt:otpresult.expiresAt}
+    }
+
+    async changeBusinessDetails(userId: string, data: ChangeBusinessDetailsDTO): Promise<AuctionHouseResponseDTO> {
+        const existingRecord=await this._auctionRepo.findOne({userId:userId});
+        if(!existingRecord){
+            throw new NotFoundError(MESSAGES.AUCTION_HOUSE_NOT_FOUND)
+        }
+        this._logger.info('Finded document for auction house bussiness details change',{
+            userId:userId,
+            document:existingRecord
+        })
+        const updatePayload:Partial<IAuctionHouseDocument>={
+            name:data.businessName,
+            briefDescription:data.briefDescription,
+            contact:{
+                primaryContactName:data.primaryContactName,
+                businessEmail:data.businessEmail,
+                phone:data.phone
+            },
+            address:{
+                city:data.city,
+                fullAddress:data.fullAddress,
+                state:existingRecord.address.state,
+                country:existingRecord.address.country
+            }
+        }
+       const updatedDocument=await this._auctionRepo.updateById(existingRecord._id.toString(),updatePayload)
+       if(!updatedDocument){
+        throw new NotFoundError(MESSAGES.AUCTION_HOUSE_NOT_FOUND)
+       }
+       return AuctionHouseMapper.toResponseDTO(updatedDocument)
     }
 
 }

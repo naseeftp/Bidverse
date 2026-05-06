@@ -4,11 +4,13 @@ import {
     changeEmailSchema,
     changeEmailVerificationSchema
 } from '../dtos/Common.dto'
+import { changeBusinessDetailsSchema } from '../dtos/auctionHouse.dto/auctionHouse.dto'
 
 
 export const ProfileValidators = {
     profileDeatailsChangeValidator: profileDetailChangeSchema,
     changePasswordValidator: changePasswordSchema,
     changeEmailValidator:changeEmailSchema,
-    changeEmailVerificationValidator:changeEmailVerificationSchema
+    changeEmailVerificationValidator:changeEmailVerificationSchema,
+    changeBusinessDetailsValidator:changeBusinessDetailsSchema
 }
