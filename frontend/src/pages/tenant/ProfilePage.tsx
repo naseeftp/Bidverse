@@ -128,7 +128,7 @@ const TenantProfilePage: React.FC = () => {
                                 <Lock size={16} /> Password
                             </button>
                         </Link>
-                        <Link to='/change-email'>
+                        <Link to='/tenant/changeEmail'>
                             <button className="px-4 py-2 bg-[#2F6FED] text-white rounded-lg text-sm font-semibold hover:opacity-90 transition-opacity flex items-center gap-2 shadow-sm">
                                 <Mail size={16} /> Change Email
                             </button>

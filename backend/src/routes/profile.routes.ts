@@ -31,19 +31,19 @@ router.patch(
 )
 router.patch(
     PROFILE_ROUTES.CHANGE_EMAIL,
-    allowedTo(Role.USER),
+    allowedTo(Role.USER,Role.TENANT),
     validator(ProfileValidators.changeEmailValidator),
     (req,res,next)=>profileController.changeEmail(req,res,next)
 )
 router.post(
     PROFILE_ROUTES.CHANGE_EMAIL_VERIFY,
-    allowedTo(Role.USER),
+    allowedTo(Role.USER,Role.TENANT),
     validator(ProfileValidators.changeEmailVerificationValidator),
     (req,res,next)=>profileController.changeEmailVerification(req,res,next)
 )
 router.post(
     PROFILE_ROUTES.CHANGE_EMAIL_RESEND,
-    allowedTo(Role.USER),
+    allowedTo(Role.USER,Role.TENANT),
     validator(AuthValidators.validateResendOtpInput),
     (req,res,next)=>profileController.changeEmailResendOtp(req,res,next)
 )
