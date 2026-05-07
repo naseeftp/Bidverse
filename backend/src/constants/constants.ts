@@ -35,6 +35,12 @@ export enum HttpStatus {
     INTERNAL_ERROR = StatusCodes.INTERNAL_SERVER_ERROR,
     GONE = StatusCodes.GONE,
 }
+export enum AddressLabel{
+    HOME='home',
+    OFFICE='office',
+    OTHER='other'
+}
+export const AddressLabelValues=Object.values(AddressLabel)
 
 export const CONFIG = {
     OTP_EXPIRY_MINUTES: 1,
@@ -118,6 +124,8 @@ export const MESSAGES = {
     USER_DETAILS_UPDTD: 'Details updated successfully',
     USER_DETAILS_UPDTD_FAILED: 'Details updation Failed',
     EMAIL_UPDATED:'Email updated successfully',
+    
+    ADDRESS_CREATED:'Address Created Successfully',
 
     LOGOUT_SUCCESS: "Logout success",
     LOGOUT_FAILED: "Logout failed",

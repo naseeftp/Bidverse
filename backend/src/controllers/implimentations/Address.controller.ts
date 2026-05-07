@@ -1,0 +1,23 @@
+import { Request, Response, NextFunction } from "express";
+import { IAddressService } from "../../services/interface/IAddress.service";
+import { ILoggerService } from "../../services/interface/ILogger.service";
+import { IAddressController } from "../interfaces/IAddress.controller";
+import { SuccessResponse } from "../../utils/response.utility";
+import { HttpStatus, MESSAGES } from "../../constants/constants";
+
+export class AddressController implements IAddressController {
+    constructor(
+        private _addressService: IAddressService,
+        private _logger: ILoggerService
+    ) { }
+    async createAddress(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const userId=req.user.id;
+            this._logger.info('call reached on address controller')
+            const result=await this._addressService.createAddress(userId,req.body)
+            SuccessResponse(res,MESSAGES.ADDRESS_CREATED,result,HttpStatus.CREATED)
+        } catch (error) {
+            next(error)
+        }
+    }
+}

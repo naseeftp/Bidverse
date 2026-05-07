@@ -3,7 +3,8 @@ export const BASE_ROUTES = {
     AUTH: '/auth',
     AUCTION_HOUSE: '/auction-house',
     ADMIN: '/admin',
-    PROFILE_MANAGEMENT: '/profile'
+    PROFILE_MANAGEMENT: '/profile',
+    ADDRESS:'/address'
 } as const
 
 export const AUTH_ROUTES = {
@@ -43,4 +44,7 @@ export const PROFILE_ROUTES = {
     CHANGE_EMAIL_VERIFY: '/change-email-verify',
     CHANGE_EMAIL_RESEND: '/change-email-resend',
     CHANGE_BUSINESS_DETAILS:'/change-business-details'
+}
+export const ADDRESS_ROUTES={
+    CREATE_ADDRESS:'/create-address'
 }
