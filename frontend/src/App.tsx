@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom"
 import MainLayout from "./components/layout/MainLayout"
 import TenantLayout from "./components/layout/tenant/TenantLayout";
 import AdminLayout from "./components/layout/admin/AminLayout";
+import UsertLayout from "./components/layout/userLayout";
 import ToastProvider from "./components/common/ToastProvider";
 import PublicRoute from '../src/routes/PublicRoute'
 import ProtectedRoute from "./routes/ProtectedRoute";
@@ -20,6 +21,8 @@ import NewPasswordPage from "./pages/users/resetPassword";
 import ChangeEmailPage from "./pages/users/changeEmailPage";
 import ChangeEmailVerifyPage from "./pages/users/changeEmailVerify";
 import AuthSuccessPage from "./pages/users/AuthSuccessPage";
+import Dashboard from "./pages/users/Dashboard";
+import AddressPage from "./pages/users/AddressPage";
 
 import TenantRegisterPage from "./pages/tenant/RegiterPage";
 import TenantVerifyOtpPage from "./pages/tenant/VerifyotpPage";
@@ -72,6 +75,13 @@ function App() {
                   <Route path="/change-password" element={<ChangePasswordPage />} />
                   <Route path="/change-email" element={<ChangeEmailPage/>}/>
                   <Route path="/change-email-verify" element={<ChangeEmailVerifyPage/>}/>
+               </Route>
+            </Route>
+
+            <Route element={<UsertLayout/>}>
+               <Route element={<ProtectedRoute allowedRoles={['user']} />}>
+                  <Route path="/dashboard" element={<Dashboard />} />
+                  <Route path="/addresses" element={<AddressPage/>} />
                </Route>
             </Route>
 

@@ -2,7 +2,8 @@
 
 export const API_BASE_URL = import.meta.env.VITE_API_URL
 export const BASE_ROUTES = {
-    PROFILE_MANAGEMENT: '/profile'
+    PROFILE_MANAGEMENT: '/profile',
+    ADDRESS:'/address'
 }
 export const AUTH_ROUTES = {
     REGISTER: "/auth/register",
@@ -38,4 +39,8 @@ export const PROFILE_ROUTES = {
     CHANGE_EMAIL_VERIFY: '/change-email-verify',
     CHANGE_EMAIL_RESEND: '/change-email-resend',
     CHANGE_BUSINESS_DETAILS:'/change-business-details'
+}
+
+export const ADDRESS_ROUTES={
+    ADD_ADDRESS:'/create-address'
 }
