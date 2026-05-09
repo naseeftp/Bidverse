@@ -14,9 +14,9 @@ export class AddressMapper{
         pincode:doc.pincode,
         landMark:doc.landMark,
         city:doc.city,
-        state:doc.city,
+        state:doc.state,
         country:doc.country,
-        isDefault:doc.isActive,
+        isDefault:doc.isDefault,
         isActive:doc.isActive,
         createdAt:doc.createdAt,
         updatedAt:doc.updatedAt

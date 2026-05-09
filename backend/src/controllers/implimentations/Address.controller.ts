@@ -20,4 +20,15 @@ export class AddressController implements IAddressController {
             next(error)
         }
     }
+    async listAllUserAddress(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const userId=req.user.id;
+            const page=Number(req.query.page)||1;
+            const limit=Number( req.query.limit)||10
+            const result=await this._addressService.listAllUserAddress(userId,page,limit)
+            SuccessResponse(res,MESSAGES.LIST_RETRIEVED,result,HttpStatus.OK)
+        } catch (error) {
+            next(error)
+        }
+    }
 }

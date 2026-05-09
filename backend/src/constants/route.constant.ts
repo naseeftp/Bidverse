@@ -46,5 +46,6 @@ export const PROFILE_ROUTES = {
     CHANGE_BUSINESS_DETAILS:'/change-business-details'
 }
 export const ADDRESS_ROUTES={
-    CREATE_ADDRESS:'/create-address'
+    CREATE_ADDRESS:'/create-address',
+    GET_USER_ADDRESS:'/addresses'
 }

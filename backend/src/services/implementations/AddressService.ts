@@ -6,6 +6,7 @@ import { AppError } from "../../errors/AppError";
 import { Types } from 'mongoose'
 import { AddressMapper } from "../../mappers/address.mapper";
 import { AddressLabel } from "../../constants/constants";
+import { IGenericPaginatedResposnse } from "../../types/response.type";
 export class AddressService implements IAddressService {
   constructor(
     private _addressRepo: IAddressRepository,
@@ -18,8 +19,12 @@ export class AddressService implements IAddressService {
       userId: userId,
       count: existingCount
     })
-    if (existingCount > 5) {
+    if (existingCount >=5) {
       throw new AppError("Maximum address limit (5) reached.")
+    }
+    const isDuplicate=await this._addressRepo.findDuplicate(userId,data.fullAddress,data.city,data.pincode)
+    if(isDuplicate){
+      throw new AppError('This address allrdy saved')
     }
     const shouldBeDefault = existingCount === 0 ? true : data.isDefault
     if (shouldBeDefault) {
@@ -34,6 +39,21 @@ export class AddressService implements IAddressService {
     })
     return AddressMapper.toAddressDto(newAddress)
   }
-
+  
+  async listAllUserAddress(userId: string, page: number, limit: number): Promise<IGenericPaginatedResposnse<AddressResponseDTO>> {
+    const {docs,total}=await this._addressRepo.findAllUserAddress(userId,page,limit)
+    const mappedAddress=docs.map((address)=>AddressMapper.toAddressDto(address));
+    return{
+      data:mappedAddress,
+      pagination:{
+        totalItems:total,
+        itemsPerPage:limit,
+        currentPage:page,
+        totalPages:Math.ceil(total/limit),
+        hasNextPage:page*limit<total,
+        hasPrevPage: page > 1
+      }
+    }
+  }
 
 }

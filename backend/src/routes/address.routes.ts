@@ -17,6 +17,10 @@ router.post(
     validator(AddressValidator.createAddressValidator),
     (req,res,next)=>addressController.createAddress(req,res,next)
 )
-
+router.get(
+    ADDRESS_ROUTES.GET_USER_ADDRESS,
+    allowedTo(Role.USER),
+    (req,res,next)=>addressController.listAllUserAddress(req,res,next)
+)
 
 export default router
