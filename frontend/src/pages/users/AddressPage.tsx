@@ -6,12 +6,14 @@ import { X } from "lucide-react";
 import { addressFormSchema } from "../../types/address.dto";
 import type { addAddressDTO, AddressResponseDTO } from "../../types/address.dto";
 import toast from "react-hot-toast";
-import type { IPaginationMeta } from "../../types/auth.type";
+// import type { IPaginationMeta } from "../../types/auth.type";
 
 const AddressPage: React.FC = () => {
     const [isModalOpen, setIsModalOpen] = useState(false)
     const [addresses, setAddress] = useState<AddressResponseDTO[]>([])
-    const [pagination, setPageination] = useState<IPaginationMeta | null>(null)
+    // const [pagination, setPageination] = useState<IPaginationMeta | null>(null)
+    const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
+    const [addressToDelete, setAddressToDelete] = useState<string | null>(null)
     const { register, handleSubmit, formState: { errors }, reset } = useForm({
         resolver: yupResolver(addressFormSchema),
         defaultValues: {
@@ -23,10 +25,10 @@ const AddressPage: React.FC = () => {
             const response = await addressService.getUserAddressed(1, 5)
             if (response.success) {
                 setAddress(response.data ?? [])
-                setPageination(response.pagination ?? null)
+                // setPageination(response.pagination ?? null)
             }
             else {
-               toast.error(response.message) 
+                toast.error(response.message)
             }
         } catch {
             toast.error('Failed to get addresses')
@@ -51,6 +53,30 @@ const AddressPage: React.FC = () => {
             toast.error('Failed to add Address')
         }
     }
+    const openDeleteModal = async (addressId: string) => {
+        setAddressToDelete(addressId)
+        setDeleteModalOpen(true)
+    }
+
+    const confirmDealete = async () => {
+        if (!addressToDelete) return
+        try {
+            const data = { isActive: false };
+            const result = await addressService.deleteAddress(addressToDelete, data);
+            if (result.success) {
+                toast.success(result.message)
+                setDeleteModalOpen(false);
+                setAddressToDelete(null)
+                await getAddress()
+            }
+            else {
+                toast.error(result.message)
+            }
+        } catch {
+            toast.error('Failed to delete Address')
+        }
+    }
+
     return (
         <div className="p-6 bg-[#FFF9F4] min-h-screen">
 
@@ -100,7 +126,7 @@ const AddressPage: React.FC = () => {
                                             Edit Address
                                         </button>
                                         <button
-                                            onClick={() => { }}
+                                            onClick={() => openDeleteModal(address.id)}
                                             className="text-sm font-bold text-red-600 hover:opacity-80 transition-opacity"
                                         >
                                             Delete
@@ -236,6 +262,34 @@ const AddressPage: React.FC = () => {
                                 </button>
                             </div>
                         </form>
+                    </div>
+                </div>
+            )}
+            {isDeleteModalOpen && (
+                <div className="fixed inset-0 z-[110] flex items-center justify-center bg-black/40 backdrop-blur-sm animate-in fade-in duration-200">
+                    <div className="bg-white w-full max-w-md rounded-2xl shadow-2xl p-8 border border-[#E6E0DA] text-center">
+                        <div className="w-16 h-16 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <button onClick={() => setDeleteModalOpen(false)} className="text-[#6B6B6B] hover:text-[#1F1F1F]">
+                                <X size={24} />
+                            </button>
+                        </div>
+                        <h2 className="text-xl font-bold text-[#1F1F1F] mb-2">Delete Address?</h2>
+                        <p className="text-[#6B6B6B] mb-8">
+                            Are you sure you want to remove this address? This action cannot be undone.
+                        </p>
+                        <div className="flex gap-4">
+                            <button onClick={() => setDeleteModalOpen(false)}
+                                className="flex-1 px-6 py-3 rounded-lg font-bold text-[#6B6B6B] border border-[#E6E0DA] hover:bg-gray-50 transition-colors"
+                            >
+                                Cancel
+                            </button>
+                            <button onClick={confirmDealete}
+                                className="flex-1 px-6 py-3 rounded-lg font-bold text-white bg-red-600 shadow-md hover:bg-red-700 transition-colors"
+                            >
+                                Yes,Delete
+                            </button>
+
+                        </div>
                     </div>
                 </div>
             )}

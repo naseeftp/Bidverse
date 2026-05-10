@@ -4,6 +4,8 @@ import { ILoggerService } from "../../services/interface/ILogger.service";
 import { IAddressController } from "../interfaces/IAddress.controller";
 import { SuccessResponse } from "../../utils/response.utility";
 import { HttpStatus, MESSAGES } from "../../constants/constants";
+import { ParamsDictionary } from "express-serve-static-core";
+import { deleteAddressDTO } from "../../dtos/user.dto/address.dto";
 
 export class AddressController implements IAddressController {
     constructor(
@@ -31,4 +33,15 @@ export class AddressController implements IAddressController {
             next(error)
         }
     }
+async deleteAddress(req: Request<ParamsDictionary, unknown, deleteAddressDTO>, res: Response, next: NextFunction): Promise<void> {
+    try {
+        const userId=req.user.id;
+        const addressId=req.params.id as string;
+        const result=await this._addressService.deleteAddress(userId,addressId,req.body)
+        SuccessResponse(res,MESSAGES.ADDRESS_DELETED,result,HttpStatus.OK)
+    } catch (error) {
+        next(error)
+    }
+}
+
 }

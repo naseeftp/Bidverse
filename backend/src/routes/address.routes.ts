@@ -22,5 +22,11 @@ router.get(
     allowedTo(Role.USER),
     (req,res,next)=>addressController.listAllUserAddress(req,res,next)
 )
+router.patch(
+    ADDRESS_ROUTES.DELETE_ADDRESS,
+    allowedTo(Role.USER),
+    (req,res,next)=>addressController.deleteAddress(req,res,next)
+   
+)
 
 export default router

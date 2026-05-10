@@ -33,5 +33,8 @@ export interface AddressResponseDTO {
   createdAt: string | Date;
   updatedAt: string | Date;
 }
+export interface deleteAddressDTO{
+    isActive:boolean
+}
 
 export type addAddressDTO = yup.InferType<typeof addressFormSchema>
