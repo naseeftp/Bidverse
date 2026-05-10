@@ -26,7 +26,11 @@ router.patch(
     ADDRESS_ROUTES.DELETE_ADDRESS,
     allowedTo(Role.USER),
     (req,res,next)=>addressController.deleteAddress(req,res,next)
-   
 )
-
+router.patch(
+    ADDRESS_ROUTES.EDIT_ADDRESS,
+    validator(AddressValidator.createAddressValidator),
+    allowedTo(Role.USER),
+    (req,res,next)=>addressController.editAddress(req,res,next)
+)
 export default router

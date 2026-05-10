@@ -44,5 +44,6 @@ export const PROFILE_ROUTES = {
 export const ADDRESS_ROUTES={
     ADD_ADDRESS:'/create-address',
     GET_USER_ADDRESS:'/addresses',
-    DELETE_ADDRESS:'/delete'
+    DELETE_ADDRESS:'/delete',
+    EDIT_ADDRESS:'/edit'
 }

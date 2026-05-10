@@ -5,7 +5,7 @@ import { IAddressController } from "../interfaces/IAddress.controller";
 import { SuccessResponse } from "../../utils/response.utility";
 import { HttpStatus, MESSAGES } from "../../constants/constants";
 import { ParamsDictionary } from "express-serve-static-core";
-import { deleteAddressDTO } from "../../dtos/user.dto/address.dto";
+import { CreateAddressDTO, deleteAddressDTO } from "../../dtos/user.dto/address.dto";
 
 export class AddressController implements IAddressController {
     constructor(
@@ -39,6 +39,17 @@ async deleteAddress(req: Request<ParamsDictionary, unknown, deleteAddressDTO>, r
         const addressId=req.params.id as string;
         const result=await this._addressService.deleteAddress(userId,addressId,req.body)
         SuccessResponse(res,MESSAGES.ADDRESS_DELETED,result,HttpStatus.OK)
+    } catch (error) {
+        next(error)
+    }
+}
+async editAddress(req: Request<ParamsDictionary, unknown, CreateAddressDTO>, res: Response, next: NextFunction): Promise<void> {
+    try {
+        const userId=req.user.id;
+        const addressId=req.params.id as string;
+        const data=req.body;
+        const result=await this._addressService.editAddress(userId,addressId,data);
+        SuccessResponse(res,MESSAGES.ADDRESS_EDITED,result,HttpStatus.OK)
     } catch (error) {
         next(error)
     }

@@ -14,6 +14,8 @@ const AddressPage: React.FC = () => {
     // const [pagination, setPageination] = useState<IPaginationMeta | null>(null)
     const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
     const [addressToDelete, setAddressToDelete] = useState<string | null>(null)
+    const [isEditing, setIsEditing] = useState(false)
+    const [currentAddressId, setCurrentAddressId] = useState<string | null>(null)
     const { register, handleSubmit, formState: { errors }, reset } = useForm({
         resolver: yupResolver(addressFormSchema),
         defaultValues: {
@@ -38,20 +40,51 @@ const AddressPage: React.FC = () => {
         getAddress()
     }, [])
 
-    const AddAddress = async (data: addAddressDTO) => {
+    const openEditModal = async (data: AddressResponseDTO) => {
+        setIsEditing(true);
+        setCurrentAddressId(data.id);
+        reset({
+            recipientName: data.recipientName,
+            phone: data.phone,
+            altPhone: data.altPhone,
+            fullAddress: data.fullAddress,
+            landMark: data.landMark,
+            pincode: data.pincode,
+            city: data.city,
+            state: data.state,
+            country: data.country,
+            label: data.label,
+            isDefault: data.isDefault
+        })
+        setIsModalOpen(true)
+
+    }
+    const onSubmit = async (data: addAddressDTO) => {
         try {
-            const result = await addressService.addAddress(data)
+            let result;
+            if (isEditing && currentAddressId) {
+                result = await addressService.editAddress(currentAddressId, data)
+            }
+            else {
+                result = await addressService.addAddress(data)
+            }
+
             if (result.success) {
                 toast.success(result.message)
-                setIsModalOpen(false)
-                reset()
+                closeModal()
                 await getAddress()
             } else {
                 toast.error(result.message)
             }
         } catch {
-            toast.error('Failed to add Address')
+            toast.error(isEditing?'Failed to update Address':'Failed to add Address');
         }
+    }
+    const closeModal=async()=>{
+        setIsModalOpen(false);
+        setIsEditing(false);
+        setCurrentAddressId(null);
+        reset({isDefault:false})
     }
     const openDeleteModal = async (addressId: string) => {
         setAddressToDelete(addressId)
@@ -83,7 +116,7 @@ const AddressPage: React.FC = () => {
             <div className="flex justify-between items-center mb-8">
                 <h1 className="text-2xl font-bold text-[#1F1F1F]">Your Addresses</h1>
                 <button
-                    onClick={() => setIsModalOpen(true)}
+                    onClick={() => {setIsEditing(false);setIsModalOpen(true);reset({isDefault:false})}}
                     className="bg-[#C9653B] text-white px-6 py-2.5 rounded-lg font-bold hover:opacity-90 transition-all shadow-sm"
                 >
                     Add Address +
@@ -120,7 +153,7 @@ const AddressPage: React.FC = () => {
                                     </p>
                                     <div className="mt-6 pt-4 border-t border-[#E6E0DA] flex items-center justify-between">
                                         <button
-                                            onClick={() => { }}
+                                            onClick={()=>openEditModal(address)}
                                             className="text-sm font-bold text-[#C9653B] hover:opacity-80 transition-opacity"
                                         >
                                             Edit Address
@@ -152,13 +185,15 @@ const AddressPage: React.FC = () => {
                     <div className="bg-white w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden border border-[#E6E0DA]">
 
                         <div className="p-6 border-b border-[#E6E0DA] flex justify-between items-center">
-                            <h2 className="text-xl font-bold text-[#1F1F1F]">Add New Shipping Address</h2>
+                            <h2 className="text-xl font-bold text-[#1F1F1F]">
+                                {isEditing?'Edit Your Address':' Add New Shipping Address'}
+                                </h2>
                             <button onClick={() => setIsModalOpen(false)} className="text-[#6B6B6B] hover:text-[#1F1F1F]">
                                 <X size={24} />
                             </button>
                         </div>
 
-                        <form onSubmit={handleSubmit(AddAddress)} className="p-8 max-h-[80vh] overflow-y-auto">
+                        <form onSubmit={handleSubmit(onSubmit)} className="p-8 max-h-[80vh] overflow-y-auto">
                             <div className="grid grid-cols-2 gap-6">
 
                                 <div className="col-span-2">
@@ -258,7 +293,7 @@ const AddressPage: React.FC = () => {
                                     type="submit"
                                     className="flex-1 px-6 py-3 rounded-lg font-bold text-white bg-[#C9653B] shadow-md hover:opacity-95"
                                 >
-                                    Save Address
+                                   {isEditing?'Update Address':' Save Address'}
                                 </button>
                             </div>
                         </form>

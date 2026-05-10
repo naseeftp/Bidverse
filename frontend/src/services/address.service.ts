@@ -49,6 +49,19 @@ class AddressService {
 
        } 
     }
+    async editAddress(addressId:string,data:addAddressDTO){
+        try {
+            const url=`${BASE_ROUTES.ADDRESS}${ADDRESS_ROUTES.EDIT_ADDRESS}/${addressId}`
+            const response=await axiosInstance.patch<AddressResponseDTO,ApiResponse<AddressResponseDTO>>(url,data);
+            return{
+                success:true,
+                message:response.message,
+                data:response.data
+            }
+        } catch (error) {
+          return apiErrorHandler(error, 'Failed to Edit Address')
+        }
+    }
 }
 
 export default new AddressService()

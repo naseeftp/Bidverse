@@ -124,6 +124,7 @@ export const MESSAGES = {
     USER_DETAILS_UPDTD: 'Details updated successfully',
     USER_DETAILS_UPDTD_FAILED: 'Details updation Failed',
     EMAIL_UPDATED:'Email updated successfully',
+    ADDRES_NOT_FOUND:'Address Not found',
     ADDRESS_DELETED:'Address Delated Successfully',
     ADDRESS_EDITED:'Address Edited Successfully',
     ADDRESS_CREATED:'Address Created Successfully',
