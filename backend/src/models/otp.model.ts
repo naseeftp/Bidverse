@@ -33,5 +33,6 @@ const otpSchema = new Schema<IOTP>({
     }
 )
 otpSchema.index({ email: 1, otp: 1 })
+otpSchema.index({expiresAt:1},{expireAfterSeconds:0})
 const otpModel: Model<IOTP> = model<IOTP>('Otp', otpSchema)
 export default otpModel
