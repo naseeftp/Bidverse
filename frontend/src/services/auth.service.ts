@@ -15,6 +15,7 @@ import { apiErrorHandler } from '../utils/error.handle'
 interface AuthSuccessData {
     token: string;
     user: JwtPayload;
+    
 }
 
 interface RegisterSuccessData {

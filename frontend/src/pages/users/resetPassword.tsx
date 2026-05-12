@@ -78,7 +78,7 @@ const ResetPasswordPage: React.FC = () => {
           toast.success(result.message || "Security credentials updated. Please login.");
           navigate("/login");
         }
-
+        localStorage.removeItem('verifyotpdata')
 
       } else {
         toast.error(result.message || "Failed to reset password.");
@@ -100,7 +100,7 @@ const ResetPasswordPage: React.FC = () => {
       toast.error(errorMessage);
     } finally {
       setIsSubmitting(false);
-      localStorage.removeItem('verifyotpdata')
+      
     }
   };
 

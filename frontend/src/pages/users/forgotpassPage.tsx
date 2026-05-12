@@ -7,13 +7,6 @@ import authService from "../../services/auth.service";
 import toast from "react-hot-toast";
 import { useAppSelector } from "../../hooks/redux.hooks";
 
-interface ForgotPassResponse {
-    success: boolean;
-    message: string;
-    expiresAt?: string;
-}
-
-
 interface ApiError {
     response?: {
         data?: {

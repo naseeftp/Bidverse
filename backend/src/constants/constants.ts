@@ -77,7 +77,7 @@ export const MESSAGES = {
     LOGIN_SUCCESS: "Login successful",
     OTP_SENT: "OTP sent to your email. Please verify to complete registration.",
     OTP_RESENT: "OTP resent to your email.",
-    REGISTRATION_COMPLETE: "Registration complete!",
+    REGISTRATION_COMPLETE: "Verification Complete!",
     PASSWORD_RESET_OTP: "OTP sent to your email for password reset.",
     CHANGE_EMAIL_OTP:"OTP sent to your email for change Email",
     OTP_VERIFIED: "OTP verified successfully",

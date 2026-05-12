@@ -47,30 +47,25 @@ const TenantRegisterPage: React.FC = () => {
         window.location.href = `${baseURL}/auth/google?role=tenant`;
     };
 
-    // 3. Typed onSubmit (No 'any')
+
     const onSubmit = async (data: RegisterDTO) => {
         setLoading(true);
         try {
             const result = await authService.register(data);
             
-            if (result && result.success) {
+            if (result && result.success&&result.data) {
                 toast.success(result.message || "Registration in progress! Verify your email");
-                
-                // 4. Safe access to expiresAt
-                const registrationResult = result as { expiresAt?: string };
-                
+                const {email,expiresAt}=result.data
+                localStorage.setItem('registrationData',
+                    JSON.stringify({email:email,expiresAt:expiresAt})
+                )
                 dispatch(setRegistrationData({ 
                     email: data.email, 
                     role: 'tenant', 
                     phone: data.phone 
                 }));
 
-                navigate('/tenant/verify-otp', { 
-                    state: { 
-                        email: data.email, 
-                        expiresAt: registrationResult.expiresAt 
-                    } 
-                });
+                navigate('/tenant/verify-otp');
             } else {
                 toast.error(result.message || "Registration failed");
             }

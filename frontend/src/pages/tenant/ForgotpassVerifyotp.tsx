@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import authService from "../../services/auth.service";
 import toast from "react-hot-toast";
 
@@ -10,82 +10,57 @@ interface AxiosErrorResponse {
     };
   };
 }
-interface AuthResponse {
+interface ForgotPassData {
+  expiresAt: string;
+  resetToken?: string;
+}
+
+interface ServiceResponse {
   success: boolean;
-  message?: string;
-  data?: {
-    resetToken: string;
-    email: string;
-    verified: boolean;
-    message?: string;
-    expiresAt?: string;
-  };
+  message: string;
+  data?: ForgotPassData;
 }
 
 const TenantForgotPassVerifyOtp: React.FC = () => {
   const navigate = useNavigate();
-  const location = useLocation();
-
-  const email = location.state?.email || "";
-  const role = location.state?.role || "tenant";
-  
-
-  const [expiresAt, setExpiresAt] = useState<number | null>(() => {
-    const saved = sessionStorage.getItem("tenant_recovery_expiry");
-    return saved ? parseInt(saved, 10) : null;
-  });
-
+  const [email, setEmail] = useState('');
+  const [expiresAt, setExpiresAt] = useState<number | null>(null);
+  const [role, setRole] = useState('')
   const [otp, setOtp] = useState<string[]>(new Array(6).fill(""));
   const [loading, setLoading] = useState(false);
   const [timeLeft, setTimeLeft] = useState<number>(0);
 
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
-  
-  useEffect(() => {
-    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
-      if (timeLeft > 0) {
-        e.preventDefault();
-        e.returnValue = ""; 
-      }
-    };
-    window.addEventListener("beforeunload", handleBeforeUnload);
-    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
-  }, [timeLeft]);
-
 
   useEffect(() => {
-    if (!email) {
-      toast.error("Session expired. Please restart recovery.");
+    const storedData = localStorage.getItem('forgotpassData')
+    if (!storedData) {
+      toast.error("Session expired. Please restart recovery");
       navigate("/tenant/forgot-pass");
       return;
     }
+    const parsedData = JSON.parse(storedData);
+    setRole(parsedData.role);
+    setExpiresAt(new Date(parsedData.expiresAt).getTime());
+    setEmail(parsedData.email);
 
-    const initialExpiry = location.state?.expiresAt;
-    if (initialExpiry && !expiresAt) {
-      const time = new Date(initialExpiry).getTime();
-      setExpiresAt(time);
-      sessionStorage.setItem("tenant_recovery_expiry", time.toString());
-    } else if (!expiresAt) {
-      const fallback = Date.now() + 120000;
-      setExpiresAt(fallback);
-      sessionStorage.setItem("tenant_recovery_expiry", fallback.toString());
-    }
-  }, [email, navigate, location.state, expiresAt]);
+  }, [email, navigate]);
 
- 
+
   useEffect(() => {
     if (!expiresAt) return;
     const calculateTime = () => {
       const now = Date.now();
       const difference = Math.max(0, Math.floor((expiresAt - now) / 1000));
       setTimeLeft(difference);
-      if (difference <= 0) sessionStorage.removeItem("tenant_recovery_expiry");
       return difference;
     };
     calculateTime();
-    const interval = setInterval(calculateTime, 1000);
-    return () => clearInterval(interval);
+    const interval = setInterval(() => {
+      if (calculateTime() <= 0) clearInterval(interval);
+    }, 1000);
+    return () => clearInterval(interval)
   }, [expiresAt]);
 
   const handleChange = (value: string, index: number) => {
@@ -106,18 +81,26 @@ const TenantForgotPassVerifyOtp: React.FC = () => {
     if (timeLeft > 0) return;
     setLoading(true);
     try {
-      // Cast as AuthResponse to handle nested data correctly
-      const result = await authService.forgotpass({ email, role: 'tenant' }) as AuthResponse;
-      if (result && result.success) {
-        // Look inside .data for the new expiry if provided by backend
-        const newExpiry = result.data?.expiresAt 
-          ? new Date(result.data.expiresAt).getTime() 
-          : Date.now() + 120000;
-          
+
+      const result = await authService.forgotpass({ email, role: 'tenant' }) ;
+      if (result && result.success&&result.data) {
+        const newExpiry=new Date(result.data.expiresAt).getTime()
         setExpiresAt(newExpiry);
-        sessionStorage.setItem("tenant_recovery_expiry", newExpiry.toString());
+        localStorage.setItem('forgotpassData',
+          JSON.stringify(
+            {
+              email:result.data.email,
+              expiresAt:result.data.expiresAt,
+              role:'tenant',
+              isForgotPassword: true
+            }
+          )
+        )
         setOtp(new Array(6).fill(""));
-        toast.success("New business recovery code sent.");
+        toast.success(result.message);
+      }
+      else{
+        toast.error(result.message)
       }
     } catch {
       toast.error("Failed to resend code.");
@@ -136,20 +119,17 @@ const TenantForgotPassVerifyOtp: React.FC = () => {
         otp: otp.join(""),
         role: role as string,
         purpose: 'forgot_password'
-      }) as AuthResponse;
-      if (result && result.success && result.data?.resetToken) {
-        sessionStorage.removeItem("tenant_recovery_expiry");
-        toast.success("Identity verified. Update your password.");
-        
-        navigate("/tenant/reset-password", {
-          state: { 
-            email, 
-            role, 
-            resetToken: result.data.resetToken 
-          }
-        });
+      }) as ServiceResponse;
+
+      if (result && result.success&&result.data) {
+        localStorage.removeItem('forgotpassData')
+        toast.success(result.message);
+          localStorage.setItem('verifyotpdata',
+          JSON.stringify({email:email,role:role,resetToken:result.data.resetToken})
+        )
+        navigate("/tenant/reset-password")
       } else {
-        toast.error(result.message || "Verification failed. Check your code.");
+        toast.error(result.message);
       }
     } catch (error: unknown) {
       const err = error as AxiosErrorResponse;

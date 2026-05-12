@@ -33,26 +33,37 @@ const resetSchema = yup.object({
 
 const TenantResetPasswordPage: React.FC = () => {
   const navigate = useNavigate();
-  const location = useLocation();
+  
   const { isAuthenticated } = useAppSelector((state) => state.auth)
 
-  const email = location.state?.email || "";
-  const resetToken = location.state?.resetToken || "";
+  // const email = location.state?.email || "";
+  // const resetToken = location.state?.resetToken || "";
+  
 
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [email,setEmail]=useState('');
+  const [resetToken,setResetToken]=useState('')
 
   useEffect(() => {
-    if (!resetToken || !email) {
+    const storedData=localStorage.getItem('verifyotpdata')
+    
+    if (!storedData) {
       toast.error("Unauthorized. Please verify your business email first.");
       navigate("/tenant/forgot-pass");
     }
+     const parsedData=JSON.parse(storedData??'')
+     setEmail(parsedData.email);
+     setResetToken(parsedData.resetToken)
+     setValue("email", parsedData.email);
+     setValue("resetToken", parsedData.resetToken);
   }, [resetToken, email, navigate]);
 
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors },
   } = useForm<ResetPasswordDTO>({
     resolver: yupResolver(resetSchema),
@@ -75,7 +86,7 @@ const TenantResetPasswordPage: React.FC = () => {
           toast.success("Auction House credentials updated. Please login.");
           navigate("/tenant/login");
         }
-
+        localStorage.removeItem('verifyotpdata')
       }
 
     } catch (err: unknown) {
@@ -83,6 +94,7 @@ const TenantResetPasswordPage: React.FC = () => {
       toast.error(error.response?.data?.message || "Failed to update password.");
     } finally {
       setIsSubmitting(false);
+      
     }
   };
 

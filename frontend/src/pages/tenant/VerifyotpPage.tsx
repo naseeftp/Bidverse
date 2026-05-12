@@ -1,21 +1,17 @@
 import React, { useState, useRef, useEffect } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../hooks/redux.hooks";
 import { setAuthSuccess } from "../../redux/user/auth.slice";
 import authService from "../../services/auth.service";
 import toast from "react-hot-toast";
 import type { ApiResponse, JwtPayload } from '../../types/auth.type';
 
-// Local interfaces for strict typing
-// We omit 'exp' because the frontend state doesn't need the token expiry timestamp in the user object
+
 interface RegistrationResult {
   token: string;
   user:JwtPayload 
 }
 
-interface ResendResult {
-  expiresAt: string;
-}
 
 interface AxiosError {
   response?: {
@@ -28,12 +24,11 @@ interface AxiosError {
 const TenantVerifyOtpPage: React.FC = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const location = useLocation();
+
 
   const tempAuthData = useAppSelector((state) => state.auth.tempAuthData);
-  const email = location.state?.email || tempAuthData?.email || "";
-  const initialExpiry = location.state?.expiresAt;
-  
+
+  const [email,setEmail]=useState('')
   const [otp, setOtp] = useState<string[]>(new Array(6).fill(""));
   const [loading, setLoading] = useState(false);
   const [expiresAt, setExpiresAt] = useState<number | null>(null);
@@ -41,24 +36,23 @@ const TenantVerifyOtpPage: React.FC = () => {
 
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
-  // Theme Constants
+
   const brandBlue = "#2F6FED";
   const deepNavy = "#0F172A";
   const slateGrey = "#475569";
   const bgLight = "#F5F7FB";
 
   useEffect(() => {
-    if (!email) {
+    const storedData=localStorage.getItem('registrationData')
+    if (!storedData) {
       navigate("/tenant/register");
       return;
     }
-
-    if (initialExpiry) {
-      setExpiresAt(new Date(initialExpiry).getTime());
-    } else if (!expiresAt) {
-      setExpiresAt(Date.now() + 60000);
-    }
-  }, [email, navigate, initialExpiry, expiresAt]);
+    const parseData=JSON.parse(storedData);
+    setEmail(parseData.email);
+    setExpiresAt(new Date(parseData.expiresAt).getTime())
+   
+  }, [email, navigate,expiresAt]);
 
   useEffect(() => {
     if (!expiresAt) return;
@@ -102,9 +96,16 @@ const TenantVerifyOtpPage: React.FC = () => {
 
     try {
       const result=await authService.resendOtp({ email });
-      if (result?.success) {
-        setExpiresAt(result.data?.expiresAt ? new Date(result.data.expiresAt).getTime() : Date.now() + 60000);
-        toast.success("New code sent to your email");
+      if (result?.success&&result.data) {
+        const newExpiry=new Date(result.data.expiresAt).getTime()
+        setExpiresAt(newExpiry)
+        localStorage.setItem('registrationData',
+          JSON.stringify({
+            email,
+            expiresAt:newExpiry
+          })
+        )
+        toast.success(result.message);
       } else {
         toast.error(result.message || 'Failed to resend OTP');
       }
@@ -133,7 +134,8 @@ const TenantVerifyOtpPage: React.FC = () => {
       if (result?.success && result.data) {
         localStorage.setItem("accessToken", result.data.token);
         dispatch(setAuthSuccess(result.data.user));
-        toast.success("Account Verified Successfully");
+        toast.success(result.message);
+        localStorage.removeItem('registrationData')
         navigate("/tenant/dashboard");
       } else {
         toast.error(result.message || "Invalid verification code");

@@ -40,16 +40,17 @@ const TenantForgotPassPage: React.FC = () => {
             };
             const result = await authService.forgotpass(payload);
 
-            if (result && result.success) {
-                toast.success(result.message || "Recovery code sent successfully");
-                navigate("/tenant/forgot-verify-otp", {
-                    state: {
-                        email: data.email,
+            if (result && result.success && result.data) {
+                toast.success(result.message);
+                localStorage.setItem('forgotpassData',
+                    JSON.stringify({
+                        email: result.data.email,
                         role: 'tenant',
                         isForgotPassword: true,
-                        expiresAt: result.expiresAt
-                    }
-                });
+                        expiresAt: result.data.expiresAt
+                    })
+                )
+                navigate("/tenant/forgot-verify-otp");
             } else {
                 toast.error(result.message || 'Failed to send recovery code');
             }
