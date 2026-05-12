@@ -49,18 +49,17 @@ const ForgotPassPage: React.FC = () => {
             };
 
 
-            const result = (await authService.forgotpass(payload)) as ForgotPassResponse;
+            const result = await authService.forgotpass(payload);
 
-            if (result && result.success) {
+            if (result && result.success && result.data) {
                 toast.success(result.message);
-                navigate("/forgot-verify-otp", {
-                    state: {
-                        email: data.email,
-                        role: 'user',
-                        isForgotPassword: true,
-                        expiresAt: result.expiresAt
-                    }
-                });
+                localStorage.setItem('forgotpassData', JSON.stringify({
+                    email: result.data.email,
+                    expiresAt: result.data.expiresAt,
+                    role: "user",
+                    isForgotPassword: true,
+                }))
+                navigate("/forgot-verify-otp");
             } else {
                 toast.error(result.message || 'Failed to send recovery code');
             }

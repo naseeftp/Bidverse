@@ -101,7 +101,7 @@ const TenantVerifyOtpPage: React.FC = () => {
     setLoading(true);
 
     try {
-      const result: ApiResponse<ResendResult> = await authService.resendOtp({ email });
+      const result=await authService.resendOtp({ email });
       if (result?.success) {
         setExpiresAt(result.data?.expiresAt ? new Date(result.data.expiresAt).getTime() : Date.now() + 60000);
         toast.success("New code sent to your email");

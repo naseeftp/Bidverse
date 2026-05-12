@@ -19,6 +19,8 @@ interface AuthSuccessData {
 
 interface RegisterSuccessData {
     user: Omit<JwtPayload, 'exp'>;
+    email: string;
+    expiresAt: string;
 }
 
 interface ResendOtpData {

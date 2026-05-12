@@ -1,8 +1,8 @@
 import React, { useState, useRef, useEffect } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import authService from "../../services/auth.service";
 import toast from "react-hot-toast";
-import type { userRole } from "../../types/auth.type";
+// import type { userRole } from "../../types/auth.type";
 
 interface ForgotPassData {
   expiresAt: string;
@@ -25,32 +25,29 @@ interface ApiErrorResponse {
 
 const ForgotPassVerifyOtp: React.FC = () => {
   const navigate = useNavigate();
-  const location = useLocation();
 
-  const email = (location.state?.email as string) || "";
-  const role = (location.state?.role as userRole) || "user";
-  const initialExpiry = location.state?.expiresAt as string | undefined;
+  // const initialExpiry = location.state?.expiresAt as string | undefined;
 
+  const [email, setEmail] = useState('')
   const [otp, setOtp] = useState<string[]>(new Array(6).fill(""));
   const [loading, setLoading] = useState(false);
   const [expiresAt, setExpiresAt] = useState<number | null>(null);
   const [timeLeft, setTimeLeft] = useState<number>(0);
-
+  const [role, setRole] = useState('')
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
   useEffect(() => {
-    if (!email) {
+    const storedData = localStorage.getItem('forgotpassData')
+    if (!storedData) {
       toast.error("Session expired. Please start again.");
       navigate("/forgot-pass");
       return;
     }
-
-    if (initialExpiry) {
-      setExpiresAt(new Date(initialExpiry).getTime());
-    } else {
-      setExpiresAt(Date.now() + 120000);
-    }
-  }, [email, navigate, initialExpiry]);
+    const parsedData = JSON.parse(storedData)
+    setRole(parsedData.role);
+    setExpiresAt(new Date(parsedData.expiresAt).getTime());
+    setEmail(parsedData.email)
+  }, [email, navigate]);
 
   useEffect(() => {
     if (!expiresAt) return;
@@ -85,16 +82,31 @@ const ForgotPassVerifyOtp: React.FC = () => {
     if (timeLeft > 0) return;
     setLoading(true);
     try {
-      
-      const result = (await authService.forgotpass({
+
+      const result = await authService.forgotpass({
         email,
         role: "user",
-      })) as ServiceResponse;
+      });
 
       if (result.success && result.data) {
         const newExpiry = new Date(result.data.expiresAt).getTime();
         setExpiresAt(newExpiry);
-        toast.success("New recovery code sent.");
+        localStorage.setItem(
+          'forgotpassData',
+          JSON.stringify(
+            {
+              email: result.data.email,
+              expiresAt: result.data.expiresAt,
+              role: "user",
+              isForgotPassword: true
+
+            }
+          )
+        )
+        toast.success(result.message);
+      }
+      else {
+        toast.error(result.message)
       }
     } catch (err: unknown) {
       const error = err as ApiErrorResponse;
@@ -119,13 +131,11 @@ const ForgotPassVerifyOtp: React.FC = () => {
 
       if (result.success && result.data) {
         toast.success("Email verified. Set your new password.");
-        navigate("/reset-password", {
-          state: {
-            email,
-            role,
-            resetToken: result.data.resetToken,
-          },
-        });
+        localStorage.removeItem('forgotpassData')
+        localStorage.setItem('verifyotpdata',
+          JSON.stringify({email:email,role:role,resetToken:result.data.resetToken})
+        )
+        navigate("/reset-password");
       } else {
         toast.error(result.message || "Invalid recovery code");
       }

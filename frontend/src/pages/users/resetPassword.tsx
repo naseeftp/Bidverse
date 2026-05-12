@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
@@ -24,26 +24,37 @@ const resetSchema = yup.object({
 
 const ResetPasswordPage: React.FC = () => {
   const navigate = useNavigate();
-  const location = useLocation();
+  // const location = useLocation();
   const { isAuthenticated } = useAppSelector((state) => state.auth)
-  const email = location.state?.email || "";
-  const resetToken = location.state?.resetToken || "";
+  // const email = location.state?.email || "";
+  // const resetToken = location.state?.resetToken || "";
+  const [email, setEmail] = useState('')
+  const [resetToken, setResetToken] = useState('')
 
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
-    if (!resetToken || !email) {
+    const storedData = localStorage.getItem('verifyotpdata')
+
+
+    if (!storedData) {
       toast.error("Unauthorized access. Please verify your identity first.");
       navigate("/forgot-pass");
     }
+    const parsedData = JSON.parse(storedData ?? '')
+    setEmail(parsedData.email);
+    setResetToken(parsedData.resetToken)
+    setValue("email", parsedData.email);
+    setValue("resetToken", parsedData.resetToken);
   }, [resetToken, email, navigate]);
 
-  // Initialize form with ResetPasswordDTO
+
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors },
   } = useForm<ResetPasswordDTO>({
     resolver: yupResolver(resetSchema),
@@ -68,6 +79,7 @@ const ResetPasswordPage: React.FC = () => {
           navigate("/login");
         }
 
+
       } else {
         toast.error(result.message || "Failed to reset password.");
       }
@@ -88,6 +100,7 @@ const ResetPasswordPage: React.FC = () => {
       toast.error(errorMessage);
     } finally {
       setIsSubmitting(false);
+      localStorage.removeItem('verifyotpdata')
     }
   };
 

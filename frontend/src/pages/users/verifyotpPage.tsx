@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../hooks/redux.hooks";
 import { setAuthSuccess } from "../../redux/user/auth.slice";
 import authService from "../../services/auth.service";
@@ -9,7 +9,7 @@ import type { ApiResponse, JwtPayload, VerifyOtpDTO } from "../../types/auth.typ
 // Define the expected response for a successful registration verification
 interface RegistrationResponse {
   token: string;
-  user:JwtPayload;
+  user: JwtPayload;
 }
 
 interface AxiosError {
@@ -23,31 +23,28 @@ interface AxiosError {
 const VerifyOtpPage: React.FC = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const location = useLocation();
 
   const tempAuthData = useAppSelector((state) => state.auth.tempAuthData);
-  const email = location.state?.email || tempAuthData?.email || "";
-  const initialExpiry = location.state?.expiresAt;
-  
+
+
   const [otp, setOtp] = useState<string[]>(new Array(6).fill(""));
   const [loading, setLoading] = useState(false);
   const [expiresAt, setExpiresAt] = useState<number | null>(null);
+  const [email, setEmail] = useState('');;
   const [timeLeft, setTimeLeft] = useState<number>(0);
 
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
   useEffect(() => {
-    if (!email) {
+    const storedData = localStorage.getItem('registrationData')
+    if (!storedData) {
       navigate("/register");
       return;
     }
-
-    if (initialExpiry) {
-      setExpiresAt(new Date(initialExpiry).getTime());
-    } else if (!expiresAt) {
-      setExpiresAt(Date.now() + 60000);
-    }
-  }, [email, navigate, initialExpiry, expiresAt]);
+    const parsedData = JSON.parse(storedData)
+    setEmail(parsedData.email);
+    setExpiresAt(new Date(parsedData.expiresAt).getTime())
+  }, [navigate]);
 
   useEffect(() => {
     if (!expiresAt) return;
@@ -77,6 +74,26 @@ const VerifyOtpPage: React.FC = () => {
       inputRefs.current[index + 1]?.focus();
     }
   };
+  const handleResend = async () => {
+    if (timeLeft > 0) {
+      return
+    }
+    try {
+      const result = await authService.resendOtp({ email });
+      if (result.success && result.data) {
+        const newExpiry = new Date(result.data.expiresAt).getTime()
+        setExpiresAt(newExpiry);
+        localStorage.setItem('registrationData', JSON.stringify({ email, expiresAt: result.data.expiresAt }))
+        toast.success(result.message)
+        setOtp(new Array(6).fill(''))
+      }
+      else {
+        toast.error(result.message)
+      }
+    } catch {
+      toast.error('Error in resending otp')
+    }
+  }
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, index: number) => {
     if (e.key === "Backspace" && !otp[index] && index > 0) {
@@ -88,12 +105,12 @@ const VerifyOtpPage: React.FC = () => {
     e.preventDefault();
     setLoading(true);
 
-   
+
     const payload: VerifyOtpDTO = {
       email,
       otp: otp.join(""),
       role: tempAuthData?.role || 'user',
-      purpose: 'registration' 
+      purpose: 'registration'
     };
 
     try {
@@ -103,6 +120,7 @@ const VerifyOtpPage: React.FC = () => {
         localStorage.setItem("accessToken", result.data.token);
         dispatch(setAuthSuccess(result.data.user));
         toast.success(result.message);
+        localStorage.removeItem('registrationData')
         navigate("/home");
       } else {
         toast.error(result.message || "Invalid code");
@@ -160,11 +178,25 @@ const VerifyOtpPage: React.FC = () => {
           <p className="text-[10px] text-[#6B6B6B] uppercase tracking-[0.15em] mb-3">
             {timeLeft > 0 ? "Code is active" : "Code has expired"}
           </p>
-          {timeLeft > 0 && (
+          {timeLeft > 0 ? (
             <span className={`text-[10px] font-bold uppercase italic ${timeLeft < 15 ? 'text-[#D98880]' : 'text-[#B37E27]'}`}>
               Expires in {formatTime(timeLeft)}
             </span>
-          )}
+          ) : (
+            <div className="space-y-2">
+              <p className="text-[10px] text-[#6B6B6B] uppercase tracking-[0.15em]">Didn't receive the code?</p>
+              <button
+                onClick={handleResend}
+                type="button"
+                className="text-[11px] font-bold uppercase tracking-widest border-b-2 border-[#C9653B] text-[#1F1F1F] hover:bg-[#C9653B] hover:text-white hover:border-transparent px-2 py-1 transition-all"
+              >
+                Resend New Code
+              </button>
+            </div>
+
+          )
+
+          }
         </div>
       </div>
     </div>

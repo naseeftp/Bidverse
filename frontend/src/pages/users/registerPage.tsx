@@ -52,21 +52,21 @@ const RegisterPage: React.FC = () => {
         
         try {
             const result = await authService.register(data);
-            if (result && result.success) {
+            if (result && result.success&&result.data) {
                 toast.success(result.message || "Registration in progress! Verify your email");
-                const expiresAt = (result as { expiresAt?: string }).expiresAt;
+                const {email,expiresAt}=result.data
+                localStorage.setItem('registrationData',JSON.stringify({
+                  email:email,
+                  expiresAt:expiresAt
+
+                }))
                 dispatch(setRegistrationData({ 
                     email: data.email, 
                     role: 'user', 
                     phone: data.phone 
                 }));
 
-                navigate('/verify-otp', { 
-                    state: { 
-                        email: data.email, 
-                        expiresAt: expiresAt 
-                    } 
-                });
+                navigate('/verify-otp');
             } else {
                 setServerError(result.message || "Registration failed");
                 toast.error(result.message || "Registration failed");
