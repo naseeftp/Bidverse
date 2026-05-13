@@ -45,21 +45,6 @@ const TenantResetPasswordPage: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [email,setEmail]=useState('');
   const [resetToken,setResetToken]=useState('')
-
-  useEffect(() => {
-    const storedData=localStorage.getItem('verifyotpdata')
-    
-    if (!storedData) {
-      toast.error("Unauthorized. Please verify your business email first.");
-      navigate("/tenant/forgot-pass");
-    }
-     const parsedData=JSON.parse(storedData??'')
-     setEmail(parsedData.email);
-     setResetToken(parsedData.resetToken)
-     setValue("email", parsedData.email);
-     setValue("resetToken", parsedData.resetToken);
-  }, [resetToken, email, navigate]);
-
   const {
     register,
     handleSubmit,
@@ -73,6 +58,21 @@ const TenantResetPasswordPage: React.FC = () => {
     },
   });
 
+    useEffect(() => {
+    const storedData=localStorage.getItem('verifyotpdata')
+    
+    if (!storedData) {
+      toast.error("Unauthorized. Please verify your business email first.");
+      navigate("/tenant/forgot-pass");
+      return
+    }
+     const parsedData=JSON.parse(storedData??'')
+     setEmail(parsedData.email);
+     setResetToken(parsedData.resetToken)
+     setValue("email", parsedData.email);
+     setValue("resetToken", parsedData.resetToken);
+     
+  }, [navigate,setValue]);
   const onSubmit = async (data: ResetPasswordDTO) => {
     setIsSubmitting(true);
     try {

@@ -38,7 +38,7 @@ const TenantChangePasswordPage: React.FC = () => {
             } else {
                 toast.error(result.message);
             }
-        } catch (err) {
+        } catch {
             toast.error('Failed to update password. Please try again.');
         } finally {
             setIsSubmitting(false);

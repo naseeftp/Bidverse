@@ -39,6 +39,7 @@ const AuctionHouseDetails: React.FC = () => {
 
    
     const handleStatusUpdate = async (status: TVerificationStatus) => {
+        if(!house?.houseId) return
         if (status === VerificationStatus.REJECTED) {
             if (!showRejectInput) {
                 setShowRejectInput(true);
@@ -57,7 +58,7 @@ const AuctionHouseDetails: React.FC = () => {
 
         setActionLoading(true);
         try {
-            const res = await adminService.updateHouseStatus(house?.houseId!, updateData);
+            const res = await adminService.updateHouseStatus(house?.houseId, updateData);
             if (res.success) {
                 setHouse((prev) => prev ? ({ ...prev, status }) : null);
                 setShowRejectInput(false);
@@ -99,7 +100,7 @@ const AuctionHouseDetails: React.FC = () => {
             } else {
                 toast.error(response.message || "Action failed");
             }
-        } catch (error) {
+        } catch {
             toast.error("An unexpected error occurred during status sync.");
         } finally {
             setIsStatusSubmitting(false);
@@ -227,7 +228,7 @@ const AuctionHouseDetails: React.FC = () => {
                                     <div className="md:col-span-2 space-y-6">
                                         <div>
                                             <label className="text-[9px] font-black text-[#D4AF37] uppercase tracking-widest block mb-2">Executive Summary</label>
-                                            <p className="text-sm leading-relaxed text-[#111827] font-medium italic border-l-2 border-[#E5E7EB] pl-4">"{house.briefDescription}"</p>
+                                            <p className="text-sm leading-relaxed text-[#111827] font-medium italic border-l-2 border-[#E5E7EB] pl-4">{house.briefDescription}</p>
                                         </div>
                                         <div className="grid grid-cols-2 gap-6 pt-4">
                                             <div>

@@ -300,13 +300,13 @@ const TenantProfilePage: React.FC = () => {
                             <div className="space-y-4 md:col-span-1">
                                 <div className="p-4 rounded-xl border border-[#E2E8F0] bg-white">
                                     <p className="text-[10px] font-bold text-[#94A3B8] uppercase mb-3">Registration Cert</p>
-                                    <a href={house?.documents?.registrationCertificateUrl} target="_blank" className="text-xs font-bold text-[#2F6FED] flex items-center gap-2 hover:underline">
+                                    <a href={house?.documents?.registrationCertificateUrl} target="_blank" rel="noreferrer" className="text-xs font-bold text-[#2F6FED] flex items-center gap-2 hover:underline">
                                         View Document <Globe size={14} />
                                     </a>
                                 </div>
                                 <div className="p-4 rounded-xl border border-[#E2E8F0] bg-white">
                                     <p className="text-[10px] font-bold text-[#94A3B8] uppercase mb-3">Identity Proof</p>
-                                    <a href={house?.documents?.identityProofUrl} target="_blank" className="text-xs font-bold text-[#2F6FED] flex items-center gap-2 hover:underline">
+                                    <a href={house?.documents?.identityProofUrl} target="_blank" rel="noreferrer" className="text-xs font-bold text-[#2F6FED] flex items-center gap-2 hover:underline">
                                         View Document <Globe size={14} />
                                     </a>
                                 </div>

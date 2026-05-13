@@ -40,7 +40,7 @@ const TenantChangeEmailPage: React.FC = () => {
             } else {
                 toast.error(result.message);
             }
-        } catch (error) {
+        } catch {
             toast.error('Failed to initiate email change. Please try again.');
         } finally {
             setIsSubmitting(false);

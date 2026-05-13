@@ -8,7 +8,7 @@ import { ADDRESS_ROUTES } from "../constants/route.constant";
 import { Role } from "../dtos/Common.dto";
 
 const router= Router()
-router.use(protect),
+router.use(protect)
 router.use(CheckUserBlocked)
 
 router.post(

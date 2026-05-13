@@ -184,7 +184,7 @@ const VerifyOtpPage: React.FC = () => {
             </span>
           ) : (
             <div className="space-y-2">
-              <p className="text-[10px] text-[#6B6B6B] uppercase tracking-[0.15em]">Didn't receive the code?</p>
+              <p className="text-[10px] text-[#6B6B6B] uppercase tracking-[0.15em]">Didn&apos;t receive the code?</p>
               <button
                 onClick={handleResend}
                 type="button"

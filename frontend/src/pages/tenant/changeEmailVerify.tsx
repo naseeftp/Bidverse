@@ -106,7 +106,7 @@ const TenantVerifyEmailPage: React.FC = () => {
             } else {
                 toast.error(result.message);
             }
-        } catch (error) {
+        } catch{
             toast.error("OTP verification failed");
         } finally {
             setLoading(false);

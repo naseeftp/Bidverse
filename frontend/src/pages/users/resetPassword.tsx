@@ -24,33 +24,16 @@ const resetSchema = yup.object({
 
 const ResetPasswordPage: React.FC = () => {
   const navigate = useNavigate();
-  // const location = useLocation();
+
   const { isAuthenticated } = useAppSelector((state) => state.auth)
-  // const email = location.state?.email || "";
-  // const resetToken = location.state?.resetToken || "";
+ 
   const [email, setEmail] = useState('')
   const [resetToken, setResetToken] = useState('')
 
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  useEffect(() => {
-    const storedData = localStorage.getItem('verifyotpdata')
-
-
-    if (!storedData) {
-      toast.error("Unauthorized access. Please verify your identity first.");
-      navigate("/forgot-pass");
-    }
-    const parsedData = JSON.parse(storedData ?? '')
-    setEmail(parsedData.email);
-    setResetToken(parsedData.resetToken)
-    setValue("email", parsedData.email);
-    setValue("resetToken", parsedData.resetToken);
-  }, [resetToken, email, navigate]);
-
-
+  
   const {
     register,
     handleSubmit,
@@ -63,6 +46,22 @@ const ResetPasswordPage: React.FC = () => {
       resetToken: resetToken,
     },
   });
+
+    useEffect(() => {
+    const storedData = localStorage.getItem('verifyotpdata')
+
+
+    if (!storedData) {
+      toast.error("Unauthorized access. Please verify your identity first.");
+      navigate("/forgot-pass");
+      return
+    }
+    const parsedData = JSON.parse(storedData ?? '')
+    setEmail(parsedData.email);
+    setResetToken(parsedData.resetToken)
+    setValue("email", parsedData.email);
+    setValue("resetToken", parsedData.resetToken);
+  }, [setValue, navigate]);
 
   const onSubmit = async (data: ResetPasswordDTO) => {
     setIsSubmitting(true);
