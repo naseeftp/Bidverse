@@ -1,4 +1,4 @@
-import { IAuctionHouseRepository} from "../interfaces/IAuctionHouse.repository";
+import { IAuctionHouseRepository } from "../interfaces/IAuctionHouse.repository";
 import { IAuctionHouseDocument } from "../../types/auctionhouse.type";
 import { BaseRepository } from "./Base.repository";
 import { AuctionHouse } from "../../models/auctionHouse.model";
@@ -40,8 +40,20 @@ export class AuctionHouseRepository extends BaseRepository<IAuctionHouseDocument
                     userId: { $toString: '$_id' },
                     userEmail: '$email',
                     userName: '$name',
-                    userPhone:'$phone',
-                    profileImage:'$profileImage',
+                    userPhone: '$phone',
+                    profileImage: '$profileImage',
+                    isGoogleSignup: {
+                        $cond: { // works like conditional operator/ternary operator
+                            if: {
+                                $and: [
+                                    {$ifNull:['$googleId',false]}, //if the field missing or null return false
+                                    {$ne:['$googleId',null]}  //make sure that google id null
+                                ]
+                            },
+                            then: true,
+                            else: false
+                        }
+                    },
                     isAccountBlocked: { $eq: ['$isActive', false] },
                     houseId: { $ifNull: [{ $toString: '$house._id' }, null] },
                     businessName: { $ifNull: ['$house.name', 'N/A'] },
@@ -119,8 +131,20 @@ export class AuctionHouseRepository extends BaseRepository<IAuctionHouseDocument
                     userId: { $toString: '$_id' },
                     userEmail: '$email',
                     userName: '$name',
-                    userPhone:'$phone',
-                    profileImage:'$profileImage',
+                    userPhone: '$phone',
+                    profileImage: '$profileImage',
+                    isGoogleSignup: {
+                        $cond: {
+                            if: {
+                                $and: [
+                                    {$ifNull:['$googleId',false]}, 
+                                    {$ne:['$googleId',null]}  
+                                ]
+                            },
+                            then: true,
+                            else: false
+                        }
+                    },
                     isAccountBlocked: { $eq: ['$isActive', false] },
                     houseId: { $ifNull: [{ $toString: '$house._id' }, null] },
                     businessName: { $ifNull: ['$house.name', 'NA'] },

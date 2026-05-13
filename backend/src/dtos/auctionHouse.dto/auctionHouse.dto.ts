@@ -139,8 +139,8 @@ export interface AdminAuctionHouseDetailDTO {
   userName: string;
   userPhone: string,
   profileImage: string;
+  isGoogleSignup: boolean;
   isAccountBlocked: boolean;
-
 
   houseId: string | null;
   businessName: string | null;

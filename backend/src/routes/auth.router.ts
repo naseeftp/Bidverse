@@ -3,7 +3,7 @@ import { authController } from "../di/container";
 import { AuthValidators } from "../validators/auth.validators";
 import { validator } from "../middlewares/validation.middleware";
 import { AUTH_ROUTES } from "../constants/route.constant";
-// import { CheckUserBlocked } from "../middlewares/check-user-blocked-middleware";
+import { CheckUserBlocked } from "../middlewares/check-user-blocked-middleware";
 
 const router = Router()
 router.post(
@@ -24,6 +24,7 @@ router.post(
 router.post(
     AUTH_ROUTES.LOGIN,
     validator(AuthValidators.validateLoginInput),
+    // CheckUserBlocked,
     (req, res, next) => authController.login(req, res, next)
 )
 router.get(

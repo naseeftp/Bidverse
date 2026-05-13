@@ -122,7 +122,10 @@ const TenantProfilePage: React.FC = () => {
                         <h1 className="text-3xl font-bold tracking-tight">Profile Mangement</h1>
                         <p className="text-[#475569] text-sm mt-1">Manage your personal account and business credentials.</p>
                     </div>
-                    <div className="flex flex-wrap gap-3">
+                   {house?.isGoogleSignup ?
+                   (<></>):
+                   (
+                     <div className="flex flex-wrap gap-3">
                         <Link to='/tenant/changePassword'>
                             <button className="px-4 py-2 bg-white border border-[#E2E8F0] rounded-lg text-sm font-semibold hover:bg-[#F1F5F9] transition-colors flex items-center gap-2">
                                 <Lock size={16} /> Password
@@ -134,6 +137,10 @@ const TenantProfilePage: React.FC = () => {
                             </button>
                         </Link>
                     </div>
+                   )
+                
+                   }
+                   
                 </div>
                 <div className="space-y-8">
                     <section className="bg-white rounded-2xl border border-[#E2E8F0] shadow-sm overflow-hidden">
@@ -183,7 +190,7 @@ const TenantProfilePage: React.FC = () => {
                                     <input
                                         disabled={!isEditingUser}
                                         className="w-full bg-[#F8FAFC] border border-[#E2E8F0] rounded-lg px-4 py-2 text-sm focus:border-[#2F6FED] outline-none disabled:opacity-60"
-                                        value={userData.phone}
+                                        value={userData.phone?userData.phone:'Not Available'}
                                         onChange={(e) => setUserData({ ...userData, phone: e.target.value })}
                                     />
                                 </div>
