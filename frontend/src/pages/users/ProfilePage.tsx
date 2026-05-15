@@ -27,7 +27,6 @@ const ProfilePage: React.FC = () => {
         const file = e.target.files?.[0];
         if (!file) return;
         setIsUploading(true);
-        toast.loading("Processing image upload...")
         try {
             const secureUrl = await uploadservice.uploadSecurely(file);
             const response = await profileService.updateProfileImage({ profileImage: secureUrl })
@@ -44,13 +43,11 @@ const ProfilePage: React.FC = () => {
         finally {
             setIsUploading(false)
             if (fileInputRef.current) fileInputRef.current.value = "";
-            toast.dismiss()
         }
     }
     const handleProfileImgDelete = async () => {
         setIsDeleteModalOpen(false)
         setIsUploading(true);
-        toast.loading("Removing Profile Picture...")
 
         try {
             const response = await profileService.updateProfileImage({ profileImage: null })
@@ -68,7 +65,7 @@ const ProfilePage: React.FC = () => {
         }
         finally {
             setIsUploading(false)
-            toast.dismiss()
+            
         }
     }
 
