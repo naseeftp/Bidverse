@@ -53,4 +53,9 @@ router.patch(
     validator(ProfileValidators.changeBusinessDetailsValidator),
     (req,res,next)=>profileController.changeBusinessDetails(req,res,next)
 )
+router.patch(
+    PROFILE_ROUTES.HANDLE_PROFILE_IMG,
+    allowedTo(Role.TENANT,Role.USER),
+    (req,res,next)=>profileController.updateProfileImage(req,res,next)
+)
 export default router

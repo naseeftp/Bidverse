@@ -86,6 +86,10 @@ export const changeBussinessDetailsSchema = yup.object({
       .max(255, 'Address is too long'),
  
 })
+export interface UpdateProfilePicDTO{
+  profileImage:string|null;
+}
+
 export type ProfileDetailChangeFormData = yup.InferType<typeof profileDetailChangeSchema>;
 export type changePasswordDTO = yup.InferType<typeof changePasswordSchema>
 export type changeEmailDTO = yup.InferType<typeof changeEmailSchema>

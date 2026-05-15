@@ -6,12 +6,13 @@ import type { UserResponseDTO } from "../types/auth.type";
 import type {
     ChangeEmaiLResponseDTO,
     ProfileDetailChangeFormData,
+    UpdateProfilePicDTO,
     changeBussinessDetailsDTO,
     changeEmailDTO,
     changeEmailVerificationDTO,
     changePasswordDTO
 } from '../types/profile.dto'
-import type {ResendOtpDTO} from '../types/auth.type'
+import type { ResendOtpDTO } from '../types/auth.type'
 import type { AuctionHouseResponseDTO } from "../types/auctionHouse.type";
 
 
@@ -69,44 +70,58 @@ class profileService {
             return apiErrorHandler(error, 'Failed to changeEmail')
         }
     }
-    async changeEmailVerification(data: changeEmailVerificationDTO){
+    async changeEmailVerification(data: changeEmailVerificationDTO) {
         try {
-            const url=`${BASE_ROUTES.PROFILE_MANAGEMENT}${PROFILE_ROUTES.CHANGE_EMAIL_VERIFY}`
-            const response=await axiosInstance.post<UserResponseDTO,ApiResponse<UserResponseDTO>>(url,data)
+            const url = `${BASE_ROUTES.PROFILE_MANAGEMENT}${PROFILE_ROUTES.CHANGE_EMAIL_VERIFY}`
+            const response = await axiosInstance.post<UserResponseDTO, ApiResponse<UserResponseDTO>>(url, data)
             return {
-                success:true,
-                message:response.message,
-                data:response.data
+                success: true,
+                message: response.message,
+                data: response.data
             }
         } catch (error) {
             return apiErrorHandler(error, 'Otp Verification failed')
         }
     }
-    async changeEmailResendOtp(data:ResendOtpDTO){
-      try {
-        const url=`${BASE_ROUTES.PROFILE_MANAGEMENT}${PROFILE_ROUTES.CHANGE_EMAIL_RESEND}`;
-        const response=await axiosInstance.post<ChangeEmaiLResponseDTO,ApiResponse<ChangeEmaiLResponseDTO>>(url,data);
-        return {
-            success:true,
-            message:response.message,
-            data:response.data
-        }
-      } catch (error) {
-         return apiErrorHandler(error, 'Resend otp failed')
-      }
-    }
-    async changeBusinessDetails(data:changeBussinessDetailsDTO){
+    async changeEmailResendOtp(data: ResendOtpDTO) {
         try {
-            const url=`${BASE_ROUTES.PROFILE_MANAGEMENT}${PROFILE_ROUTES.CHANGE_BUSINESS_DETAILS}`
-            const response=await axiosInstance.patch<AuctionHouseResponseDTO,ApiResponse<AuctionHouseResponseDTO>>(url,data)
+            const url = `${BASE_ROUTES.PROFILE_MANAGEMENT}${PROFILE_ROUTES.CHANGE_EMAIL_RESEND}`;
+            const response = await axiosInstance.post<ChangeEmaiLResponseDTO, ApiResponse<ChangeEmaiLResponseDTO>>(url, data);
             return {
-                success:true,
-                message:response.message,
-                data:response.data
+                success: true,
+                message: response.message,
+                data: response.data
+            }
+        } catch (error) {
+            return apiErrorHandler(error, 'Resend otp failed')
+        }
+    }
+    async changeBusinessDetails(data: changeBussinessDetailsDTO) {
+        try {
+            const url = `${BASE_ROUTES.PROFILE_MANAGEMENT}${PROFILE_ROUTES.CHANGE_BUSINESS_DETAILS}`
+            const response = await axiosInstance.patch<AuctionHouseResponseDTO, ApiResponse<AuctionHouseResponseDTO>>(url, data)
+            return {
+                success: true,
+                message: response.message,
+                data: response.data
             }
 
         } catch (error) {
-             return apiErrorHandler(error, 'Resend otp failed')
+            return apiErrorHandler(error, 'Change bussiness details failed')
+        }
+    }
+    async updateProfileImage(data: UpdateProfilePicDTO) {
+        try {
+            const url = `${BASE_ROUTES.PROFILE_MANAGEMENT}${PROFILE_ROUTES.HANDLE_PROFILE_IMG}`;
+            const response = await axiosInstance.patch<UserResponseDTO, ApiResponse<UserResponseDTO>>(url, data)
+            return {
+                success: true,
+                message: response.message,
+                data: response.data
+            }
+        } catch (error) {
+            return apiErrorHandler(error, 'Updating profile picture failed')
+
         }
     }
 }

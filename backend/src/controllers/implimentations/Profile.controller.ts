@@ -81,4 +81,14 @@ export class ProfileController implements IprofileController {
             next(error)
         }
     }
+    async updateProfileImage(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const userId=req.user.id;
+           const {profileImage} =req.body
+            const result=await this._profileService.updateProfileImage(userId,profileImage)
+            SuccessResponse(res,MESSAGES.PROFILE_PIC_UPADATED,result,HttpStatus.OK)
+        } catch (error) {
+            next(error)
+        }
+    }
 }

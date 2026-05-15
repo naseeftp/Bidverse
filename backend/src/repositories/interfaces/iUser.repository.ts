@@ -13,4 +13,5 @@ export interface IUserRepository extends IBaseRepository<IUserDocument> {
         filter?: QueryFilter<IUserDocument>,
         sort?: Record<string, SortOrder>
     ): Promise<{ docs: IUserDocument[]; total: number }>;
+    
 }

@@ -5,7 +5,10 @@ class UploadService {
     async uploadSecurely(file: File): Promise<string> {
         try {
             const response = await axiosInstance.get(AUCTION_HOUSE_ROUTES.GET_UPLOAD_SIGNATURE)
-            const { signature, timestamp, folder, cloudName, apiKey } = response.data
+            
+            const actualData = response.data.data || response.data
+            const { signature, timestamp, folder, cloudName, apiKey } = actualData
+            // const { signature, timestamp, folder, cloudName, apiKey } = response.data
             const formData = new FormData()
             formData.append("file", file);
             formData.append('api_key', apiKey);

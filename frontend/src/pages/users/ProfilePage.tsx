@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import profileService from '../../services/profileManagement.service';
+import uploadservice from "../../services/uploadservice";
 import type { UserResponseDTO } from "../../types/auth.type";
-import { Mail, Lock, User as UserIcon, Trash2, Camera, Check, Pencil } from "lucide-react";
+import { Mail, Lock, User as UserIcon, Trash2, Camera, Check, Pencil, AlertTriangle, X } from "lucide-react";
 import toast from "react-hot-toast";
 import { Link } from "react-router-dom";
 
@@ -9,7 +10,9 @@ const ProfilePage: React.FC = () => {
     const [user, setUser] = useState<UserResponseDTO | null>(null);
     const [isEditing, setIsEditing] = useState(false);
     const [formData, setFormData] = useState({ name: "", phone: "" });
-
+    const fileInputRef = useRef<HTMLInputElement>(null)
+    const [isUploading, setIsUploading] = useState(false);
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
     useEffect(() => {
         const fetchData = async () => {
             const response = await profileService.getProfile();
@@ -20,6 +23,54 @@ const ProfilePage: React.FC = () => {
         };
         fetchData();
     }, []);
+    const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        setIsUploading(true);
+        toast.loading("Processing image upload...")
+        try {
+            const secureUrl = await uploadservice.uploadSecurely(file);
+            const response = await profileService.updateProfileImage({ profileImage: secureUrl })
+            if (response.success && response.data) {
+                setUser(response.data);
+                toast.success(response.message)
+            } else {
+                toast.error(response.message)
+            }
+
+        } catch {
+            toast.error("An error occurred during upload.")
+        }
+        finally {
+            setIsUploading(false)
+            if (fileInputRef.current) fileInputRef.current.value = "";
+            toast.dismiss()
+        }
+    }
+    const handleProfileImgDelete = async () => {
+        setIsDeleteModalOpen(false)
+        setIsUploading(true);
+        toast.loading("Removing Profile Picture...")
+
+        try {
+            const response = await profileService.updateProfileImage({ profileImage: null })
+            if (response.success && response.data) {
+                setUser(response.data)
+                toast.success(response.message)
+            }
+            else {
+                toast.error(response.message)
+            }
+
+
+        } catch {
+            toast.error('Error while removing profile image')
+        }
+        finally {
+            setIsUploading(false)
+            toast.dismiss()
+        }
+    }
 
     const handleSave = async () => {
         const isChanged = user?.name !== formData.name || user.phone != formData.phone;
@@ -63,9 +114,9 @@ const ProfilePage: React.FC = () => {
                                 </button>
                             </Link>
                             <Link to='/change-email'>
-                             <button className="px-4 py-2 bg-[#C9653B] text-white rounded-lg text-sm font-semibold hover:opacity-90 transition-opacity flex items-center gap-2 shadow-sm">
-                                <Mail size={16} /> Change Email
-                            </button>
+                                <button className="px-4 py-2 bg-[#C9653B] text-white rounded-lg text-sm font-semibold hover:opacity-90 transition-opacity flex items-center gap-2 shadow-sm">
+                                    <Mail size={16} /> Change Email
+                                </button>
                             </Link>
                         </div>
                     }
@@ -73,7 +124,7 @@ const ProfilePage: React.FC = () => {
                 </div>
 
                 <div className="space-y-6">
-
+                    <input type="file" ref={fileInputRef} onChange={handleImageUpload} className="hidden" accept="image/png, image/jpeg, image/jpg" />
 
                     <section className="bg-white rounded-xl border border-[#E6E0DA] p-8 shadow-sm">
                         <div className="flex flex-col sm:flex-row items-center gap-8">
@@ -90,19 +141,23 @@ const ProfilePage: React.FC = () => {
                             <div className="flex flex-col gap-2">
                                 <h3 className="text-lg font-bold">Profile Picture</h3>
                                 <div className="flex flex-wrap gap-2">
-                                    {!user?.profileImage ? (
-                                        <button className="px-4 py-1.5 bg-[#C9653B] text-white text-xs font-bold rounded-md flex items-center gap-2">
-                                            <Camera size={14} /> Add Profile Pic
+                                    <button
+                                        type="button"
+                                        disabled={isUploading}
+                                        onClick={() => fileInputRef.current?.click()}
+                                        className="px-4 py-1.5 bg-[#C9653B] text-white text-xs font-bold rounded-md flex items-center gap-2 hover:opacity-90 transition-opacity disabled:opacity-50"
+                                    >
+                                        <Camera size={14} />
+                                        {user?.profileImage ? 'Change Photo' : 'Add Profile Pic'}
+                                    </button>
+                                    {user?.profileImage && !isUploading && (
+                                        <button
+                                            type="button"
+                                            onClick={() => setIsDeleteModalOpen(true)}
+                                            className="px-4 py-1.5 bg-red-50 text-red-600 text-xs font-bold rounded-md hover:bg-red-100 transition-colors flex items-center gap-1.5"
+                                        >
+                                            <Trash2 size={14} /> Delete
                                         </button>
-                                    ) : (
-                                        <>
-                                            <button className="px-4 py-1.5 bg-[#FFF9F4] border border-[#E6E0DA] text-[#1F1F1F] text-xs font-bold rounded-md hover:bg-[#E6E0DA] transition-colors">
-                                                Change Photo
-                                            </button>
-                                            <button className="px-4 py-1.5 bg-red-50 text-red-600 text-xs font-bold rounded-md hover:bg-red-100 transition-colors flex items-center gap-1.5">
-                                                <Trash2 size={14} /> Delete
-                                            </button>
-                                        </>
                                     )}
                                 </div>
                             </div>
@@ -161,6 +216,50 @@ const ProfilePage: React.FC = () => {
                             </div>
                         </div>
                     </section>
+
+                    {isDeleteModalOpen && (
+                        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-fade-in">
+                            <div className="bg-white w-full max-w-md rounded-xl border border-[#E6E0DA] p-6 shadow-xl space-y-4 animate-scale-up">
+
+                                <div className="flex justify-between items-start">
+                                    <div className="p-2 bg-red-50 rounded-lg text-red-600">
+                                        <AlertTriangle size={24} />
+                                    </div>
+                                    <button
+                                        onClick={() => setIsDeleteModalOpen(false)}
+                                        className="text-[#6B6B6B] hover:text-[#1F1F1F] transition-colors p-1 rounded-md hover:bg-[#FFF9F4]"
+                                    >
+                                        <X size={18} />
+                                    </button>
+                                </div>
+
+                                <div className="space-y-1">
+                                    <h3 className="text-lg font-bold text-[#1F1F1F]">Remove Profile Picture?</h3>
+                                    <p className="text-[#6B6B6B] text-sm leading-relaxed">
+                                        This will permanently delete your profile photo. You can upload a new photo at any time.
+                                    </p>
+                                </div>
+
+                                <div className="flex gap-3 pt-2 justify-end">
+                                    <button
+                                        type="button"
+                                        onClick={() => setIsDeleteModalOpen(false)}
+                                        className="px-4 py-2 bg-white border border-[#E6E0DA] rounded-lg text-sm font-semibold text-[#1F1F1F] hover:bg-[#FFF9F4] transition-colors"
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={handleProfileImgDelete}
+                                        className="px-4 py-2 bg-red-600 text-white rounded-lg text-sm font-semibold hover:bg-red-700 transition-colors shadow-sm flex items-center gap-1.5"
+                                    >
+                                        <Trash2 size={14} /> Remove Photo
+                                    </button>
+                                </div>
+
+                            </div>
+                        </div>
+                    )}
                 </div>
             </div>
         </div>

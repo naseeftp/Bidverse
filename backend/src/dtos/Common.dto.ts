@@ -107,6 +107,11 @@ export const changeEmailVerificationSchema = z.object({
   otp: z.string().length(6, "OTP must be 6 digits"),
 });
 
+export interface UpdateProfilePicDTO{
+  profileImage:string|null;
+}
+
+
 export type RegisterUserDTO = z.infer<typeof RegisterUserSchema>;
 export type LoginDTO = z.infer<typeof LoginSchema>;
 export type VerifyotpDTO = z.infer<typeof VerifyOtpSchema>;

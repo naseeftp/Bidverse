@@ -38,7 +38,8 @@ export const PROFILE_ROUTES = {
     CHANGE_EMAIL: '/change-email',
     CHANGE_EMAIL_VERIFY: '/change-email-verify',
     CHANGE_EMAIL_RESEND: '/change-email-resend',
-    CHANGE_BUSINESS_DETAILS:'/change-business-details'
+    CHANGE_BUSINESS_DETAILS:'/change-business-details',
+    HANDLE_PROFILE_IMG:'/handle-profile-image'
 }
 
 export const ADDRESS_ROUTES={

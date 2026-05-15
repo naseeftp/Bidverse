@@ -24,7 +24,7 @@ router.get(
 )
 router.get(
     AUCTION_HOUSE_ROUTES.UPLOAD_SIGNATURE,
-    allowedTo(Role.TENANT),
+    allowedTo(Role.TENANT,Role.USER),
     (req, res, next) => auctionHouseController.getUploadSignature(req, res, next)
 )
 

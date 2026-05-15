@@ -8,4 +8,5 @@ export interface IprofileController {
     changeEmailVerification(req:Request,res:Response,next:NextFunction):Promise<void>
     changeEmailResendOtp(req:Request,res:Response,next:NextFunction):Promise<void>
     changeBusinessDetails(req:Request,res:Response,next:NextFunction):Promise<void>
+    updateProfileImage(req:Request,res:Response,next:NextFunction):Promise<void>
 }

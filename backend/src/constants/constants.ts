@@ -123,11 +123,13 @@ export const MESSAGES = {
     USER_STTS_UPDTD: 'User status updated successfully',
     USER_DETAILS_UPDTD: 'Details updated successfully',
     USER_DETAILS_UPDTD_FAILED: 'Details updation Failed',
+    PROFILE_PIC_UPADATED:'Profile Picture Updated',
     EMAIL_UPDATED:'Email updated successfully',
     ADDRES_NOT_FOUND:'Address Not found',
     ADDRESS_DELETED:'Address Delated Successfully',
     ADDRESS_EDITED:'Address Edited Successfully',
     ADDRESS_CREATED:'Address Created Successfully',
+    
 
     LOGOUT_SUCCESS: "Logout success",
     LOGOUT_FAILED: "Logout failed",

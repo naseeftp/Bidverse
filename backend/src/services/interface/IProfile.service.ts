@@ -16,5 +16,5 @@ export interface IProfileService {
     changeEmailVerification(userId:string,data:changeEmailVerificationDTO):Promise<UserResponseDTO>
     changeEmailResendOtp(data:ResendOtpDTO):Promise<changeEmailResponseDto>;
     changeBusinessDetails(userId:string,data:ChangeBusinessDetailsDTO):Promise<AuctionHouseResponseDTO>
-    
+    updateProfileImage(userId:string,imageUrl:string|null):Promise<UserResponseDTO>
 }
