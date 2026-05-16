@@ -74,6 +74,7 @@ export class AdminService implements IAdminService {
             if (!updatedHouse) {
                 throw new NotFoundError(MESSAGES.AUCTION_HOUSE_NOT_FOUND)
             }
+            await this._emailService.sendVerificationStatusUpdationEmail(updatedHouse.contact.businessEmail,updatedHouse.name,status,reason)
             return AuctionHouseMapper.toResponseDTO(updatedHouse)
         } catch (error) {
             this._logger.error("Error in updating status service", { error });

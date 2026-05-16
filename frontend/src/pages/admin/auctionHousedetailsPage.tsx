@@ -65,6 +65,7 @@ const AuctionHouseDetails: React.FC = () => {
                 setRejectionReason('');
                 toast.success(`Protocol updated to ${status}`);
             }
+            
         } catch {
             toast.error("Protocol update failed.");
         } finally {

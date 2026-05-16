@@ -9,12 +9,12 @@ export const getOtpTemplate = (name: string, otp: string): string => {
 }
 
 
-export const getAccountBlockedTemplate=(
-    name:string,
-    email:string,
-    reason:string
-):string=>{
-return `
+export const getAccountBlockedTemplate = (
+    name: string,
+    email: string,
+    reason: string
+): string => {
+    return `
     <!DOCTYPE html>
     <html>
     <head>
@@ -106,7 +106,7 @@ return `
 
 
 export const getAccountUnblockedTemplate = (
-    name: string, 
+    name: string,
     email: string
 ): string => {
     return `
@@ -176,6 +176,184 @@ export const getAccountUnblockedTemplate = (
                     </p>
                     <p style="margin: 0;">
                         This is an operational transaction status message. Thank you for your patience during our systematic verification check.
+                    </p>
+                </td>
+            </tr>
+        </table>
+    </body>
+    </html>
+    `;
+}
+
+
+export const getAuctionHouseRejectedTemplate = (
+    auctionHouseName: string, 
+    businessEmail: string, 
+    rejectionReason: string
+): string => {
+    return `
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Application Status Update</title>
+    </head>
+    <body style="margin: 0; padding: 0; background-color: #F8FAFC; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
+        <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px; margin: 40px auto; background-color: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; overflow: hidden; border-collapse: collapse; shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);">
+            
+            <tr>
+                <td height="4" style="background-color: #0F172A;"></td>
+            </tr>
+
+            <tr>
+                <td style="padding: 40px 32px;">
+                    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                        <tr>
+                            <td style="font-size: 20px; font-weight: 800; color: #0F172A; tracking-tight: -0.05em; padding-bottom: 24px;">
+                                BIDVERSE
+                            </td>
+                        </tr>
+                    </table>
+
+                    <p style="margin: 0 0 12px 0; font-size: 13px; font-weight: 700; color: #DC2626; text-transform: uppercase; letter-spacing: 0.05em;">
+                        Verification Update
+                    </p>
+                    <h2 style="margin: 0 0 16px 0; font-size: 22px; font-weight: 700; color: #0F172A; line-height: 1.3;">
+                        Application Status: Declined
+                    </h2>
+                    <p style="margin: 0 0 20px 0; font-size: 15px; line-height: 1.6; color: #475569;">
+                        Thank you for submitting your merchant verification credentials for <strong style="color: #0F172A;">${auctionHouseName}</strong> (${businessEmail}). 
+                    </p>
+                    <p style="margin: 0 0 24px 0; font-size: 14px; line-height: 1.6; color: #475569;">
+                        Our compliance team has carefully reviewed your business documentation, license certifications, and tax identification details. Regrettably, your application cannot be approved at this time due to the following finding(s):
+                    </p>
+
+                    <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #FFF5F5; border: 1px solid #FEE2E2; border-radius: 8px; margin-bottom: 28px;">
+                        <tr>
+                            <td style="padding: 20px;">
+                                <p style="margin: 0 0 6px 0; font-size: 11px; font-weight: 700; color: #B91C1C; text-transform: uppercase; letter-spacing: 0.05em;">
+                                    Reason for Rejection
+                                </p>
+                                <p style="margin: 0; font-size: 14px; line-height: 1.5; font-weight: 500; color: #991B1B;">
+                                    ${rejectionReason}
+                                </p>
+                            </td>
+                        </tr>
+                    </table>
+
+                    <h3 style="margin: 0 0 8px 0; font-size: 14px; font-weight: 700; color: #0F172A;">
+                        How to proceed:
+                    </h3>
+                    <p style="margin: 0 0 24px 0; font-size: 14px; line-height: 1.6; color: #475569;">
+                        Most verification rejections occur due to blurry document scans, mismatched business registry names, or expired credentials. You can easily fix these issues by logging into your merchant portal and uploading corrected files.
+                    </p>
+
+                    <table border="0" cellpadding="0" cellspacing="0" width="100%" style="margin-bottom: 24px;">
+                        <tr>
+                            <td align="left">
+                                <a href="https://bidverse.com/tenant/profile" style="display: inline-block; background-color: #0F172A; color: #FFFFFF; font-size: 13px; font-weight: 600; text-decoration: none; padding: 12px 24px; border-radius: 6px; box-shadow: 0 1px 2px 0 rgba(0,0,0,0.05);">
+                                    Update Profile & Documents
+                                </a>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+
+            <tr>
+                <td style="padding: 24px 32px; background-color: #F8FAFC; border-top: 1px solid #E2E8F0; font-size: 12px; line-height: 1.5; color: #64748B;">
+                    <p style="margin: 0 0 4px 0; font-weight: 600; color: #475569;">
+                        BidVerse Trust & Safety Operations
+                    </p>
+                    <p style="margin: 0;">
+                        This verification check is mandatory to maintain marketplace authenticity. If you have any questions regarding this assessment, please reply to this email string to open a case file.
+                    </p>
+                </td>
+            </tr>
+        </table>
+    </body>
+    </html>
+    `;
+}
+
+
+export const getAuctionHouseApprovedTemplate = (
+    auctionHouseName: string, 
+    businessEmail: string
+): string => {
+    return `
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Application Approved</title>
+    </head>
+    <body style="margin: 0; padding: 0; background-color: #F8FAFC; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
+        <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px; margin: 40px auto; background-color: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; overflow: hidden; border-collapse: collapse; shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);">
+            
+            <tr>
+                <td height="4" style="background-color: #0F172A;"></td>
+            </tr>
+
+            <tr>
+                <td style="padding: 40px 32px;">
+                    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                        <tr>
+                            <td style="font-size: 20px; font-weight: 800; color: #0F172A; tracking-tight: -0.05em; padding-bottom: 24px;">
+                                BIDVERSE
+                            </td>
+                        </tr>
+                    </table>
+
+                    <p style="margin: 0 0 12px 0; font-size: 13px; font-weight: 700; color: #10B981; text-transform: uppercase; letter-spacing: 0.05em;">
+                        Verification Approved
+                    </p>
+                    <h2 style="margin: 0 0 16px 0; font-size: 22px; font-weight: 700; color: #0F172A; line-height: 1.3;">
+                        Your Auction House is Live
+                    </h2>
+                    <p style="margin: 0 0 20px 0; font-size: 15px; line-height: 1.6; color: #475569;">
+                        We are thrilled to inform you that credential verification for <strong style="color: #0F172A;">${auctionHouseName}</strong> (${businessEmail}) has been successfully finalized.
+                    </p>
+                    <p style="margin: 0 0 24px 0; font-size: 14px; line-height: 1.6; color: #475569;">
+                        Your corporate status has been elevated to verified partner. Your public auction listings will now showcase the official verification shield badge, fostering maximum bidding credibility across our collective multi-tenant marketplace networks.
+                    </p>
+
+                    <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; margin-bottom: 28px;">
+                        <tr>
+                            <td style="padding: 20px;">
+                                <p style="margin: 0 0 8px 0; font-size: 11px; font-weight: 700; color: #64748B; text-transform: uppercase; letter-spacing: 0.05em;">
+                                    Activated Capabilities
+                                </p>
+                                <ul style="margin: 0; padding-left: 18px; font-size: 13px; line-height: 1.6; color: #1E293B;">
+                                    <li>Publish live real-time dynamic inventory listings.</li>
+                                    <li>Uncapped concurrent customer auction interactions.</li>
+                                    <li>Access premium analytics tables via your merchant dashboard view.</li>
+                                </ul>
+                            </td>
+                        </tr>
+                    </table>
+
+                    <table border="0" cellpadding="0" cellspacing="0" width="100%" style="margin-bottom: 24px;">
+                        <tr>
+                            <td align="left">
+                                <a href="https://bidverse.com/tenant/dashboard" style="display: inline-block; background-color: #0F172A; color: #FFFFFF; font-size: 13px; font-weight: 600; text-decoration: none; padding: 12px 24px; border-radius: 6px; box-shadow: 0 1px 2px 0 rgba(0,0,0,0.05);">
+                                    Access Admin Console
+                                </a>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+
+            <tr>
+                <td style="padding: 24px 32px; background-color: #F8FAFC; border-top: 1px solid #E2E8F0; font-size: 12px; line-height: 1.5; color: #64748B;">
+                    <p style="margin: 0 0 4px 0; font-weight: 600; color: #475569;">
+                        BidVerse Trust, Safety & Merchant Success Teams
+                    </p>
+                    <p style="margin: 0;">
+                        This operational message marks successful compliance onboarding. If you require technical system integration engineering support, please touch base via your admin interface panel.
                     </p>
                 </td>
             </tr>

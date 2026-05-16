@@ -4,9 +4,15 @@ import { IEmailService } from "../interface/IEmai.service"
 import { EmailConfig, SmtpConfig } from "../../types/email.type"
 import { HttpStatus, MESSAGES, otpPurpose } from '../../constants/constants'
 import { AppError } from "../../errors/AppError"
-import { getOtpTemplate, getAccountBlockedTemplate, getAccountUnblockedTemplate } from "../../utils/emailTemplates"
+import {
+    getOtpTemplate,
+    getAccountBlockedTemplate,
+    getAccountUnblockedTemplate,
+    getAuctionHouseRejectedTemplate,
+    getAuctionHouseApprovedTemplate
+} from "../../utils/emailTemplates"
 import { ILoggerService } from "../interface/ILogger.service";
-import { OtpPurpose } from "../../constants/constants"
+import { OtpPurpose, VerificationStatus } from "../../constants/constants"
 
 export class EmailService implements IEmailService {
     private _transporter: Transporter;
@@ -95,4 +101,19 @@ export class EmailService implements IEmailService {
         })
     }
 
+    async sendVerificationStatusUpdationEmail(businessEmail: string, businessName: string, status: string, reason?: string | null): Promise<void> {
+        let subject = `BidVerse Verification Update: ${businessName}`
+        let htmlContent;
+        if (status == VerificationStatus.REJECTED) {
+            htmlContent = getAuctionHouseRejectedTemplate(businessName, businessEmail, reason!)
+        }
+        else {
+            htmlContent = getAuctionHouseApprovedTemplate(businessName,businessEmail)
+        }
+        await this.sendEmail({
+            to: businessEmail,
+            subject: subject!,
+            html: htmlContent!
+        })
+    }
 }

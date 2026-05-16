@@ -4,4 +4,5 @@ export interface IEmailService {
     sendEmail(config: EmailConfig): Promise<void>;
     sendOtpEmail(email: string, name: string, otp: string, purpose?: otpPurpose): Promise<void>
     sendBlockOrUnBlockEmail(email:string,name:string,isActive:boolean,reason?:string):Promise<void>
+    sendVerificationStatusUpdationEmail(businessEmail:string,businessName:string,status:string,reason?:string|null):Promise<void>
 }
