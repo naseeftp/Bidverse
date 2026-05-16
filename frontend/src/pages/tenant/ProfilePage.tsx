@@ -33,6 +33,11 @@ const TenantProfilePage: React.FC = () => {
     const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (!file) return;
+        if(!file.type.startsWith('image/')){
+            toast.error("Please select a valid image file (PNG, JPEG, etc)")
+            if(fileInputRef.current) fileInputRef.current.value=''
+            return
+        }
         setIsUploading(true);
         //    toast.loading("Processing image upload...")
         try {
@@ -205,7 +210,7 @@ const TenantProfilePage: React.FC = () => {
                 </div>
                 <div className="space-y-8">
                     <section className="bg-white rounded-2xl border border-[#E2E8F0] shadow-sm overflow-hidden">
-                       =
+                       
                         <div className="px-8 py-5 border-b border-[#F1F5F9] flex justify-between items-center">
                             <h3 className="font-bold flex items-center gap-2 text-[#0F172A]">
                                 <UserIcon size={18} className="text-[#2F6FED]" /> Personal Account
@@ -227,7 +232,7 @@ const TenantProfilePage: React.FC = () => {
                                 ref={fileInputRef}
                                 onChange={handleImageUpload}
                                 className="hidden"
-                                accept="image/png, image/jpeg, image/jpg"
+                                accept="image/*"
                             />
 
                             

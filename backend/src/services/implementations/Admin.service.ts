@@ -4,6 +4,7 @@ import { AuctionHouseMapper } from "../../mappers/auctionHouse.mapper";
 import { AuctionHouseResponseDTO,AdminAuctionHouseDetailDTO } from "../../dtos/auctionHouse.dto/auctionHouse.dto";
 import { UpdateHouseStatusDTO, UpdateUserStatusDTO } from "../../dtos/admin.dto/updatestatus.dto";
 import { ILoggerService } from "../interface/ILogger.service";
+import { IEmailService } from "../interface/IEmai.service";
 import { AppError, NotFoundError } from "../../errors/AppError";
 import { VerificationStatus } from "../../constants/constants";
 import { MESSAGES } from "../../constants/constants";
@@ -19,7 +20,8 @@ export class AdminService implements IAdminService {
     constructor(
         private _auctionHouseRepo: IAuctionHouseRepository,
         private _userRepo: IUserRepository,
-        private _logger: ILoggerService
+        private _logger: ILoggerService,
+        private _emailService:IEmailService
     ) { }
     async listAllAuctionHouses(page: number, limit: number,search?:string,status?:string): Promise<IGenericPaginatedResposnse<AdminAuctionHouseDetailDTO>> {
         try {
@@ -150,6 +152,7 @@ export class AdminService implements IAdminService {
             if (!updatedUser) {
                 throw new NotFoundError(MESSAGES.USER_NOT_FOUND)
             }
+            await this._emailService.sendBlockOrUnBlockEmail(updatedUser.email,updatedUser.name,isActive,reason)
             const mappedUser = UserMapper.toDTO(updatedUser)
             return mappedUser
         } catch (error) {

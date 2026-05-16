@@ -26,6 +26,11 @@ const ProfilePage: React.FC = () => {
     const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (!file) return;
+        if(!file.type.startsWith('image/')){
+            toast.error("Please select a valid image file (PNG, JPEG, etc)")
+            if(fileInputRef.current) fileInputRef.current.value=''
+            return
+        }
         setIsUploading(true);
         try {
             const secureUrl = await uploadservice.uploadSecurely(file);
@@ -121,7 +126,7 @@ const ProfilePage: React.FC = () => {
                 </div>
 
                 <div className="space-y-6">
-                    <input type="file" ref={fileInputRef} onChange={handleImageUpload} className="hidden" accept="image/png, image/jpeg, image/jpg" />
+                    <input type="file" ref={fileInputRef} onChange={handleImageUpload} className="hidden" accept="image/*" />
 
                     <section className="bg-white rounded-xl border border-[#E6E0DA] p-8 shadow-sm">
                         <div className="flex flex-col sm:flex-row items-center gap-8">

@@ -4,7 +4,7 @@ import { IEmailService } from "../interface/IEmai.service"
 import { EmailConfig, SmtpConfig } from "../../types/email.type"
 import { HttpStatus, MESSAGES, otpPurpose } from '../../constants/constants'
 import { AppError } from "../../errors/AppError"
-import { getOtpTemplate } from "../../utils/emailTemplates"
+import { getOtpTemplate, getAccountBlockedTemplate, getAccountUnblockedTemplate } from "../../utils/emailTemplates"
 import { ILoggerService } from "../interface/ILogger.service";
 import { OtpPurpose } from "../../constants/constants"
 
@@ -74,4 +74,25 @@ export class EmailService implements IEmailService {
             html: htmlContent
         })
     }
+    async sendBlockOrUnBlockEmail(email: string, name: string, isActive: boolean, reason?: string): Promise<void> {
+        let htmlContent;
+        let subject;
+
+        if (isActive) {
+            subject = 'Your BidVerse account has been successfully re-activated';
+            htmlContent = getAccountUnblockedTemplate(name, email)
+
+        }
+        else {
+            htmlContent = getAccountBlockedTemplate(name, email, reason!)
+            subject = 'Urgent: Your BidVerse account has been temporarily suspended'
+        }
+
+        await this.sendEmail({
+            to: email,
+            subject: subject!,
+            html: htmlContent!
+        })
+    }
+
 }
