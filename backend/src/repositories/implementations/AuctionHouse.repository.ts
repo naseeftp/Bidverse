@@ -4,6 +4,7 @@ import { BaseRepository } from "./Base.repository";
 import { AuctionHouse } from "../../models/auctionHouse.model";
 import { AdminAuctionHouseDetailDTO } from '../../dtos/auctionHouse.dto/auctionHouse.dto'
 import mongoose, { PipelineStage } from "mongoose";
+import { PublicAuctionHouseResponseDTO } from "../../dtos/Common.dto";
 
 export class AuctionHouseRepository extends BaseRepository<IAuctionHouseDocument> implements IAuctionHouseRepository {
     constructor() {
@@ -46,8 +47,8 @@ export class AuctionHouseRepository extends BaseRepository<IAuctionHouseDocument
                         $cond: { // works like conditional operator/ternary operator
                             if: {
                                 $and: [
-                                    {$ifNull:['$googleId',false]}, //if the field missing or null return false
-                                    {$ne:['$googleId',null]}  //make sure that google id null
+                                    { $ifNull: ['$googleId', false] }, //if the field missing or null return false
+                                    { $ne: ['$googleId', null] }  //make sure that google id null
                                 ]
                             },
                             then: true,
@@ -137,8 +138,8 @@ export class AuctionHouseRepository extends BaseRepository<IAuctionHouseDocument
                         $cond: {
                             if: {
                                 $and: [
-                                    {$ifNull:['$googleId',false]}, 
-                                    {$ne:['$googleId',null]}  
+                                    { $ifNull: ['$googleId', false] },
+                                    { $ne: ['$googleId', null] }
                                 ]
                             },
                             then: true,
@@ -186,4 +187,66 @@ export class AuctionHouseRepository extends BaseRepository<IAuctionHouseDocument
         return result[0] || null;
     }
 
+    async listPublicAuctionHouses(
+        page: number,
+        limit: number,
+        search?: string
+    ): Promise<{ houses: PublicAuctionHouseResponseDTO[], total: number }> {
+        const skip = (page - 1) * limit;
+
+        const pipeline: PipelineStage[] = [
+            { $match: { role: 'tenant', isActive: true } },
+            {
+                $lookup: {
+                    from: 'auctionhouses',
+                    localField: '_id',
+                    foreignField: 'userId',
+                    as: 'house'
+                }
+            },
+            { $unwind: { path: '$house', preserveNullAndEmptyArrays: false } },
+            { $match: { 'house.isVerified': true } },
+
+            {
+                $project: {
+                    _id: 0,
+                    houseId: { $toString: '$house._id' },
+                    businessName: '$house.name',
+                    profileImage: { $ifNull: ['$profileImage', ''] },
+                    yearEstablished: '$house.yearEstablished',
+                    briefDescription: '$house.briefDescription',
+                    isVerified: '$house.isVerified',
+                    address: {
+                        city: '$house.address.city',
+                        state: '$house.address.state',
+                        country: '$house.address.country'
+                    }
+                }
+            }
+        ];
+
+
+        if (search) {
+            pipeline.push({
+                $match: {
+                    businessName: { $regex: search, $options: 'i' }
+                }
+            });
+        }
+
+        const results = await mongoose.model('User').aggregate([
+            ...pipeline,
+            {
+                $facet: {
+                    data: [{ $skip: skip }, { $limit: limit }],
+                    totalCount: [{ $count: 'count' }]
+                }
+            }
+        ]);
+
+        return {
+            houses: results[0].data as PublicAuctionHouseResponseDTO[],
+            total: results[0].totalCount[0]?.count || 0
+        };
+    }
 }

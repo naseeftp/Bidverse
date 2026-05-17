@@ -3,7 +3,8 @@
 export const API_BASE_URL = import.meta.env.VITE_API_URL
 export const BASE_ROUTES = {
     PROFILE_MANAGEMENT: '/profile',
-    ADDRESS:'/address'
+    ADDRESS:'/address',
+    PUBLIC:'/public'
 }
 export const AUTH_ROUTES = {
     REGISTER: "/auth/register",
@@ -47,4 +48,7 @@ export const ADDRESS_ROUTES={
     GET_USER_ADDRESS:'/addresses',
     DELETE_ADDRESS:'/delete',
     EDIT_ADDRESS:'/edit'
+}
+export const PUBLIC_ROUTES={
+    AUCTION_HOUSES:'/houses'
 }

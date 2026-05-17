@@ -11,6 +11,7 @@ import auctionHouseRoutes from './routes/auctionHouse.routes'
 import adminRoutes from './routes/admin.routes'
 import profileRoutes from './routes/profile.routes'
 import addressRoutess from './routes/address.routes'
+import publicAuctionRoutes from './routes/publicAuction.routes'
 import { LoggerService } from "./services/implementations/Logger.service";
 
 
@@ -34,7 +35,7 @@ app.use(BASE_ROUTES.AUCTION_HOUSE, auctionHouseRoutes)
 app.use(BASE_ROUTES.ADMIN, adminRoutes)
 app.use(BASE_ROUTES.PROFILE_MANAGEMENT, profileRoutes)
 app.use(BASE_ROUTES.ADDRESS,addressRoutess)
-
+app.use(BASE_ROUTES.PUBLIC,publicAuctionRoutes)
 
 app.use(errorHandler);
 const startServer = async () => {

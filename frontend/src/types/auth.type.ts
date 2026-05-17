@@ -72,6 +72,20 @@ export interface UserResponseDTO {
     provider:'google'|'local'
 }
 
+export interface PublicAuctionHouseResponseDTO{
+  houseId:string;
+  bussinessName:string;
+  profileImage:string;
+  briefDescription:string;
+  yearEstablished:string;
+  isVerified:boolean;
+  address:{
+    city:string;
+    state:string;
+    country:string
+  }
+}
+
 export interface ApiResponse<T=unknown> {
     success: boolean;
     message: string;

@@ -118,6 +118,7 @@ export const MESSAGES = {
     PROFILE_RETRIEVED: 'Profile Retrieved successfully',
     AUC_HOUSE_STTS_UPDTD: 'Auction house status updated successfully',
     LIST_RETRIEVED: 'List Retrieved successfully',
+    LIST_RETRIEVING_FAILED: 'List Retriving Failed',
     HOUSE_RETRIEVED: 'House Retrieved successfully',
     USER_RETRIEVED: 'User Retrieved successfully',
     USER_STTS_UPDTD: 'User status updated successfully',

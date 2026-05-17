@@ -112,6 +112,20 @@ export interface UpdateProfilePicDTO{
 }
 
 
+export interface PublicAuctionHouseResponseDTO{
+  houseId:string;
+  bussinessName:string;
+  profileImage:string;
+  briefDescription:string;
+  yearEstablished:string;
+  isVerified:boolean;
+  address:{
+    city:string;
+    state:string;
+    country:string
+  }
+}
+
 export type RegisterUserDTO = z.infer<typeof RegisterUserSchema>;
 export type LoginDTO = z.infer<typeof LoginSchema>;
 export type VerifyotpDTO = z.infer<typeof VerifyOtpSchema>;

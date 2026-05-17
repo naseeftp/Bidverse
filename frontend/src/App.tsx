@@ -8,6 +8,7 @@ import PublicRoute from '../src/routes/PublicRoute'
 import ProtectedRoute from "./routes/ProtectedRoute";
 
 import LandingPage from "./pages/LandingPage";
+import PublicAuctionHouses from "./pages/auctionHouses";
 import RegisterPage from "./pages/users/registerPage";
 import VerifyOtpPage from "./pages/users/verifyotpPage";
 import UserHomePage from './pages/users/homePage'
@@ -57,7 +58,7 @@ function App() {
 
             <Route element={<MainLayout />}>
                <Route path="/auth-success" element={<AuthSuccessPage />} />
-
+               <Route path="/auction-houses" element={<PublicAuctionHouses/>}/>
 
                <Route element={<PublicRoute />}>
                   <Route path="/" element={<LandingPage />} />

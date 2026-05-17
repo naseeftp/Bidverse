@@ -4,7 +4,8 @@ export const BASE_ROUTES = {
     AUCTION_HOUSE: '/auction-house',
     ADMIN: '/admin',
     PROFILE_MANAGEMENT: '/profile',
-    ADDRESS:'/address'
+    ADDRESS:'/address',
+    PUBLIC:'/public'
 } as const
 
 export const AUTH_ROUTES = {
@@ -51,4 +52,8 @@ export const ADDRESS_ROUTES={
     GET_USER_ADDRESS:'/addresses',
     DELETE_ADDRESS:'/delete/:id',
     EDIT_ADDRESS:'/edit/:id'
+}
+
+export const PUBLIC_ROUTES={
+    AUCTION_HOUSES:'/houses'
 }
