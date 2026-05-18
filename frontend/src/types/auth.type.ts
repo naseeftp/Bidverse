@@ -74,7 +74,7 @@ export interface UserResponseDTO {
 
 export interface PublicAuctionHouseResponseDTO{
   houseId:string;
-  bussinessName:string;
+  businessName:string;
   profileImage:string;
   briefDescription:string;
   yearEstablished:string;

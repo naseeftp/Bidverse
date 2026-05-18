@@ -11,7 +11,7 @@ const UsersListPage: React.FC = () => {
   const [statusFilter, setStatusFilter] = useState("all");
   const [page, setPage] = useState(1);
   const [pagination, setPageination] = useState<IPaginationMeta | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate()
   const fetchUsers = useCallback(async () => {
     setLoading(true);
@@ -33,7 +33,7 @@ const UsersListPage: React.FC = () => {
       fetchUsers();
     }, 500);
     return () => clearTimeout(handler);
-  }, [fetchUsers, search, statusFilter, page]);
+  }, [fetchUsers]);
 
   return (
     <div className="space-y-6">
