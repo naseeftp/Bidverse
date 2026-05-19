@@ -15,6 +15,7 @@ export interface IAuctionHouseRepository extends IBaseRepository<IAuctionHouseDo
     listPublicAuctionHouses(
     page: number,
     limit: number,
-    search?: string
+    search?: string,
+    category?:string
 ): Promise<{ houses: PublicAuctionHouseResponseDTO[], total: number }>
 }

@@ -13,9 +13,9 @@ export class PublicAuctionService implements IPublicAunctionService{
         private _logger:ILoggerService
     ){}
 
-    async  listAllPublicAuctionHouses(page: number, limit: number, search: string): Promise<IGenericPaginatedResposnse<PublicAuctionHouseResponseDTO>> {
+    async  listAllPublicAuctionHouses(page: number, limit: number, search: string,category?:string): Promise<IGenericPaginatedResposnse<PublicAuctionHouseResponseDTO>> {
         
-            const {houses,total}=await this._auctionHouseRepo.listPublicAuctionHouses(page,limit,search)
+            const {houses,total}=await this._auctionHouseRepo.listPublicAuctionHouses(page,limit,search,category)
             return{
                 data:houses,
                 pagination:{

@@ -190,7 +190,8 @@ export class AuctionHouseRepository extends BaseRepository<IAuctionHouseDocument
     async listPublicAuctionHouses(
         page: number,
         limit: number,
-        search?: string
+        search?: string,
+        category?:string,
     ): Promise<{ houses: PublicAuctionHouseResponseDTO[], total: number }> {
         const skip = (page - 1) * limit;
 
@@ -216,7 +217,7 @@ export class AuctionHouseRepository extends BaseRepository<IAuctionHouseDocument
                     yearEstablished: '$house.yearEstablished',
                     briefDescription: '$house.briefDescription',
                     isVerified: '$house.isVerified',
-                    categories:{$ifNull:['$house.categories',[]]},
+                    categories: { $ifNull: ['$house.categories', []] },
                     address: {
                         city: '$house.address.city',
                         state: '$house.address.state',
@@ -230,10 +231,20 @@ export class AuctionHouseRepository extends BaseRepository<IAuctionHouseDocument
         if (search) {
             pipeline.push({
                 $match: {
-                    businessName: { $regex: search, $options: 'i' }
+                    $or: [
+                        { businessName: { $regex: search, $options: 'i' } },
+                        { categories: { $regex: search, $options: 'i' } }
+                    ]
                 }
             });
         }
+        if(category){
+            pipeline.push({
+                $match:{categories:category}
+            })
+        }
+
+
 
         const results = await mongoose.model('User').aggregate([
             ...pipeline,

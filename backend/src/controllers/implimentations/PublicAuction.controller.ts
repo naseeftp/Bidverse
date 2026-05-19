@@ -14,8 +14,9 @@ export class PublicAuctionController implements IPublicAuctionController{
             const page=Number(req.query.page)||1;
             const limit=Number(req.query.limit)||10;
             const search=req.query.search as string
-            this._logger.info('fetching public auction house list',{page:page,limit:limit,search:search})
-            const result=await this._publicAuctionService. listAllPublicAuctionHouses(page,limit,search)
+            const category=req.query.category as string
+            this._logger.info('fetching public auction house list',{page:page,limit:limit,search:search,category:category})
+            const result=await this._publicAuctionService. listAllPublicAuctionHouses(page,limit,search,category)
             SuccessResponse(res,MESSAGES.LIST_RETRIEVED,result,HttpStatus.OK)
         } catch (error) {
             next(error)
