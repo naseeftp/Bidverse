@@ -42,6 +42,20 @@ export enum AddressLabel{
 }
 export const AddressLabelValues=Object.values(AddressLabel)
 
+export enum AuctionHouseCategory {
+  FINE_ART = 'Fine Art & Antiquities',
+  LUXURY = 'Luxury & Estate Jewelry',
+  AUTOMOTIVE = 'Automotive & Vehicles',
+  REAL_ESTATE = 'Real Estate & Property',
+  INDUSTRIAL = 'Industrial & Heavy Equipment',
+  GENERAL_ESTATE = 'General Estate & Liquidation',
+  DIGITAL_ASSETS = 'Electronics & Digital Assets'
+}
+
+export const AuctionHouseCategoryValues = Object.values(AuctionHouseCategory);
+
+
+
 export const CONFIG = {
     OTP_EXPIRY_MINUTES: 1,
     FORGOT_PASSWORD_EXPIRY: 2,

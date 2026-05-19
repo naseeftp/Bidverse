@@ -1,3 +1,5 @@
+import type { TAuctionHouseCategory } from "./auctionHouse.type";
+
 export const Roles = {
     USER: 'user',
     ADMIN: 'admin',
@@ -77,8 +79,9 @@ export interface PublicAuctionHouseResponseDTO{
   businessName:string;
   profileImage:string;
   briefDescription:string;
-  yearEstablished:string;
+  yearEstablished:number;
   isVerified:boolean;
+  categories:TAuctionHouseCategory[]
   address:{
     city:string;
     state:string;

@@ -8,10 +8,25 @@ export const VerificationStatus = {
 } as const
 
 export type TVerificationStatus = typeof VerificationStatus[keyof typeof VerificationStatus];
+
+export const AuctionHouseCategory = {
+    FINE_ART: 'Fine Art & Antiquities',
+    LUXURY: 'Luxury & Estate Jewelry',
+    AUTOMOTIVE: 'Automotive & Vehicles',
+    REAL_ESTATE: 'Real Estate & Property',
+    INDUSTRIAL: 'Industrial & Heavy Equipment',
+    GENERAL_ESTATE: 'General Estate & Liquidation',
+    DIGITAL_ASSETS: 'Electronics & Digital Assets'
+} as const;
+export type TAuctionHouseCategory = typeof AuctionHouseCategory[keyof typeof AuctionHouseCategory];
+
+
 export interface AuctionHouseSubmissionDTO {
     name: string;
     yearEstablished: number;
     briefDescription: string;
+    categories: TAuctionHouseCategory[];
+
     address: {
         city: string;
         state: string;
@@ -37,6 +52,7 @@ export interface AuctionHouseResponseDTO {
     name: string;
     yearEstablished: number;
     briefDescription: string;
+    categories: TAuctionHouseCategory[];
     address: {
         city: string;
         state: string;

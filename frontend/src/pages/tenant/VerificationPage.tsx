@@ -4,20 +4,22 @@ import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import toast from 'react-hot-toast';
-import { 
-  Building2, MapPin, PhoneCall, FileCheck, Info, Loader2 
+import {
+  Building2, MapPin, PhoneCall, FileCheck, Info, Loader2
 } from 'lucide-react';
 
 import { useAppDispatch } from "../../hooks/redux.hooks";
 import { submitVerification } from '../../redux/tenant/auctionHouse.slice';
 import uploadservice from '../../services/uploadservice';
 import type { AuctionHouseSubmissionDTO } from '../../types/auctionHouse.type';
+import type { TAuctionHouseCategory } from '../../types/auctionHouse.type'
+import { AuctionHouseCategory } from '../../types/auctionHouse.type';
 
 const schema = yup.object({
   name: yup
     .string()
     .trim()
-    .max(100, 'Business name cannot exceed 100 characters') 
+    .max(100, 'Business name cannot exceed 100 characters')
     .required('Business name is required'),
 
   yearEstablished: yup
@@ -30,59 +32,65 @@ const schema = yup.object({
   briefDescription: yup
     .string()
     .min(20, 'Please provide more detail')
-    .max(1000, 'Description cannot exceed 1000 characters') 
+    .max(1000, 'Description cannot exceed 1000 characters')
     .required('Description is required'),
+
+  categories: yup
+    .array()
+    .of(yup.string().oneOf(Object.values(AuctionHouseCategory)).required())
+    .min(1, 'Please select at least one operational category specialty')
+    .required('Category specialty is required'),
 
   address: yup.object({
     city: yup
       .string()
-      .max(50, 'City too long') 
+      .max(50, 'City too long')
       .required('City is required'),
 
     state: yup
       .string()
-      .max(50, 'State too long') 
+      .max(50, 'State too long')
       .required('State is required'),
 
     country: yup
       .string()
-      .max(50, 'Country too long') 
+      .max(50, 'Country too long')
       .required('Country is required'),
 
     fullAddress: yup
       .string()
-      .max(255, 'Address too long') 
+      .max(255, 'Address too long')
       .required('Full address is required'),
   }),
 
   contact: yup.object({
     primaryContactName: yup
       .string()
-      .max(100, 'Name too long') 
+      .max(100, 'Name too long')
       .required('Contact name is required'),
 
     businessEmail: yup
       .string()
       .email('Invalid email')
-      .max(100, 'Email too long') 
+      .max(100, 'Email too long')
       .required('Email is required'),
 
     phone: yup
       .string()
-      .matches(/^\d{10}$/, 'Phone must be exactly 10 digits') 
-      .max(10, 'Phone cannot exceed 10 digits') 
+      .matches(/^\d{10}$/, 'Phone must be exactly 10 digits')
+      .max(10, 'Phone cannot exceed 10 digits')
       .required('Phone is required'),
   }),
 
   legal: yup.object({
     registrationNumber: yup
       .string()
-      .max(100, 'Registration number too long') 
+      .max(100, 'Registration number too long')
       .required('Reg. number is required'),
 
     taxId: yup
       .string()
-      .max(50, 'Tax ID too long') 
+      .max(50, 'Tax ID too long')
       .required('Tax ID is required'),
   }),
 
@@ -100,15 +108,29 @@ type VerificationFormData = yup.InferType<typeof schema>;
 const TenantVerificationForm: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  
+
   const { register, handleSubmit, setValue, watch, formState: { errors, isSubmitting } } = useForm<VerificationFormData>({
     resolver: yupResolver(schema),
+    defaultValues: {
+      categories: []
+    }
   });
 
   const regCertFile = watch('registrationCertificate') as File | undefined;
   const idProofFile = watch('identityProof') as File | undefined;
+  const selectedCategories = (watch('categories') || []) as TAuctionHouseCategory[];
 
-  
+  const handleCategoryToggle = (categoryValue: TAuctionHouseCategory) => {
+    if (selectedCategories.includes(categoryValue)) {
+      const updated = selectedCategories.filter(item => item !== categoryValue);
+      setValue('categories', updated, { shouldValidate: true });
+    } else {
+      const updated = [...selectedCategories, categoryValue];
+      setValue('categories', updated, { shouldValidate: true });
+    }
+  };
+
+
   const onSubmit = async (data: VerificationFormData) => {
     try {
       const [regCertUrl, idProofUrl] = await Promise.all([
@@ -120,25 +142,26 @@ const TenantVerificationForm: React.FC = () => {
         name: data.name,
         yearEstablished: data.yearEstablished,
         briefDescription: data.briefDescription,
+        categories: data.categories as TAuctionHouseCategory[],
         address: data.address,
         contact: data.contact,
         legal: {
           registrationNumber: data.legal.registrationNumber,
           taxId: data.legal.taxId,
-          registrationCertificateUrl: regCertUrl, 
-          identityProofUrl: idProofUrl,           
+          registrationCertificateUrl: regCertUrl,
+          identityProofUrl: idProofUrl,
         },
       };
 
-      
+
       await dispatch(submitVerification(finalPayload)).unwrap();
-      
+
       toast.success('Verification submitted successfully');
       navigate('/tenant/dashboard');
 
     } catch (error: unknown) {
       let errorMessage = "Submission failed. Please try again.";
-      
+
       if (error && typeof error === 'object' && 'message' in error) {
         errorMessage = String(error.message);
       } else if (typeof error === 'string') {
@@ -161,8 +184,8 @@ const TenantVerificationForm: React.FC = () => {
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
-        
-      
+
+
         <div className="bg-white rounded-2xl p-8 border border-[#E2E8F0] shadow-sm">
           <div className="flex items-center gap-3 mb-8 pb-4 border-b border-[#F5F7FB]">
             <Building2 size={18} className="text-[#2F6FED]" />
@@ -180,6 +203,37 @@ const TenantVerificationForm: React.FC = () => {
               <input type="number" {...register('yearEstablished')} placeholder="YYYY" className={inputStyle} />
               {errors.yearEstablished && <p className={errorStyle}>{errors.yearEstablished.message}</p>}
             </div>
+            <div className="md:col-span-2 space-y-2">
+              <label className={labelStyle}>Operational Category Specialties (Select all that apply)</label>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
+                {Object.values(AuctionHouseCategory).map((categoryStr) => {
+                  const isChecked = selectedCategories.includes(categoryStr);
+                  return (
+                    <button
+                      type="button"
+                      key={categoryStr}
+                      onClick={() => handleCategoryToggle(categoryStr)}
+                      className={`flex items-center justify-between text-left px-4 py-3 rounded-xl border text-xs font-medium transition-all ${isChecked
+                          ? 'border-[#2F6FED] bg-[#2F6FED]/5 text-[#2F6FED] font-bold'
+                          : 'border-[#E2E8F0] bg-white text-[#475569] hover:border-[#CBD5E1]'
+                        }`}
+                    >
+                      <span>{categoryStr}</span>
+                      <div className={`w-4 h-4 rounded-md border flex items-center justify-center transition-all ${isChecked ? 'border-[#2F6FED] bg-[#2F6FED]' : 'border-[#CBD5E1]'
+                        }`}>
+                        {isChecked && (
+                          <svg className="w-2.5 h-2.5 text-white" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                          </svg>
+                        )}
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+              {errors.categories && <p className={errorStyle}>{errors.categories.message}</p>}
+            </div>
+
             <div className="md:col-span-2 space-y-1">
               <label className={labelStyle}>Brief Description</label>
               <textarea rows={3} {...register('briefDescription')} placeholder="Specialization..." className={`${inputStyle} resize-none`} />
@@ -261,16 +315,16 @@ const TenantVerificationForm: React.FC = () => {
             </div>
 
             <div className="space-y-4">
-               <div>
+              <div>
                 <div className="relative group">
-                  <input 
-                    type="file" 
+                  <input
+                    type="file"
                     accept=".pdf,.jpg,.jpeg,.png"
                     onChange={(e) => {
                       const file = e.target.files?.[0];
                       if (file) setValue('registrationCertificate', file, { shouldValidate: true });
                     }}
-                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" 
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
                   />
                   <div className={`border-2 border-dashed rounded-xl p-4 text-center transition-all ${regCertFile ? 'border-[#10B981] bg-[#F0FDF4]' : 'border-[#E2E8F0] hover:border-[#2F6FED]'}`}>
                     <p className="text-[10px] font-bold text-[#475569] uppercase tracking-widest truncate">
@@ -283,14 +337,14 @@ const TenantVerificationForm: React.FC = () => {
 
               <div>
                 <div className="relative group">
-                  <input 
-                    type="file" 
+                  <input
+                    type="file"
                     accept=".pdf,.jpg,.jpeg,.png"
                     onChange={(e) => {
                       const file = e.target.files?.[0];
                       if (file) setValue('identityProof', file, { shouldValidate: true });
                     }}
-                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" 
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
                   />
                   <div className={`border-2 border-dashed rounded-xl p-4 text-center transition-all ${idProofFile ? 'border-[#10B981] bg-[#F0FDF4]' : 'border-[#E2E8F0] hover:border-[#2F6FED]'}`}>
                     <p className="text-[10px] font-bold text-[#475569] uppercase tracking-widest truncate">
@@ -305,8 +359,8 @@ const TenantVerificationForm: React.FC = () => {
         </div>
 
         <div className="flex flex-col items-center gap-6 mt-12">
-          <button 
-            type="submit" 
+          <button
+            type="submit"
             disabled={isSubmitting}
             className="w-full md:w-auto bg-[#2F6FED] text-white px-16 py-4 rounded-xl font-bold text-sm uppercase tracking-widest hover:bg-[#2557C8] transition-all flex items-center justify-center gap-3 shadow-lg shadow-blue-500/20 disabled:opacity-50"
           >

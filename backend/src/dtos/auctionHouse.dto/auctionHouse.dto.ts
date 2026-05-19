@@ -1,5 +1,6 @@
 import { z } from "zod";
-import { TVerificationStatus } from "../../types/auctionhouse.type";
+import { TVerificationStatus,TAuctionHouseCategory} from "../../types/auctionhouse.type";
+import { AuctionHouseCategory } from "../../constants/constants";
 
 
 export const AuctionHouseVerificationSchema = z.object({
@@ -16,6 +17,8 @@ export const AuctionHouseVerificationSchema = z.object({
   briefDescription: z.string()
     .min(20, "Provide at least 20 characters")
     .max(1000, 'Description is too long'),
+
+  categories: z.array(z.nativeEnum(AuctionHouseCategory)).min(1, "Select at least one category"),
 
   address: z.object({
     city: z.string()
@@ -110,6 +113,7 @@ export interface AuctionHouseResponseDTO {
   name: string;
   yearEstablished: number;
   briefDescription: string;
+  categories: TAuctionHouseCategory[]
   address: {
     city: string;
     state: string;

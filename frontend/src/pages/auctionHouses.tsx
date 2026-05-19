@@ -164,12 +164,33 @@ const PublicAuctionHouses: React.FC = () => {
                       )}
                     </div>
                   </div>
+                                  <div className="mt-5 flex flex-wrap gap-1.5 min-h-[26px]">
+                   {house.categories&&house.categories.length>0?(
+                    house.categories.map((cat,index)=>(
+                      <span key={index}
+                    className="inline-flex items-center text-[9px] font-semibold italic text-[#6B6B6B]/60 tracking-wider uppercase px-0.5 py-1"
+                      >
+                        {cat}
+                      </span>
+                    ))
+                   ):(
+                    <span
+                    className="inline-flex items-center text-[9px] font-semibold italic text-[#6B6B6B]/60 tracking-wider uppercase px-0.5 py-1"
+                    >
+                       Genaral Speciality
+                    </span>
+                   )
+                   
+                   }
 
+                </div>
              
                   <p className="mt-6 text-xs leading-relaxed text-[#6B6B6B] line-clamp-3 min-h-[54px] font-normal">
                     {house.briefDescription || "No institutional business overview statement has been published by this merchant node."}
                   </p>
                 </div>
+
+
 
                
                 <div className="space-y-4">

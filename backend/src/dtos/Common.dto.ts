@@ -1,5 +1,5 @@
 import { otpPurpose } from "../constants/constants";
-
+import { TAuctionHouseCategory } from "../types/auctionhouse.type";
 
 export enum Role {
   ADMIN = 'admin',
@@ -117,8 +117,9 @@ export interface PublicAuctionHouseResponseDTO{
   bussinessName:string;
   profileImage:string;
   briefDescription:string;
-  yearEstablished:string;
+  yearEstablished:number;
   isVerified:boolean;
+  categories:TAuctionHouseCategory[]
   address:{
     city:string;
     state:string;

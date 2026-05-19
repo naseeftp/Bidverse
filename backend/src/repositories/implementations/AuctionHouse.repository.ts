@@ -216,6 +216,7 @@ export class AuctionHouseRepository extends BaseRepository<IAuctionHouseDocument
                     yearEstablished: '$house.yearEstablished',
                     briefDescription: '$house.briefDescription',
                     isVerified: '$house.isVerified',
+                    categories:{$ifNull:['$house.categories',[]]},
                     address: {
                         city: '$house.address.city',
                         state: '$house.address.state',

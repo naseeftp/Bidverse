@@ -1,7 +1,8 @@
 import { Document, Types } from "mongoose";
-import { VerificationStatus } from "../constants/constants";
+import { VerificationStatus,AuctionHouseCategory} from "../constants/constants";
 
 export type TVerificationStatus = typeof VerificationStatus[keyof typeof VerificationStatus]
+export type TAuctionHouseCategory=typeof AuctionHouseCategory[keyof typeof AuctionHouseCategory]
 
 export interface IAuctionHouse {
     _id: Types.ObjectId;
@@ -9,6 +10,7 @@ export interface IAuctionHouse {
     name: string;
     yearEstablished: number;
     briefDescription: string;
+    categories: TAuctionHouseCategory[]
     address: {
         city: string;
         state: string;

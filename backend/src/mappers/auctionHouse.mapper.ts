@@ -9,6 +9,7 @@ export class AuctionHouseMapper {
             name: doc.name,
             yearEstablished: doc.yearEstablished,
             briefDescription: doc.briefDescription,
+            categories: doc.categories || [],
             address: {
                 city: doc.address.city,
                 state: doc.address.state,
