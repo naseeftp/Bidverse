@@ -3,6 +3,7 @@ import publicAuctionService from "../services/publicAuction.service";
 import type { PublicAuctionHouseResponseDTO } from "../types/auth.type";
 import type { IPaginationMeta } from "../types/auth.type";
 import toast from "react-hot-toast";
+import Pagination from "../components/user/pagination";
 
 const AUCTION_CATEGORIES = [
   { value: "all", label: "All Specialties" },
@@ -53,25 +54,6 @@ const PublicAuctionHouses: React.FC = () => {
     fetchHouses();
   }, [fetchHouses]);
 
-  const renderPageNumbers = () => {
-    if (!pagination) return null;
-    const pages = [];
-    for (let i = 1; i <= pagination.totalPages; i++) {
-      pages.push(
-        <button
-          key={i}
-          onClick={() => setPage(i)}
-          className={`w-10 h-10 text-xs font-bold rounded-xl border transition-all duration-300 cursor-pointer ${pagination.currentPage === i
-              ? "bg-[#C9653B] text-white border-[#C9653B] shadow-md shadow-[#C9653B]/20 scale-105"
-              : "bg-white text-[#1F1F1F] border-[#E6E0DA] hover:bg-[#FFF9F4] hover:border-[#C9653B]/40"
-            }`}
-        >
-          {i}
-        </button>
-      );
-    }
-    return pages;
-  };
 
   return (
     <div className="min-h-screen bg-[#FFF9F4] text-[#1F1F1F] font-sans antialiased selection:bg-[#C9653B]/20">
@@ -197,26 +179,26 @@ const PublicAuctionHouses: React.FC = () => {
                       </div>
                     </div>
                     <div className="mt-5 flex flex-wrap gap-1.5 min-h-[26px]">
-                    {house.categories && house.categories.length > 0 ? (
-                      house.categories.map((cat, index) => (
-                        <span
-                          key={index}
-                          className="inline-flex items-center text-[9px] font-bold italic text-[#555555] tracking-wider uppercase px-0.5 py-1">
-                          {cat}
+                      {house.categories && house.categories.length > 0 ? (
+                        house.categories.map((cat, index) => (
+                          <span
+                            key={index}
+                            className="inline-flex items-center text-[9px] font-bold italic text-[#555555] tracking-wider uppercase px-0.5 py-1">
+                            {cat}
+                          </span>
+                        ))
+                      ) : (
+                        <span className="inline-flex items-center text-[9px] font-bold italic text-[#555555] tracking-wider uppercase px-0.5 py-1">
+                          General Specialty
                         </span>
-                      ))
-                    ) : (
-                      <span className="inline-flex items-center text-[9px] font-bold italic text-[#555555] tracking-wider uppercase px-0.5 py-1">
-                        General Specialty
-                      </span>
-                    )}
-                  </div>
+                      )}
+                    </div>
                     <p className="mt-6 text-xs leading-relaxed text-[#3A3A3A] line-clamp-3 min-h-[54px] font-medium">
                       {house.briefDescription || "No institutional business overview statement has been published by this merchant node."}
                     </p>
                   </div>
 
-                  
+
                 </div>
 
                 <div className="space-y-4">
@@ -249,37 +231,12 @@ const PublicAuctionHouses: React.FC = () => {
           </div>
         )}
 
-        {pagination && pagination.totalPages > 1 && (
-          <div className="mt-20 flex items-center justify-center">
-            <div className="inline-flex items-center gap-1.5 bg-white p-2 border border-[#E6E0DA] rounded-2xl shadow-md">
-              <button
-                onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
-                disabled={!pagination.hasPrevPage || loading}
-                className="h-10 px-4 text-xs font-bold rounded-xl text-[#6B6B6B] hover:bg-[#FFF9F4] hover:text-[#C9653B] disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-[#6B6B6B] flex items-center justify-center transition-all cursor-pointer disabled:cursor-not-allowed select-none"
-              >
-                <svg className="w-4 h-4 mr-1.5 stroke-current" fill="none" viewBox="0 0 24 24" strokeWidth="2.5">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
-                </svg>
-                Prev
-              </button>
+        <Pagination
+          pagination={pagination}
+          onPageChange={setPage}
+          loading={loading}
 
-              <div className="flex items-center gap-1.5 px-1">
-                {renderPageNumbers()}
-              </div>
-
-              <button
-                onClick={() => setPage((prev) => Math.min(prev + 1, pagination.totalPages))}
-                disabled={!pagination.hasNextPage || loading}
-                className="h-10 px-4 text-xs font-bold rounded-xl text-[#6B6B6B] hover:bg-[#FFF9F4] hover:text-[#C9653B] disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-[#6B6B6B] flex items-center justify-center transition-all cursor-pointer disabled:cursor-not-allowed select-none"
-              >
-                Next
-                <svg className="w-4 h-4 ml-1.5 stroke-current" fill="none" viewBox="0 0 24 24" strokeWidth="2.5">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-                </svg>
-              </button>
-            </div>
-          </div>
-        )}
+        />
 
       </div>
     </div>

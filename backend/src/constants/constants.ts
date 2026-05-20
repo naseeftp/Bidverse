@@ -151,3 +151,22 @@ export const MESSAGES = {
 
 
 };
+
+export enum AuctionItemStatus{
+    DRAFT='DRAFT',
+    PENDING_APPROVAL='PENDING_APPROVAL',
+    REJECTED='REJECTED',
+    SCHEDULED='SCHEDULED',
+    SOLD='SOLD',
+    PASSED='PASSED',
+    CANCELLED_BY_HOUSE='CANCELLED_BY_HOUSE',
+    CANCELLED_BY_ADMIN='CANCELLED_BY_ADMIN',
+}
+export const AuctionItemStatusValues=Object.values(AuctionItemStatus)
+
+export enum AuctionType{
+    TIMED='TIMED',
+    LIVE='LIVE'
+}
+export const AuctionTypeValues=Object.values(AuctionType)
+
