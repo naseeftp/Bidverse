@@ -3,8 +3,7 @@ import { IAuctionHouseRepository } from "../../repositories/interfaces/IAuctionH
 import { ILoggerService } from "../interface/ILogger.service";
 import { PublicAuctionHouseResponseDTO } from "../../dtos/Common.dto";
 import { IGenericPaginatedResposnse } from "../../types/response.type";
-import { AppError } from "../../errors/AppError";
-import { MESSAGES } from "../../constants/constants";
+
 
 
 export class PublicAuctionService implements IPublicAunctionService{

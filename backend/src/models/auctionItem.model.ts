@@ -6,7 +6,7 @@ import { AuctionItemStatus,AuctionItemStatusValues,AuctionTypeValues} from "../c
 const AuctionItemSchema = new Schema<IAuctionItemDocument>({
     houseId: {
         type:Schema.Types.ObjectId,
-        ref: 'User',
+        ref: 'AuctionHouse',
         required: true,
         index: true
     },

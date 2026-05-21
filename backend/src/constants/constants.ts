@@ -85,8 +85,6 @@ export const MESSAGES = {
     USER_NOT_ACTIVE: "User is not active",
     USER_NOT_FOUND: "User not found",
     USER_BLOCKED: "Your account has been blocked",
-    APPOINTMENT_CANNOT_RESCHEDULE: "You can only reschedule an appointment once.",
-    DOCTOR_SPECIALITY_LIMIT_EXCEEDED: "limit is 2",
     INVALID_CREDENTIALS: "Invalid email or password",
     LOGIN_SUCCESS: "Login successful",
     OTP_SENT: "OTP sent to your email. Please verify to complete registration.",
@@ -144,8 +142,9 @@ export const MESSAGES = {
     ADDRESS_DELETED:'Address Delated Successfully',
     ADDRESS_EDITED:'Address Edited Successfully',
     ADDRESS_CREATED:'Address Created Successfully',
-    
-
+    NOT_PERMITTED:'You are not permitted to this Action',
+    AUCTION_CREATED:'Auction Created Successfully' ,
+   
     LOGOUT_SUCCESS: "Logout success",
     LOGOUT_FAILED: "Logout failed",
 
