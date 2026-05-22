@@ -80,11 +80,7 @@ export const createAuctionItemSchema = yup.object({
             yup.object({
                 id: yup.string().trim().required('image Id Asset Token is required'),
                 url: yup.string()
-                    .url('Invalid image attachment link')
-                    .required('Image URL is required')
-                    .test('is-cloudinary', 'Images must be hosted via Cloudinary CDN', (value) => {
-                        return value ? value.includes('cloudinary.com') : false;
-                    }),
+                   .required('Image URL is required'),
                 isPrimary: yup.boolean().default(false),
                 altText: yup.string().trim().max(200, 'Alt text too long').optional(),
             })

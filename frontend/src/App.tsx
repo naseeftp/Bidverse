@@ -38,6 +38,8 @@ import TenantProfilePage from './pages/tenant/ProfilePage'
 import TenantChangePasswordPage from "./pages/tenant/changePassword";
 import TenantChangeEmailPage from "./pages/tenant/changeEmailPage";
 import TenantVerifyEmailPage from './pages/tenant/changeEmailVerify'
+import CreateAuctionPage from "./pages/tenant/createAuctionPage";
+
 
 import AdminLoginPage from "./pages/admin/LoginPage";
 import AdminDashboard from "./pages/admin/Dashboard";
@@ -106,6 +108,7 @@ function App() {
                   <Route path="/tenant/changePassword" element={<TenantChangePasswordPage/>}/>
                   <Route path="/tenant/changeEmail" element={<TenantChangeEmailPage/>}/>
                   <Route path="/tenant/changeEmail-verify" element={<TenantVerifyEmailPage />}/>
+                  <Route path="/tenant/create-auction" element={<CreateAuctionPage/>}/>
                </Route>
 
             </Route>

@@ -17,7 +17,7 @@ export class AuctionItemMangementSevice implements IAuctionItemMangementSevice{
 
     async createAuction(userId: string, data: CreateAuctionItemDTO): Promise<AuctionItemResponseDTO> {
         this._logger.info('auction item creation requested',{houseowner:userId})
-        const houseExist=await this._auctionHouseRepo.findById(userId);
+        const houseExist=await this._auctionHouseRepo.findOne({userId:userId});
         this._logger.info('auction house exist',{house:houseExist})
         if(!houseExist){
             throw new NotFoundError(MESSAGES.USER_NOT_FOUND)
@@ -40,6 +40,7 @@ export class AuctionItemMangementSevice implements IAuctionItemMangementSevice{
         }))
        }
        const createdItem=await this._auctionItemRepo.create(auctionItemData)
-       return AuctionItemMapper.toResponseDTO(createdItem)
+       const hydratedObject = createdItem.toObject ? createdItem.toObject() : createdItem;
+       return AuctionItemMapper.toResponseDTO(hydratedObject)
     }
 }

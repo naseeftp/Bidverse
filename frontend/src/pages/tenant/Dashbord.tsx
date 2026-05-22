@@ -96,10 +96,18 @@ const TenantDashboard: React.FC = () => {
           </div>
         </div>
       </div>
+      
     );
   }
 
-
+  return(
+    <div>
+      <Link to='/tenant/create-auction'>
+     <button>create Auction</button>
+      </Link>
+    </div>
+   
+  )
 
 
 

@@ -7,7 +7,7 @@ export class AuctionItemMapper {
             id: doc._id.toString(),
             houseId: doc.houseId.toString(),
             title: doc.title,
-            description: doc.title,
+            description: doc.description,
             status: doc.status,
             type: doc.type,
             images: doc.images.map(img => ({
