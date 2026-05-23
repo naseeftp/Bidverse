@@ -3,6 +3,7 @@ import type { IPaginationMeta } from "../../types/auth.type";
 
 interface PaginationProps{
     pagination:IPaginationMeta|null;
+    // eslint-disable-next-line no-unused-vars
     onPageChange:(page:number)=>void;
     loading?:boolean
 }

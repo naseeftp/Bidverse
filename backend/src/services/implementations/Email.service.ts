@@ -102,7 +102,7 @@ export class EmailService implements IEmailService {
     }
 
     async sendVerificationStatusUpdationEmail(businessEmail: string, businessName: string, status: string, reason?: string | null): Promise<void> {
-        let subject = `BidVerse Verification Update: ${businessName}`
+        const subject = `BidVerse Verification Update: ${businessName}`
         let htmlContent;
         if (status == VerificationStatus.REJECTED) {
             htmlContent = getAuctionHouseRejectedTemplate(businessName, businessEmail, reason!)

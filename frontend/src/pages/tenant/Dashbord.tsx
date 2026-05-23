@@ -22,7 +22,7 @@ const TenantDashboard: React.FC = () => {
     setHouse(response.data)
   }
  }
- let status=house?.status
+const status=house?.status
  useEffect(()=>{
   fetchAuctionProfile()
  },[])

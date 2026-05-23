@@ -23,13 +23,11 @@ interface ICropQueueItem {
 
 const CreateAuctionPage: React.FC = () => {
   const [isFormSubmitting, setIsFormSubmitting] = useState(false);
-
-
-  const [cropQueue, setCropQueue] = useState<ICropQueueItem[]>([]);
-  const [activeCropIndex, setActiveCropIndex] = useState<number | null>(null);
+  const [cropQueue, setCropQueue] = useState<ICropQueueItem[]>([]);// arr holding that need to be cropped before hitting main form list
+  const [activeCropIndex, setActiveCropIndex] = useState<number | null>(null);// track which image in the queue is currently visible inside the cropper canvas model
   const [crop, setCrop] = useState<Point>({ x: 0, y: 0 });
-  const [zoom, setZoom] = useState(1);
-  const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null);
+  const [zoom, setZoom] = useState(1);//zoom crop croppedAreapixels are state variables diroctly  pass to react-easy crop for track positioning
+  const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null);//hold the exact pixel cordinates and diamensions of the image area you want to cut out
 
   const { register, handleSubmit, control, setValue, watch, formState: { errors } } = useForm<CreateAuctionItemDTO>({
     resolver: yupResolver(createAuctionItemSchema),
@@ -50,8 +48,8 @@ const CreateAuctionPage: React.FC = () => {
 
     const newQueueItems = selectedFiles.map((file) => ({
       id: crypto.randomUUID(),
-      rawUrl: URL.createObjectURL(file),
-      file
+      rawUrl: URL.createObjectURL(file),// creating local browswer url
+      file          //  fn purpose instead of  passing every selected files into form at once,intercepts the raw files and creates temp browser link for them
     }));
 
     setCropQueue((prev) => [...prev, ...newQueueItems]);
@@ -110,7 +108,7 @@ const CreateAuctionPage: React.FC = () => {
       });
 
       advanceOrCloseCropModal();
-    } catch (err) {
+    } catch  {
       toast.error("Image optimization failed. Please retry.");
     }
   };
@@ -172,8 +170,8 @@ const CreateAuctionPage: React.FC = () => {
       
       data.images.forEach((img) => URL.revokeObjectURL(img.url));
 
-    } catch (error: any) {
-      toast.error(error?.message || "Failed to catalog auction request parameter limits.");
+    } catch {
+      toast.error("Failed to catalog auction request parameter limits.");
     } finally {
       setIsFormSubmitting(false);
     }
