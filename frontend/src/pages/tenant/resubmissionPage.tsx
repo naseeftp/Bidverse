@@ -2,6 +2,8 @@ import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm, type SubmitHandler, type Resolver } from 'react-hook-form';
 import { yupResolver } from "@hookform/resolvers/yup";
+import { AuctionHouseCategory } from "../../types/auctionHouse.type";
+import auctionHouseService from "../../services/auctionHouse.service";
 import * as yup from 'yup';
 import toast from 'react-hot-toast';
 import {
@@ -26,6 +28,11 @@ const resubmissionSchema = yup.object({
     name: yup.string().min(3, 'Name must be at least 3 characters').max(100, 'Name cannot exceed 100 characters').required('Required'),
     yearEstablished: yup.number().typeError('Must be a year').required().min(1700).max(new Date().getFullYear()),
     briefDescription: yup.string().min(20, 'Min 20 characters').max(1000, 'Description cannot exceed 1000 characters').required(),
+      categories: yup
+        .array()
+        .of(yup.string().oneOf(Object.values(AuctionHouseCategory)).required())
+        .min(1, 'Please select at least one operational category specialty')
+        .required('Category specialty is required'),
     address: yup.object({
         city: yup.string().max(50, 'City too long').required('Required'),
         state: yup.string().max(50, 'State too long').required('Required'),
@@ -51,7 +58,7 @@ const TenantVerificationResubmissionPage: React.FC = () => {
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
     const { profile, status, loading, reason } = useAppSelector((state) => state.auctionHouse);
-
+     console.log('profile',profile)
     const { register, handleSubmit, setValue, watch, reset, formState: { errors, isSubmitting } } = useForm<ResubmitFormData>({
         resolver: yupResolver(resubmissionSchema) as Resolver<ResubmitFormData>,
         defaultValues: {
@@ -65,10 +72,16 @@ const TenantVerificationResubmissionPage: React.FC = () => {
     const regCertFile = watch('registrationCertificate');
     const idProofFile = watch('identityProof');
 
+    const fetchAuctionHouseData= async()=>{
+        const result=await auctionHouseService.getProfile()
+        console.log('result',result)
+    }
+
     useEffect(() => {
         dispatch(fetchAuctionProfile());
+        fetchAuctionHouseData()
     }, [dispatch]);
-
+    
     useEffect(() => {
         if (profile) {
             reset({

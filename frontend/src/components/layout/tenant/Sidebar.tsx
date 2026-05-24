@@ -1,6 +1,6 @@
 import React,{useState,useEffect} from "react";
 import { Link, useLocation } from "react-router-dom";
-import { LayoutDashboard, Gavel, ShieldCheck, Settings, LogOut } from "lucide-react";
+import { LayoutDashboard, Gavel,Settings, LogOut } from "lucide-react";
 import { useAppDispatch} from "../../../hooks/redux.hooks";
 import { logout } from "../../../redux/user/auth.slice";
 import { VerificationStatus } from "../../../types/auctionHouse.type";
@@ -33,7 +33,7 @@ const Sidebar: React.FC = () => {
 
   const publicItems = [
     { name: "Dashboard", path: "/tenant/dashboard", icon: <LayoutDashboard size={18} /> },
-    { name: "KYC Verification", path: "/tenant/kyc", icon: <ShieldCheck size={18} /> },
+    
   ];
 
   const verifiedItems = [

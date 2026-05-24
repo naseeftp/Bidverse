@@ -6,7 +6,8 @@ import { Roles } from '../constants/constants';
 const UserSchema = new Schema<IUserDocument>({
     name: {
         type: String,
-        required: true
+        required: true,
+        trim:true
     },
     email: {
         type: String,

@@ -211,6 +211,7 @@ const AddressPage: React.FC = () => {
                                 <div>
                                     <label className="block text-sm font-bold text-[#6B6B6B] mb-1">Alternative Phone (Optional)</label>
                                     <input {...register("altPhone")} className="w-full p-3 border border-[#E6E0DA] rounded-lg" placeholder="10 digits" />
+                                    {errors.altPhone&&<p className="text-[#991B1B] text-xs mt-1">{errors.altPhone.message}</p>}
                                 </div>
 
 

@@ -151,8 +151,10 @@ export class AuctionHouseRepository extends BaseRepository<IAuctionHouseDocument
                     businessName: { $ifNull: ['$house.name', 'NA'] },
                     yearEstablished: '$house.yearEstablished',
                     briefDescription: '$house.briefDescription',
+                    category:'$house.categories',
                     address: '$house.address',
                     contact: '$house.contact',
+                    
                     documents: {
                         registrationCertificateUrl:
                             '$house.legal.registrationCertificateUrl',

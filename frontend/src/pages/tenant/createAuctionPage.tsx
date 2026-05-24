@@ -65,8 +65,8 @@ const CreateAuctionPage: React.FC = () => {
 
   
   const processCroppedBlob = async (activeItem: ICropQueueItem, pixelCrop: Area): Promise<File> => {
-    const image = new Image();
-    image.src = activeItem.rawUrl;
+    const image = new Image();   // instantiate an invisible html img elemnt  in your browser's background engine memory                               
+    image.src = activeItem.rawUrl;  //and binds it to the local temporary file location tracker                           //this fn act as virtual knife
     await new Promise((resolve) => (image.onload = resolve));
 
     const canvas = document.createElement("canvas");
@@ -78,27 +78,27 @@ const CreateAuctionPage: React.FC = () => {
 
     ctx.drawImage(
       image,
-      pixelCrop.x, pixelCrop.y, pixelCrop.width, pixelCrop.height,
-      0, 0, pixelCrop.width, pixelCrop.height
+      pixelCrop.x, pixelCrop.y, pixelCrop.width, pixelCrop.height,//source where to cut the orginal file
+      0, 0, pixelCrop.width, pixelCrop.height // destination where to past it on canvas
     );
 
-    return new Promise((resolve, reject) => {
-      canvas.toBlob((blob) => {
+    return new Promise((resolve, reject) => {  // it takes temp pixel data drawn on virtual web screen and convert into stndrd js file object
+      canvas.toBlob((blob) => {                //[ Canvas Pixels on Screen ] ──► (canvas.toBlob) ──► [ Raw Binary Data Array ] ──► (new File) ──► [ Labeled System File ]                    
         if (!blob) return reject(new Error("Canvas generation returned null data stream"));
-        const finalFile = new File([blob], activeItem.file.name, { type: activeItem.file.type });
+        const finalFile = new File([blob], activeItem.file.name, { type: activeItem.file.type });//[blob]: The raw cropped image data,activeItem.file.name: It copies over the original name of the file  { type: activeItem.file.type }: It seals the file extension type.
         resolve(finalFile);
-      }, activeItem.file.type);
-    });
+      }, activeItem.file.type);  //activeItem.file.type passed as a configuration argmnt,telling the brwsr exctly how to encode row pixl data
+    });           //canvas.toBlob( (blob) => { ... }, activeItem.file.type ); 2 argmnts
   };
 
-  const saveActiveCropSelection = async () => {
+  const saveActiveCropSelection = async () => {  // this fn bridge that connect your image cropping modal to ur main applctn form
     if (activeCropIndex === null || !croppedAreaPixels) return;
     const activeItem = cropQueue[activeCropIndex];
 
     try {
       const finishedCroppedFile = await processCroppedBlob(activeItem, croppedAreaPixels);
       
-      const frontendPreviewUrl = URL.createObjectURL(finishedCroppedFile);
+      const frontendPreviewUrl = URL.createObjectURL(finishedCroppedFile);// now we have new file instance that ,that broser shows on the screen
 
       appendImageField({
         id: activeItem.id,
@@ -128,7 +128,7 @@ const CreateAuctionPage: React.FC = () => {
   };
 
   const setPrimaryImageIndex = (targetIndex: number) => {
-    watchedImages.forEach((_, index) => {
+    watchedImages.forEach((_, index) => { //_ image object itslf and which insnt needed here
       setValue(`images.${index}.isPrimary`, index === targetIndex);
     });
   };
@@ -139,9 +139,9 @@ const CreateAuctionPage: React.FC = () => {
       setIsFormSubmitting(true);
 
       const secureUploadPipelines = attachedImages.map(async (field, idx) => {
-        const previewUrl = data.images[idx].url;
-        const res = await fetch(previewUrl);
-        const blob = await res.blob();
+        const previewUrl = data.images[idx].url;// gtes the local browser link
+        const res = await fetch(previewUrl);// http fetches the raw bytes from browsers ram
+        const blob = await res.blob();// extract the raw binary file chunk
         const fileInstance = new File([blob], `item_photo_${idx}.jpg`, { type: blob.type });
 
         const secureCdnUrl = await uploadservice.uploadSecurely(fileInstance);

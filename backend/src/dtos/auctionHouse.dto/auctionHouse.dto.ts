@@ -150,7 +150,7 @@ export interface AdminAuctionHouseDetailDTO {
   businessName: string | null;
   yearEstablished: number | null;
   briefDescription: string | null;
-
+  category:TAuctionHouseCategory[]
   address: {
     city: string;
     state: string;
