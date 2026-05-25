@@ -1,8 +1,9 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm, type SubmitHandler, type Resolver } from 'react-hook-form';
 import { yupResolver } from "@hookform/resolvers/yup";
 import { AuctionHouseCategory } from "../../types/auctionHouse.type";
+import type { TAuctionHouseCategory } from "../../types/auctionHouse.type";
 import auctionHouseService from "../../services/auctionHouse.service";
 import * as yup from 'yup';
 import toast from 'react-hot-toast';
@@ -16,19 +17,21 @@ import {
     X,
     FileText,
     UploadCloud,
-    CheckCircle2
+    CheckCircle2,
+    PhoneCall,
+    RefreshCw
 } from "lucide-react";
 
-import { useAppDispatch, useAppSelector } from "../../hooks/redux.hooks";
-import { fetchAuctionProfile, submitVerification } from "../../redux/tenant/auctionHouse.slice";
+import { useAppDispatch } from "../../hooks/redux.hooks";
+import { submitVerification } from "../../redux/tenant/auctionHouse.slice";
 import uploadservice from "../../services/uploadservice";
-import type { AuctionHouseSubmissionDTO } from "../../types/auctionHouse.type";
+import type { AdminAuctionHouseDetailDTO, AuctionHouseSubmissionDTO } from "../../types/auctionHouse.type";
 
 const resubmissionSchema = yup.object({
-    name: yup.string().min(3, 'Name must be at least 3 characters').max(100, 'Name cannot exceed 100 characters').required('Required'),
+    name: yup.string().trim().min(3, 'Name must be at least 3 characters').max(100, 'Name cannot exceed 100 characters').required('Required'),
     yearEstablished: yup.number().typeError('Must be a year').required().min(1700).max(new Date().getFullYear()),
     briefDescription: yup.string().min(20, 'Min 20 characters').max(1000, 'Description cannot exceed 1000 characters').required(),
-      categories: yup
+    categories: yup
         .array()
         .of(yup.string().oneOf(Object.values(AuctionHouseCategory)).required())
         .min(1, 'Please select at least one operational category specialty')
@@ -40,12 +43,12 @@ const resubmissionSchema = yup.object({
         fullAddress: yup.string().min(5, 'Address too short').max(255, 'Address too long').required()
     }),
     contact: yup.object({
-        primaryContactName: yup.string().max(100, 'Name too long').required('Required'),
+        primaryContactName: yup.string().trim().min(3,'Name must be at least 3 characters').max(100, 'Name too long').required('Required'),
         businessEmail: yup.string().email('Invalid email').max(100, 'Email too long').required(),
         phone: yup.string().matches(/^\d{10}$/, 'Phone must be exactly 10 digits').max(10, 'Phone cannot exceed 10 digits').required(),
     }),
     legal: yup.object({
-        registrationNumber: yup.string().max(100, 'Registration number too long') .required('Required'),
+        registrationNumber: yup.string().max(100, 'Registration number too long').required('Required'),
         taxId: yup.string().max(50, 'Tax ID too long').required('Required'),
     }),
     registrationCertificate: yup.mixed<File>().nullable().optional(),
@@ -57,51 +60,95 @@ type ResubmitFormData = yup.InferType<typeof resubmissionSchema>;
 const TenantVerificationResubmissionPage: React.FC = () => {
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
-    const { profile, status, loading, reason } = useAppSelector((state) => state.auctionHouse);
-     console.log('profile',profile)
+    const [profile, setProfile] = useState<AdminAuctionHouseDetailDTO | null>(null)
+    const [loading, setLoading] = useState(false)
+    const [regCertPreview, setRegCertPreview] = useState<string | null>(null);
+    const [idProofPreview, setIdProofReview] = useState<string | null>(null);
+
+    const status = profile?.status;
+
     const { register, handleSubmit, setValue, watch, reset, formState: { errors, isSubmitting } } = useForm<ResubmitFormData>({
         resolver: yupResolver(resubmissionSchema) as Resolver<ResubmitFormData>,
         defaultValues: {
             name: '',
+            briefDescription: "",
+            categories: [],
             address: { city: '', state: '', country: '', fullAddress: '' },
             contact: { primaryContactName: '', businessEmail: '', phone: '' },
             legal: { registrationNumber: '', taxId: '' }
+
         }
     });
 
     const regCertFile = watch('registrationCertificate');
     const idProofFile = watch('identityProof');
+    const selectedCategories = watch('categories') || [];
+    useEffect(() => {
+        if (regCertFile instanceof File) {
+            const objectUrl = URL.createObjectURL(regCertFile)
+            setRegCertPreview(objectUrl);
+            return () => URL.revokeObjectURL(objectUrl)
+        } else {
+            setRegCertPreview(null)
+        }
+    }, [regCertFile])
+    useEffect(() => {
+        if (idProofFile instanceof File) {
+            const objectUrl = URL.createObjectURL(idProofFile);
+            setIdProofReview(objectUrl);
+            return () => URL.revokeObjectURL(objectUrl)
+        }
+        else {
+            setIdProofReview(null)
+        }
+    }, [idProofFile])
 
-    const fetchAuctionHouseData= async()=>{
-        const result=await auctionHouseService.getProfile()
-        console.log('result',result)
+    const fetchAuctionHouseData = async () => {
+        setLoading(true)
+        const response = await auctionHouseService.getProfile()
+        if (response.success && response.data) {
+            setProfile(response.data)
+        }
+        setLoading(false)
     }
 
     useEffect(() => {
-        dispatch(fetchAuctionProfile());
         fetchAuctionHouseData()
     }, [dispatch]);
-    
+
     useEffect(() => {
+
         if (profile) {
             reset({
-                name: profile.name,
-                yearEstablished: profile.yearEstablished,
-                briefDescription: profile.briefDescription,
-                address: profile.address,
-                contact: profile.contact,
+                name: profile.businessName ?? '',
+                yearEstablished: profile.yearEstablished ?? 0,
+                briefDescription: profile.briefDescription ?? '',
+                categories: (profile.category as TAuctionHouseCategory[]) ?? [],
+                address: profile.address ?? { city: '', state: '', country: '', fullAddress: '' },
+                contact: profile.contact ?? { primaryContactName: '', businessEmail: '', phone: '' },
                 legal: {
-                    registrationNumber: profile.documents.registerNumber,
-                    taxId: profile.documents.taxId
+                    registrationNumber: profile.documents?.registerNumber,
+                    taxId: profile.documents?.taxId
                 }
             });
         }
     }, [profile, reset]);
 
+    const handleCategoryToggle = (category: TAuctionHouseCategory) => {
+        const current = [...selectedCategories];
+        const index = current.indexOf(category);
+        if (index > -1) {
+            current.splice(index, 1)
+        } else {
+            current.push(category)
+        }
+        setValue('categories', current, { shouldValidate: true })
+    }
+
     const onSubmit: SubmitHandler<ResubmitFormData> = async (data) => {
         try {
-            let regCertUrl = profile?.documents.registrationCertificateUrl || '';
-            let idProofUrl = profile?.documents.identityProofUrl || '';
+            let regCertUrl = profile?.documents?.registrationCertificateUrl || '';
+            let idProofUrl = profile?.documents?.identityProofUrl || '';
 
             if (data.registrationCertificate instanceof File) {
                 regCertUrl = await uploadservice.uploadSecurely(data.registrationCertificate);
@@ -112,6 +159,8 @@ const TenantVerificationResubmissionPage: React.FC = () => {
 
             const finalPayload: AuctionHouseSubmissionDTO = {
                 ...data,
+
+
                 legal: {
                     registrationNumber: data.legal.registrationNumber,
                     taxId: data.legal.taxId,
@@ -142,70 +191,110 @@ const TenantVerificationResubmissionPage: React.FC = () => {
         );
     }
 
-    const DocumentPreview = ({ label, currentUrl, selectedFile, onClear }: { 
-        label: string, 
-        currentUrl?: string, 
-        selectedFile?: File | null, 
-        onClear: (file: File) => void // eslint-disable-line no-unused-vars
-    }) => (
-        <div className="space-y-2">
-            <label className={labelStyle}>{label}</label>
-            <div className="relative group border-2 border-dashed border-[#E2E8F0] rounded-2xl p-4 bg-[#FFFFFF] hover:bg-[#F5F7FB] transition-all">
-                {selectedFile ? (
-                    <div className="flex items-center justify-between bg-[#F0FDF4] p-3 rounded-xl border border-[#DCFCE7]">
-                        <div className="flex items-center gap-3">
-                            <CheckCircle2 size={18} className="text-[#22C55E]" />
-                            <span className="text-xs font-semibold text-[#166534] truncate max-w-[150px]">{selectedFile.name}</span>
+    const DocumentPreview = ({
+        label,
+        currentUrl,
+        localPreviewUrl,
+        selectedFile,
+        onFileSelect,
+        onClearFile
+    }: {
+        label: string,
+        currentUrl?: string,
+        localPreviewUrl: string | null,
+        selectedFile?: File | null,
+        onFileSelect: (file: File) => void,
+        onClearFile: () => void
+    }) => {
+        const displayUrl = localPreviewUrl || currentUrl;
+        const isImage = displayUrl?.match(/\.(jpeg|jpg|gif|png|webp)$/i) || localPreviewUrl;
+
+        return (
+            <div className="space-y-2">
+                <label className={labelStyle}>{label}</label>
+                <div className="relative border-2 border-dashed border-[#E2E8F0] rounded-2xl p-4 bg-[#FFFFFF] transition-all">
+
+                    {selectedFile ? (
+                        <div className="flex items-center justify-between bg-[#F0FDF4] p-3 rounded-xl border border-[#DCFCE7]">
+                            <div className="flex items-center gap-3 min-w-0 flex-1">
+                                {isImage ? (
+                                    <div className="w-10 h-10 rounded-lg bg-white overflow-hidden border border-[#E2E8F0] flex-shrink-0">
+                                        <img src={displayUrl!} alt="Local Preview" className="w-full h-full object-cover" />
+                                    </div>
+                                ) : (
+                                    <CheckCircle2 size={18} className="text-[#22C55E] flex-shrink-0" />
+                                )}
+                                <div className="min-w-0 flex-1">
+                                    <p className="text-xs font-semibold text-[#166534] truncate">{selectedFile.name}</p>
+                                    <p className="text-[10px] text-[#22C55E] font-medium">Ready to upload</p>
+                                </div>
+                            </div>
+                            <button
+                                type="button"
+                                onClick={onClearFile}
+                                className="p-1.5 hover:bg-[#DCFCE7] rounded-md text-[#166534] transition-colors"
+                            >
+                                <X size={14} />
+                            </button>
                         </div>
-                        <button type="button" className="p-1 hover:bg-[#DCFCE7] rounded-md text-[#166534]"><X size={14} /></button>
-                    </div>
-                ) : currentUrl ? (
-                    <div className="flex items-center gap-4">
-                        <div className="w-16 h-16 rounded-lg bg-[#F5F7FB] overflow-hidden border border-[#E2E8F0] flex-shrink-0">
-                            {currentUrl.match(/\.(jpeg|jpg|gif|png)$/) ? (
-                                <img src={currentUrl} alt="Preview" className="w-full h-full object-cover" />
-                            ) : (
-                                <div className="w-full h-full flex items-center justify-center text-[#2F6FED]"><FileText size={24} /></div>
-                            )}
+                    ) : currentUrl ? (
+                        <div className="flex items-center justify-between gap-4">
+                            <div className="flex items-center gap-4 min-w-0 flex-1">
+                                <div className="w-16 h-16 rounded-lg bg-[#F5F7FB] overflow-hidden border border-[#E2E8F0] flex-shrink-0">
+                                    {isImage ? (
+                                        <img src={currentUrl} alt="Server Record" className="w-full h-full object-cover" />
+                                    ) : (
+                                        <div className="w-full h-full flex items-center justify-center text-[#2F6FED]"><FileText size={24} /></div>
+                                    )}
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                    <p className="text-[10px] font-bold text-[#2F6FED] uppercase tracking-tighter mb-1">Current File Attached</p>
+                                    <p className="text-xs text-[#475569] truncate font-medium">Click change option to switch document</p>
+                                </div>
+                            </div>
+
+                            {/* Explicit Visible Change Button Action Block */}
+                            <label className="flex items-center gap-1.5 bg-white border border-[#E2E8F0] px-3 py-1.5 rounded-xl text-xs font-bold text-[#475569] hover:bg-[#F8FAFC] hover:text-[#0F172A] cursor-pointer shadow-sm transition-all flex-shrink-0">
+                                <RefreshCw size={12} />
+                                <span>Change</span>
+                                <input
+                                    type="file"
+                                    accept="image/*,application/pdf"
+                                    className="hidden"
+                                    onChange={(event) => {
+                                        if (event.target.files && event.target.files[0]) {
+                                            onFileSelect(event.target.files[0]);
+                                        }
+                                    }}
+                                />
+                            </label>
                         </div>
-                        <div className="flex-1">
-                            <p className="text-[10px] font-bold text-[#2F6FED] uppercase tracking-tighter mb-1">Current File Attached</p>
-                            <input 
-                                type="file" 
-                                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" 
+                    ) : (
+
+                        <label className="py-4 flex flex-col items-center gap-2 cursor-pointer group hover:bg-[#F5F7FB] rounded-xl transition-all w-full">
+                            <input
+                                type="file"
+                                accept="image/*,application/pdf"
+                                className="hidden"
                                 onChange={(event) => {
                                     if (event.target.files && event.target.files[0]) {
-                                        onClear(event.target.files[0]); 
+                                        onFileSelect(event.target.files[0]);
                                     }
                                 }}
                             />
-                            <p className="text-[11px] text-[#475569]">Click to replace with new file</p>
-                        </div>
-                    </div>
-                ) : (
-                    <div className="py-4 flex flex-col items-center gap-2">
-                        <UploadCloud size={24} className="text-[#94A3B8]" />
-                        <span className="text-[11px] font-bold text-[#475569] uppercase">Upload Document</span>
-                        <input 
-                            type="file" 
-                            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" 
-                            onChange={(event) => {
-                                if (event.target.files && event.target.files[0]) {
-                                    onClear(event.target.files[0]); 
-                                }
-                            }}
-                        />
-                    </div>
-                )}
+                            <UploadCloud size={24} className="text-[#94A3B8] group-hover:text-[#2F6FED] transition-colors" />
+                            <span className="text-[11px] font-bold text-[#475569] uppercase group-hover:text-[#0F172A] transition-colors">Upload Document</span>
+                        </label>
+                    )}
+                </div>
             </div>
-        </div>
-    );
-
+        );
+    };
     return (
         <div className="min-h-screen bg-[#F5F7FB] pt-12 pb-24 px-6">
             <div className="max-w-4xl mx-auto">
-                <button 
-                    onClick={() => navigate(-1)} 
+                <button
+                    onClick={() => navigate(-1)}
                     className="flex items-center gap-2 mb-8 text-[#475569] hover:text-[#0F172A] transition-colors font-bold text-[11px] uppercase tracking-widest"
                 >
                     <ArrowLeft size={14} /> Back to Dashboard
@@ -221,7 +310,7 @@ const TenantVerificationResubmissionPage: React.FC = () => {
                         <AlertCircle className="text-[#EF4444] mt-0.5" size={20} />
                         <div>
                             <h3 className="text-[10px] font-black uppercase text-[#991B1B] tracking-widest">Rejection Reason</h3>
-                            <p className="text-sm text-[#B91C1C] mt-1 font-medium">{reason || "Document mismatch."}</p>
+                            <p className="text-sm text-[#B91C1C] mt-1 font-medium">{profile?.rejectionReason || "Document mismatch."}</p>
                         </div>
                     </div>
                 )}
@@ -234,7 +323,7 @@ const TenantVerificationResubmissionPage: React.FC = () => {
                             </div>
                             <h2 className="text-sm font-black uppercase tracking-widest text-[#0F172A]">Identity Details</h2>
                         </div>
-                        
+
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div className="space-y-1">
                                 <label className={labelStyle}>Business Name</label>
@@ -253,7 +342,62 @@ const TenantVerificationResubmissionPage: React.FC = () => {
                             </div>
                         </div>
                     </div>
+                    <div className={cardStyle}>
+                        <div className="flex items-center gap-3 mb-4">
+                            <div className="w-10 h-10 bg-[#F5F7FB] rounded-xl flex items-center justify-center text-[#2F6FED]">
+                                <CheckCircle2 size={20} />
+                            </div>
+                            <h2 className="text-sm font-black uppercase tracking-widest text-[#0F172A]">Operational Specialties</h2>
+                        </div>
+                        <p className="text-xs text-[#64748B] mb-4 font-medium">Select all vertical specialties handled inside your local lot yards.</p>
 
+                        <div className="flex flex-wrap gap-2">
+                            {Object.values(AuctionHouseCategory).map((cat) => {
+                                const isSelected = selectedCategories.includes(cat);
+                                return (
+                                    <button
+                                        type="button"
+                                        key={cat}
+                                        onClick={() => handleCategoryToggle(cat)}
+                                        className={`px-4 py-2.5 rounded-xl text-xs font-bold border transition-all ${isSelected
+                                                ? "bg-[#0F172A] border-[#0F172A] text-[#FFFFFF]"
+                                                : "bg-[#FFFFFF] border-[#E2E8F0] text-[#475569] hover:bg-[#F8FAFC]"
+                                            }`}
+                                    >
+                                        {cat}
+                                    </button>
+                                );
+                            })}
+                        </div>
+                        {errors.categories && <p className={errorStyle}>{errors.categories.message}</p>}
+                    </div>
+
+                    <div className={cardStyle}>
+                        <div className="flex items-center gap-3 mb-8">
+                            <div className="w-10 h-10 bg-[#F5F7FB] rounded-xl flex items-center justify-center text-[#2F6FED]">
+                                <PhoneCall size={20} />
+                            </div>
+                            <h2 className="text-sm font-black uppercase tracking-widest text-[#0F172A]">Corporate Contacts</h2>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div className="space-y-1">
+                                <label className={labelStyle}>Contact Rep Name</label>
+                                <input {...register('contact.primaryContactName')} placeholder="John Doe" className={inputStyle} />
+                                {errors.contact?.primaryContactName && <p className={errorStyle}>{errors.contact.primaryContactName.message}</p>}
+                            </div>
+                            <div className="space-y-1">
+                                <label className={labelStyle}>Business Email Address</label>
+                                <input {...register('contact.businessEmail')} placeholder="corp@domain.com" className={inputStyle} />
+                                {errors.contact?.businessEmail && <p className={errorStyle}>{errors.contact.businessEmail.message}</p>}
+                            </div>
+                            <div className="space-y-1">
+                                <label className={labelStyle}>Official Direct Line</label>
+                                <input {...register('contact.phone')} placeholder="10-digit number" className={inputStyle} />
+                                {errors.contact?.phone && <p className={errorStyle}>{errors.contact.phone.message}</p>}
+                            </div>
+                        </div>
+                    </div>
                     <div className={cardStyle}>
                         <div className="flex items-center gap-3 mb-8">
                             <div className="w-10 h-10 bg-[#F5F7FB] rounded-xl flex items-center justify-center text-[#2F6FED]">
@@ -274,7 +418,7 @@ const TenantVerificationResubmissionPage: React.FC = () => {
                             <FileCheck size={20} className="text-[#2F6FED]" />
                             <h2 className="text-sm font-black uppercase tracking-widest text-[#0F172A]">Compliance Documents</h2>
                         </div>
-                        
+
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
                             <div className="space-y-6">
                                 <div className="space-y-1">
@@ -289,25 +433,29 @@ const TenantVerificationResubmissionPage: React.FC = () => {
 
                             <div className="space-y-6">
                                 <div className="grid grid-cols-1 gap-4">
-                                    <DocumentPreview 
+                                    <DocumentPreview
                                         label="Business Certificate"
-                                        currentUrl={profile?.documents.registrationCertificateUrl}
+                                        currentUrl={profile?.documents?.registrationCertificateUrl}
                                         selectedFile={regCertFile}
-                                        onClear={(file) => setValue('registrationCertificate', file)}
+                                        localPreviewUrl={regCertPreview}
+                                        onFileSelect={(file) => setValue('registrationCertificate', file, { shouldValidate: true })}
+                                        onClearFile={() => setValue('registrationCertificate', null, { shouldValidate: true })}
                                     />
-                                    <DocumentPreview 
+                                    <DocumentPreview
                                         label="Owner Identity Proof"
-                                        currentUrl={profile?.documents.identityProofUrl}
+                                        currentUrl={profile?.documents?.identityProofUrl}
                                         selectedFile={idProofFile}
-                                        onClear={(file) => setValue('identityProof', file)}
+                                        localPreviewUrl={idProofPreview}
+                                        onFileSelect={(file) => setValue('identityProof', file, { shouldValidate: true })}
+                                        onClearFile={() => setValue('identityProof', null, { shouldValidate: true })}
                                     />
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <button 
-                        type="submit" 
+                    <button
+                        type="submit"
                         disabled={isSubmitting}
                         className="w-full bg-[#2F6FED] text-white py-4 rounded-xl font-bold text-sm uppercase tracking-[0.1em] hover:bg-[#2557C8] transition-all flex items-center justify-center gap-3 disabled:opacity-50 shadow-lg shadow-[#2F6FED]/20"
                     >
