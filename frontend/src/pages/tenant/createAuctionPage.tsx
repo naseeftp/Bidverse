@@ -12,7 +12,7 @@ import  type { CreateAuctionItemDTO } from "../../types/auctionItem.dto";
 import uploadservice from "../../services/uploadservice";
 import auctionItemMangementService from "../../services/auctionItemMangement.service";
 import { AuctionType } from "../../types/auctionItem.dto";
-
+import { useNavigate } from "react-router-dom";
 
 
 interface ICropQueueItem {
@@ -28,7 +28,7 @@ const CreateAuctionPage: React.FC = () => {
   const [crop, setCrop] = useState<Point>({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);//zoom crop croppedAreapixels are state variables diroctly  pass to react-easy crop for track positioning
   const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null);//hold the exact pixel cordinates and diamensions of the image area you want to cut out
-
+  const navigate=useNavigate();
   const { register, handleSubmit, control, setValue, watch, formState: { errors } } = useForm<CreateAuctionItemDTO>({
     resolver: yupResolver(createAuctionItemSchema),
     defaultValues: { images: [] }
@@ -161,15 +161,16 @@ const CreateAuctionPage: React.FC = () => {
       };
 
       const result = await auctionItemMangementService.createAuctionItem(finalAuctionPayload);
-
-      if (!result.success) {
-        throw new Error(result.message);
+      if(result.success){
+        toast.success(result.message)
+        data.images.forEach((img) => URL.revokeObjectURL(img.url));
+        navigate('/tenant/dashboard')
       }
-
-      toast.success(result.message);
+      else{
+        toast.error(result.message)
+      }
       
-      data.images.forEach((img) => URL.revokeObjectURL(img.url));
-
+      
     } catch {
       toast.error("Failed to catalog auction request parameter limits.");
     } finally {

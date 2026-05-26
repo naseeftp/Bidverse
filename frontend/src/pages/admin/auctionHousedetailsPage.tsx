@@ -18,7 +18,7 @@ const AuctionHouseDetails: React.FC = () => {
     const [showRejectInput, setShowRejectInput] = useState(false);
     const [selectedImg, setSelectedImg] = useState<string | null>(null);
 
-  
+
     const [isBlockModalOpen, setIsBlockModalOpen] = useState(false);
     const [blockModalMode, setBlockModalMode] = useState<"BLOCK" | "UNBLOCK">("BLOCK");
     const [blockReason, setBlockReason] = useState("");
@@ -37,9 +37,9 @@ const AuctionHouseDetails: React.FC = () => {
         if (id) fetchDetails();
     }, [id, fetchDetails]);
 
-   
+
     const handleStatusUpdate = async (status: TVerificationStatus) => {
-        if(!house?.houseId) return
+        if (!house?.houseId) return
         if (status === VerificationStatus.REJECTED) {
             if (!showRejectInput) {
                 setShowRejectInput(true);
@@ -65,7 +65,7 @@ const AuctionHouseDetails: React.FC = () => {
                 setRejectionReason('');
                 toast.success(`Protocol updated to ${status}`);
             }
-            
+
         } catch {
             toast.error("Protocol update failed.");
         } finally {
@@ -89,11 +89,11 @@ const AuctionHouseDetails: React.FC = () => {
 
         setIsStatusSubmitting(true);
         try {
-            
+
             const response = await adminService.updateUserStatus(house.userId, payload);
 
             if (response.success) {
-                
+
                 setHouse(prev => prev ? ({ ...prev, isAccountBlocked: !targetActiveState }) : null);
                 toast.success(`Owner ${targetActiveState ? "unblocked" : "blocked"} successfully`);
                 setIsBlockModalOpen(false);
@@ -121,7 +121,7 @@ const AuctionHouseDetails: React.FC = () => {
     return (
         <div className="min-h-screen bg-[#F3F4F6] p-6 lg:p-12 text-[#0F172A] font-sans">
 
-            
+
             {selectedImg && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center bg-[#111827]/95 p-6 cursor-zoom-out" onClick={() => setSelectedImg(null)}>
                     <img src={selectedImg} className="max-w-full max-h-full rounded shadow-2xl border border-[#D4AF37]" alt="Preview" />
@@ -160,7 +160,7 @@ const AuctionHouseDetails: React.FC = () => {
                     )}
                 </header>
 
-                
+
                 {showRejectInput && (
                     <section className="bg-white border-l-4 border-[#DC2626] p-8 shadow-sm animate-in slide-in-from-top-4 duration-300">
                         <h3 className="text-[11px] font-black text-[#DC2626] uppercase tracking-widest mb-4">Rejection Protocol</h3>
@@ -177,7 +177,7 @@ const AuctionHouseDetails: React.FC = () => {
                     </section>
                 )}
 
-               
+
                 <section className="bg-white border border-[#E5E7EB] shadow-sm overflow-hidden rounded-sm">
                     <div className="bg-[#111827] px-8 py-4 flex items-center gap-3">
                         <FaUserShield className="text-[#D4AF37]" />
@@ -199,7 +199,7 @@ const AuctionHouseDetails: React.FC = () => {
                             </span>
                         </div>
                         <div className="md:text-right">
-                            <button 
+                            <button
                                 onClick={() => handleOpenBlockModal(house.isAccountBlocked ? "UNBLOCK" : "BLOCK")}
                                 className={`px-6 py-2 text-[10px] font-black uppercase border transition-all ${house.isAccountBlocked ? 'border-[#16A34A] text-[#16A34A] hover:bg-[#16A34A] hover:text-white' : 'border-[#DC2626] text-[#DC2626] hover:bg-[#DC2626] hover:text-white'}`}
                             >
@@ -209,7 +209,7 @@ const AuctionHouseDetails: React.FC = () => {
                     </div>
                 </section>
 
-               
+
                 <section className="space-y-6">
                     {!isSubmitted ? (
                         <div className="bg-white border border-[#E5E7EB] p-20 text-center rounded-sm">
@@ -223,7 +223,7 @@ const AuctionHouseDetails: React.FC = () => {
                                 <FaStoreAlt className="text-[#D4AF37]" />
                                 <h2 className="text-white text-[11px] font-black uppercase tracking-[0.3em]">Business Registry</h2>
                             </div>
-                            
+
                             <div className="p-8 space-y-10">
                                 <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
                                     <div className="md:col-span-2 space-y-6">
@@ -237,9 +237,22 @@ const AuctionHouseDetails: React.FC = () => {
                                                 <p className="text-sm font-bold">{house.yearEstablished}</p>
                                             </div>
                                             <div>
-                                                <label className="text-[9px] font-black text-[#6B7280] uppercase tracking-widest block mb-1">Tax / Registration ID</label>
-                                                <p className="text-sm font-mono font-bold text-[#111827]">{house.documents?.taxId || house.documents?.registerNumber}</p>
+                                                <label className="text-[9px] font-black text-[#6B7280] uppercase tracking-widest block mb-1">Tax Id</label>
+                                                <p className="text-sm font-mono font-bold text-[#111827]">{house.documents?.taxId}</p>
                                             </div>
+                                            <div>
+                                                <label className="text-[9px] font-black text-[#6B7280] uppercase tracking-widest block mb-1">Registarion No</label>
+                                                <p className="text-sm font-mono font-bold text-[#111827]">{house.documents?.registerNumber}</p>
+                                            </div>
+                                            <div>
+                                                <label className="text-[9px] font-black text-[#6B7280] uppercase tracking-widest block mb-1">House Category</label>
+                                                <p className="text-sm font-mono font-bold text-[#111827]">
+                                                    {house.category && house.category.length > 0
+                                                        ? house.category.join(", ")
+                                                        : "No Categories Specified"}
+                                                </p>
+                                            </div>
+
                                         </div>
                                     </div>
                                     <div className="space-y-6 bg-[#F3F4F6] p-6 rounded-sm">
@@ -269,7 +282,7 @@ const AuctionHouseDetails: React.FC = () => {
                                             doc.url && (
                                                 <div key={idx} className="group relative">
                                                     <p className="text-[9px] font-black text-[#6B7280] uppercase tracking-widest mb-3">{doc.label}</p>
-                                                    <div 
+                                                    <div
                                                         className="relative aspect-video bg-[#F3F4F6] border border-[#E5E7EB] overflow-hidden cursor-zoom-in group-hover:border-[#D4AF37] transition-all"
                                                         onClick={() => setSelectedImg(doc.url!)}
                                                     >
@@ -295,7 +308,7 @@ const AuctionHouseDetails: React.FC = () => {
                 </footer>
             </div>
 
-            
+
             {isBlockModalOpen && (
                 <div className="fixed inset-0 z-[110] flex items-center justify-center bg-[#111827]/80 backdrop-blur-sm p-4">
                     <div className={`bg-white w-full max-w-md p-8 border-t-4 shadow-2xl ${blockModalMode === 'BLOCK' ? 'border-[#DC2626]' : 'border-[#16A34A]'}`}>

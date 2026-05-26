@@ -37,22 +37,28 @@ const resubmissionSchema = yup.object({
         .min(1, 'Please select at least one operational category specialty')
         .required('Category specialty is required'),
     address: yup.object({
-        city: yup.string().max(50, 'City too long').required('Required'),
-        state: yup.string().max(50, 'State too long').required('Required'),
-        country: yup.string().max(50, 'Country too long').required('Required'),
+        city: yup.string().trim().min(2,'City must be atleat 2 characters').max(50, 'City too long').required('Required'),
+        state: yup.string().trim().min(2,'State must be atleat 2 characters').max(50, 'State too long').required('Required'),
+        country: yup.string().trim().min(2,'Country must be atleat 2 characters').max(50, 'Country too long').required('Required'),
         fullAddress: yup.string().min(5, 'Address too short').max(255, 'Address too long').required()
     }),
     contact: yup.object({
-        primaryContactName: yup.string().trim().min(3,'Name must be at least 3 characters').max(100, 'Name too long').required('Required'),
+        primaryContactName: yup.string().trim().min(3, 'Name must be at least 3 characters').max(100, 'Name too long').required('Required'),
         businessEmail: yup.string().email('Invalid email').max(100, 'Email too long').required(),
         phone: yup.string().matches(/^\d{10}$/, 'Phone must be exactly 10 digits').max(10, 'Phone cannot exceed 10 digits').required(),
     }),
     legal: yup.object({
-        registrationNumber: yup.string().max(100, 'Registration number too long').required('Required'),
-        taxId: yup.string().max(50, 'Tax ID too long').required('Required'),
+        registrationNumber: yup.string().trim().min(6,'Registration Number atleast 6 charactor').max(100, 'Registration number too long').required('Required'),
+        taxId: yup.string().trim().min(6,'TaxID atleast 6 charactor').max(50, 'Tax ID too long').required('Required'),
     }),
-    registrationCertificate: yup.mixed<File>().nullable().optional(),
-    identityProof: yup.mixed<File>().nullable().optional(),
+    registrationCertificate: yup.mixed<File>().nullable().test("is-image", "Only image files (JPEG, PNG, WEBP) are allowed", (value) => {
+        if (!value || !(value instanceof File)) return true;
+        return value.type.startsWith("image/");
+    }),
+    identityProof: yup.mixed<File>().nullable().test("is-image", "Only image files (JPEG, PNG, WEBP) are allowed", (value) => {
+        if (!value || !(value instanceof File)) return true; // Pass if no new file is chosen
+        return value.type.startsWith("image/");
+    }),
 }).required();
 
 type ResubmitFormData = yup.InferType<typeof resubmissionSchema>;
@@ -253,13 +259,12 @@ const TenantVerificationResubmissionPage: React.FC = () => {
                                 </div>
                             </div>
 
-                            {/* Explicit Visible Change Button Action Block */}
                             <label className="flex items-center gap-1.5 bg-white border border-[#E2E8F0] px-3 py-1.5 rounded-xl text-xs font-bold text-[#475569] hover:bg-[#F8FAFC] hover:text-[#0F172A] cursor-pointer shadow-sm transition-all flex-shrink-0">
                                 <RefreshCw size={12} />
                                 <span>Change</span>
                                 <input
                                     type="file"
-                                    accept="image/*,application/pdf"
+                                    accept=".pdf,.jpg,.jpeg,.png"
                                     className="hidden"
                                     onChange={(event) => {
                                         if (event.target.files && event.target.files[0]) {
@@ -274,7 +279,7 @@ const TenantVerificationResubmissionPage: React.FC = () => {
                         <label className="py-4 flex flex-col items-center gap-2 cursor-pointer group hover:bg-[#F5F7FB] rounded-xl transition-all w-full">
                             <input
                                 type="file"
-                                accept="image/*,application/pdf"
+                                accept=".pdf,.jpg,.jpeg,.png"
                                 className="hidden"
                                 onChange={(event) => {
                                     if (event.target.files && event.target.files[0]) {
@@ -287,6 +292,7 @@ const TenantVerificationResubmissionPage: React.FC = () => {
                         </label>
                     )}
                 </div>
+
             </div>
         );
     };
@@ -360,8 +366,8 @@ const TenantVerificationResubmissionPage: React.FC = () => {
                                         key={cat}
                                         onClick={() => handleCategoryToggle(cat)}
                                         className={`px-4 py-2.5 rounded-xl text-xs font-bold border transition-all ${isSelected
-                                                ? "bg-[#0F172A] border-[#0F172A] text-[#FFFFFF]"
-                                                : "bg-[#FFFFFF] border-[#E2E8F0] text-[#475569] hover:bg-[#F8FAFC]"
+                                            ? "bg-[#0F172A] border-[#0F172A] text-[#FFFFFF]"
+                                            : "bg-[#FFFFFF] border-[#E2E8F0] text-[#475569] hover:bg-[#F8FAFC]"
                                             }`}
                                     >
                                         {cat}
@@ -407,10 +413,14 @@ const TenantVerificationResubmissionPage: React.FC = () => {
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                             <input {...register('address.city')} placeholder="City" className={inputStyle} />
+                            {errors.address?.city && <p className={errorStyle}>{errors.address.city.message}</p>}
                             <input {...register('address.state')} placeholder="State" className={inputStyle} />
+                            {errors.address?.state && <p className={errorStyle}>{errors.address.state.message}</p>}
                             <input {...register('address.country')} placeholder="Country" className={inputStyle} />
+                            {errors.address?.country && <p className={errorStyle}>{errors.address.country.message}</p>}
                         </div>
                         <input {...register('address.fullAddress')} placeholder="Street Address" className={inputStyle} />
+                        {errors.address?.fullAddress && <p className={errorStyle}>{errors.address.fullAddress.message}</p>}
                     </div>
 
                     <div className={cardStyle}>
@@ -424,10 +434,13 @@ const TenantVerificationResubmissionPage: React.FC = () => {
                                 <div className="space-y-1">
                                     <label className={labelStyle}>Registration No.</label>
                                     <input {...register('legal.registrationNumber')} className={inputStyle} />
+                                    {errors.legal?.registrationNumber && <p className={errorStyle}>{errors.legal.registrationNumber.message}</p>}
                                 </div>
                                 <div className="space-y-1">
                                     <label className={labelStyle}>Tax Identifier (TIN/VAT)</label>
                                     <input {...register('legal.taxId')} className={inputStyle} />
+                                    {errors.legal?.taxId && <p className={errorStyle}>{errors.legal.taxId.message}</p>}
+
                                 </div>
                             </div>
 
@@ -441,14 +454,22 @@ const TenantVerificationResubmissionPage: React.FC = () => {
                                         onFileSelect={(file) => setValue('registrationCertificate', file, { shouldValidate: true })}
                                         onClearFile={() => setValue('registrationCertificate', null, { shouldValidate: true })}
                                     />
+                                    {errors.registrationCertificate && (
+                                        <p className={errorStyle}>{errors.registrationCertificate.message}</p>
+                                    )}
                                     <DocumentPreview
+
                                         label="Owner Identity Proof"
                                         currentUrl={profile?.documents?.identityProofUrl}
                                         selectedFile={idProofFile}
                                         localPreviewUrl={idProofPreview}
                                         onFileSelect={(file) => setValue('identityProof', file, { shouldValidate: true })}
                                         onClearFile={() => setValue('identityProof', null, { shouldValidate: true })}
+
                                     />
+                                    {errors.identityProof && (
+                                        <p className={errorStyle}>{errors.identityProof.message}</p>
+                                    )}
                                 </div>
                             </div>
                         </div>
