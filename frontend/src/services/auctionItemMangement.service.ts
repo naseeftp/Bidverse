@@ -2,7 +2,8 @@ import axiosInstance from "../api/axios.instance";
 import type{ AuctionItemResponseDTO,CreateAuctionItemDTO} from "../types/auctionItem.dto";
 import { BASE_ROUTES,AUCTION_ITEM_ROUTES } from "../constants/api.constant";
 import { apiErrorHandler } from "../utils/error.handle";
-import type { ApiResponse } from "../types/auth.type";
+import type { ApiResponse, IPaginationMeta } from "../types/auth.type";
+import type { AuctionItemListDTO } from "../types/auctionItem.dto";
 
 class AuctionItemMangementService{
     async createAuctionItem(data:CreateAuctionItemDTO){
@@ -16,6 +17,25 @@ class AuctionItemMangementService{
             }
         } catch (error) {
             return apiErrorHandler(error, 'Failed to Create AuctionItem')
+        }
+    }
+
+    async listAdminAuctions(page:number,limit:number,search?:number){
+        try {
+            let url=`${BASE_ROUTES.AUCTION_ITEM}${AUCTION_ITEM_ROUTES.ADMIN_AUCTIONS}?page=${page}&limit=${limit}`
+            if(search){
+                url+=`&search=${encodeURIComponent(search)}`
+            }
+            const response=await axiosInstance.get<AuctionItemListDTO,ApiResponse<{data:AuctionItemListDTO[],pagination:IPaginationMeta}>>(url)
+            const paginatedResult=response.data;
+            return{
+                success:true,
+                message:response.message,
+                data:paginatedResult?.data,
+                pagination:paginatedResult?.pagination
+            }
+        } catch (error) {
+            return apiErrorHandler(error,'Failed to get Auctuions')
         }
     }
 }

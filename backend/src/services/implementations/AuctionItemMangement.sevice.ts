@@ -1,12 +1,13 @@
 import { IAuctionItemMangementSevice } from "../interface/IAuctionItemMangement.service";
 import { ILoggerService } from "../interface/ILogger.service";
 import { IAuctionItemRepository } from "../../repositories/interfaces/IAuctionItem.repository";
-import { CreateAuctionItemDTO, AuctionItemResponseDTO } from "../../dtos/auctionHouse.dto/auctionItem.dto";
+import { CreateAuctionItemDTO, AuctionItemResponseDTO, AuctionItemListDTO } from "../../dtos/auctionHouse.dto/auctionItem.dto";
 import { IAuctionHouseRepository } from "../../repositories/interfaces/IAuctionHouse.repository";
 import { ForbiddenError, NotFoundError } from "../../errors/AppError";
 import { AuctionItemStatus, MESSAGES } from "../../constants/constants";
 import { IAuctionItem } from "../../types/auctionItem.type";
 import { AuctionItemMapper } from "../../mappers/auctionItem.mapper";
+import { IGenericPaginatedResposnse } from "../../types/response.type";
 
 export class AuctionItemMangementSevice implements IAuctionItemMangementSevice{
     constructor(
@@ -42,5 +43,19 @@ export class AuctionItemMangementSevice implements IAuctionItemMangementSevice{
        const createdItem=await this._auctionItemRepo.create(auctionItemData)
        const hydratedObject = createdItem.toObject ? createdItem.toObject() : createdItem;
        return AuctionItemMapper.toResponseDTO(hydratedObject)
+    }
+    async listAdminAuctions(page: number, limit: number, search?: string): Promise<IGenericPaginatedResposnse<AuctionItemListDTO>> {
+        const {auctions,total}=await this._auctionItemRepo.listAllAuctionItems(page,limit,search)
+        return{
+            data:auctions,
+            pagination:{
+                totalItems:total,
+                itemsPerPage:limit,
+                currentPage:page,
+                totalPages:Math.ceil(total/limit),
+                hasNextPage:page*limit<total,
+                hasPrevPage:page>1
+            }
+        }
     }
 }

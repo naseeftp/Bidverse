@@ -110,6 +110,10 @@ export interface AuctionItemResponseDTO {
 }
 
 export interface AuctionItemListDTO{
-
+auctionItemId:string;
+auctionHouseId:string;
+auctionName:string;
+auctionHouseName:string;
+auctionStatus:AuctionItemStatus;
 }
 export type CreateAuctionItemDTO=z.infer<typeof createAuctionItemSchema>

@@ -55,5 +55,6 @@ export const PUBLIC_ROUTES={
 }
 
 export const AUCTION_ITEM_ROUTES={
-    CREATE:'/create'
+    CREATE:'/create',
+     ADMIN_AUCTIONS:'/admin/auctions'
 }

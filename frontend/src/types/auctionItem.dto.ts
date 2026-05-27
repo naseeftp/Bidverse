@@ -158,6 +158,13 @@ export const createAuctionItemSchema = yup.object({
     .required('Shipping terms are required'),
 
 })
+export interface AuctionItemListDTO{
+auctionItemId:string;
+auctionHouseId:string;
+auctionName:string;
+auctionHouseName:string;
+auctionStatus:AuctionItemStatus;
+}
 
 export type CreateAuctionItemDTO= yup.InferType<typeof createAuctionItemSchema>;
 

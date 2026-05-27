@@ -18,5 +18,10 @@ router.post(
     validator(AuctionItemValidators.validateCreationInput),
     (req,res,next)=>auctionItemMangementController.createAuctionItem(req,res,next)
 )
+router.get(
+    AUCTION_ITEM_ROUTES.ADMIN_AUCTIONS,
+    allowedTo(Role.ADMIN),
+    (req,res,next)=>auctionItemMangementController.getAllAuctionByAdmin(req,res,next)
+)
 
 export default router
