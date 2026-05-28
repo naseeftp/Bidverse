@@ -52,7 +52,9 @@ export class AuctionItemRepository extends BaseRepository<IAuctionItemDocument> 
                             auctionHouseId:{$toString:'$houseId'},
                             auctionName:'$title',
                             auctionHouseName:{$ifNull:['$auctions.name','Unknown House']},
-                            auctionStatus:'$status'
+                            auctionStatus:'$status',
+                            type:'$type',
+                            images:{$ifNull:['$images',[]]}
                         }
                     }
                 ],

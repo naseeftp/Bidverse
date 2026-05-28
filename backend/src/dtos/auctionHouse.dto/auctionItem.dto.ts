@@ -115,5 +115,12 @@ auctionHouseId:string;
 auctionName:string;
 auctionHouseName:string;
 auctionStatus:AuctionItemStatus;
+type:AuctionType,
+  images: {
+        id: string;
+        url: string;
+        isPrimary: boolean;
+        altText?: string;
+ }[];
 }
 export type CreateAuctionItemDTO=z.infer<typeof createAuctionItemSchema>
