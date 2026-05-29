@@ -9,10 +9,26 @@ export class AuctionItemRepository extends BaseRepository<IAuctionItemDocument> 
     constructor() {
         super(AuctionItem)
     }
-    async listAllAuctionItems(page: number, limit: number, search?: string): Promise<{ auctions: AuctionItemListDTO[], total: number }> {
+    async listAllAuctionItems(page: number, limit: number, search?: string,status?:string,type?:string): Promise<{ auctions: AuctionItemListDTO[], total: number }> {
         const skip = (page - 1) * limit;
-        const pipeline: PipelineStage[] = [
-            {
+        const pipeline:PipelineStage[]=[];
+             if(status){
+                pipeline.push({
+                    $match:{
+                        status:status
+                    }
+                })
+             }
+             if(type){
+                pipeline.push({
+                    $match:{
+                        type:type
+                    }
+                })
+             }
+      
+            pipeline.push(
+                {
                 $lookup: {
                     from: 'auctionhouses',
                     localField: 'houseId',
@@ -26,9 +42,10 @@ export class AuctionItemRepository extends BaseRepository<IAuctionItemDocument> 
                     path: '$auctions',
                     preserveNullAndEmptyArrays: true
                 }
-            },
+            }
+            );
 
-        ]
+        
         if (search && search.trim() !== '') {
             const searchRegex = { $regex: search.trim(), $options: 'i' };
             pipeline.push({

@@ -44,8 +44,8 @@ export class AuctionItemMangementSevice implements IAuctionItemMangementSevice{
        const hydratedObject = createdItem.toObject ? createdItem.toObject() : createdItem;
        return AuctionItemMapper.toResponseDTO(hydratedObject)
     }
-    async listAdminAuctions(page: number, limit: number, search?: string): Promise<IGenericPaginatedResposnse<AuctionItemListDTO>> {
-        const {auctions,total}=await this._auctionItemRepo.listAllAuctionItems(page,limit,search)
+    async listAdminAuctions(page: number, limit: number, search?: string,status?:string,type?:string): Promise<IGenericPaginatedResposnse<AuctionItemListDTO>> {
+        const {auctions,total}=await this._auctionItemRepo.listAllAuctionItems(page,limit,search,status,type)
         return{
             data:auctions,
             pagination:{

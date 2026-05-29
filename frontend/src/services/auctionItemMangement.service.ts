@@ -20,11 +20,17 @@ class AuctionItemMangementService{
         }
     }
 
-    async listAdminAuctions(page:number,limit:number,search?:number){
+    async listAdminAuctions(page:number,limit:number,search?:string,status?:string,type?:string){
         try {
             let url=`${BASE_ROUTES.AUCTION_ITEM}${AUCTION_ITEM_ROUTES.ADMIN_AUCTIONS}?page=${page}&limit=${limit}`
             if(search){
                 url+=`&search=${encodeURIComponent(search)}`
+            }
+            if(status&&status!='all'){
+                url+=`&status=${status}`
+            }
+            if(type&&type!='all'){
+                url+=`&type=${type}`
             }
             const response=await axiosInstance.get<AuctionItemListDTO,ApiResponse<{data:AuctionItemListDTO[],pagination:IPaginationMeta}>>(url)
             const paginatedResult=response.data;

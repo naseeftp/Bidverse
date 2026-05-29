@@ -37,7 +37,14 @@ const UsersListPage: React.FC = () => {
 
   return (
     <div className="space-y-6">
-
+      <div>
+                <h1 className="text-xl font-black uppercase tracking-[0.25em] text-[#111827]">
+                    User Management
+                </h1>
+                <p className="text-[10px] font-bold text-[#111827] uppercase tracking-widest mt-1">
+                    System Administration Panel
+                </p>
+            </div>
 
       <div className="flex flex-col md:flex-row justify-between items-end gap-4">
 
@@ -61,8 +68,8 @@ const UsersListPage: React.FC = () => {
 
 
         <div className="w-full md:w-auto min-w-[200px] relative group">
-          <label className="text-[9px] font-black uppercase tracking-[0.2em] text-white/40 mb-2 block ml-1 text-right md:mr-1">
-            Filter Status
+          <label className="text-[9px] font-black uppercase tracking-[0.2em] text-[#111827] mb-2 block ml-1 text-right md:mr-1">
+           Status Filter
           </label>
           <div className="absolute bottom-3.5 left-4 text-white/20 group-focus-within:text-white transition-colors">
             <FaFilter size={10} />
