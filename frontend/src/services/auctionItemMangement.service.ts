@@ -43,6 +43,35 @@ class AuctionItemMangementService{
         } catch (error) {
             return apiErrorHandler(error,'Failed to get Auctuions')
         }
+        
     }
+
+       async listTenantAuctions(page:number,limit:number,search?:string,status?:string,type?:string){
+        try {
+            let url=`${BASE_ROUTES.AUCTION_ITEM}${AUCTION_ITEM_ROUTES.TENANT_AUCTIONS}?page=${page}&limit=${limit}`
+            if(search){
+                url+=`&search=${encodeURIComponent(search)}`
+            }
+            if(status&&status!='all'){
+                url+=`&status=${status}`
+            }
+            if(type&&type!='all'){
+                url+=`&type=${type}`
+            }
+            const response=await axiosInstance.get<AuctionItemListDTO,ApiResponse<{data:AuctionItemListDTO[],pagination:IPaginationMeta}>>(url)
+            const paginatedResult=response.data;
+            return{
+                success:true,
+                message:response.message,
+                data:paginatedResult?.data,
+                pagination:paginatedResult?.pagination
+            }
+        } catch (error) {
+            return apiErrorHandler(error,'Failed to get Auctuions')
+        }
+    }
+
+ 
+
 }
 export default new AuctionItemMangementService()

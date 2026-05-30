@@ -9,9 +9,16 @@ export class AuctionItemRepository extends BaseRepository<IAuctionItemDocument> 
     constructor() {
         super(AuctionItem)
     }
-    async listAllAuctionItems(page: number, limit: number, search?: string,status?:string,type?:string): Promise<{ auctions: AuctionItemListDTO[], total: number }> {
+    async listAllAuctionItems(page: number, limit: number, search?: string,status?:string,type?:string,houseId?:string): Promise<{ auctions: AuctionItemListDTO[], total: number }> {
         const skip = (page - 1) * limit;
         const pipeline:PipelineStage[]=[];
+             if(houseId){
+                pipeline.push({
+                    $match:{
+                       houseId:houseId 
+                    }
+                })
+             }
              if(status){
                 pipeline.push({
                     $match:{

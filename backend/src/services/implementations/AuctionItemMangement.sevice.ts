@@ -21,7 +21,7 @@ export class AuctionItemMangementSevice implements IAuctionItemMangementSevice{
         const houseExist=await this._auctionHouseRepo.findOne({userId:userId});
         this._logger.info('auction house exist',{house:houseExist})
         if(!houseExist){
-            throw new NotFoundError(MESSAGES.USER_NOT_FOUND)
+            throw new NotFoundError(MESSAGES.AUCTION_HOUSE_NOT_FOUND)
         }
         const houseId=houseExist._id;
         if(!houseExist.isVerified){
@@ -47,6 +47,25 @@ export class AuctionItemMangementSevice implements IAuctionItemMangementSevice{
     async listAdminAuctions(page: number, limit: number, search?: string,status?:string,type?:string): Promise<IGenericPaginatedResposnse<AuctionItemListDTO>> {
         const {auctions,total}=await this._auctionItemRepo.listAllAuctionItems(page,limit,search,status,type)
         return{
+            data:auctions,
+            pagination:{
+                totalItems:total,
+                itemsPerPage:limit,
+                currentPage:page,
+                totalPages:Math.ceil(total/limit),
+                hasNextPage:page*limit<total,
+                hasPrevPage:page>1
+            }
+        }
+    }
+    async listTenantAuctions(page:number,limit:number,search?:string,status?:string,type?:string, userId?: string): Promise<IGenericPaginatedResposnse<AuctionItemListDTO>> {
+        const house=await this._auctionHouseRepo.findOne({userId:userId});
+        if(!house){
+            throw new NotFoundError(MESSAGES.AUCTION_HOUSE_NOT_FOUND)
+        };
+        const houseId=house._id as unknown as string;
+        const {auctions,total}=await this._auctionItemRepo.listAllAuctionItems(page,limit,search,status,type,houseId)
+          return{
             data:auctions,
             pagination:{
                 totalItems:total,

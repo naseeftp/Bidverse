@@ -6,6 +6,7 @@ const Sidebar:React.FC = () => {
     { name: 'My Bids', icon: Hammer, path: '/bids', count: 3 },      
     { name: 'Orders', icon: ShoppingBag, path: '/orders', count: 1 }, 
     { name: 'Addresses', icon: MapPin, path: '/addresses' },
+    
     { name: 'Profile', icon: User, path: '/profile' },
   ];
 

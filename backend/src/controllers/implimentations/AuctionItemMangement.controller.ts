@@ -42,5 +42,27 @@ export class AuctionItemMangementController implements IAuctionItemMangementCont
             next(error)
         }
     }
+    async  getTenantAuctions(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const page=Number(req.query.page)
+            const limit=Number(req.query.limit)
+            const search=req.query.search as string;
+            const status=req.query.status as string;
+            const type =req.query.type as string;
+            const userId=req.user.id;
+            this._logger.info('fetching auctions of auctionhouse',{
+                page:page,
+                search:search,
+                status:status,
+                limit:limit,
+                type:type,
+                userId:userId
+            })
+            const result=await this._auctionItemService.listTenantAuctions(page,limit,search,status,type,userId)
+            SuccessResponse(res,MESSAGES.LIST_RETRIEVED,result,HttpStatus.OK)
+        } catch (error) {
+            next(error)
+        }
+    } 
 
 }

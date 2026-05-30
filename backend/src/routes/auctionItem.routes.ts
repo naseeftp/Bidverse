@@ -23,5 +23,10 @@ router.get(
     allowedTo(Role.ADMIN),
     (req,res,next)=>auctionItemMangementController.getAllAuctionByAdmin(req,res,next)
 )
+router.get(
+    AUCTION_ITEM_ROUTES.TENANT_AUCTIONS,
+    allowedTo(Role.TENANT),
+    (req,res,next)=>auctionItemMangementController.getTenantAuctions(req,res,next)
+)
 
 export default router
