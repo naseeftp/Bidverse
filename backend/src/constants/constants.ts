@@ -144,7 +144,8 @@ export const MESSAGES = {
     ADDRESS_CREATED:'Address Created Successfully',
     NOT_PERMITTED:'You are not permitted to this Action',
     AUCTION_CREATED:'Auction Created Successfully' ,
-   
+    AUCTION_NOT_FOUND:'Auction Not found',
+    AUCTION_RETRIEVED: 'Auction Retrieved successfully',
     LOGOUT_SUCCESS: "Logout success",
     LOGOUT_FAILED: "Logout failed",
 

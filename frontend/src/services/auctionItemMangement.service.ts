@@ -3,7 +3,7 @@ import type{ AuctionItemResponseDTO,CreateAuctionItemDTO} from "../types/auction
 import { BASE_ROUTES,AUCTION_ITEM_ROUTES } from "../constants/api.constant";
 import { apiErrorHandler } from "../utils/error.handle";
 import type { ApiResponse, IPaginationMeta } from "../types/auth.type";
-import type { AuctionItemListDTO } from "../types/auctionItem.dto";
+import type { AuctionItemListDTO,AuctionItemDetailDTO} from "../types/auctionItem.dto";
 
 class AuctionItemMangementService{
     async createAuctionItem(data:CreateAuctionItemDTO){
@@ -71,7 +71,19 @@ class AuctionItemMangementService{
         }
     }
 
- 
+    async getAuction(ItemId:string){
+     try {
+        let url=`${AUCTION_ITEM_ROUTES.GET_AUCTION}/${ItemId}`
+        const response=await axiosInstance.get<AuctionItemDetailDTO,ApiResponse<AuctionItemDetailDTO>>(url)
+        return{
+            success:true,
+            message:response.message,
+            data:response.data
+        }
+     } catch (error) {
+        return apiErrorHandler(error,'Failed to get Auctuion')
+     }
+    }
 
 }
 export default new AuctionItemMangementService()

@@ -1,7 +1,7 @@
 import { IAuctionItemMangementSevice } from "../interface/IAuctionItemMangement.service";
 import { ILoggerService } from "../interface/ILogger.service";
 import { IAuctionItemRepository } from "../../repositories/interfaces/IAuctionItem.repository";
-import { CreateAuctionItemDTO, AuctionItemResponseDTO, AuctionItemListDTO } from "../../dtos/auctionHouse.dto/auctionItem.dto";
+import { CreateAuctionItemDTO, AuctionItemResponseDTO, AuctionItemListDTO, AuctionItemDetailDTO } from "../../dtos/auctionHouse.dto/auctionItem.dto";
 import { IAuctionHouseRepository } from "../../repositories/interfaces/IAuctionHouse.repository";
 import { ForbiddenError, NotFoundError } from "../../errors/AppError";
 import { AuctionItemStatus, MESSAGES } from "../../constants/constants";
@@ -76,5 +76,13 @@ export class AuctionItemMangementSevice implements IAuctionItemMangementSevice{
                 hasPrevPage:page>1
             }
         }
+    }
+    async getAuctionDetails(itemId: string): Promise<AuctionItemDetailDTO | null> {
+        const auction=await this._auctionItemRepo.findById(itemId);
+        if(!auction){
+            throw new NotFoundError(MESSAGES.AUCTION_NOT_FOUND)
+        }
+        const result=await this._auctionItemRepo.getAuctionItemDetails(itemId);
+        return result
     }
 }

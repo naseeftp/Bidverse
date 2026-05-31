@@ -123,4 +123,52 @@ type:AuctionType,
         altText?: string;
  }[];
 }
+
+export interface AuctionItemDetailDTO{
+   auctionItemId: string;
+    title: string;
+    description: string;
+    status: string;
+    type: string;
+    images: Array<{
+        id: string;
+        url: string;
+        isPrimary: boolean;
+        altText?: string;
+    }>;
+    currency: string;
+    startingPrice: number;
+    reservePrice: number;
+    minimumIncrement: number;
+    buyerPremiumPercent: number;
+    shippingCost: number;
+    shippingTerms: string;
+    startTime: string; 
+    endTime: string;   
+    snipingProtectionMinutes: number;
+    isApproved: boolean;
+    approvedAt?: string;
+    rejectionReason?: string;
+    createdAt: string;
+    updatedAt: string;
+
+   
+    auctionHouse: {
+        id: string;
+        name: string;
+        yearEstablished: number;
+        briefDescription: string;
+        categories: string[];
+        city: string;
+        state: string;
+        country: string;
+        fullAddress: string;
+        primaryContactName: string;
+        businessEmail: string;
+        phone: string;
+        isVerified: boolean;
+    };
+    
+}
+
 export type CreateAuctionItemDTO=z.infer<typeof createAuctionItemSchema>

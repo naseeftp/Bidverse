@@ -2,7 +2,7 @@ import { IAuctionItemDocument } from "../../types/auctionItem.type";
 import { IAuctionItemRepository } from "../interfaces/IAuctionItem.repository";
 import { BaseRepository } from "./Base.repository";
 import { AuctionItem } from '../../models/auctionItem.model'
-import { AuctionItemListDTO } from "../../dtos/auctionHouse.dto/auctionItem.dto";
+import { AuctionItemDetailDTO, AuctionItemListDTO } from "../../dtos/auctionHouse.dto/auctionItem.dto";
 import mongoose, { PipelineStage } from "mongoose";
 
 export class AuctionItemRepository extends BaseRepository<IAuctionItemDocument> implements IAuctionItemRepository {
@@ -95,5 +95,74 @@ export class AuctionItemRepository extends BaseRepository<IAuctionItemDocument> 
             total:results[0].totalCount[0]?.count||0
         }
     }
+    async getAuctionItemDetails(itemId: string): Promise<AuctionItemDetailDTO | null> {
+        if(!mongoose.Types.ObjectId.isValid(itemId)){
+            return null
+        }
+        const pipiline:PipelineStage[]=[
+            {
+                $match:{_id: new mongoose.Types.ObjectId(itemId)}
+            },
+            {
+                $lookup:{
+                    from:'auctionhouses',
+                    localField:'houseId',
+                    foreignField:'_id',
+                    as:'auction'
+                }
+            },
+            {
+                $unwind:{
+                    path:"$auction",
+                    preserveNullAndEmptyArrays:true
+                }
+            },
+            {
+                $project: {
+                    _id: 0,
+                    auctionItemId: { $toString: '$_id' },
+                    title: 1,
+                    description: 1,
+                    status: 1,
+                    type: 1,
+                    images: { $ifNull: ['$images', []] },
+                    currency: 1,
+                    startingPrice: 1,
+                    reservePrice: 1,
+                    minimumIncrement: 1,
+                    buyerPremiumPercent: 1,
+                    shippingCost: 1,
+                    shippingTerms: 1,
+                    startTime: { $dateToString: { date: '$startTime' } },
+                    endTime: { $dateToString: { date: '$endTime' } },
+                    snipingProtectionMinutes: 1,
+                    isApproved: 1,
+                    approvedAt: { $dateToString: { date: '$approvedAt', onNull: undefined } },
+                    rejectionReason: 1,
+                    createdAt: { $dateToString: { date: '$createdAt' } },
+                    updatedAt: { $dateToString: { date: '$updatedAt' } },
+                    
+                    auctionHouse: {
+                        id: { $toString: '$auction._id' },
+                        name: { $ifNull: ['$auction.name', 'Unknown Organization'] },
+                        yearEstablished: '$auction.yearEstablished',
+                        briefDescription: '$auction.briefDescription',
+                        categories: { $ifNull: ['$auction.categories', []] },
+                        city: '$auctions.address.city',
+                        state: '$auction.address.state',
+                        country: '$auction.address.country',
+                        fullAddress: '$auction.address.fullAddress',
+                        primaryContactName: '$auction.contact.primaryContactName',
+                        businessEmail: '$auction.contact.businessEmail',
+                        phone: '$auction.contact.phone',
+                        isVerified: { $ifNull: ['$auction.isVerified', false] }
+                    }
+                }
+            }
+        ]
+        const result=await this.model.aggregate(pipiline)
+        return (result[0] as AuctionItemDetailDTO)||null
+    }
+    
 
 }
