@@ -68,7 +68,11 @@ export class AuctionItemMangementController implements IAuctionItemMangementCont
      async getAuctionDetails(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
             const itemId=req.params.id as string;
+            this._logger.info('finding auction item details for',{itemId:itemId})
             const result=await this._auctionItemService.getAuctionDetails(itemId);
+            this._logger.info('founded result',{
+                result:result
+            })
             SuccessResponse(res,MESSAGES.AUCTION_RETRIEVED,result,HttpStatus.OK)
         } catch (error) {
             next(error)

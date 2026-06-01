@@ -48,7 +48,7 @@ import AuctionHouseDetailPage from './pages/admin/auctionHousedetailsPage'
 import UsersListPage from "./pages/admin/usersList";
 import UserDetailPage from "./pages/admin/userDetailPage";
 import AdminAuctionsListPage from "./pages/admin/auctions";
-
+import AdminAuctionDetailPage from "./pages/admin/auctionDetails";
 
 function App() {
 
@@ -127,6 +127,7 @@ function App() {
                   <Route path='/admin/users' element={<UsersListPage />} />
                   <Route path='/admin/user/:id' element={<UserDetailPage/>} />
                   <Route path="/admin/auctions" element={<AdminAuctionsListPage/>}/>
+                  <Route path="/admin/auctions/:id" element={<AdminAuctionDetailPage/>}/>
                </Route>
             </Route>
 

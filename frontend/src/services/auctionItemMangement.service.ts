@@ -71,9 +71,9 @@ class AuctionItemMangementService{
         }
     }
 
-    async getAuction(ItemId:string){
+    async getAuction(Id:string){
      try {
-        let url=`${AUCTION_ITEM_ROUTES.GET_AUCTION}/${ItemId}`
+        let url=`${BASE_ROUTES.AUCTION_ITEM}${AUCTION_ITEM_ROUTES.GET_AUCTION}/${Id}`
         const response=await axiosInstance.get<AuctionItemDetailDTO,ApiResponse<AuctionItemDetailDTO>>(url)
         return{
             success:true,
