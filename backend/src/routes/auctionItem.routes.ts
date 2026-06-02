@@ -30,7 +30,7 @@ router.get(
 )
 router.get(
     AUCTION_ITEM_ROUTES.GET_AUCTION,
-    allowedTo(Role.ADMIN),
+    allowedTo(Role.ADMIN,Role.TENANT),
     (req,res,next)=>auctionItemMangementController.getAuctionDetails(req,res,next)
 )
 router.patch(

@@ -120,9 +120,46 @@ const AdminAuctionDetailPage: React.FC = () => {
     }
     if (!auction) return null
     const isPendingReview = auction?.status == 'PENDING_APPROVAL' && !auction?.isApproved
+    const isHalted = auction.status === 'REJECTED' || auction.status === 'CANCELLED_BY_ADMIN';
+    const haltNotice = auction.rejectionReason // later add auction cancellation reason
     return (
+        
         <div className="min-h-screen bg-[#F3F4F6] px-4 py-8 md:px-8 text-[#0F172A] font-sans">
-            
+            {isHalted && (
+                <style>{`
+                    @keyframes marqueeHalt {
+                        0% { transform: translate3d(100%, 0, 0); }
+                        100% { transform: translate3d(-100%, 0, 0); }
+                    }
+                    .animate-marquee-halt {
+                        display: inline-block;
+                        white-space: nowrap;
+                        padding-left: 25%;
+                        animation: marqueeHalt 22s linear infinite;
+                    }
+                    .animate-marquee-halt:hover {
+                        animation-play-state: paused;
+                    }
+                `}</style>
+            )}
+
+            {/* ✅ Top Scrolled Infraction Marquee Banner Row */}
+            {isHalted && (
+                <div className="max-w-7xl mx-auto mb-6 bg-[#DC2626] border border-[#B91C1C] rounded-xl shadow-md overflow-hidden relative group">
+                    <div className="flex items-center">
+                        <div className="bg-[#B91C1C] text-white px-4 py-2.5 flex items-center gap-2 text-[10px] font-black uppercase tracking-widest border-r border-[#991B1B] z-10 shadow-lg shrink-0 select-none">
+                            <FaExclamationTriangle className="animate-pulse text-[#FDE047]" size={12} />
+                            <span>System Alert ({auction.status.replace(/_/g, " ")}) :</span>
+                        </div>
+                        
+                        <div className="w-full overflow-hidden py-2 text-white font-mono font-bold text-xs tracking-wide">
+                            <div className="animate-marquee-halt cursor-help">
+                                {haltNotice} &bull; <span className="text-amber-300">ACTION REASON </span> &bull; {haltNotice}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
             <div className="max-w-7xl mx-auto mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <button
                     onClick={() => navigate("/admin/auctions")}
@@ -203,6 +240,8 @@ const AdminAuctionDetailPage: React.FC = () => {
                                     ? "bg-amber-50 border-amber-200 text-amber-700"
                                     : auction.status === "DRAFT"
                                         ? "bg-slate-50 border-slate-200 text-slate-600"
+                                        :auction.status=='REJECTED'||auction.status.startsWith('CANCELLED')
+                                        ?"bg-red-50 border-red-200 text-red-700"
                                         : "bg-emerald-50 border-emerald-200 text-emerald-700"
                             }`}>
                                 {auction.status?.replace(/_/g, " ")}
@@ -273,11 +312,11 @@ const AdminAuctionDetailPage: React.FC = () => {
                                     </button>
                                 </div>
                             ) : (
-                                <button
+                               auction.status=='SCHEDULED'&&  <button
                                     onClick={handleCancelAuction}
                                     className="w-full bg-[#111827] hover:bg-black text-[#D4AF37] text-xs font-black uppercase tracking-widest py-3.5 rounded-xl transition-all flex items-center justify-center gap-2 shadow-md"
                                 >
-                                    <FaBan /> Terminate Live Auction
+                                    <FaBan /> Terminate Auction
                                 </button>
                             )}
                         </div>
