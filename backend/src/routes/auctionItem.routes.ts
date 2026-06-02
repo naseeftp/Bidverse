@@ -33,5 +33,10 @@ router.get(
     allowedTo(Role.ADMIN),
     (req,res,next)=>auctionItemMangementController.getAuctionDetails(req,res,next)
 )
-
+router.patch(
+    AUCTION_ITEM_ROUTES.UPDATE_STATUS,
+    allowedTo(Role.ADMIN),
+    validator(AuctionItemValidators.validateUpdateStatusInput),
+    (req,res,next)=>auctionItemMangementController.updateAuctionStatus(req,res,next)
+)
 export default router

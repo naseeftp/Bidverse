@@ -1,9 +1,9 @@
 import { IAuctionItemMangementSevice } from "../interface/IAuctionItemMangement.service";
 import { ILoggerService } from "../interface/ILogger.service";
 import { IAuctionItemRepository } from "../../repositories/interfaces/IAuctionItem.repository";
-import { CreateAuctionItemDTO, AuctionItemResponseDTO, AuctionItemListDTO, AuctionItemDetailDTO } from "../../dtos/auctionHouse.dto/auctionItem.dto";
+import { CreateAuctionItemDTO, AuctionItemResponseDTO, AuctionItemListDTO, AuctionItemDetailDTO, updateAuctionStatusDTO } from "../../dtos/auctionHouse.dto/auctionItem.dto";
 import { IAuctionHouseRepository } from "../../repositories/interfaces/IAuctionHouse.repository";
-import { ForbiddenError, NotFoundError } from "../../errors/AppError";
+import { AppError, ForbiddenError, NotFoundError } from "../../errors/AppError";
 import { AuctionItemStatus, MESSAGES } from "../../constants/constants";
 import { IAuctionItem } from "../../types/auctionItem.type";
 import { AuctionItemMapper } from "../../mappers/auctionItem.mapper";
@@ -84,5 +84,25 @@ export class AuctionItemMangementSevice implements IAuctionItemMangementSevice{
         }
         const result=await this._auctionItemRepo.getAuctionItemDetails(itemId);
         return result
+    }
+    async updateAuctionStatus(data: updateAuctionStatusDTO): Promise<AuctionItemResponseDTO> {
+        const {itemId,status,reason}=data;
+        const auction= await this._auctionItemRepo.findById(itemId);
+        if(!auction){
+            throw new NotFoundError(MESSAGES.AUCTION_NOT_FOUND)
+        }
+        const isApproving = status === AuctionItemStatus.SCHEDULED;
+        const updateData={
+            status:status,
+            rejectionReason:status===AuctionItemStatus.REJECTED?reason:null,
+            isApproved:isApproving,
+            approvedAt:isApproving? new Date():null
+            
+        }
+        const updatedAuction=await this._auctionItemRepo.updateById(itemId,updateData)
+        if(!updatedAuction){
+           throw new AppError('Failed to update auction') 
+        }
+        return AuctionItemMapper.toResponseDTO(updatedAuction)
     }
 }

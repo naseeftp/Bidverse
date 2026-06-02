@@ -78,5 +78,14 @@ export class AuctionItemMangementController implements IAuctionItemMangementCont
             next(error)
         }
     }
+    async updateAuctionStatus(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const data=req.body;
+            const result=await this._auctionItemService.updateAuctionStatus(data);
+            SuccessResponse(res,MESSAGES.AUCTION_STATUS_UPDATED,result,HttpStatus.OK)
+        } catch (error) {
+            next(error)
+        }
+    }
 
 }

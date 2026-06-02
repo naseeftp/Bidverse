@@ -1,4 +1,5 @@
-import { createAuctionItemSchema } from "../dtos/auctionHouse.dto/auctionItem.dto"
+import { createAuctionItemSchema,updateAuctionStatusSchema} from "../dtos/auctionHouse.dto/auctionItem.dto"
 export const AuctionItemValidators={
-    validateCreationInput:createAuctionItemSchema
+    validateCreationInput:createAuctionItemSchema,
+    validateUpdateStatusInput:updateAuctionStatusSchema
 }

@@ -220,5 +220,26 @@ export interface AuctionItemDetailDTO{
     };
 }
 
+export const updateAuctionStatusSchema=yup.object({
+    itemId: yup.string().required('item id is required'),
+    status: yup.string().required('status is required'),
+    reason: yup.string()
+        .nullable()
+        .notRequired()
+        .when("status", {
+            is: (val: string) => val === AuctionItemStatus.REJECTED,
+            then: (schema) => schema
+                .required("A valid reason is required when rejecting an auction")
+                .min(5, "Reason must be at least 5 characters")
+                .max(500, "Reason is too long")
+                .test(
+                    "no-empty-spaces",
+                    "Reason cannot be just empty spaces",
+                    (value: string | null | undefined) => !!value && value.trim().length >= 5
+                )
+        })
+})
+
 export type CreateAuctionItemDTO= yup.InferType<typeof createAuctionItemSchema>;
+export type UpdateAuctionStatusDTO=yup.InferType<typeof updateAuctionStatusSchema>
 

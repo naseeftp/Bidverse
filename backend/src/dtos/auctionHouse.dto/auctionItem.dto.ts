@@ -1,5 +1,5 @@
-import { AuctionItemStatus, AuctionType } from "../../constants/constants";
-import { z } from 'zod'
+import { AuctionItemStatus, AuctionItemStatusValues, AuctionType } from "../../constants/constants";
+import { string, z } from 'zod'
 
 export const createAuctionItemSchema = z.object({
     title: z.string()
@@ -109,23 +109,23 @@ export interface AuctionItemResponseDTO {
     updatedAt: string;
 }
 
-export interface AuctionItemListDTO{
-auctionItemId:string;
-auctionHouseId:string;
-auctionName:string;
-auctionHouseName:string;
-auctionStatus:AuctionItemStatus;
-type:AuctionType,
-  images: {
+export interface AuctionItemListDTO {
+    auctionItemId: string;
+    auctionHouseId: string;
+    auctionName: string;
+    auctionHouseName: string;
+    auctionStatus: AuctionItemStatus;
+    type: AuctionType,
+    images: {
         id: string;
         url: string;
         isPrimary: boolean;
         altText?: string;
- }[];
+    }[];
 }
 
-export interface AuctionItemDetailDTO{
-   auctionItemId: string;
+export interface AuctionItemDetailDTO {
+    auctionItemId: string;
     title: string;
     description: string;
     status: string;
@@ -143,8 +143,8 @@ export interface AuctionItemDetailDTO{
     buyerPremiumPercent: number;
     shippingCost: number;
     shippingTerms: string;
-    startTime: string; 
-    endTime: string;   
+    startTime: string;
+    endTime: string;
     snipingProtectionMinutes: number;
     isApproved: boolean;
     approvedAt?: string;
@@ -152,7 +152,7 @@ export interface AuctionItemDetailDTO{
     createdAt: string;
     updatedAt: string;
 
-   
+
     auctionHouse: {
         id: string;
         name: string;
@@ -168,7 +168,25 @@ export interface AuctionItemDetailDTO{
         phone: string;
         isVerified: boolean;
     };
-    
+
 }
 
-export type CreateAuctionItemDTO=z.infer<typeof createAuctionItemSchema>
+export const updateAuctionStatusSchema = z.object({
+    itemId: z.string().min(1, 'Item Id is required'),
+    status: z.enum(AuctionItemStatusValues as [string, ...string[]]),
+    reason: z.string().min(5, 'Reason must be atleast 5 characters')
+        .max(500, 'Reason is too long').nullish()
+}).refine((data) => {
+    if (data.status == AuctionItemStatus.REJECTED) {
+        return !!data.reason && data.reason.trim().length >= 5
+    }
+    return true;
+}, {
+    message: "A valid reason is required when rejecting an auction",
+    path: ["reason"]
+}
+
+);
+
+export type CreateAuctionItemDTO = z.infer<typeof createAuctionItemSchema>
+export type updateAuctionStatusDTO = z.infer<typeof updateAuctionStatusSchema>

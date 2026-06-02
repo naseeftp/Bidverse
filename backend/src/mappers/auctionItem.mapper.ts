@@ -23,17 +23,21 @@ export class AuctionItemMapper {
             buyerPremiumPercent: doc.buyerPremiumPercent,
             currentHighestBidderId: doc.currentHighestBidder?.toString(),
             winningBidderId: doc.winningBidder?.toString(),
-            startTime: doc.startTime.toISOString(),
-            endTime: doc.endTime.toISOString(),
+            startTime: doc.startTime && typeof doc.startTime.toISOString === 'function'
+                ? doc.startTime.toISOString()
+                : new Date(doc.startTime).toISOString(),
+            endTime: doc.endTime && typeof doc.endTime.toISOString === 'function'
+                ? doc.endTime.toISOString()
+                : new Date(doc.endTime).toISOString(),
             snipingProtectionMinutes: doc.snipingProtectionMinutes,
             shippingCost: doc.shippingCost,
             shippingTerms: doc.shippingTerms,
-            createdAt: doc.createdAt.toISOString(),
-            updatedAt: doc.updatedAt.toISOString(),
+            createdAt: doc.createdAt?.toISOString ? doc.createdAt.toISOString() : new Date().toISOString(),
+            updatedAt: doc.updatedAt?.toISOString ? doc.updatedAt.toISOString() : new Date().toISOString(),
             cancellation: doc.cancellation ? {
                 cancelledBy: doc.cancellation.cancelledBy,
                 reason: doc.cancellation.reason,
-                cancelledAt: doc.cancellation.cancelledAt.toISOString()
+                cancelledAt: doc.cancellation.cancelledAt?.toISOString ? doc.cancellation.cancelledAt.toISOString() : new Date().toISOString()
             } : undefined
 
         }

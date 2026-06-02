@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import type { AuctionItemDetailDTO } from "../../types/auctionItem.dto";
+import { AuctionItemStatus, updateAuctionStatusSchema, type AuctionItemDetailDTO } from "../../types/auctionItem.dto";
 import toast from "react-hot-toast";
 import auctionItemMangementService from "../../services/auctionItemMangement.service";
 import {
@@ -12,8 +12,11 @@ import {
     FaCheckCircle,
     FaTimesCircle,
     FaBan,
-    FaSearchPlus
+    FaSearchPlus,
+    FaExclamationTriangle
 } from "react-icons/fa";
+
+import { ValidationError } from "yup";
 const AdminAuctionDetailPage: React.FC = () => {
     const { id } = useParams<{ id: string }>()
     const navigate = useNavigate()
@@ -22,7 +25,12 @@ const AdminAuctionDetailPage: React.FC = () => {
     const [activeImage, setActiveImage] = useState<string>('');
     const [zoomPos, setZoomPos] = useState({ x: 0, y: 0 });
     const [isZoomed, setIsZoomed] = useState(false);
-
+    
+    const [modalOpen,setModalOpen]=useState(false);
+    const [modalType,setModalType]=useState<'APPROVE'|'REJECT'|null>(null);
+    const [rejectionReason, setRejectionReason] = useState("");
+    const [validationError, setValidationError] = useState("");
+    const [actionLoading, setActionLoading] = useState(false);
     const fetchAuction = async () => {
         setLoading(true);
         try {
@@ -57,12 +65,48 @@ const AdminAuctionDetailPage: React.FC = () => {
         const y = ((e.pageY - top - window.scrollY) / height) * 100;
         setZoomPos({ x, y });
     };
-    const handleApprove = async () => {
-
+   const openStatusModal=(type:'APPROVE'|'REJECT')=>{
+     setModalType(type);
+     setRejectionReason('');
+     setValidationError('');
+     setModalOpen(true)
+   }
+   
+   const handleUpdateStatus=async ()=>{
+    if(!auction) return;
+    const targetStatus=modalType==='APPROVE'?AuctionItemStatus.SCHEDULED:AuctionItemStatus.REJECTED;
+    const payload={
+        itemId:auction.auctionItemId,
+        status:targetStatus,
+        reason:modalType=='REJECT'?rejectionReason:null
     }
-    const handleReject = () => {
-
-    }
+        try {
+            await updateAuctionStatusSchema.validate(payload, { abortEarly: false });
+            setValidationError("");
+        } catch (err) {
+            if (err instanceof ValidationError) {
+                setValidationError(err.errors[0]);
+                return;
+            }
+        }
+        setActionLoading(true)
+        try {
+            const result=await auctionItemMangementService.updateAuctionStatus(payload);
+            if(result.success){
+                toast.success(result.message);
+                setModalOpen(false);
+                fetchAuction()
+            }
+            else{
+                toast.error(result.message)
+            }
+        } catch{
+            toast.error('error while updating the auction status')
+        }finally{
+            setActionLoading(false)
+        }
+   }
+  
     const handleCancelAuction = () => {
 
     }
@@ -214,13 +258,15 @@ const AdminAuctionDetailPage: React.FC = () => {
                             {isPendingReview ? (
                                 <div className="grid grid-cols-2 gap-4">
                                     <button
-                                        onClick={handleReject}
+                                        disabled={actionLoading}
+                                        onClick={()=>openStatusModal('REJECT')}
                                         className="w-full bg-white border border-[#DC2626] text-[#DC2626] hover:bg-red-50 text-xs font-black uppercase tracking-widest py-3 rounded-xl transition-colors flex items-center justify-center gap-2 shadow-sm"
                                     >
                                         <FaTimesCircle /> Reject Request
                                     </button>
                                     <button
-                                        onClick={handleApprove}
+                                        disabled={actionLoading}
+                                        onClick={()=>openStatusModal('APPROVE')}
                                         className="w-full bg-[#16A34A] hover:bg-emerald-700 text-white text-xs font-black uppercase tracking-widest py-3 rounded-xl transition-colors flex items-center justify-center gap-2 shadow-sm"
                                     >
                                         <FaCheckCircle /> Approve & Publish
@@ -304,6 +350,87 @@ const AdminAuctionDetailPage: React.FC = () => {
 
                 </div>
             </div>
+            {modalOpen && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn">
+                    <div className="bg-white w-full max-w-md rounded-2xl border border-[#E5E7EB] shadow-2xl p-6 relative overflow-hidden animate-scaleIn">
+                        
+                        {/* Header Area */}
+                        <div className="flex items-center gap-3 mb-4">
+                            <div className={`p-2.5 rounded-xl ${modalType === 'APPROVE' ? 'bg-emerald-50 text-[#16A34A]' : 'bg-red-50 text-[#DC2626]'}`}>
+                                {modalType === 'APPROVE' ? <FaCheckCircle size={20} /> : <FaExclamationTriangle size={20} />}
+                            </div>
+                            <div>
+                                <h3 className="text-sm font-black uppercase tracking-widest text-[#0F172A]">
+                                    {modalType === 'APPROVE' ? "Approve Publication Request" : "Reject Asset Listing"}
+                                </h3>
+                                <p className="text-[11px] font-medium text-[#6B7280] mt-0.5">
+                                    Item Ref: #{auction.auctionItemId?.toUpperCase()}
+                                </p>
+                            </div>
+                        </div>
+
+                        <div className="space-y-4">
+                            {modalType === 'APPROVE' ? (
+                                <p className="text-xs font-medium text-[#6B7280] leading-relaxed">
+                                    Are you completely sure you want to verify and approve <span className="font-bold text-[#0F172A]">"{auction.title}"</span>? This will schedule the asset for live public bidding matching its timeline parameters.
+                                </p>
+                            ) : (
+                                <div className="space-y-1.5">
+                                    <label className="block text-[10px] font-black uppercase tracking-widest text-[#6B7280]">
+                                        Rejection Explanation Note <span className="text-red-500">*</span>
+                                    </label>
+                                    <textarea
+                                        rows={4}
+                                        value={rejectionReason}
+                                        onChange={(e) => {
+                                            setRejectionReason(e.target.value);
+                                            if (validationError) setValidationError("");
+                                        }}
+                                        placeholder="Type administrative rationale parameters here (minimum 5 characters)..."
+                                        className={`w-full text-xs font-medium bg-[#F3F4F6] border rounded-xl p-3 text-[#0F172A] placeholder-[#9CA3AF] focus:outline-none focus:ring-1 transition-all ${
+                                            validationError ? 'border-[#DC2626] focus:ring-[#DC2626]' : 'border-[#E5E7EB] focus:ring-[#111827]'
+                                        }`}
+                                    />
+                                    {validationError && (
+                                        <span className="text-[10px] font-bold tracking-wide text-[#DC2626] block mt-1 animate-slideDown">
+                                            ⚠️ {validationError}
+                                        </span>
+                                    )}
+                                </div>
+                            )}
+                        </div>
+
+                    
+                        <div className="flex items-center gap-3 mt-6 pt-4 border-t border-[#E5E7EB]">
+                            <button
+                                type="button"
+                                disabled={actionLoading}
+                                onClick={() => setModalOpen(false)}
+                                className="w-1/2 bg-[#F3F4F6] hover:bg-[#E5E7EB] text-[#6B7280] hover:text-[#0F172A] text-xs font-black uppercase tracking-widest py-3 rounded-xl transition-colors disabled:opacity-50"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                type="button"
+                                disabled={actionLoading}
+                                onClick={handleUpdateStatus}
+                                className={`w-1/2 text-white text-xs font-black uppercase tracking-widest py-3 rounded-xl transition-colors shadow-sm flex items-center justify-center gap-2 disabled:opacity-50 ${
+                                    modalType === 'APPROVE' ? 'bg-[#16A34A] hover:bg-emerald-700' : 'bg-[#111827] hover:bg-black'
+                                }`}
+                            >
+                                {actionLoading ? (
+                                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                                ) : modalType === 'APPROVE' ? (
+                                    "Confirm & Publish"
+                                ) : (
+                                    "Submit Rejection"
+                                )}
+                            </button>
+                        </div>
+
+                    </div>
+                </div>
+            )}
         </div>
     );
 
