@@ -9,7 +9,7 @@ export class AuctionItemRepository extends BaseRepository<IAuctionItemDocument> 
     constructor() {
         super(AuctionItem)
     }
-    async listAllAuctionItems(page: number, limit: number, search?: string,status?:string,type?:string,houseId?:string): Promise<{ auctions: AuctionItemListDTO[], total: number }> {
+    async listAllAuctionItems(page: number, limit: number, search?: string,status?:string|string[],type?:string,houseId?:string): Promise<{ auctions: AuctionItemListDTO[], total: number }> {
         const skip = (page - 1) * limit;
         const pipeline:PipelineStage[]=[];
              if(houseId){
@@ -22,7 +22,7 @@ export class AuctionItemRepository extends BaseRepository<IAuctionItemDocument> 
              if(status){
                 pipeline.push({
                     $match:{
-                        status:status
+                        status:Array.isArray(status)?{$in:status}:status
                     }
                 })
              }
@@ -78,6 +78,8 @@ export class AuctionItemRepository extends BaseRepository<IAuctionItemDocument> 
                             auctionHouseName:{$ifNull:['$auctions.name','Unknown House']},
                             auctionStatus:'$status',
                             type:'$type',
+                            startTime:'$startTime',
+                            endTime:'$endTime',
                             images:{$ifNull:['$images',[]]}
                         }
                     }

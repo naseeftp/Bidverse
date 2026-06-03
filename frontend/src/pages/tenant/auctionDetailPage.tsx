@@ -156,10 +156,9 @@ const TenantAuctionDetailPage: React.FC = () => {
                         )}
                     </div>
 
-                    {/* Catalog Core Profile Text */}
                     <div className="bg-white rounded-xl border border-[#E2E8F0] p-6 shadow-sm">
                         <h2 className="text-xs font-bold uppercase tracking-widest text-[#0F172A] border-b border-[#E2E8F0] pb-3 mb-4">
-                            Asset Presentation Profile
+                            Auction Item Description
                         </h2>
                         <p className="text-sm text-[#475569] leading-relaxed whitespace-pre-line font-medium">
                             {auction.description}

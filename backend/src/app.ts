@@ -11,7 +11,7 @@ import auctionHouseRoutes from './routes/auctionHouse.routes'
 import adminRoutes from './routes/admin.routes'
 import profileRoutes from './routes/profile.routes'
 import addressRoutess from './routes/address.routes'
-import publicAuctionRoutes from './routes/publicAuction.routes'
+import publicAuctionRoutes from './routes/public.routes'
 import auctionItemRoutes from './routes/auctionItem.routes'
 import { LoggerService } from "./services/implementations/Logger.service";
 

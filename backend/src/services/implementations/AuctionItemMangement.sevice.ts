@@ -77,6 +77,26 @@ export class AuctionItemMangementSevice implements IAuctionItemMangementSevice{
             }
         }
     }
+    async listPublicAuctions(page: number, limit: number, search?: string, type?: string): Promise<IGenericPaginatedResposnse<AuctionItemListDTO>> {
+        const publicStatus=[
+            AuctionItemStatus.SCHEDULED,
+            AuctionItemStatus.PASSED,
+            AuctionItemStatus.SOLD
+        ]
+
+        const {auctions,total}=await this._auctionItemRepo.listAllAuctionItems(page,limit,search,publicStatus,type)
+        return{
+            data:auctions,
+            pagination:{
+                totalItems:total,
+                itemsPerPage:limit,
+                currentPage:page,
+                totalPages:Math.ceil(total/limit),
+                hasNextPage:page*limit<total,
+                hasPrevPage:page>1
+            }
+        }
+    }
     async getAuctionDetails(itemId: string): Promise<AuctionItemDetailDTO | null> {
         const auction=await this._auctionItemRepo.findById(itemId);
         if(!auction){

@@ -51,7 +51,8 @@ export const ADDRESS_ROUTES={
     EDIT_ADDRESS:'/edit'
 }
 export const PUBLIC_ROUTES={
-    AUCTION_HOUSES:'/houses'
+    AUCTION_HOUSES:'/houses',
+    AUCTIONS:'/auctions'
 }
 
 export const AUCTION_ITEM_ROUTES={

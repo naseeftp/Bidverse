@@ -9,6 +9,7 @@ import ProtectedRoute from "./routes/ProtectedRoute";
 
 import LandingPage from "./pages/LandingPage";
 import PublicAuctionHouses from "./pages/auctionHouses";
+import PublicAuctions from "./pages/auctions";
 import RegisterPage from "./pages/users/registerPage";
 import VerifyOtpPage from "./pages/users/verifyotpPage";
 import UserHomePage from './pages/users/homePage'
@@ -63,7 +64,7 @@ function App() {
             <Route element={<MainLayout />}>
                <Route path="/auth-success" element={<AuthSuccessPage />} />
                <Route path="/auction-houses" element={<PublicAuctionHouses/>}/>
-
+               <Route path="/auctions" element={<PublicAuctions/>}/>
                <Route element={<PublicRoute />}>
                   <Route path="/" element={<LandingPage />} />
                   <Route path="/register" element={<RegisterPage />} />

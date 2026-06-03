@@ -116,6 +116,8 @@ export interface AuctionItemListDTO {
     auctionHouseName: string;
     auctionStatus: AuctionItemStatus;
     type: AuctionType,
+    startTime: string;
+    endTime: string;
     images: {
         id: string;
         url: string;

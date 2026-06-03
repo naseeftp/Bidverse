@@ -7,4 +7,8 @@ router.get(
     PUBLIC_ROUTES.AUCTION_HOUSES,
     (req,res,next)=>publicAuctionController. listAllPublicAuctionHouses(req,res,next)
 )
+router.get(
+    PUBLIC_ROUTES.AUCTIONS,
+    (req,res,next)=>publicAuctionController.getPublicAuctions(req,res,next)
+)
 export default router
