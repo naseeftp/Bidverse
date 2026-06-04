@@ -16,7 +16,7 @@ const publicAuctions: React.FC = () => {
     const fetchAuctions = useCallback(async () => {
         setLoading(true)
         try {
-            const response = await publicAuctionService.listPublicAuction(page, 1, search, typeFilter)
+            const response = await publicAuctionService.listPublicAuction(page, 6, search, typeFilter)
             if (response.success && response.data) {
                 setAuction(response.data);
                 setPagination(response.pagination ?? null)
@@ -49,8 +49,8 @@ const publicAuctions: React.FC = () => {
                     
                 
                     <div className="max-w-md">
-                        <h1 className="text-3xl font-bold tracking-tight text-[#1F1F1F] mb-2">Public Marketplace</h1>
-                        <p className="text-sm text-[#6B6B6B]">Explore verified active assets and global catalog drops.</p>
+                        <h1 className="text-3xl font-bold tracking-tight text-[#1F1F1F] mb-2">Find Auctions....</h1>
+                        <p className="text-sm text-[#6B6B6B]">Explore verified active Auctions and Participate.</p>
                     </div>
 
                   
@@ -99,7 +99,7 @@ const publicAuctions: React.FC = () => {
                     </div>
                 ) : auction.length === 0 ? (
                     <div className="bg-white border border-[#E6E0DA] rounded-xl p-12 text-center shadow-sm">
-                        <p className="text-[#6B6B6B] text-sm">No live or scheduled catalog items match your search criteria.</p>
+                        <p className="text-[#6B6B6B] text-sm">No live or scheduled Auctions Available</p>
                     </div>
                 ) : (
                     <>

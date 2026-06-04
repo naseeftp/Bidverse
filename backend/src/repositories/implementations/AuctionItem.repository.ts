@@ -80,7 +80,8 @@ export class AuctionItemRepository extends BaseRepository<IAuctionItemDocument> 
                             type:'$type',
                             startTime:'$startTime',
                             endTime:'$endTime',
-                            images:{$ifNull:['$images',[]]}
+                            images:{$ifNull:['$images',[]]},
+                            startingPrice:'$startingPrice'
                         }
                     }
                 ],

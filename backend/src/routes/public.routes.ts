@@ -10,5 +10,10 @@ router.get(
 router.get(
     PUBLIC_ROUTES.AUCTIONS,
     (req,res,next)=>publicAuctionController.getPublicAuctions(req,res,next)
+),
+router.get(
+    PUBLIC_ROUTES.GET_AUCTION,
+    (req,res,next)=>publicAuctionController.getAuctionDetails(req,res,next)
+
 )
 export default router

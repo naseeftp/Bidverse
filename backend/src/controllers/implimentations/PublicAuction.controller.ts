@@ -4,11 +4,10 @@ import { IPublicAunctionService } from "../../services/interface/IPublicAuction.
 import { Request, Response, NextFunction } from "express";
 import { SuccessResponse } from "../../utils/response.utility";
 import { HttpStatus, MESSAGES } from "../../constants/constants";
-import { AuctionItemMangementSevice } from "../../services/implementations/AuctionItemMangement.sevice";
+
 export class PublicAuctionController implements IPublicAuctionController{
     constructor(
         private _publicAuctionService:IPublicAunctionService,
-        private _auctionItemService:AuctionItemMangementSevice,
         private _logger:ILoggerService
     ){}
    async  listAllPublicAuctionHouses(req: Request, res: Response, next: NextFunction): Promise<void> {
@@ -30,8 +29,17 @@ export class PublicAuctionController implements IPublicAuctionController{
             const limit=Number(req.query.limit);
             const search=req.query.search as string;
             const type=req.query.type as string;
-            const result=await this._auctionItemService.listPublicAuctions(page,limit,search,type)
+            const result=await this._publicAuctionService.listPublicAuctions(page,limit,search,type)
             SuccessResponse(res,MESSAGES.LIST_RETRIEVED,result,HttpStatus.OK)
+        } catch (error) {
+            next(error)
+        }
+    }
+     async getAuctionDetails(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const ItemId=req.params.id as string;
+            const result=await this._publicAuctionService.getAuctionDetail(ItemId)
+            SuccessResponse(res,MESSAGES.AUCTION_RETRIEVED,result,HttpStatus.OK)
         } catch (error) {
             next(error)
         }

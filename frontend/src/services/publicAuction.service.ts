@@ -3,7 +3,8 @@ import { BASE_ROUTES, PUBLIC_ROUTES } from "../constants/api.constant";
 import { apiErrorHandler } from "../utils/error.handle";
 import type { ApiResponse, PublicAuctionHouseResponseDTO } from "../types/auth.type";
 import type { IPaginationMeta } from "../types/auth.type";
-import type { AuctionItemListDTO } from "../types/auctionItem.dto";
+import type { AuctionItemDetailDTO, AuctionItemListDTO } from "../types/auctionItem.dto";
+
 
 
 class PublicAuctionService {
@@ -52,6 +53,20 @@ class PublicAuctionService {
 
         }
 
+     }
+    async getAuctionDetails(itemId:string){
+         try {
+            let url=`${BASE_ROUTES.PUBLIC}${PUBLIC_ROUTES.GET_AUCTION}/${itemId}`
+            const response=await axiosInstance.get<AuctionItemDetailDTO,ApiResponse<AuctionItemDetailDTO>>(url)
+            return{
+                success:true,
+                message:response.message,
+                data:response.data
+            }
+         } catch (error) {
+         return apiErrorHandler(error,'Failed to get Auctuion')
+
+         }   
     }
 
 }

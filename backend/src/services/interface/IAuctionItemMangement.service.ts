@@ -5,7 +5,6 @@ export interface IAuctionItemMangementSevice {
     createAuction(userId: string, data: CreateAuctionItemDTO): Promise<AuctionItemResponseDTO>
     listAdminAuctions(page: number, limit: number, search?: string, status?: string, type?: string): Promise<IGenericPaginatedResposnse<AuctionItemListDTO>>
     listTenantAuctions(page: number, limit: number, search?: string, status?: string, type?: string, userId?: string): Promise<IGenericPaginatedResposnse<AuctionItemListDTO>>
-    listPublicAuctions(page: number, limit: number, search?: string,type?: string):Promise<IGenericPaginatedResposnse<AuctionItemListDTO>>
     getAuctionDetails(itemId: string): Promise<AuctionItemDetailDTO | null>
     updateAuctionStatus(data: updateAuctionStatusDTO): Promise<AuctionItemResponseDTO>
 }
