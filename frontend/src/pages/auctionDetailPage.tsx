@@ -51,7 +51,7 @@ const PublicAuctionDetailPage: React.FC = () => {
 
     useEffect(() => {
         fetchAuctionDetail();
-    }, [itemId]);
+    }, [itemId,fetchAuctionDetail]);
 
     useEffect(() => {
         if (!auction || !auction.startTime || !auction.endTime) return;
@@ -350,7 +350,6 @@ const PublicAuctionDetailPage: React.FC = () => {
                         </div>
                     )}
 
-                    {/* Dispatch & Premium Policies Module */}
                     <div className="bg-white rounded-xl border border-[#E6E0DA] p-6 shadow-sm space-y-3">
                         <div className="flex items-center gap-2 border-b border-[#E6E0DA] pb-2">
                             <FaTruck className="text-[#6B6B6B]" size={13} />

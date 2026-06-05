@@ -57,7 +57,7 @@ const AdminAuctionDetailPage: React.FC = () => {
             fetchAuction()
         }
 
-    }, [id])
+    }, [id,fetchAuction])
    const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => { // creating an arrow fn that accept react mouse event bound to  specifally bound to html div element
                                                                        // its allow us to access active mouse co ordinates (e.pagex e.pagey)
         const { left, top, width, height } = e.currentTarget.getBoundingClientRect(); // identifying where the image located in the screen and how big it is

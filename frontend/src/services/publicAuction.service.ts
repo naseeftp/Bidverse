@@ -4,6 +4,7 @@ import { apiErrorHandler } from "../utils/error.handle";
 import type { ApiResponse, PublicAuctionHouseResponseDTO } from "../types/auth.type";
 import type { IPaginationMeta } from "../types/auth.type";
 import type { AuctionItemDetailDTO, AuctionItemListDTO } from "../types/auctionItem.dto";
+import type{ PublicAuctionHouseDetailDTO } from "../types/auctionHouse.type";
 
 
 
@@ -56,7 +57,7 @@ class PublicAuctionService {
      }
     async getAuctionDetails(itemId:string){
          try {
-            let url=`${BASE_ROUTES.PUBLIC}${PUBLIC_ROUTES.GET_AUCTION}/${itemId}`
+            const url=`${BASE_ROUTES.PUBLIC}${PUBLIC_ROUTES.GET_AUCTION}/${itemId}`
             const response=await axiosInstance.get<AuctionItemDetailDTO,ApiResponse<AuctionItemDetailDTO>>(url)
             return{
                 success:true,
@@ -67,6 +68,22 @@ class PublicAuctionService {
          return apiErrorHandler(error,'Failed to get Auctuion')
 
          }   
+    }
+
+    async getHouseDetailsWithAuctions(houseId:string,page:number,limit:number,search?:string,status?:string){
+        try {
+            let url=`${BASE_ROUTES.PUBLIC}${PUBLIC_ROUTES.AUCTION_HOUSE}/${houseId}?page=${page}&limit=${limit}`
+            const response=await axiosInstance.get<PublicAuctionHouseDetailDTO,ApiResponse<{data:PublicAuctionHouseDetailDTO[],pagination:IPaginationMeta}>>(url)
+            const paginatedResult=response.data;
+            return{
+                success:true,
+                message:response.message,
+                data:paginatedResult?.data,
+                pagination:paginatedResult?.pagination
+            }
+        } catch (error) {
+            return apiErrorHandler(error,'Failed to get AuctuionHouse Details')
+        }
     }
 
 }

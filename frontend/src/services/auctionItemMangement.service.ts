@@ -73,7 +73,7 @@ class AuctionItemMangementService{
 
     async getAuction(Id:string){
      try {
-        let url=`${BASE_ROUTES.AUCTION_ITEM}${AUCTION_ITEM_ROUTES.GET_AUCTION}/${Id}`
+        const url=`${BASE_ROUTES.AUCTION_ITEM}${AUCTION_ITEM_ROUTES.GET_AUCTION}/${Id}`
         const response=await axiosInstance.get<AuctionItemDetailDTO,ApiResponse<AuctionItemDetailDTO>>(url)
         return{
             success:true,
@@ -86,7 +86,7 @@ class AuctionItemMangementService{
     }
     async updateAuctionStatus(data:UpdateAuctionStatusDTO){
         try {
-            let url=`${BASE_ROUTES.AUCTION_ITEM}${AUCTION_ITEM_ROUTES.UPDATE_STATUS}`;
+            const url=`${BASE_ROUTES.AUCTION_ITEM}${AUCTION_ITEM_ROUTES.UPDATE_STATUS}`;
             const response=await axiosInstance.patch<AuctionItemResponseDTO,ApiResponse<AuctionItemResponseDTO>>(url,data);
             return{
                 success:true,

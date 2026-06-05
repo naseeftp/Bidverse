@@ -1,5 +1,5 @@
 import { AuctionItemStatus, AuctionItemStatusValues, AuctionType } from "../../constants/constants";
-import { string, z } from 'zod'
+import { z } from 'zod'
 
 export const createAuctionItemSchema = z.object({
     title: z.string()

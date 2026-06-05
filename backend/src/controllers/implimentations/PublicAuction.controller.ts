@@ -44,4 +44,17 @@ export class PublicAuctionController implements IPublicAuctionController{
             next(error)
         }
     }
+    async getHouseDetailsWithAuctions(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const houseId=req.params.id as string;
+            const page=Number(req.query.page)||1;
+            const limit=Number(req.query.limit)||10;
+            const itemSearch=req.query.search as string;
+            const itemStatus=req.query.status as string;
+            const result=await this._publicAuctionService.getHouseDetailsWithAuctions(houseId,page,limit,itemSearch,itemStatus)
+            SuccessResponse(res,MESSAGES.LIST_RETRIEVED,result,HttpStatus.OK)
+        } catch (error) {
+            next(error)
+        }
+    }
 }

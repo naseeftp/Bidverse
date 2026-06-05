@@ -11,6 +11,7 @@ import LandingPage from "./pages/LandingPage";
 import PublicAuctionHouses from "./pages/auctionHouses";
 import PublicAuctions from "./pages/auctions";
 import PublicAuctionDetailPage from "./pages/auctionDetailPage";
+import PublicAuctionHouseDetailsPage from "./pages/houseDetails";
 
 import RegisterPage from "./pages/users/registerPage";
 import VerifyOtpPage from "./pages/users/verifyotpPage";
@@ -68,7 +69,8 @@ function App() {
                <Route path="/auction-houses" element={<PublicAuctionHouses/>}/>
                <Route path="/auctions" element={<PublicAuctions/>}/>
                <Route path="/auctions/:itemId" element={<PublicAuctionDetailPage/>}/>
-               
+               <Route path="/auction-house/:houseId" element={<PublicAuctionHouseDetailsPage/>}/>
+
                <Route element={<PublicRoute />}>
                   <Route path="/" element={<LandingPage />} />
                   <Route path="/register" element={<RegisterPage />} />

@@ -7,7 +7,6 @@ import { AuctionItemRepository } from "../repositories/implementations/AuctionIt
 const auctionHouseRepo = new AuctionHouseRepository();
 const PublicAuctionServiceLogger = new LoggerService('publicAuctionService');
 
-const pulicAuctionItemServiceLogger=new LoggerService('public Auction Item logger')
 const auctionItemRepo=new AuctionItemRepository()
 
 const publicAuctionService = new PublicAuctionService(auctionHouseRepo, PublicAuctionServiceLogger,auctionItemRepo);

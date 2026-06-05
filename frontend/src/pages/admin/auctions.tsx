@@ -40,7 +40,7 @@ const AdminAuctionsListPage: React.FC = () => {
         } finally {
             setLoading(false)
         }
-    }, [page, search, statusFilter,typeFilter])
+    }, [statusFilter,typeFilter])
 
     useEffect(() => {
         fetchAuctions()

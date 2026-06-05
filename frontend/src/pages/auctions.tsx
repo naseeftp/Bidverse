@@ -5,7 +5,8 @@ import type { IPaginationMeta } from "../types/auth.type";
 import toast from "react-hot-toast";
 import AuctionCard from "../components/user/auctionCard";
 import Pagination from "../components/user/pagination";
-const publicAuctions: React.FC = () => {
+
+const PublicAuctions: React.FC = () => {
     const [auction, setAuction] = useState<AuctionItemListDTO[]>([])
     const [pagination, setPagination] = useState<IPaginationMeta | null>(null)
     const [page, setPage] = useState<number>(1)
@@ -123,4 +124,4 @@ const publicAuctions: React.FC = () => {
     );
 }
 
-export default publicAuctions
+export default PublicAuctions

@@ -7,6 +7,8 @@ import { AuctionItemStatus, MESSAGES } from "../../constants/constants";
 import { IAuctionItemRepository } from "../../repositories/interfaces/IAuctionItem.repository";
 import { AuctionItemListDTO,AuctionItemDetailDTO} from "../../dtos/auctionHouse.dto/auctionItem.dto";
 import { NotFoundError } from "../../errors/AppError";
+import { PublicAuctionHouseDetailDTO } from "../../dtos/auctionHouse.dto/auctionHouse.dto";
+
 export class PublicAuctionService implements IPublicAunctionService{
     constructor(
         private _auctionHouseRepo:IAuctionHouseRepository,
@@ -56,5 +58,26 @@ export class PublicAuctionService implements IPublicAunctionService{
             }
             const result=await this._auctionItemRepo.getAuctionItemDetails(itemId)
             return result
+        }
+        async getHouseDetailsWithAuctions(houseId: string, page: number, limit: number, itemSearch?: string, itemStatus?: string): Promise<IGenericPaginatedResposnse<PublicAuctionHouseDetailDTO>> {
+            const auctionHouse=await this._auctionHouseRepo.findById(houseId);
+            if(!auctionHouse){
+                throw new NotFoundError(MESSAGES.AUCTION_HOUSE_NOT_FOUND)
+            }
+            const {data,total}=await this._auctionHouseRepo.getHouseDetailsWithAuctions(houseId,page,limit,itemSearch,itemStatus)
+            if(!data){
+                throw new NotFoundError(MESSAGES.AUCTION_HOUSE_NOT_FOUND)
+            }
+            return{
+                data:[data],
+                pagination:{
+                    totalItems:total,
+                    itemsPerPage:limit,
+                    currentPage:page,
+                    totalPages:Math.ceil(total/limit),
+                    hasNextPage:page*limit<total,
+                    hasPrevPage:page>1
+                }
+            }
         }
 }

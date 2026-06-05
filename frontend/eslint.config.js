@@ -24,7 +24,7 @@ export default defineConfig([
   },
   settings: {
     react: {
-      version: "detect", // ✅ FIX
+      version: "detect", 
     },
   },
   rules: {

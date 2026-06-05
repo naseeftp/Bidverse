@@ -177,5 +177,44 @@ export interface AdminAuctionHouseDetailDTO {
   createdAt: string | Date;
 }
 
+export interface AuctionHouseProfileDTO {
+    id: string;
+    name: string;
+    profileImage:string,
+    yearEstablished: number;
+    briefDescription: string;
+    categories: string[];
+    city: string;
+    state: string;
+    country: string;
+    fullAddress: string;
+    primaryContactName: string;
+    businessEmail: string;
+    phone: string;
+    isVerified: boolean;
+}
+export interface AuctionItemDTO {
+    auctionItemId: string;
+    title: string;
+    status: string;
+    type: string;
+    currency: string;
+    startingPrice: number;
+    startTime: string;
+    endTime: string;
+    images: Array<{
+        id: string;
+        url: string;
+        isPrimary: boolean;
+        altText?: string;
+    }>;
+}
+
+export interface PublicAuctionHouseDetailDTO {
+    auctionHouse: AuctionHouseProfileDTO;
+    items: AuctionItemDTO[];
+}
+
+
 export type AuctionHouseVerificationDTO = z.infer<typeof AuctionHouseVerificationSchema>
 export type ChangeBusinessDetailsDTO=z.infer<typeof changeBusinessDetailsSchema>

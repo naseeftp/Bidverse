@@ -4,9 +4,9 @@ export const BASE_ROUTES = {
     AUCTION_HOUSE: '/auction-house',
     ADMIN: '/admin',
     PROFILE_MANAGEMENT: '/profile',
-    ADDRESS:'/address',
-    PUBLIC:'/public',
-    AUCTION_ITEM:'/auction-item'
+    ADDRESS: '/address',
+    PUBLIC: '/public',
+    AUCTION_ITEM: '/auction-item'
 } as const
 
 export const AUTH_ROUTES = {
@@ -45,26 +45,27 @@ export const PROFILE_ROUTES = {
     CHANGE_EMAIL: '/change-email',
     CHANGE_EMAIL_VERIFY: '/change-email-verify',
     CHANGE_EMAIL_RESEND: '/change-email-resend',
-    CHANGE_BUSINESS_DETAILS:'/change-business-details',
-    HANDLE_PROFILE_IMG:'/handle-profile-image'
+    CHANGE_BUSINESS_DETAILS: '/change-business-details',
+    HANDLE_PROFILE_IMG: '/handle-profile-image'
 }
-export const ADDRESS_ROUTES={
-    CREATE_ADDRESS:'/create-address',
-    GET_USER_ADDRESS:'/addresses',
-    DELETE_ADDRESS:'/delete/:id',
-    EDIT_ADDRESS:'/edit/:id'
-}
-
-export const PUBLIC_ROUTES={
-    AUCTION_HOUSES:'/houses',
-    AUCTIONS:'/auctions',
-    GET_AUCTION:'/get-auction/:id',
+export const ADDRESS_ROUTES = {
+    CREATE_ADDRESS: '/create-address',
+    GET_USER_ADDRESS: '/addresses',
+    DELETE_ADDRESS: '/delete/:id',
+    EDIT_ADDRESS: '/edit/:id'
 }
 
-export const AUCTION_ITEM_ROUTES={
-    CREATE:'/create',
-    ADMIN_AUCTIONS:'/admin/auctions',
-    TENANT_AUCTIONS:'/tenant/auctions',
-    GET_AUCTION:'/get-auction/:id',
-    UPDATE_STATUS:'/update-status'
+export const PUBLIC_ROUTES = {
+    AUCTION_HOUSES: '/houses',
+    AUCTION_HOUSE: '/house/:id',
+    AUCTIONS: '/auctions',
+    GET_AUCTION: '/get-auction/:id',
+}
+
+export const AUCTION_ITEM_ROUTES = {
+    CREATE: '/create',
+    ADMIN_AUCTIONS: '/admin/auctions',
+    TENANT_AUCTIONS: '/tenant/auctions',
+    GET_AUCTION: '/get-auction/:id',
+    UPDATE_STATUS: '/update-status'
 }

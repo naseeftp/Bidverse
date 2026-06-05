@@ -52,12 +52,13 @@ export const ADDRESS_ROUTES={
 }
 export const PUBLIC_ROUTES={
     AUCTION_HOUSES:'/houses',
+    AUCTION_HOUSE: '/house',
     AUCTIONS:'/auctions',
     GET_AUCTION:'/get-auction',
 }
 
 export const AUCTION_ITEM_ROUTES={
-    CREATE:'/create',
+     CREATE:'/create',
      ADMIN_AUCTIONS:'/admin/auctions',
      TENANT_AUCTIONS:'/tenant/auctions',
      GET_AUCTION:'/get-auction',

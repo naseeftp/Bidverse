@@ -2,7 +2,7 @@ import { IAuctionHouseRepository } from "../interfaces/IAuctionHouse.repository"
 import { IAuctionHouseDocument } from "../../types/auctionhouse.type";
 import { BaseRepository } from "./Base.repository";
 import { AuctionHouse } from "../../models/auctionHouse.model";
-import { AdminAuctionHouseDetailDTO } from '../../dtos/auctionHouse.dto/auctionHouse.dto'
+import { AdminAuctionHouseDetailDTO, PublicAuctionHouseDetailDTO } from '../../dtos/auctionHouse.dto/auctionHouse.dto'
 import mongoose, { PipelineStage } from "mongoose";
 import { PublicAuctionHouseResponseDTO } from "../../dtos/Common.dto";
 
@@ -151,10 +151,10 @@ export class AuctionHouseRepository extends BaseRepository<IAuctionHouseDocument
                     businessName: { $ifNull: ['$house.name', 'NA'] },
                     yearEstablished: '$house.yearEstablished',
                     briefDescription: '$house.briefDescription',
-                    category:'$house.categories',
+                    category: '$house.categories',
                     address: '$house.address',
                     contact: '$house.contact',
-                    
+
                     documents: {
                         registrationCertificateUrl:
                             '$house.legal.registrationCertificateUrl',
@@ -193,7 +193,7 @@ export class AuctionHouseRepository extends BaseRepository<IAuctionHouseDocument
         page: number,
         limit: number,
         search?: string,
-        category?:string,
+        category?: string,
     ): Promise<{ houses: PublicAuctionHouseResponseDTO[], total: number }> {
         const skip = (page - 1) * limit;
 
@@ -240,13 +240,11 @@ export class AuctionHouseRepository extends BaseRepository<IAuctionHouseDocument
                 }
             });
         }
-        if(category){
+        if (category) {
             pipeline.push({
-                $match:{categories:category}
+                $match: { categories: category }
             })
         }
-
-
 
         const results = await mongoose.model('User').aggregate([
             ...pipeline,
@@ -262,5 +260,120 @@ export class AuctionHouseRepository extends BaseRepository<IAuctionHouseDocument
             houses: results[0].data as PublicAuctionHouseResponseDTO[],
             total: results[0].totalCount[0]?.count || 0
         };
+    }
+    async getHouseDetailsWithAuctions(
+        houseId: string,
+        page: number,
+        limit: number,
+        itemSearch?: string,
+        itemStatus?: string
+    ): Promise<{ data: PublicAuctionHouseDetailDTO | null, total: number }> {
+        const skip = (page - 1) * limit;
+        const targetHouseObjectId = new mongoose.Types.ObjectId(houseId);
+
+        const pipeline: PipelineStage[] = [
+            {
+                $match: {
+                    _id: targetHouseObjectId,
+                    isVerified: true
+                }
+            },
+
+            {
+                $lookup: {
+                    from: 'users',
+                    localField: 'userId',
+                    foreignField: '_id',
+                    as: 'ownerUser'
+                }
+            },
+            { $unwind: { path: '$ownerUser', preserveNullAndEmptyArrays: true } },
+
+            {
+                $lookup: {
+                    from: 'auctionitems',
+                    let: { currentHouseId: '$_id' },
+                    pipeline: [
+                        {
+                            $match: {
+                                $expr: { $eq: ['$houseId', '$$currentHouseId'] },
+                                isApproved: true
+                            }
+                        },
+
+                        ...(itemStatus ? [{ $match: { status: itemStatus } }] : []),
+                        ...(itemSearch ? [{ $match: { title: { $regex: itemSearch, $options: 'i' } } }] : []),
+                        { $sort: { createdAt: -1 } }
+                    ],
+                    as: 'filteredItems'
+                }
+            },
+
+
+            {
+                $project: {
+                    profileBlock: {
+                        id: { $toString: '$_id' },
+                        name: '$name',
+                        profileImage: { $ifNull: ['$ownerUser.profileImage', ''] },
+                        yearEstablished: '$yearEstablished',
+                        briefDescription: '$briefDescription',
+                        categories: '$categories',
+                        city: '$address.city',
+                        state: '$address.state',
+                        country: '$address.country',
+                        fullAddress: '$address.fullAddress',
+                        primaryContactName: '$contact.primaryContactName',
+                        businessEmail: '$contact.businessEmail',
+                        phone: '$contact.phone',
+                        isVerified: '$isVerified'
+                    },
+
+                    totalCount: { $size: '$filteredItems' },
+                    paginatedItems: {
+                        $slice: [
+                            {
+                                $map: {
+                                    input: '$filteredItems',
+                                    as: 'item',
+                                    in: {
+                                        auctionItemId: { $toString: '$$item._id' },
+                                        title: '$$item.title',
+                                        status: '$$item.status',
+                                        type: '$$item.type',
+                                        currency: '$$item.currency',
+                                        startingPrice: '$$item.startingPrice',
+                                        startTime: { $dateToString: { date: '$$item.startTime' } },
+                                        endTime: { $dateToString: { date: '$$item.endTime' } },
+                                        images: '$$item.images'
+                                    }
+                                }
+                            },
+                            skip,
+                            limit
+                        ]
+                    }
+                }
+            }
+        ];
+
+        const aggregationResult = await this.model.aggregate(pipeline).exec();
+
+        if (!aggregationResult || aggregationResult.length === 0) {
+            return { data: null, total: 0 };
+        }
+
+        const record = aggregationResult[0];
+
+        const outputPayload: PublicAuctionHouseDetailDTO = {
+            auctionHouse: record.profileBlock,
+            items: record.paginatedItems
+        };
+
+        return {
+            data: outputPayload,
+            total: record.totalCount || 0
+        };
+
     }
 }

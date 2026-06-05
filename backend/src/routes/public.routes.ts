@@ -8,9 +8,13 @@ router.get(
     (req,res,next)=>publicAuctionController. listAllPublicAuctionHouses(req,res,next)
 )
 router.get(
+    PUBLIC_ROUTES.AUCTION_HOUSE,
+    (req,res,next)=>publicAuctionController.getHouseDetailsWithAuctions(req,res,next)
+)
+router.get(
     PUBLIC_ROUTES.AUCTIONS,
     (req,res,next)=>publicAuctionController.getPublicAuctions(req,res,next)
-),
+)
 router.get(
     PUBLIC_ROUTES.GET_AUCTION,
     (req,res,next)=>publicAuctionController.getAuctionDetails(req,res,next)
