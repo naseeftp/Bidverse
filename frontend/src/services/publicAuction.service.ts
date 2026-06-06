@@ -73,6 +73,9 @@ class PublicAuctionService {
     async getHouseDetailsWithAuctions(houseId:string,page:number,limit:number,search?:string,status?:string){
         try {
             let url=`${BASE_ROUTES.PUBLIC}${PUBLIC_ROUTES.AUCTION_HOUSE}/${houseId}?page=${page}&limit=${limit}`
+            if (search) url += `&search=${encodeURIComponent(search)}`;
+            if (status) url += `&status=${encodeURIComponent(status)}`;
+            
             const response=await axiosInstance.get<PublicAuctionHouseDetailDTO,ApiResponse<{data:PublicAuctionHouseDetailDTO[],pagination:IPaginationMeta}>>(url)
             const paginatedResult=response.data;
             return{

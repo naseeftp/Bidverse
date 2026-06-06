@@ -1,4 +1,5 @@
 import type { ApiResponse } from "./auth.type";
+import type { AuctionItemListDTO } from "./auctionItem.dto";
 export const VerificationStatus = {
     PENDING: 'pending',
     APPROVED: 'approved',
@@ -135,26 +136,26 @@ export interface AuctionHouseProfileDTO {
     phone: string;
     isVerified: boolean;
 }
-export interface AuctionItemDTO {
-    auctionItemId: string;
-    title: string;
-    status: string;
-    type: string;
-    currency: string;
-    startingPrice: number;
-    startTime: string;
-    endTime: string;
-    images: Array<{
-        id: string;
-        url: string;
-        isPrimary: boolean;
-        altText?: string;
-    }>;
-}
+// export interface AuctionItemDTO {
+//     auctionItemId: string;
+//     title: string;
+//     status: string;
+//     type: string;
+//     currency: string;
+//     startingPrice: number;
+//     startTime: string;
+//     endTime: string;
+//     images: Array<{
+//         id: string;
+//         url: string;
+//         isPrimary: boolean;
+//         altText?: string;
+//     }>;
+// }
 
 export interface PublicAuctionHouseDetailDTO {
     auctionHouse: AuctionHouseProfileDTO;
-    items: AuctionItemDTO[];
+    items: AuctionItemListDTO[];
 }
 
 export type AuctionHouseResponse = ApiResponse<AuctionHouseResponseDTO>;

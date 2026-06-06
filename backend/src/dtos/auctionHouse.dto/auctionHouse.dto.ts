@@ -1,7 +1,7 @@
   import { z } from "zod";
 import { TVerificationStatus,TAuctionHouseCategory} from "../../types/auctionhouse.type";
 import { AuctionHouseCategory } from "../../constants/constants";
-
+import { AuctionItemListDTO } from "./auctionItem.dto";
 
 export const AuctionHouseVerificationSchema = z.object({
   name: z.string()
@@ -193,26 +193,26 @@ export interface AuctionHouseProfileDTO {
     phone: string;
     isVerified: boolean;
 }
-export interface AuctionItemDTO {
-    auctionItemId: string;
-    title: string;
-    status: string;
-    type: string;
-    currency: string;
-    startingPrice: number;
-    startTime: string;
-    endTime: string;
-    images: Array<{
-        id: string;
-        url: string;
-        isPrimary: boolean;
-        altText?: string;
-    }>;
-}
+// export interface AuctionItemDTO {
+//     auctionItemId: string;
+//     title: string;
+//     status: string;
+//     type: string;
+//     currency: string;
+//     startingPrice: number;
+//     startTime: string;
+//     endTime: string;
+//     images: Array<{
+//         id: string;
+//         url: string;
+//         isPrimary: boolean;
+//         altText?: string;
+//     }>;
+// }
 
 export interface PublicAuctionHouseDetailDTO {
     auctionHouse: AuctionHouseProfileDTO;
-    items: AuctionItemDTO[];
+    items: AuctionItemListDTO[];
 }
 
 
