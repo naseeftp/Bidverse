@@ -147,6 +147,7 @@ export const MESSAGES = {
     AUCTION_NOT_FOUND:'Auction Not found',
     AUCTION_RETRIEVED: 'Auction Retrieved successfully',
     AUCTION_STATUS_UPDATED:'Auction status updated',
+    AUCTION_UPDATED:'Auction Details updated Successfully',
     LOGOUT_SUCCESS: "Logout success",
     LOGOUT_FAILED: "Logout failed",
 

@@ -67,5 +67,6 @@ export const AUCTION_ITEM_ROUTES = {
     ADMIN_AUCTIONS: '/admin/auctions',
     TENANT_AUCTIONS: '/tenant/auctions',
     GET_AUCTION: '/get-auction/:id',
-    UPDATE_STATUS: '/update-status'
+    UPDATE_STATUS: '/update-status',
+    UPDATE_AUCTION:'/update-auction/:id'
 }

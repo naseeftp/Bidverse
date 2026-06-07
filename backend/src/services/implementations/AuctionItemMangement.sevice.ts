@@ -1,7 +1,7 @@
 import { IAuctionItemMangementSevice } from "../interface/IAuctionItemMangement.service";
 import { ILoggerService } from "../interface/ILogger.service";
 import { IAuctionItemRepository } from "../../repositories/interfaces/IAuctionItem.repository";
-import { CreateAuctionItemDTO, AuctionItemResponseDTO, AuctionItemListDTO, AuctionItemDetailDTO, updateAuctionStatusDTO } from "../../dtos/auctionHouse.dto/auctionItem.dto";
+import { CreateAuctionItemDTO, AuctionItemResponseDTO, AuctionItemListDTO, AuctionItemDetailDTO, updateAuctionStatusDTO, UpdateAuctionDTO } from "../../dtos/auctionHouse.dto/auctionItem.dto";
 import { IAuctionHouseRepository } from "../../repositories/interfaces/IAuctionHouse.repository";
 import { AppError, ForbiddenError, NotFoundError } from "../../errors/AppError";
 import { AuctionItemStatus, MESSAGES } from "../../constants/constants";
@@ -105,5 +105,43 @@ export class AuctionItemMangementSevice implements IAuctionItemMangementSevice{
            throw new AppError('Failed to update auction') 
         }
         return AuctionItemMapper.toResponseDTO(updatedAuction)
+    }
+
+    async editAuction(userId: string, itemId: string, data: UpdateAuctionDTO): Promise<AuctionItemResponseDTO> {
+        this._logger.info('auction item edit requested',{houseOwner:userId,item:itemId});
+        const houseExist=await this._auctionHouseRepo.findOne({userId:userId});
+        if(!houseExist){
+            throw new NotFoundError(MESSAGES.AUCTION_HOUSE_NOT_FOUND)
+        }
+        const existingAuction=await this._auctionItemRepo.findById(itemId);
+        if(!existingAuction){
+            throw new NotFoundError(MESSAGES.AUCTION_NOT_FOUND)
+        }
+        if(existingAuction.houseId.toString()!==houseExist._id.toString()){
+            throw new ForbiddenError(MESSAGES.NOT_PERMITTED)
+        }
+        const uneditableStatuses=[AuctionItemStatus.SCHEDULED, AuctionItemStatus.PASSED, AuctionItemStatus.SOLD];
+        if(uneditableStatuses.includes(existingAuction.status)){
+            throw new ForbiddenError('Cannot modify an auction item that is scheduled, active, or concluded.');
+        }
+        const updatePayload:Partial<IAuctionItem>={
+            ...data,
+            status:AuctionItemStatus.PENDING_APPROVAL,
+            isApproved:false,
+
+        }
+
+        if(data.images){
+            updatePayload.images=data.images.map(img => ({
+            id: img.id,
+            url: img.url,
+            isPrimary: img.isPrimary,
+            altText: img.altText
+        }));
+        }
+        const updatedItem=await this._auctionItemRepo.updateById(itemId,updatePayload)
+        if (!updatedItem) throw new AppError('Failed to execute auction modification updates');
+        const hydratedObject = updatedItem.toObject ? updatedItem.toObject() : updatedItem;
+        return AuctionItemMapper.toResponseDTO(hydratedObject);
     }
 }

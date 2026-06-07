@@ -10,7 +10,9 @@ import {
     FaLayerGroup, 
     FaEye, 
     FaChevronLeft, 
-    FaChevronRight 
+    FaChevronRight ,
+    FaEdit,
+    FaCloudUploadAlt,
 } from "react-icons/fa";
 
 const TenantAuctions:React.FC=()=>{
@@ -188,13 +190,33 @@ const TenantAuctions:React.FC=()=>{
                                             </p>
                                         </div>
 
-                                        <div className="pt-4 mt-4 border-t border-[#E2E8F0] flex items-center justify-end">
+                                        <div className="pt-4 mt-4 border-t border-[#E2E8F0] grid grid-cols-2 gap-2">
                                             <button
                                                 onClick={() => navigate(`/tenant/auctions/${item.auctionItemId}`)}
-                                                className="inline-flex items-center gap-2 bg-[#2F6FED] hover:bg-[#1E56C8] text-white text-xs font-bold uppercase tracking-wider px-4 py-2 rounded-lg transition-colors shadow-sm"
+                                                className="inline-flex items-center justify-center gap-2 bg-[#F8FAFC] border border-[#E2E8F0] hover:bg-[#F1F5F9] text-[#475569] text-xs font-bold uppercase tracking-wider py-2.5 rounded-lg transition-colors"
                                             >
                                                 Details <FaEye size={12} />
                                             </button>
+
+                                           
+                                            {item.auctionStatus === "REJECTED" && (
+                                                <button
+                                                    onClick={() => navigate(`/tenant/update-auctions/${item.auctionItemId}`)}
+                                                    className="inline-flex items-center justify-center gap-2 bg-[#EF4444] hover:bg-[#DC2626] text-white text-xs font-bold uppercase tracking-wider py-2.5 rounded-lg transition-colors shadow-sm"
+                                                >
+                                                    Resubmit <FaCloudUploadAlt size={13} />
+                                                </button>
+                                            )}
+
+                                            
+                                            {(item.auctionStatus === "PENDING_APPROVAL" || item.auctionStatus === "DRAFT") && (
+                                                <button
+                                                    onClick={() => navigate(`/tenant/update-auctions/${item.auctionItemId}`)}
+                                                    className="inline-flex items-center justify-center gap-2 bg-[#2F6FED] hover:bg-[#1E56C8] text-white text-xs font-bold uppercase tracking-wider py-2.5 rounded-lg transition-colors shadow-sm"
+                                                >
+                                                    Edit <FaEdit size={12} />
+                                                </button>
+                                            )}
                                         </div>
                                     </div>
                                 </div>

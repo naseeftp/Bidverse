@@ -3,7 +3,7 @@ import type{ AuctionItemResponseDTO,CreateAuctionItemDTO, UpdateAuctionStatusDTO
 import { BASE_ROUTES,AUCTION_ITEM_ROUTES } from "../constants/api.constant";
 import { apiErrorHandler } from "../utils/error.handle";
 import type { ApiResponse, IPaginationMeta } from "../types/auth.type";
-import type { AuctionItemListDTO,AuctionItemDetailDTO} from "../types/auctionItem.dto";
+import type { AuctionItemListDTO,AuctionItemDetailDTO,UpdateAuctionItemDTO} from "../types/auctionItem.dto";
 
 class AuctionItemMangementService{
     async createAuctionItem(data:CreateAuctionItemDTO){
@@ -96,6 +96,21 @@ class AuctionItemMangementService{
         } catch (error) {
             return apiErrorHandler(error,'Failed to update Auctuion status')
         }
+    }
+
+    async updateAuction(itemId:string,data:UpdateAuctionItemDTO){
+     try {
+        const url=`${BASE_ROUTES.AUCTION_ITEM}${AUCTION_ITEM_ROUTES.UPDATE_AUCTION}/${itemId}`;
+        const response=await axiosInstance.patch<AuctionItemResponseDTO,ApiResponse<AuctionItemResponseDTO>>(url,data);
+        return{
+            success:true,
+            message:response.message,
+            data:response.data
+        }
+     } catch (error) {
+        return apiErrorHandler(error,'Failed to update Auctuion')
+
+     }
     }
 
 }

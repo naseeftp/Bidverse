@@ -1,7 +1,7 @@
 import { AuctionItemStatus, AuctionItemStatusValues, AuctionType } from "../../constants/constants";
 import { z } from 'zod'
 
-export const createAuctionItemSchema = z.object({
+export const baseAuctionItemObjectSchema = z.object({
     title: z.string()
         .trim()
         .min(3, "Title must be at least 3 characters long")
@@ -28,8 +28,8 @@ export const createAuctionItemSchema = z.object({
     ).min(1, "Upload at least one item demonstration photo"),
 
     startingPrice: z.coerce.number()
-        .nonnegative("Starting price cannot be negative").
-        min(0, "Starting bidding must begin at ₹0 or more"),
+        .nonnegative("Starting price cannot be negative")
+        .min(0, "Starting bidding must begin at ₹0 or more"),
 
     reservePrice: z.coerce.number()
         .nonnegative('Reserve price cannot be negative'),
@@ -61,16 +61,18 @@ export const createAuctionItemSchema = z.object({
         .trim()
         .min(5, "Provide explicit parcel transit/pickup specifications")
         .max(500, "Shipping notes cannot exceed 500 characters"),
+});
 
-
-})
+export const createAuctionItemSchema = baseAuctionItemObjectSchema
     .refine((data) => data.endTime > data.startTime, {
         message: "The auction end time must occur after the start timeline has opened",
-        path: ["endTime"], // Points the UI error highlight directly to the input container element
-    }).refine((data) => data.reservePrice >= data.startingPrice, {
+        path: ["endTime"], 
+    })
+    .refine((data) => data.reservePrice >= data.startingPrice, {
         message: "Reserve price cannot be lower than the starting opening price",
         path: ["reservePrice"],
     });
+
 
 export interface AuctionItemResponseDTO {
     id: string;
@@ -192,4 +194,6 @@ export const updateAuctionStatusSchema = z.object({
 );
 
 export type CreateAuctionItemDTO = z.infer<typeof createAuctionItemSchema>
+export type UpdateAuctionDTO=Partial<CreateAuctionItemDTO>
+export const updateAuctionSchema = baseAuctionItemObjectSchema.partial();
 export type updateAuctionStatusDTO = z.infer<typeof updateAuctionStatusSchema>

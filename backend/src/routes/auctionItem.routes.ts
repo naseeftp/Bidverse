@@ -39,4 +39,10 @@ router.patch(
     validator(AuctionItemValidators.validateUpdateStatusInput),
     (req,res,next)=>auctionItemMangementController.updateAuctionStatus(req,res,next)
 )
+router.patch(
+    AUCTION_ITEM_ROUTES.UPDATE_AUCTION,
+    allowedTo(Role.TENANT),
+    validator(AuctionItemValidators.validateUpdateAuctionInput),
+    (req,res,next)=>auctionItemMangementController.editAuction(req,res,next)
+)
 export default router

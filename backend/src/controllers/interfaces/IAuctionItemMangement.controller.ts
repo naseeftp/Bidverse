@@ -6,4 +6,5 @@ export interface IAuctionItemMangementController{
     getTenantAuctions(req:Request,res:Response,next:NextFunction):Promise<void>
     getAuctionDetails(req:Request,res:Response,next:NextFunction):Promise<void>
     updateAuctionStatus(req:Request,res:Response,next:NextFunction):Promise<void>
+    editAuction(req:Request,res:Response,next:NextFunction):Promise<void>
 }

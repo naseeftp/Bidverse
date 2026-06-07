@@ -51,7 +51,7 @@ const PublicAuctionDetailPage: React.FC = () => {
 
     useEffect(() => {
         fetchAuctionDetail();
-    }, [itemId,fetchAuctionDetail]);
+    }, [itemId,navigate]);
 
     useEffect(() => {
         if (!auction || !auction.startTime || !auction.endTime) return;

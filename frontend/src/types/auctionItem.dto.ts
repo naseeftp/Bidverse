@@ -242,7 +242,47 @@ export const updateAuctionStatusSchema = yup.object({
                 )
         })
 })
-
 export type CreateAuctionItemDTO = yup.InferType<typeof createAuctionItemSchema>;
-export type UpdateAuctionStatusDTO = yup.InferType<typeof updateAuctionStatusSchema>
 
+
+
+const baseFieldsShape = createAuctionItemSchema.fields;
+
+
+export const updateAuctionItemSchema = yup.object()
+    .shape(baseFieldsShape)
+    .partial()
+    .test(
+        'reserve-price-validation-on-edit',
+        'Reserve price cannot be lower than the starting opening price',
+        function (value) {
+            const data = value as Partial<CreateAuctionItemDTO>;
+            
+            if (!data || data.startingPrice === undefined || data.startingPrice === null || 
+                data.reservePrice === undefined || data.reservePrice === null) {
+                return true; 
+            }
+            
+            return data.reservePrice >= data.startingPrice;
+        }
+    )
+    .test(
+        'end-time-validation-on-edit',
+        'The auction end time must occur after the start timeline has opened',
+        function (value) {
+            const data = value as Partial<CreateAuctionItemDTO>;
+
+            if (!data || !data.startTime || !data.endTime) {
+                return true; 
+            }
+
+            const start = new Date(data.startTime);
+            const end = new Date(data.endTime);
+
+            if (isNaN(start.getTime()) || isNaN(end.getTime())) return false;
+
+            return end > start;
+        }
+    );
+ export type UpdateAuctionItemDTO = yup.InferType<typeof updateAuctionItemSchema>;
+ export type UpdateAuctionStatusDTO = yup.InferType<typeof updateAuctionStatusSchema>
