@@ -4,45 +4,45 @@ import type { IPaginationMeta } from "../../types/auth.type";
 import auctionItemMangementService from "../../services/auctionItemMangement.service";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
-import { 
-    FaSearch, 
-    FaFilter, 
-    FaLayerGroup, 
-    FaEye, 
-    FaChevronLeft, 
-    FaChevronRight ,
+import {
+    FaSearch,
+    FaFilter,
+    FaLayerGroup,
+    FaEye,
+    FaChevronLeft,
+    FaChevronRight,
     FaEdit,
     FaCloudUploadAlt,
 } from "react-icons/fa";
 
-const TenantAuctions:React.FC=()=>{
-  const [auctions, setAuction] = useState<AuctionItemListDTO[]>([])
+const TenantAuctions: React.FC = () => {
+    const [auctions, setAuction] = useState<AuctionItemListDTO[]>([])
     const [pagination, setPagination] = useState<IPaginationMeta | null>(null)
     const [loading, setLoading] = useState(false);
     const [page, setPage] = useState<number>(1)
     const [search, setSearch] = useState<string>("");
-    const [debouncedSearch,setDebouncedSearch]=useState<string>('')
+    const [debouncedSearch, setDebouncedSearch] = useState<string>('')
     const [statusFilter, setStatusFilter] = useState<string>("all");
-    const [typeFilter,setTypeFilter]=useState<string>('all')
+    const [typeFilter, setTypeFilter] = useState<string>('all')
     const navigate = useNavigate()
 
-    useEffect(()=>{
-        const delayHandler=setTimeout(()=>{
-           setDebouncedSearch(search);
-           setPage(1)
-        },400)
-        return ()=> clearTimeout(delayHandler)
-    },[search])
+    useEffect(() => {
+        const delayHandler = setTimeout(() => {
+            setDebouncedSearch(search);
+            setPage(1)
+        }, 400)
+        return () => clearTimeout(delayHandler)
+    }, [search])
     const fetchAuctions = useCallback(async () => {
         setLoading(true)
         try {
             const result = await auctionItemMangementService.listTenantAuctions(
                 page,
                 6,
-                debouncedSearch.trim()===''?undefined:debouncedSearch,
-                statusFilter=='all'?undefined:statusFilter,
-                typeFilter=='all'?undefined:typeFilter
-            
+                debouncedSearch.trim() === '' ? undefined : debouncedSearch,
+                statusFilter == 'all' ? undefined : statusFilter,
+                typeFilter == 'all' ? undefined : typeFilter
+
             )
             if (result.success && result.data) {
                 setAuction(result.data)
@@ -56,7 +56,7 @@ const TenantAuctions:React.FC=()=>{
         } finally {
             setLoading(false)
         }
-    }, [page,debouncedSearch, statusFilter,typeFilter])
+    }, [page, debouncedSearch, statusFilter, typeFilter])
 
     useEffect(() => {
         fetchAuctions()
@@ -135,48 +135,46 @@ const TenantAuctions:React.FC=()=>{
                 ) : auctions.length > 0 ? (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                         {auctions.map((item) => {
-                            const thumbnailImage = item.images?.find((img) => img.isPrimary)?.url 
-                               
+                            const thumbnailImage = item.images?.find((img) => img.isPrimary)?.url
+
 
                             return (
                                 <div key={item.auctionItemId} className="bg-white rounded-xl border border-[#E2E8F0] shadow-sm overflow-hidden flex flex-col hover:shadow-md transition-shadow duration-300 group">
                                     <div className="h-48 bg-[#F5F7FB] relative overflow-hidden">
-                                        <img 
-                                            src={thumbnailImage} 
+                                        <img
+                                            src={thumbnailImage}
                                             alt={item.auctionName}
                                             className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500"
                                             onError={(e) => { (e.target as HTMLImageElement).src = "https://via.placeholder.com/400x250?text=No+Image+Available"; }}
                                         />
-                                        
-                                      
+
+
                                         <div className="absolute top-3 left-3 flex flex-col gap-1.5 items-start">
-                                         
-                                            <span className={`px-2.5 py-1 text-[9px] font-black tracking-wider uppercase rounded-md shadow-sm border ${
-                                                item.type === "LIVE" 
-                                                    ? "bg-[#0F172A] text-white border-[#0F172A]" 
+
+                                            <span className={`px-2.5 py-1 text-[9px] font-black tracking-wider uppercase rounded-md shadow-sm border ${item.type === "LIVE"
+                                                    ? "bg-[#0F172A] text-white border-[#0F172A]"
                                                     : "bg-white text-[#0F172A] border-[#E2E8F0]"
-                                            }`}>
+                                                }`}>
                                                 {item.type}
                                             </span>
                                         </div>
                                     </div>
 
-                                  
+
                                     <div className="p-5 flex-1 flex flex-col justify-between">
                                         <div className="space-y-2">
                                             <div className="flex justify-between items-start gap-2">
                                                 <span className="text-[10px] font-mono uppercase tracking-wider text-[#475569]/60">
                                                     #{item.auctionItemId?.slice(-8).toUpperCase()}
                                                 </span>
-                                                <span className={`px-2 py-0.5 text-[9px] font-bold tracking-wide uppercase rounded-md border ${
-                                                    item.auctionStatus === "SCHEDULED" || item.auctionStatus === "SOLD"
+                                                <span className={`px-2 py-0.5 text-[9px] font-bold tracking-wide uppercase rounded-md border ${item.auctionStatus === "SCHEDULED" || item.auctionStatus === "SOLD"
                                                         ? "bg-emerald-50 border-emerald-200 text-emerald-700"
                                                         : item.auctionStatus === "PENDING_APPROVAL"
                                                             ? "bg-amber-50 border-amber-200 text-amber-700"
                                                             : item.auctionStatus === "DRAFT"
                                                                 ? "bg-slate-50 border-slate-200 text-slate-600"
                                                                 : "bg-rose-50 border-rose-200 text-rose-700"
-                                                }`}>
+                                                    }`}>
                                                     {item.auctionStatus?.replace(/_/g, " ")}
                                                 </span>
                                             </div>
@@ -198,7 +196,7 @@ const TenantAuctions:React.FC=()=>{
                                                 Details <FaEye size={12} />
                                             </button>
 
-                                           
+
                                             {item.auctionStatus === "REJECTED" && (
                                                 <button
                                                     onClick={() => navigate(`/tenant/update-auctions/${item.auctionItemId}`)}
@@ -208,7 +206,7 @@ const TenantAuctions:React.FC=()=>{
                                                 </button>
                                             )}
 
-                                            
+
                                             {(item.auctionStatus === "PENDING_APPROVAL" || item.auctionStatus === "DRAFT") && (
                                                 <button
                                                     onClick={() => navigate(`/tenant/update-auctions/${item.auctionItemId}`)}
@@ -237,7 +235,7 @@ const TenantAuctions:React.FC=()=>{
                     <p className="text-xs font-semibold text-[#475569] tracking-wide">
                         Showing page <span className="text-[#0F172A] font-bold underline">{page}</span> of {pagination.totalPages}
                     </p>
-                    
+
                     <div className="flex gap-3">
                         <button
                             onClick={() => setPage((prev) => Math.max(1, prev - 1))}
@@ -258,6 +256,6 @@ const TenantAuctions:React.FC=()=>{
             )}
         </div>
     );
-   
+
 }
 export default TenantAuctions

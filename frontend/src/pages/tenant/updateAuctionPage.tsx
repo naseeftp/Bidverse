@@ -34,7 +34,6 @@ const TenantEditAuctionPage: React.FC = () => {
   const [rejectionReason, setRejectionReason] = useState<string | null>(null);
   const [itemStatus, setItemStatus] = useState<string | null>(null);
 
-  // Cropper Workspace States
   const [cropQueue, setCropQueue] = useState<ICropQueueItem[]>([]);
   const [activeCropIndex, setActiveCropIndex] = useState<number | null>(null);
   const [crop, setCrop] = useState<Point>({ x: 0, y: 0 });
@@ -46,16 +45,13 @@ const TenantEditAuctionPage: React.FC = () => {
     defaultValues: { images: [] }
   });
 
-  // FIX: Match the whole form type context, avoiding control type mismatches
   const { fields: attachedImages, append: appendImageField, remove: removeImageField } = useFieldArray<UpdateAuctionItemDTO, FieldArrayPath<UpdateAuctionItemDTO>>({
     control,
     name: "images" as FieldArrayPath<UpdateAuctionItemDTO>
   });
 
-  // Explicit type hint cast prevents watched items array from defaulting down to never[]
   const watchedImages = (watch("images") || []) as IFormImage[];
 
-  // --- 1. Fetch & Initialize Form State Layer ---
   useEffect(() => {
     const fetchAuctionDetails = async () => {
       if (!id) return;
@@ -111,7 +107,6 @@ const TenantEditAuctionPage: React.FC = () => {
     fetchAuctionDetails();
   }, [id, reset, navigate]);
 
-  // --- 2. Image Optimization Node (Virtual Canvas Crop) ---
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files) return;
     const selectedFiles = Array.from(e.target.files);
@@ -168,13 +163,12 @@ const TenantEditAuctionPage: React.FC = () => {
       const finishedCroppedFile = await processCroppedBlob(activeItem, croppedAreaPixels);
       const frontendPreviewUrl = URL.createObjectURL(finishedCroppedFile);
 
-      // FIX: Cast object as any inside hook inputs to bypass validation schema inference mismatch errors
       appendImageField({
         id: activeItem.id,
         url: frontendPreviewUrl,
         isPrimary: attachedImages.length === 0,
         altText: ""
-      } as any);
+      });
 
       advanceOrCloseCropModal();
     } catch {
@@ -197,12 +191,10 @@ const TenantEditAuctionPage: React.FC = () => {
 
   const setPrimaryImageIndex = (targetIndex: number) => {
     watchedImages.forEach((_, index: number) => {
-      // FIX: Use explicit string literal route mapping template strings to circumvent deep schema index compilation errors
       setValue(`images.${index}.isPrimary` as any, index === targetIndex);
     });
   };
 
-  // --- 3. Unified Update & Resubmission Delivery ---
   const onSubmit = async (data: UpdateAuctionItemDTO) => {
     if (!id) return;
     try {
@@ -282,7 +274,6 @@ const TenantEditAuctionPage: React.FC = () => {
   return (
     <div className="max-w-5xl mx-auto pb-20 px-6 pt-10 font-sans">
       
-      {/* Rejection Notification Banner */}
       {itemStatus === AuctionItemStatus.REJECTED && rejectionReason && (
         <div className="mb-8 border-2 border-[#EF4444] bg-[#FEF2F2] rounded-2xl p-6 flex items-start gap-4 shadow-sm">
           <AlertOctagon className="text-[#EF4444] shrink-0 mt-0.5" size={22} />
@@ -309,7 +300,6 @@ const TenantEditAuctionPage: React.FC = () => {
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
         
-        {/* Listing Core Info */}
         <div className="bg-white rounded-2xl p-8 border border-[#E2E8F0] shadow-sm space-y-6">
           <div className="flex items-center gap-3 pb-4 border-b border-[#F5F7FB]">
             <Gavel size={18} className="text-[#2F6FED]" />
@@ -342,7 +332,6 @@ const TenantEditAuctionPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Dynamic Image Form Galleries */}
         <div className="bg-white rounded-2xl p-8 border border-[#E2E8F0] shadow-sm space-y-6">
           <div className="flex items-center gap-3 pb-4 border-b border-[#F5F7FB]">
             <ImageIcon size={18} className="text-[#2F6FED]" />
@@ -384,7 +373,6 @@ const TenantEditAuctionPage: React.FC = () => {
           )}
         </div>
 
-        {/* Pricing Metrics */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           <div className="bg-white rounded-2xl p-8 border border-[#E2E8F0] shadow-sm space-y-4">
             <div className="flex items-center gap-3 mb-2">
@@ -428,7 +416,6 @@ const TenantEditAuctionPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Timelines */}
         <div className="bg-white rounded-2xl p-8 border border-[#E2E8F0] shadow-sm space-y-4">
           <div className="flex items-center gap-3 pb-2 border-b border-[#F5F7FB]">
             <Calendar size={17} className="text-[#2F6FED]" />
@@ -448,7 +435,6 @@ const TenantEditAuctionPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Shipping Logistics */}
         <div className="bg-white rounded-2xl p-8 border border-[#E2E8F0] shadow-sm space-y-4">
           <div className="flex items-center gap-3 pb-2 border-b border-[#F5F7FB]">
             <Truck size={17} className="text-[#2F6FED]" />
@@ -466,7 +452,6 @@ const TenantEditAuctionPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Submission Actions */}
         <div className="flex flex-col items-center gap-6 mt-12">
           <button type="submit" disabled={isFormSubmitting} className="w-full md:w-auto bg-[#2F6FED] text-white px-20 py-4 rounded-xl font-bold text-sm uppercase tracking-widest hover:bg-[#2557C8] transition-all flex items-center justify-center gap-3 shadow-lg shadow-blue-500/20 disabled:opacity-50">
             {isFormSubmitting ? (
@@ -483,7 +468,6 @@ const TenantEditAuctionPage: React.FC = () => {
         </div>
       </form>
 
-      {/* Dynamic Crop Workspace Model */}
       {activeCropIndex !== null && cropQueue[activeCropIndex] && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
           <div className="bg-white rounded-2xl max-w-2xl w-full flex flex-col overflow-hidden max-h-[90vh]">
