@@ -9,7 +9,7 @@ import {
 import profileService from '../../services/profileManagement.service';
 import toast from "react-hot-toast"
 import uploadservice from "../../services/uploadservice";
-
+import ImageCropModal from "../../components/common/ImageCropModal";
 
 
 const TenantProfilePage: React.FC = () => {
@@ -30,18 +30,32 @@ const TenantProfilePage: React.FC = () => {
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null)
 
-    const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const [selectedImgSrc, setSelectedImgSrc] = useState<string | null>(null);
+    const [isCropModalOpen, setIsCropModalOpen] = useState(false);
+
+  
+    const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (!file) return;
-        if(!file.type.startsWith('image/')){
+        if (!file.type.startsWith('image/')) {
             toast.error("Please select a valid image file (PNG, JPEG, etc)")
-            if(fileInputRef.current) fileInputRef.current.value=''
+            if (fileInputRef.current) fileInputRef.current.value = ''
             return
         }
+
+        const reader = new FileReader();
+        reader.addEventListener("load", () => {
+            setSelectedImgSrc(reader.result as string);
+            setIsCropModalOpen(true);
+        });
+        reader.readAsDataURL(file);
+    };
+
+    const handleCropExecution = async (croppedFile: File) => {
+        setIsCropModalOpen(false);
         setIsUploading(true);
-        //    toast.loading("Processing image upload...")
         try {
-            const secureUrl = await uploadservice.uploadSecurely(file);
+            const secureUrl = await uploadservice.uploadSecurely(croppedFile);
             const response = await profileService.updateProfileImage({ profileImage: secureUrl })
             if (response.success && response.data) {
                 toast.success(response.message);
@@ -51,21 +65,17 @@ const TenantProfilePage: React.FC = () => {
                         profileImage: secureUrl
                     })
                 }
-            }
-            else {
+            } else {
                 toast.error(response.message)
             }
         } catch {
             toast.error("An error occurred during upload.")
-        }
-        finally {
+        } finally {
             setIsUploading(false);
+            setSelectedImgSrc(null);
             if (fileInputRef.current) fileInputRef.current.value = '';
-
         }
-    }
-
-
+    };
 
     useEffect(() => {
         const fethData = async () => {
@@ -210,7 +220,7 @@ const TenantProfilePage: React.FC = () => {
                 </div>
                 <div className="space-y-8">
                     <section className="bg-white rounded-2xl border border-[#E2E8F0] shadow-sm overflow-hidden">
-                       
+
                         <div className="px-8 py-5 border-b border-[#F1F5F9] flex justify-between items-center">
                             <h3 className="font-bold flex items-center gap-2 text-[#0F172A]">
                                 <UserIcon size={18} className="text-[#2F6FED]" /> Personal Account
@@ -224,20 +234,21 @@ const TenantProfilePage: React.FC = () => {
                             </button>
                         </div>
 
-                       
+
                         <div className="p-8 flex flex-col md:flex-row gap-8 items-start">
-                            
+
                             <input
                                 type="file"
                                 ref={fileInputRef}
-                                onChange={handleImageUpload}
+                                onChange={handleImageSelect}
                                 className="hidden"
                                 accept="image/*"
                             />
 
-                            
+
                             <div className="flex flex-col items-center text-center w-full md:w-auto min-w-[120px] gap-3 pt-1">
                                 <div className="w-24 h-24 rounded-full bg-[#F1F5F9] border border-[#E2E8F0] flex items-center justify-center overflow-hidden shadow-inner">
+                                  
                                     {house?.profileImage ? (
                                         <img src={house.profileImage} alt="User" className="w-full h-full object-cover" />
                                     ) : (
@@ -245,7 +256,7 @@ const TenantProfilePage: React.FC = () => {
                                     )}
                                 </div>
 
-                               
+
                                 <div className="flex flex-col w-full gap-1.5 items-center">
                                     <button
                                         type="button"
@@ -269,7 +280,7 @@ const TenantProfilePage: React.FC = () => {
                                 </div>
                             </div>
 
-                           
+
                             <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-6 w-full">
                                 <div className="space-y-1.5">
                                     <label className="text-[11px] font-bold text-[#64748B] uppercase tracking-wider">Display Name</label>
@@ -431,6 +442,17 @@ const TenantProfilePage: React.FC = () => {
                             </div>
                         </div>
                     </section>
+                    {isCropModalOpen&&selectedImgSrc&&(
+                        <ImageCropModal 
+                        imageSrc={selectedImgSrc}
+                        onClose={()=>{
+                            setIsCropModalOpen(false);
+                            setSelectedImgSrc(null);
+                            if(fileInputRef.current) fileInputRef.current.value=''
+                        }}
+                        onCropComplete={handleCropExecution}
+                        />
+                    )}
 
                     {isDeleteModalOpen && (
                         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-fade-in">

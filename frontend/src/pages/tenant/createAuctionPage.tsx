@@ -380,17 +380,21 @@ const CreateAuctionPage: React.FC = () => {
             </div>
 
            
-            <div className="relative flex-1 bg-neutral-900 min-h-[350px] max-h-[500px]">
-              <Cropper
-                image={cropQueue[activeCropIndex].rawUrl}
-                crop={crop}
-                zoom={zoom}
-                aspect={4 / 3} // Locked aspect scale constraint matching modern item list displays
-                onCropChange={setCrop}
-                onZoomChange={setZoom}
-                onCropComplete={onCropComplete}
-              />
-            </div>
+          <div className="relative flex-1 bg-neutral-900 w-full min-h-[350px] max-h-[500px] overflow-hidden">
+  <Cropper
+    image={cropQueue[activeCropIndex].rawUrl}
+    crop={crop}
+    zoom={zoom}
+    aspect={4 / 3}
+    objectFit="contain"
+    minZoom={0.2}              
+    maxZoom={3}
+    restrictPosition={false}   
+    onCropChange={setCrop}
+    onZoomChange={setZoom}
+    onCropComplete={onCropComplete}
+  />
+</div>
 
             
             <div className="p-6 bg-white border-t border-[#E2E8F0] space-y-4">

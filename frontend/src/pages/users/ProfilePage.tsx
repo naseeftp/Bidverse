@@ -5,6 +5,8 @@ import type { UserResponseDTO } from "../../types/auth.type";
 import { Mail, Lock, User as UserIcon, Trash2, Camera, Check, Pencil, AlertTriangle, X } from "lucide-react";
 import toast from "react-hot-toast";
 import { Link } from "react-router-dom";
+import ImageCropModal from "../../components/common/ImageCropModal";
+
 
 const ProfilePage: React.FC = () => {
     const [user, setUser] = useState<UserResponseDTO | null>(null);
@@ -13,6 +15,8 @@ const ProfilePage: React.FC = () => {
     const fileInputRef = useRef<HTMLInputElement>(null)
     const [isUploading, setIsUploading] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
+    const [imageToCrop, setImageToCrop] = useState<string | null>(null);
+
     useEffect(() => {
         const fetchData = async () => {
             const response = await profileService.getProfile();
@@ -23,33 +27,45 @@ const ProfilePage: React.FC = () => {
         };
         fetchData();
     }, []);
-    const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    
+    const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (!file) return;
-        if(!file.type.startsWith('image/')){
-            toast.error("Please select a valid image file (PNG, JPEG, etc)")
-            if(fileInputRef.current) fileInputRef.current.value=''
-            return
+
+        if (!file.type.startsWith('image/')) {
+            toast.error("Please select a valid image file (PNG, JPEG, etc)");
+            if (fileInputRef.current) fileInputRef.current.value = '';
+            return;
         }
+
+        const reader = new FileReader();
+        reader.addEventListener("load", () => {
+            setImageToCrop(reader.result as string);
+        });
+        reader.readAsDataURL(file);
+    };
+
+    const handleCropComplete = async (croppedFile: File) => {
+        setImageToCrop(null);
         setIsUploading(true);
+        
         try {
-            const secureUrl = await uploadservice.uploadSecurely(file);
-            const response = await profileService.updateProfileImage({ profileImage: secureUrl })
+            const secureUrl = await uploadservice.uploadSecurely(croppedFile);
+            const response = await profileService.updateProfileImage({ profileImage: secureUrl });
             if (response.success && response.data) {
                 setUser(response.data);
-                toast.success(response.message)
+                toast.success(response.message || "Profile image updated!");
             } else {
-                toast.error(response.message)
+                toast.error(response.message);
             }
-
         } catch {
-            toast.error("An error occurred during upload.")
+            toast.error("An error occurred during upload.");
+        } finally {
+            setIsUploading(false);
+            if (fileInputRef.current) fileInputRef.current.value = ""; // Clear file input buffer
         }
-        finally {
-            setIsUploading(false)
-            if (fileInputRef.current) fileInputRef.current.value = "";
-        }
-    }
+    };
+
     const handleProfileImgDelete = async () => {
         setIsDeleteModalOpen(false)
         setIsUploading(true);
@@ -126,7 +142,7 @@ const ProfilePage: React.FC = () => {
                 </div>
 
                 <div className="space-y-6">
-                    <input type="file" ref={fileInputRef} onChange={handleImageUpload} className="hidden" accept="image/*" />
+                    <input type="file" ref={fileInputRef} onChange={handleImageSelect} className="hidden" accept="image/*" />
 
                     <section className="bg-white rounded-xl border border-[#E6E0DA] p-8 shadow-sm">
                         <div className="flex flex-col sm:flex-row items-center gap-8">
@@ -218,6 +234,16 @@ const ProfilePage: React.FC = () => {
                             </div>
                         </div>
                     </section>
+
+                  {imageToCrop&&(
+                    <ImageCropModal
+                    imageSrc={imageToCrop}
+                    onClose={()=>setImageToCrop(null)}
+                    onCropComplete={handleCropComplete}
+                    />
+
+                   
+                  )}
 
                     {isDeleteModalOpen && (
                         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-fade-in">

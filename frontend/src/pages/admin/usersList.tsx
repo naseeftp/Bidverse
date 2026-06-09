@@ -4,7 +4,7 @@ import toast from "react-hot-toast";
 import type { UserResponseDTO, IPaginationMeta } from "../../types/auth.type";
 import { FaExternalLinkAlt, FaSearch, FaFilter } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-
+import Pagination from "../../components/admin/pagination";
 const UsersListPage: React.FC = () => {
   const [users, setUsers] = useState<UserResponseDTO[]>([]);
   const [search, setSearch] = useState("");
@@ -38,13 +38,13 @@ const UsersListPage: React.FC = () => {
   return (
     <div className="space-y-6">
       <div>
-                <h1 className="text-xl font-black uppercase tracking-[0.25em] text-[#111827]">
-                    User Management
-                </h1>
-                <p className="text-[10px] font-bold text-[#111827] uppercase tracking-widest mt-1">
-                    System Administration Panel
-                </p>
-            </div>
+        <h1 className="text-xl font-black uppercase tracking-[0.25em] text-[#111827]">
+          User Management
+        </h1>
+        <p className="text-[10px] font-bold text-[#111827] uppercase tracking-widest mt-1">
+          System Administration Panel
+        </p>
+      </div>
 
       <div className="flex flex-col md:flex-row justify-between items-end gap-4">
 
@@ -69,7 +69,7 @@ const UsersListPage: React.FC = () => {
 
         <div className="w-full md:w-auto min-w-[200px] relative group">
           <label className="text-[9px] font-black uppercase tracking-[0.2em] text-[#111827] mb-2 block ml-1 text-right md:mr-1">
-           Status Filter
+            Status Filter
           </label>
           <div className="absolute bottom-3.5 left-4 text-white/20 group-focus-within:text-white transition-colors">
             <FaFilter size={10} />
@@ -135,28 +135,12 @@ const UsersListPage: React.FC = () => {
           </table>
         </div>
 
-
-        <div className="px-6 py-4 border-t border-white/10 flex items-center justify-between">
-          <p className="text-[9px] font-bold text-white uppercase tracking-[0.2em]">
-            Displaying Page <span className="underline">{page}</span> OF {pagination?.totalPages || 1}
-          </p>
-          <div className="flex gap-2">
-            <button
-              onClick={() => setPage(prev => Math.max(1, prev - 1))}
-              disabled={page === 1 || loading}
-              className="p-2 border border-white/20 text-white hover:bg-white hover:text-black disabled:opacity-20 disabled:cursor-not-allowed transition-all font-bold text-[10px]"
-            >
-              PREV
-            </button>
-            <button
-              onClick={() => setPage(prev => Math.min(pagination?.totalPages || 1, prev + 1))}
-              disabled={page === pagination?.totalPages || loading}
-              className="p-2 border border-white/20 text-white hover:bg-white hover:text-black disabled:opacity-20 disabled:cursor-not-allowed transition-all font-bold text-[10px]"
-            >
-              NEXT
-            </button>
-          </div>
-        </div>
+        <Pagination
+          currentPage={page}
+          paginationMeta={pagination}
+          isLoading={loading}
+          onPageChange={setPage}
+        />
       </div>
     </div>
   );

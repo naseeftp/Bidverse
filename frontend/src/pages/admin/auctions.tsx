@@ -9,7 +9,7 @@ import {
     FaSearch,
     FaFilter
 } from "react-icons/fa";
-
+import Pagination from "../../components/admin/pagination";
 const AdminAuctionsListPage: React.FC = () => {
     const [auctions, setAuction] = useState<AuctionItemListDTO[]>([])
     const [pagination, setPagination] = useState<IPaginationMeta | null>(null)
@@ -17,16 +17,16 @@ const AdminAuctionsListPage: React.FC = () => {
     const [page, setPage] = useState<number>(1)
     const [search, setSearch] = useState<string>("");
     const [statusFilter, setStatusFilter] = useState<string>("all");
-    const [typeFilter,setTypeFilter]=useState<string>('all')
+    const [typeFilter, setTypeFilter] = useState<string>('all')
     const navigate = useNavigate()
     const fetchAuctions = useCallback(async () => {
         setLoading(true)
         try {
             const result = await auctionItemMangementService.listAdminAuctions(
                 1, 5, undefined,
-                statusFilter=='all'?undefined:statusFilter,
-                typeFilter=='all'?undefined:typeFilter
-            
+                statusFilter == 'all' ? undefined : statusFilter,
+                typeFilter == 'all' ? undefined : typeFilter
+
             )
             if (result.success && result.data) {
                 setAuction(result.data)
@@ -40,7 +40,7 @@ const AdminAuctionsListPage: React.FC = () => {
         } finally {
             setLoading(false)
         }
-    }, [statusFilter,typeFilter])
+    }, [statusFilter, typeFilter])
 
     useEffect(() => {
         fetchAuctions()
@@ -72,8 +72,8 @@ const AdminAuctionsListPage: React.FC = () => {
                         className="w-full bg-[#111827] border border-white/10 pl-10 pr-4 py-3 text-[10px] text-white/40 font-bold uppercase tracking-widest "
                     />
                 </div>
-                
-                
+
+
                 <div className="w-full md:w-auto min-w-[200px] relative group">
                     <label className="text-[9px] font-black uppercase tracking-[0.2em] text-[#111827] mb-2 block ml-1 text-right md:mr-1">
                         Auction Type
@@ -87,9 +87,9 @@ const AdminAuctionsListPage: React.FC = () => {
                         onChange={(e) => { setTypeFilter(e.target.value); setPage(1) }}
                         className="w-full bg-[#111827] border border-white/10 pl-10 pr-10 py-3 text-[10px] text-white/40 font-bold uppercase tracking-widest "
                     >
-                       <option value="all">ALL TYPES</option>
-                       <option value="LIVE">LIVE</option>
-                       <option value="TIMED">TIMED</option>
+                        <option value="all">ALL TYPES</option>
+                        <option value="LIVE">LIVE</option>
+                        <option value="TIMED">TIMED</option>
                     </select>
                     <div className="absolute bottom-4 right-4 text-white/20 text-[8px]">▼</div>
                 </div>
@@ -198,12 +198,12 @@ const AdminAuctionsListPage: React.FC = () => {
 
                                             <td className="px-6 py-4 border-r border-white/5 text-center">
                                                 <span className={`px-2 py-1 text-[8px] font-black uppercase tracking-widest rounded-[2px] border ${item.auctionStatus === "SCHEDULED" || item.auctionStatus === "SOLD"
-                                                        ? "bg-green-500 text-black border-green-500"
-                                                        : item.auctionStatus === "PENDING_APPROVAL"
-                                                            ? "bg-yellow-400 text-black border-yellow-400"
-                                                            : item.auctionStatus === "DRAFT"
-                                                                ? "border-white/20 text-white/60"
-                                                                : "bg-red-500 text-white border-red-500"
+                                                    ? "bg-green-500 text-black border-green-500"
+                                                    : item.auctionStatus === "PENDING_APPROVAL"
+                                                        ? "bg-yellow-400 text-black border-yellow-400"
+                                                        : item.auctionStatus === "DRAFT"
+                                                            ? "border-white/20 text-white/60"
+                                                            : "bg-red-500 text-white border-red-500"
                                                     }`}>
                                                     {item.auctionStatus?.replace(/_/g, " ")}
                                                 </span>
@@ -234,29 +234,12 @@ const AdminAuctionsListPage: React.FC = () => {
                     </table>
                 </div>
 
-                <div className="px-6 py-4 border-t border-white/10 flex items-center justify-between">
-                    <p className="text-[9px] font-bold text-white uppercase tracking-[0.2em]">
-                        Displaying Page <span className="underline">{page}</span> OF {pagination?.totalPages || 1}
-                    </p>
-
-                    <div className="flex gap-2">
-                        <button
-                            onClick={() => setPage((prev) => Math.max(1, prev - 1))}
-                            disabled={page === 1 || loading}
-                            className="p-2 border border-white/20 text-white hover:bg-white hover:text-black disabled:opacity-20 disabled:cursor-not-allowed transition-all font-bold text-[10px]"
-                        >
-                            PREV
-                        </button>
-
-                        <button
-                            onClick={() => setPage((prev) => Math.min(pagination?.totalPages || 1, prev + 1))}
-                            disabled={page === (pagination?.totalPages || 1) || loading}
-                            className="p-2 border border-white/20 text-white hover:bg-white hover:text-black disabled:opacity-20 disabled:cursor-not-allowed transition-all font-bold text-[10px]"
-                        >
-                            NEXT
-                        </button>
-                    </div>
-                </div>
+                <Pagination
+                    currentPage={page}
+                    paginationMeta={pagination}
+                    isLoading={loading}
+                    onPageChange={setPage}
+                />
             </div>
         </div>
     );

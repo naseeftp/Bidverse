@@ -9,6 +9,7 @@ import {
     FaFilter
 } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
+import Pagination from '../../components/admin/pagination';
 
 const AuctionHouseTable: React.FC = () => {
     const [houses, setHouses] = useState<AdminAuctionHouseDetailDTO[]>([]);
@@ -54,7 +55,7 @@ const AuctionHouseTable: React.FC = () => {
 
     return (
         <div className="space-y-6">
-              <div>
+            <div>
                 <h1 className="text-xl font-black uppercase tracking-[0.25em] text-[#111827]">
                     Auction Houses
                 </h1>
@@ -62,10 +63,10 @@ const AuctionHouseTable: React.FC = () => {
                     System Administration Panel
                 </p>
             </div>
-           
+
             <div className="flex flex-col md:flex-row justify-between items-end gap-4">
 
-              
+
                 <div className="w-full max-w-md relative group">
                     <div className="absolute bottom-3.5 left-4 text-white/20 group-focus-within:text-white transition-colors">
                         <FaSearch size={10} />
@@ -83,7 +84,7 @@ const AuctionHouseTable: React.FC = () => {
                     />
                 </div>
 
-              
+
                 <div className="w-full md:w-auto min-w-[200px] relative group">
 
                     <label className="text-[9px] font-black uppercase tracking-[0.2em] text-[#111827] mb-2 block ml-1 text-right md:mr-1">
@@ -115,7 +116,7 @@ const AuctionHouseTable: React.FC = () => {
                 </div>
             </div>
 
-           
+
             <div className="bg-[#111827] rounded-sm border border-white/10 shadow-xl overflow-hidden">
 
                 <div className="overflow-x-auto">
@@ -169,27 +170,27 @@ const AuctionHouseTable: React.FC = () => {
                                         className="hover:bg-white/[0.03] transition-colors group"
                                     >
 
-                                      
+
                                         <td className="px-6 py-4 border-r border-white/5 font-mono text-[10px] text-white/60">
                                             #{house.userId}
                                         </td>
 
-                                       
+
                                         <td className="px-6 py-4 border-r border-white/5 text-xs font-bold uppercase tracking-wider text-white">
                                             {house.businessName || 'N/A'}
                                         </td>
 
-                                       
+
                                         <td className="px-6 py-4 border-r border-white/5 text-[11px] font-mono text-white/80 lowercase">
                                             {house.userEmail}
                                         </td>
 
-                                        
+
                                         <td className="px-6 py-4 border-r border-white/5 text-center">
                                             <span
                                                 className={`px-2 py-1 text-[8px] font-black uppercase tracking-widest rounded-[2px] border ${!house.isAccountBlocked
-                                                        ? 'bg-white text-black border-white'
-                                                        : 'border-white/20 text-white/40'
+                                                    ? 'bg-white text-black border-white'
+                                                    : 'border-white/20 text-white/40'
                                                     }`}
                                             >
                                                 {!house.isAccountBlocked
@@ -198,7 +199,7 @@ const AuctionHouseTable: React.FC = () => {
                                             </span>
                                         </td>
 
-                                        
+
                                         <td className="px-6 py-4 border-r border-white/5 text-center">
                                             <span
                                                 className={`px-2 py-1 text-[8px] font-black uppercase tracking-widest rounded-[2px] border
@@ -215,7 +216,7 @@ const AuctionHouseTable: React.FC = () => {
                                             </span>
                                         </td>
 
-                                       
+
                                         <td className="px-6 py-4 text-right">
                                             <button
                                                 onClick={() =>
@@ -241,46 +242,12 @@ const AuctionHouseTable: React.FC = () => {
                         </tbody>
                     </table>
                 </div>
-
-             
-                <div className="px-6 py-4 border-t border-white/10 flex items-center justify-between">
-
-                    <p className="text-[9px] font-bold text-white uppercase tracking-[0.2em]">
-                        Displaying Page{' '}
-                        <span className="underline">{page}</span> OF{' '}
-                        {pagination?.totalPages || 1}
-                    </p>
-
-                    <div className="flex gap-2">
-
-                        <button
-                            onClick={() =>
-                                setPage((prev) => Math.max(1, prev - 1))
-                            }
-                            disabled={page === 1 || loading}
-                            className="p-2 border border-white/20 text-white hover:bg-white hover:text-black disabled:opacity-20 disabled:cursor-not-allowed transition-all font-bold text-[10px]"
-                        >
-                            PREV
-                        </button>
-
-                        <button
-                            onClick={() =>
-                                setPage((prev) =>
-                                    Math.min(
-                                        pagination?.totalPages || 1,
-                                        prev + 1
-                                    )
-                                )
-                            }
-                            disabled={
-                                page === pagination?.totalPages || loading
-                            }
-                            className="p-2 border border-white/20 text-white hover:bg-white hover:text-black disabled:opacity-20 disabled:cursor-not-allowed transition-all font-bold text-[10px]"
-                        >
-                            NEXT
-                        </button>
-                    </div>
-                </div>
+                <Pagination
+                    currentPage={page}
+                    paginationMeta={pagination}
+                    isLoading={loading}
+                    onPageChange={setPage}
+                />
             </div>
         </div>
     );
