@@ -247,7 +247,7 @@ const TenantEditAuctionPage: React.FC = () => {
           if (img.url.startsWith("blob:")) URL.revokeObjectURL(img.url);
         });
 
-        navigate('/tenant/dashboard');
+        navigate(-1);
       } else {
         toast.error(result.message);
       }
