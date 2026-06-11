@@ -13,6 +13,7 @@ import profileRoutes from './routes/profile.routes'
 import addressRoutess from './routes/address.routes'
 import publicAuctionRoutes from './routes/public.routes'
 import auctionItemRoutes from './routes/auctionItem.routes'
+import WatchlistRoutes from './routes/watchlist.routes'
 import { LoggerService } from "./services/implementations/Logger.service";
 
 
@@ -38,6 +39,7 @@ app.use(BASE_ROUTES.PROFILE_MANAGEMENT, profileRoutes)
 app.use(BASE_ROUTES.ADDRESS,addressRoutess)
 app.use(BASE_ROUTES.PUBLIC,publicAuctionRoutes)
 app.use(BASE_ROUTES.AUCTION_ITEM,auctionItemRoutes)
+app.use(BASE_ROUTES.WATCH_LIST,WatchlistRoutes)
 
 app.use(errorHandler);
 const startServer = async () => {

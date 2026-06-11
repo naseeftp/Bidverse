@@ -1,4 +1,5 @@
 
+
 export const BASE_ROUTES = {
     AUTH: '/auth',
     AUCTION_HOUSE: '/auction-house',
@@ -6,7 +7,8 @@ export const BASE_ROUTES = {
     PROFILE_MANAGEMENT: '/profile',
     ADDRESS: '/address',
     PUBLIC: '/public',
-    AUCTION_ITEM: '/auction-item'
+    AUCTION_ITEM: '/auction-item',
+    WATCH_LIST:'/watch-list'
 } as const
 
 export const AUTH_ROUTES = {
@@ -69,4 +71,8 @@ export const AUCTION_ITEM_ROUTES = {
     GET_AUCTION: '/get-auction/:id',
     UPDATE_STATUS: '/update-status',
     UPDATE_AUCTION:'/update-auction/:id'
+}
+
+export const WATCH_LIST_ROUTES={
+    ADD_TO_WATCH_LIST:'/add'
 }

@@ -7,6 +7,7 @@ import { Types } from 'mongoose'
 import { AddressMapper } from "../../mappers/address.mapper";
 import { AddressLabel, MESSAGES } from "../../constants/constants";
 import { IGenericPaginatedResposnse } from "../../types/response.type";
+
 export class AddressService implements IAddressService {
   constructor(
     private _addressRepo: IAddressRepository,
@@ -89,16 +90,16 @@ export class AddressService implements IAddressService {
     if (existingAddress.userId.toString() !== userId) {
       throw new ForbiddenError("You do not have permission to edit this address")
     }
-    const isDuplicate= await this._addressRepo.findDuplicate(userId,data.fullAddress,data.city,data.pincode)
-    if(isDuplicate&&isDuplicate._id.toString()!==addressId){
+    const isDuplicate = await this._addressRepo.findDuplicate(userId, data.fullAddress, data.city, data.pincode)
+    if (isDuplicate && isDuplicate._id.toString() !== addressId) {
       throw new AppError('An identical address already exists.');
     }
-    let finalIsDefault=data.isDefault
-    const totalCounts=await this._addressRepo.countByUserId(userId)
-    if(totalCounts==1){
-      finalIsDefault=true
+    let finalIsDefault = data.isDefault
+    const totalCounts = await this._addressRepo.countByUserId(userId)
+    if (totalCounts == 1) {
+      finalIsDefault = true
     }
-    if(existingAddress.isDefault&&finalIsDefault==false&&totalCounts>1){
+    if (existingAddress.isDefault && finalIsDefault == false && totalCounts > 1) {
       throw new AppError("Please set another address as default before removing this one.")
     }
     if (finalIsDefault) {
@@ -108,7 +109,7 @@ export class AddressService implements IAddressService {
       _id: addressId,
       userId: userId
     }
-    const editedAddress = await this._addressRepo.updateByFilter(filter,{...data,isDefault:finalIsDefault});
+    const editedAddress = await this._addressRepo.updateByFilter(filter, { ...data, isDefault: finalIsDefault });
     return AddressMapper.toAddressDto(editedAddress!)
   }
 }

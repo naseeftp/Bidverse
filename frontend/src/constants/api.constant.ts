@@ -1,11 +1,12 @@
 
-
 export const API_BASE_URL = import.meta.env.VITE_API_URL
 export const BASE_ROUTES = {
     PROFILE_MANAGEMENT: '/profile',
     ADDRESS:'/address',
     PUBLIC:'/public',
-    AUCTION_ITEM:'/auction-item'
+    AUCTION_ITEM:'/auction-item',
+    WATCH_LIST:'/watch-list'
+
 }
 export const AUTH_ROUTES = {
     REGISTER: "/auth/register",
@@ -65,4 +66,7 @@ export const AUCTION_ITEM_ROUTES={
      UPDATE_STATUS:'/update-status',
      UPDATE_AUCTION:'/update-auction'
 
+}
+export const WATCH_LIST_ROUTES={
+    ADD_TO_WATCH_LIST:'/add'
 }
