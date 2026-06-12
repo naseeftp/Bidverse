@@ -8,7 +8,7 @@ export const BASE_ROUTES = {
     ADDRESS: '/address',
     PUBLIC: '/public',
     AUCTION_ITEM: '/auction-item',
-    WATCH_LIST:'/watch-list'
+    WATCH_LIST: '/watch-list'
 } as const
 
 export const AUTH_ROUTES = {
@@ -70,9 +70,10 @@ export const AUCTION_ITEM_ROUTES = {
     TENANT_AUCTIONS: '/tenant/auctions',
     GET_AUCTION: '/get-auction/:id',
     UPDATE_STATUS: '/update-status',
-    UPDATE_AUCTION:'/update-auction/:id'
+    UPDATE_AUCTION: '/update-auction/:id'
 }
 
-export const WATCH_LIST_ROUTES={
-    ADD_TO_WATCH_LIST:'/add'
+export const WATCH_LIST_ROUTES = {
+    ADD_TO_WATCH_LIST: '/add',
+    MY_WATH_LIST: '/watch-list'
 }

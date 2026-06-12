@@ -1,23 +1,20 @@
-
+import { AuctionItemStatus } from "../../constants/constants";
 export interface WatchListAddOrDeleteResponseDTO {
     itemid: string;
     actionsSuccess: boolean
 }
-export interface WatchedItemDetailsDTO {
-    id: string;
-    title: string;
-    status: string;
-    type: string;
-    currency: 'INR',
-    currentBid: number;
-    minimumIncrement: number;
-    primaryImageUrl: string;
-    startTime: string;
-    endTime: string;
-}
-export interface WatchListResponseDTO {
+
+export interface WatchlistItemCardDTO {
     watchlistId: string;
-    userId: string;
-    addedAt: string;
-    item: WatchedItemDetailsDTO
+    addedAt: Date;
+    auctionItemId: string;
+    title: string;
+    status: AuctionItemStatus; 
+    currentBid: number;
+    startingPrice: number;
+    minimumIncrement: number;
+    currency: string;
+    endTime: Date;
+    startTime:Date;
+    imageUrl: string;
 }

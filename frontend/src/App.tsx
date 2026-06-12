@@ -28,6 +28,7 @@ import ChangeEmailVerifyPage from "./pages/users/changeEmailVerify";
 import AuthSuccessPage from "./pages/users/AuthSuccessPage";
 import Dashboard from "./pages/users/Dashboard";
 import AddressPage from "./pages/users/AddressPage";
+import WatchlistPage from "./pages/users/WatchlistPage";
 
 import TenantRegisterPage from "./pages/tenant/RegiterPage";
 import TenantVerifyOtpPage from "./pages/tenant/VerifyotpPage";
@@ -95,6 +96,7 @@ function App() {
                <Route element={<ProtectedRoute allowedRoles={['user']} />}>
                   <Route path="/dashboard" element={<Dashboard />} />
                   <Route path="/addresses" element={<AddressPage/>} />
+                   <Route path="/watch-list" element={<WatchlistPage/>} />
                </Route>
             </Route>
 

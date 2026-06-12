@@ -1,4 +1,4 @@
-import { MapPin, ShoppingBag, Hammer, User, LogOut } from 'lucide-react';
+import { MapPin, ShoppingBag, Hammer, User, LogOut,Heart} from 'lucide-react';
 import React from 'react';
 
 const Sidebar:React.FC = () => {
@@ -6,8 +6,8 @@ const Sidebar:React.FC = () => {
     { name: 'My Bids', icon: Hammer, path: '/bids', count: 3 },      
     { name: 'Orders', icon: ShoppingBag, path: '/orders', count: 1 }, 
     { name: 'Addresses', icon: MapPin, path: '/addresses' },
-    
     { name: 'Profile', icon: User, path: '/profile' },
+    { name: 'Watchlist', icon: Heart, path: '/watch-list' },
   ];
 
   return (

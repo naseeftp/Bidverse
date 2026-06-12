@@ -13,13 +13,16 @@ import {
     FaMapMarkerAlt,
     FaCalendarAlt,
     FaShieldAlt,
-    FaRegBuilding
+    FaRegBuilding,
+    FaRegHeart,
+    FaHeart
 } from "react-icons/fa";
+import watchListService from "../services/watchList.service";
 
 const PublicAuctionDetailPage: React.FC = () => {
     const { itemId } = useParams<{ itemId: string }>();
     const navigate = useNavigate();
-    
+
     const [loading, setLoading] = useState(false);
     const [auction, setAuction] = useState<AuctionItemDetailDTO | null>(null);
     const [activeImage, setActiveImage] = useState<string>("");
@@ -27,6 +30,9 @@ const PublicAuctionDetailPage: React.FC = () => {
     const [isZoomed, setIsZoomed] = useState(false);
     const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
     const [timerLabel, setTimerLabel] = useState<'STARTS IN' | 'ENDS IN' | 'CONCLUDED'>('STARTS IN');
+
+    const [isWatched, setIsWathed] = useState<boolean>(false);
+    const [isWatchlistLoading, setIsWatchlistLoading] = useState<boolean>(false)
 
     const fetchAuctionDetail = async () => {
         if (!itemId) return;
@@ -49,13 +55,35 @@ const PublicAuctionDetailPage: React.FC = () => {
         }
     };
 
+    const handleWatchlistAction = async (e: React.MouseEvent<HTMLButtonElement>) => {
+        e.stopPropagation();
+        if (isWatchlistLoading) return;
+        try {
+            setIsWatchlistLoading(true);
+            const response = await watchListService.addToWatchList(auction?.auctionItemId as string)
+            if (response.success) {
+                toast.success(response.message)
+                setIsWathed(true)
+            }
+            else {
+                toast.error(response.message)
+            }
+        } catch {
+            toast.error('failed to add Watchlist')
+        }
+        finally {
+            setIsWatchlistLoading(false);
+        }
+    };
+
+
     useEffect(() => {
         fetchAuctionDetail();
-    }, [itemId,navigate]);
+    }, [itemId, navigate]);
 
     useEffect(() => {
         if (!auction || !auction.startTime || !auction.endTime) return;
-        
+
         const interval = setInterval(() => {
             const now = new Date().getTime();
             const start = new Date(auction.startTime).getTime();
@@ -80,13 +108,13 @@ const PublicAuctionDetailPage: React.FC = () => {
             const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
             const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
             const seconds = Math.floor((difference % (1000 * 60)) / 1000);
-            
+
             setTimeLeft({ days, hours, minutes, seconds });
         }, 1000);
 
         return () => clearInterval(interval);
     }, [auction]);
-    
+
     const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
         const { left, top, width, height } = e.currentTarget.getBoundingClientRect();
         const x = ((e.pageX - left - window.scrollX) / width) * 100;
@@ -107,7 +135,7 @@ const PublicAuctionDetailPage: React.FC = () => {
 
     return (
         <div className="min-h-screen bg-[#FFF9F4] px-4 py-8 md:px-8 text-[#1F1F1F] font-sans antialiased">
-            
+
             <div className="max-w-7xl mx-auto mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <button
                     onClick={() => navigate("/auctions")}
@@ -121,11 +149,11 @@ const PublicAuctionDetailPage: React.FC = () => {
             </div>
 
             <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-                
+
                 <div className="lg:col-span-7 space-y-6">
-                    
+
                     <div className="bg-white rounded-xl border border-[#E6E0DA] shadow-sm p-4">
-                        <div 
+                        <div
                             className="h-[450px] w-full rounded-lg overflow-hidden bg-[#FFF9F4] relative cursor-zoom-in border border-[#E6E0DA]/60"
                             onMouseMove={handleMouseMove}
                             onMouseEnter={() => setIsZoomed(true)}
@@ -135,9 +163,8 @@ const PublicAuctionDetailPage: React.FC = () => {
                                 <img
                                     src={activeImage}
                                     alt={auction.title}
-                                    className={`w-full h-full object-cover transition-transform duration-75 origin-center ${
-                                        isZoomed ? "scale-[2.2]" : "scale-100"
-                                    }`}
+                                    className={`w-full h-full object-cover transition-transform duration-75 origin-center ${isZoomed ? "scale-[2.2]" : "scale-100"
+                                        }`}
                                     style={isZoomed ? { transformOrigin: `${zoomPos.x}% ${zoomPos.y}%` } : undefined}
                                 />
                             ) : (
@@ -145,7 +172,7 @@ const PublicAuctionDetailPage: React.FC = () => {
                                     No Image Media Documented
                                 </div>
                             )}
-                            
+
                             {isZoomed === false && activeImage && (
                                 <div className="absolute bottom-4 right-4 bg-[#1F1F1F]/90 backdrop-blur-sm text-white p-2 rounded-md pointer-events-none flex items-center gap-1.5 text-[10px] uppercase font-bold tracking-wider shadow-sm">
                                     <FaSearchPlus size={11} className="text-[#C9653B]" /> Hover to Inspect
@@ -159,11 +186,10 @@ const PublicAuctionDetailPage: React.FC = () => {
                                     <button
                                         key={img.id}
                                         onClick={() => setActiveImage(img.url)}
-                                        className={`w-20 h-16 rounded-lg overflow-hidden border-2 flex-shrink-0 transition-all focus:outline-none ${
-                                            activeImage === img.url 
-                                                ? "border-[#C9653B] scale-95 shadow-sm" 
-                                                : "border-[#E6E0DA] opacity-60 hover:opacity-100"
-                                        }`}
+                                        className={`w-20 h-16 rounded-lg overflow-hidden border-2 flex-shrink-0 transition-all focus:outline-none ${activeImage === img.url
+                                            ? "border-[#C9653B] scale-95 shadow-sm"
+                                            : "border-[#E6E0DA] opacity-60 hover:opacity-100"
+                                            }`}
                                     >
                                         <img src={img.url} alt={img.altText || "Asset View"} className="w-full h-full object-cover" />
                                     </button>
@@ -183,23 +209,22 @@ const PublicAuctionDetailPage: React.FC = () => {
                 </div>
 
                 <div className="lg:col-span-5 space-y-6">
-                    
+
                     <div className="bg-white rounded-xl border border-[#E6E0DA] p-6 shadow-sm space-y-5">
-                        
+
                         <div className="flex justify-between items-center">
                             <span className="inline-block px-2.5 py-1 bg-[#C9653B]/10 text-[#C9653B] font-bold text-[10px] tracking-wider rounded uppercase border border-[#C9653B]/20">
                                 {auction.type} Format
                             </span>
-                            
-                            <span className={`px-2.5 py-1 text-[10px] font-bold tracking-wider uppercase rounded border ${
-                                auction.status === "PENDING_APPROVAL" || auction.status === "SCHEDULED"
-                                    ? "bg-amber-50 border-amber-200 text-amber-700"
-                                    : auction.status === "DRAFT"
-                                        ? "bg-stone-100 border-stone-200 text-stone-600"
-                                        : auction.status === "REJECTED" || auction.status?.startsWith('CANCELLED')
-                                            ? "bg-red-50 border-red-200 text-red-600"
-                                            : "bg-emerald-50 border-emerald-200 text-emerald-700"
-                            }`}>
+
+                            <span className={`px-2.5 py-1 text-[10px] font-bold tracking-wider uppercase rounded border ${auction.status === "PENDING_APPROVAL" || auction.status === "SCHEDULED"
+                                ? "bg-amber-50 border-amber-200 text-amber-700"
+                                : auction.status === "DRAFT"
+                                    ? "bg-stone-100 border-stone-200 text-stone-600"
+                                    : auction.status === "REJECTED" || auction.status?.startsWith('CANCELLED')
+                                        ? "bg-red-50 border-red-200 text-red-600"
+                                        : "bg-emerald-50 border-emerald-200 text-emerald-700"
+                                }`}>
                                 {auction.status?.replace(/_/g, " ")}
                             </span>
                         </div>
@@ -217,7 +242,7 @@ const PublicAuctionDetailPage: React.FC = () => {
                                     {timerLabel}
                                 </span>
                             </div>
-                            
+
                             {timerLabel !== "CONCLUDED" ? (
                                 <div className="grid grid-cols-4 gap-2 text-center">
                                     <div className="bg-white border border-[#E6E0DA] p-2 rounded-lg">
@@ -263,25 +288,44 @@ const PublicAuctionDetailPage: React.FC = () => {
                             </div>
                         </div>
 
-                        <div className="pt-2">
+                        <div className="flex flex-col gap-3 pt-2">
                             {auction.type === 'TIMED' ? (
-                                <button 
+                                <button
                                     disabled={timerLabel === "CONCLUDED" || timerLabel === 'STARTS IN'}
                                     className="w-full bg-[#C9653B] hover:bg-[#C9653B]/90 text-white font-bold text-xs uppercase tracking-wider py-3 rounded-lg transition-all shadow-sm focus:outline-none disabled:bg-[#E6E0DA] disabled:text-[#6B6B6B] disabled:cursor-not-allowed transform active:scale-[0.99]"
                                 >
-                                     {timerLabel === 'ENDS IN' ? 'Place Bid' : 'Awaiting Bidding Window'}
+                                    {timerLabel === 'ENDS IN' ? 'Place Bid' : 'Awaiting Bidding Window'}
                                 </button>
                             ) : (
-                                <button 
+                                <button
                                     disabled={timerLabel === "CONCLUDED" || timerLabel === 'ENDS IN'}
                                     className="w-full bg-[#C9653B] hover:bg-[#C9653B]/90 text-white font-bold text-xs uppercase tracking-wider py-3 rounded-lg transition-all shadow-sm focus:outline-none disabled:bg-[#E6E0DA] disabled:text-[#6B6B6B] disabled:cursor-not-allowed transform active:scale-[0.99]"
                                 >
                                     {timerLabel === 'STARTS IN' ? 'Register & Reserve Live Bidding Slot' : 'Live Show Concluded'}
                                 </button>
                             )}
+
+                            <button
+                                onClick={handleWatchlistAction}
+                                disabled={isWatchlistLoading || isWatched}
+                                className={`w-full py-2.5 rounded-lg font-bold text-xs uppercase tracking-wider transition-all focus:outline-none flex items-center justify-center gap-2 border border-[#E6E0DA] disabled:cursor-not-allowed ${
+                                    isWatched 
+                                        ? "bg-[#1F1F1F] text-white border-[#1F1F1F]" 
+                                        : "bg-white text-[#1F1F1F] hover:bg-[#FFF9F4]"
+                                }`}
+                            >
+                                {isWatched ? (
+                                    <>
+                                        <FaHeart size={12} className="text-[#C9653B]" /> Saved to Watchlist
+                                    </>
+                                ) : (
+                                    <>
+                                        <FaRegHeart size={12} className="text-[#6B6B6B]" /> Add to Watchlist
+                                    </>
+                                )}
+                            </button>
                         </div>
 
-                        {/* Increment Framework Variables Ledger */}
                         <div className="space-y-3 text-xs font-medium border-t border-[#E6E0DA] pt-4">
                             <div className="flex justify-between">
                                 <span className="text-[#6B6B6B] uppercase text-[10px] tracking-wider">Minimum Bid Increment Step:</span>
@@ -300,7 +344,6 @@ const PublicAuctionDetailPage: React.FC = () => {
                         </div>
                     </div>
 
-                    {/* BRAND NEW FEATURE: Public Verified Auction House Meta Card */}
                     {auction.auctionHouse && (
                         <div className="bg-white rounded-xl border border-[#E6E0DA] p-6 shadow-sm space-y-4">
                             <div className="flex items-center justify-between border-b border-[#E6E0DA] pb-3">

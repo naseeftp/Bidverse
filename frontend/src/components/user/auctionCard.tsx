@@ -46,11 +46,7 @@ const AuctionCard: React.FC<AuctionCardProps> = ({ item }) => {
         finally {
             setIsLoading(false);
         }
-
-
-
-
-    };
+ };
 
 
     useEffect(() => {
