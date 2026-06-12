@@ -19,11 +19,13 @@ export class WatchListController implements IWatchlistController {
         }
     }
     async findAllWatchListItems(req: Request, res: Response, next: NextFunction): Promise<void> {
+       
         try {
             const page = Number(req.query.page);
             const limit = Number(req.query.limit);
             const userId = req.user.id;
             const result = await this._watchListService.findAllWatchListItems(page, limit, userId);
+          
             SuccessResponse(res, MESSAGES.LIST_RETRIEVED, result, HttpStatus.OK)
         } catch (error) {
             next(error)

@@ -1,4 +1,4 @@
-import { AuctionItemStatus } from "../../constants/constants";
+import { AuctionItemStatus, AuctionType } from "../../constants/constants";
 export interface WatchListAddOrDeleteResponseDTO {
     itemid: string;
     actionsSuccess: boolean
@@ -16,5 +16,6 @@ export interface WatchlistItemCardDTO {
     currency: string;
     endTime: Date;
     startTime:Date;
+    type:AuctionType
     imageUrl: string;
 }

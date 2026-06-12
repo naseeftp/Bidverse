@@ -5,7 +5,7 @@ import { Watchlist } from '../../models/watchlist.model'
 import {WatchlistItemCardDTO} from '../../dtos/user.dto/watchlist.dto'
 import { Types } from "mongoose";
 import { IWatchList } from "../../types/watchlist.type";
-import { AuctionItemStatus } from "../../constants/constants";
+import { AuctionItemStatus,AuctionType} from "../../constants/constants";
 
 interface IPopulatedAuctionItem {
     _id: Types.ObjectId;
@@ -17,6 +17,7 @@ interface IPopulatedAuctionItem {
     currency: string;
     endTime: Date;
     startTime:Date;
+    type:AuctionType;
     images: Array<{
         url: string;
         isPrimary: boolean;
@@ -38,7 +39,7 @@ export class WatchListRepository extends BaseRepository<IWatchListDocument> impl
           this.model.find(queryCondition)
           .populate<{ itemId: IPopulatedAuctionItem }>({
                 path: "itemId",
-                select: "title currentBid minimumIncrement endTime startTime  status images startingPrice currency",
+                select: "title currentBid minimumIncrement endTime startTime type status images startingPrice currency",
             })
             .sort({ createdAt: -1 })
             .skip(skip)
@@ -66,6 +67,7 @@ export class WatchListRepository extends BaseRepository<IWatchListDocument> impl
                 currency: item.currency,
                 endTime: item.endTime,
                 startTime:item.startTime,
+                type:item.type,
                 imageUrl: primaryImg
             };
        })
