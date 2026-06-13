@@ -18,10 +18,13 @@ import {
     FaHeart
 } from "react-icons/fa";
 import watchListService from "../services/watchList.service";
+import { useAppDispatch } from "../hooks/redux.hooks";
+import { incrementWatchlistCount } from "../redux/user/auth.slice";
 
 const PublicAuctionDetailPage: React.FC = () => {
     const { itemId } = useParams<{ itemId: string }>();
     const navigate = useNavigate();
+    const dispatch=useAppDispatch()
 
     const [loading, setLoading] = useState(false);
     const [auction, setAuction] = useState<AuctionItemDetailDTO | null>(null);
@@ -64,6 +67,7 @@ const PublicAuctionDetailPage: React.FC = () => {
             if (response.success) {
                 toast.success(response.message)
                 setIsWathed(true)
+                dispatch(incrementWatchlistCount())
             }
             else {
                 toast.error(response.message)

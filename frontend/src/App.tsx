@@ -89,6 +89,7 @@ function App() {
                   <Route path="/change-password" element={<ChangePasswordPage />} />
                   <Route path="/change-email" element={<ChangeEmailPage/>}/>
                   <Route path="/change-email-verify" element={<ChangeEmailVerifyPage/>}/>
+                  <Route path="/watch-list" element={<WatchlistPage/>} />
                </Route>
             </Route>
 
@@ -96,7 +97,7 @@ function App() {
                <Route element={<ProtectedRoute allowedRoles={['user']} />}>
                   <Route path="/dashboard" element={<Dashboard />} />
                   <Route path="/addresses" element={<AddressPage/>} />
-                   <Route path="/watch-list" element={<WatchlistPage/>} />
+                  
                </Route>
             </Route>
 

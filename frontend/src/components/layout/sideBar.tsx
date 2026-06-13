@@ -1,13 +1,12 @@
-import { MapPin, ShoppingBag, Hammer, User, LogOut,Heart} from 'lucide-react';
+import { MapPin, ShoppingBag, Hammer, User, LogOut} from 'lucide-react';
 import React from 'react';
 
 const Sidebar:React.FC = () => {
   const menuItems = [
-    { name: 'My Bids', icon: Hammer, path: '/bids', count: 3 },      
-    { name: 'Orders', icon: ShoppingBag, path: '/orders', count: 1 }, 
+    { name: 'My Bids', icon: Hammer, path: '/bids'},      
+    { name: 'Orders', icon: ShoppingBag, path: '/orders'}, 
     { name: 'Addresses', icon: MapPin, path: '/addresses' },
     { name: 'Profile', icon: User, path: '/profile' },
-    { name: 'Watchlist', icon: Heart, path: '/watch-list' },
   ];
 
   return (
@@ -29,15 +28,6 @@ const Sidebar:React.FC = () => {
               <item.icon className="w-5 h-5 text-[#6B6B6B] group-hover:text-[#C9653B]" />
               <span className="text-[#1F1F1F] font-medium">{item.name}</span>
             </div>
-            
-            {/* Status Badges */}
-            {item.count && (
-              <span className={`text-xs px-2 py-0.5 rounded-full ${
-                item.name === 'My Bids' ? 'bg-[#FFF3E0] text-[#B45309]' : 'bg-[#E8F5E9] text-[#2E7D32]'
-              }`}>
-                {item.count}
-              </span>
-            )}
           </a>
         ))}
       </nav>

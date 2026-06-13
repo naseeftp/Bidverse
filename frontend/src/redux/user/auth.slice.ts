@@ -15,6 +15,7 @@ interface AuthState {
     role: string;
     phone: string;
   } | null;
+  watchlistCount:number;
 }
 const token = localStorage.getItem("accessToken");
 const decodeToken = (token: string): JwtPayload | null => {
@@ -32,7 +33,8 @@ const initialState: AuthState = {
   isAuthenticated: !!initialUser,
   loading: false,
   error: null,
-  tempAuthData: null
+  tempAuthData: null,
+  watchlistCount:0
 }
 
 const authSlice = createSlice({
@@ -65,12 +67,21 @@ const authSlice = createSlice({
       state.role = null;
       state.isAuthenticated = false;
       state.tempAuthData = null;
+      state.watchlistCount = 0;
       localStorage.removeItem("accessToken")
+    },
+    setWatchlistCount: (state, action: PayloadAction<number>) => {
+      state.watchlistCount = action.payload;
+    },
+    incrementWatchlistCount: (state) => {
+      state.watchlistCount += 1;
+    },
+    decrementWatchlistCount: (state) => {
+      state.watchlistCount = Math.max(0, state.watchlistCount - 1);
     }
-
 
   }
 })
 
-export const { setRegistrationData, setAuthSuccess, setAuthError, setLoading, logout } = authSlice.actions
+export const { setRegistrationData, setAuthSuccess, setAuthError, setLoading, logout,setWatchlistCount,decrementWatchlistCount,incrementWatchlistCount } = authSlice.actions
 export default authSlice.reducer;

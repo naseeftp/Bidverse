@@ -4,7 +4,8 @@ import type { WatchlistItemCardDTO } from "../../types/watchlist.dto";
 import watchListService from "../../services/watchList.service";
 import toast from "react-hot-toast";
 import { Trash2, Eye} from "lucide-react";
-
+import { useAppDispatch } from "../../hooks/redux.hooks";
+import { decrementWatchlistCount } from "../../redux/user/auth.slice";
 interface WatchlistCardProps {
     item: WatchlistItemCardDTO;
     onRemoveSuccess: (watchlistId: string) => void;
@@ -26,6 +27,7 @@ const WatchlistCard: React.FC<WatchlistCardProps> = ({ item, onRemoveSuccess }) 
         label: "Checking",
         style: "bg-[#E6E0DA] text-[#6B6B6B]"
     });
+    const dispatch=useAppDispatch()
 
    
     const handleDeleteAction = async (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -38,6 +40,7 @@ const WatchlistCard: React.FC<WatchlistCardProps> = ({ item, onRemoveSuccess }) 
             if (response.success) {
                 toast.success("Removed from watchlist");
                 onRemoveSuccess(item.watchlistId);
+                dispatch(decrementWatchlistCount())
             } else {
                 toast.error(response.message || "Failed to remove item");
             }

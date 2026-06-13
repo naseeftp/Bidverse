@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import type { AuctionItemListDTO } from "../../types/auctionItem.dto";
 import watchListService from "../../services/watchList.service";
 import toast from "react-hot-toast";
+import { incrementWatchlistCount } from "../../redux/user/auth.slice";
+import { useAppDispatch } from "../../hooks/redux.hooks";
 
 interface AuctionCardProps {
     item: AuctionItemListDTO;
@@ -18,6 +20,7 @@ interface TimeLeft {
 const AuctionCard: React.FC<AuctionCardProps> = ({ item }) => {
     const primaryImage = item.images?.find(img => img.isPrimary) || item.images?.[0];
     const navigate = useNavigate()
+    const dispatch=useAppDispatch()
     const [timerLabel, setTimerLabel] = useState<string>("INITIALIZING...");
     const [timeLeft, setTimeLeft] = useState<TimeLeft>({ days: 0, hours: 0, minutes: 0, seconds: 0 });
     const [liveBadge, setLiveBadge] = useState<{ label: string; bg: string; text: string }>({
@@ -36,6 +39,7 @@ const AuctionCard: React.FC<AuctionCardProps> = ({ item }) => {
             if (response.success) {
                 toast.success(response.message)
                 setIsWathed(true)
+                dispatch(incrementWatchlistCount())
             }
             else {
                 toast.error(response.message)
