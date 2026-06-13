@@ -3,5 +3,6 @@ import { IGenericPaginatedResposnse } from "../../types/response.type";
 
 export interface IWatchListService {
   addToWatchList(userId: string, itemId: string): Promise<WatchListAddOrDeleteResponseDTO>
+  deleteFromWatchList(userId: string, itemId: string): Promise<WatchListAddOrDeleteResponseDTO>
   findAllWatchListItems(page: number, limit: number, userId: string): Promise<IGenericPaginatedResposnse<WatchlistItemCardDTO>>
 }

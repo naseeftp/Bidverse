@@ -18,14 +18,24 @@ export class WatchListController implements IWatchlistController {
             next(error)
         }
     }
+    async deleteFromWatchList(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const userId = req.user.id;
+            const itemId = req.params.id as string;
+            const result = await this._watchListService.deleteFromWatchList(userId, itemId)
+            SuccessResponse(res, MESSAGES.WATCHLIST_DELETED, result, HttpStatus.OK)
+        } catch (error) {
+            next(error)
+        }
+    }
     async findAllWatchListItems(req: Request, res: Response, next: NextFunction): Promise<void> {
-       
+
         try {
             const page = Number(req.query.page);
             const limit = Number(req.query.limit);
             const userId = req.user.id;
             const result = await this._watchListService.findAllWatchListItems(page, limit, userId);
-          
+
             SuccessResponse(res, MESSAGES.LIST_RETRIEVED, result, HttpStatus.OK)
         } catch (error) {
             next(error)

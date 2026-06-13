@@ -2,7 +2,7 @@ import { IWatchListService } from "../interface/IWatchList.service";
 import { IWatchListRepository } from "../../repositories/interfaces/IWatchlist.repository";
 import { IAuctionItemRepository } from "../../repositories/interfaces/IAuctionItem.repository";
 import { WatchListAddOrDeleteResponseDTO, WatchlistItemCardDTO } from "../../dtos/user.dto/watchlist.dto";
-import { ConflictError, NotFoundError } from "../../errors/AppError";
+import { BadRequestError, ConflictError, NotFoundError, UnauthorizedError } from "../../errors/AppError";
 import { MESSAGES } from "../../constants/constants";
 import { Types } from "mongoose";
 import { IGenericPaginatedResposnse } from "../../types/response.type";
@@ -15,6 +15,9 @@ export class WatchListService implements IWatchListService {
     ) { }
 
     async addToWatchList(userId: string, itemId: string): Promise<WatchListAddOrDeleteResponseDTO> {
+        if (!Types.ObjectId.isValid(userId) || !Types.ObjectId.isValid(itemId)) {
+            throw new BadRequestError(MESSAGES.INVALID_ID_FORMAT)
+        }
         const auctionItem = await this._auctionItemRepo.findById(itemId);
         if (!auctionItem) {
             throw new NotFoundError(MESSAGES.AUCTION_NOT_FOUND)
@@ -28,6 +31,23 @@ export class WatchListService implements IWatchListService {
             userId: new Types.ObjectId(userId),
             itemId: new Types.ObjectId(itemId)
         })
+        return {
+            itemid: itemId,
+            actionsSuccess: true
+        }
+    }
+    async deleteFromWatchList(userId: string, itemId: string): Promise<WatchListAddOrDeleteResponseDTO> {
+        if (!Types.ObjectId.isValid(userId) || !Types.ObjectId.isValid(itemId)) {
+            throw new BadRequestError(MESSAGES.INVALID_ID_FORMAT)
+        }
+        const watchlistEntry = await this._watchlistRepo.findById(itemId);
+        if (!watchlistEntry) {
+            throw new NotFoundError
+        }
+        if (watchlistEntry.userId.toString() !== userId) {
+            throw new UnauthorizedError(MESSAGES.NOT_PERMITTED)
+        }
+        await this._watchlistRepo.deleteById(itemId)
         return {
             itemid: itemId,
             actionsSuccess: true

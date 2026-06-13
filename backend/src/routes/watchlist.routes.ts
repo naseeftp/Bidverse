@@ -14,6 +14,11 @@ router.post(
    allowedTo(Role.USER),
    (req, res, next) => watchlistController.addToWatchList(req, res, next)
 )
+router.delete(
+   WATCH_LIST_ROUTES.REMOVE_ITEM,
+   allowedTo(Role.USER),
+   (req, res, next) => watchlistController.deleteFromWatchList(req, res, next)
+)
 router.get(
    WATCH_LIST_ROUTES.MY_WATH_LIST,
    allowedTo(Role.USER),

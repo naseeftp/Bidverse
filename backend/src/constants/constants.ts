@@ -122,7 +122,7 @@ export const MESSAGES = {
 
     GOOGLE_REGISTERED: 'This account is registered with google authentication please try  google sign in',
 
-    ALLREADY_VERIFIED: 'This accout allready Verified',
+    ALLREADY_VERIFIED: 'This account allready Verified',
     UNDER_REVIEW: 'This account currently under review',
     VERIFICATION_SUBMITTED: 'Verification request submitted successfully',
     VALID_REJECT_RSN: "A valid reason is required for rejection.",
@@ -151,6 +151,7 @@ export const MESSAGES = {
     WATCHLIST_ADDED:'Item Added To WatchList Successfully',
     WATCHLIST_DELETED:'Item Removed From WatchList Successfully',
     WATCHLIST_EXISTED:'Item Allredy existed on watchlist',
+    WATCH_LIST_ITEM_NOT_FOUND:'Watchlist record not found',
 
     LOGOUT_SUCCESS: "Logout success",
     LOGOUT_FAILED: "Logout failed",

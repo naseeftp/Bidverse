@@ -18,6 +18,19 @@ class watchlistService{
             return apiErrorHandler(error,'Failed to add item to Watchlist')
         }
     }
+    async deleteFromWatchList(itemId:string){
+        try {
+            const url=`${BASE_ROUTES.WATCH_LIST}${WATCH_LIST_ROUTES.REMOVE_ITEM}/${itemId}`;
+            const response=await axiosInstance.delete<WatchListAddOrDeleteResponseDTO,ApiResponse<WatchListAddOrDeleteResponseDTO>>(url)
+            return{
+                success:true,
+                message:response.message,
+                data:response.data
+            }
+        } catch(error) {
+            return apiErrorHandler(error,'Failed to remove item from Watchlist')
+        }
+    }
    async findAllWatchListItems(page:number,limit:number){
     try {
         const url=`${BASE_ROUTES.WATCH_LIST}${WATCH_LIST_ROUTES.MY_WATH_LIST}?page=${page}&limit=${limit}`;

@@ -32,20 +32,20 @@ const WatchlistCard: React.FC<WatchlistCardProps> = ({ item, onRemoveSuccess }) 
         e.stopPropagation();
         if (isDeleting) return;
         
-        // try {
-        //     setIsDeleting(true);
-        //     const response = await watchListService.removeFromWatchList(item.watchlistId);
-        //     if (response.success) {
-        //         toast.success("Removed from watchlist");
-        //         onRemoveSuccess(item.watchlistId);
-        //     } else {
-        //         toast.error(response.message || "Failed to remove item");
-        //     }
-        // } catch {
-        //     toast.error("Internal server error handling item removal");
-        // } finally {
-        //     setIsDeleting(false);
-        // }
+        try {
+            setIsDeleting(true);
+            const response = await watchListService.deleteFromWatchList(item.watchlistId);
+            if (response.success) {
+                toast.success("Removed from watchlist");
+                onRemoveSuccess(item.watchlistId);
+            } else {
+                toast.error(response.message || "Failed to remove item");
+            }
+        } catch {
+            toast.error("Internal server error handling item removal");
+        } finally {
+            setIsDeleting(false);
+        }
     };
 
     useEffect(() => {

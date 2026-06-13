@@ -75,5 +75,6 @@ export const AUCTION_ITEM_ROUTES = {
 
 export const WATCH_LIST_ROUTES = {
     ADD_TO_WATCH_LIST: '/add',
-    MY_WATH_LIST: '/watch-list'
+    MY_WATH_LIST: '/watch-list',
+    REMOVE_ITEM:'/remove/:id'
 }
