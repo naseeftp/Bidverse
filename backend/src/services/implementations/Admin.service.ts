@@ -24,7 +24,7 @@ export class AdminService implements IAdminService {
         private _emailService:IEmailService
     ) { }
     async listAllAuctionHouses(page: number, limit: number,search?:string,status?:string): Promise<IGenericPaginatedResposnse<AdminAuctionHouseDetailDTO>> {
-        try {
+        
            const { houses, total } = await this._auctionHouseRepo.listAllTenantsWithHouseStatus(
             page, 
             limit, 
@@ -42,27 +42,20 @@ export class AdminService implements IAdminService {
                 hasPrevPage: page > 1
             }
         };
-        } catch (error) {
-            this._logger.error("Error in listAllAuctionHouses service", { error });
-            throw new AppError("Failed to list auction houses for administrative review");
-        }
+       
     }
     async getAuctionHouseById(id: string): Promise<AdminAuctionHouseDetailDTO> {
-        try {
+        
             const house = await this._auctionHouseRepo.findcombinedData(id);
             if (!house) {
                 throw new AppError("Auction House not found");
             }
             return house as unknown as AdminAuctionHouseDetailDTO;
 
-        } catch (error) {
-            this._logger.error(`Service Error: Failed to fetch auction house with ID ${id}`, { error });
-            throw new AppError("Failed to get the auction house.");
-        }
-    }
+ }
 
     async updateAuctionHouseStatus(id: string, data: UpdateHouseStatusDTO): Promise<AuctionHouseResponseDTO> {
-        try {
+    
             const { status, reason } = data
             this._logger.info('udatating status of the auction house', { Id: id, statusofhouse: status })
             const uodateData = {
@@ -76,10 +69,7 @@ export class AdminService implements IAdminService {
             }
             await this._emailService.sendVerificationStatusUpdationEmail(updatedHouse.contact.businessEmail,updatedHouse.name,status,reason)
             return AuctionHouseMapper.toResponseDTO(updatedHouse)
-        } catch (error) {
-            this._logger.error("Error in updating status service", { error });
-            throw new AppError("Failed to update the status.");
-        }
+        
     }
     async listAllUsers(page: number, limit: number, search?: string, status?: string): Promise<IGenericPaginatedResposnse<UserResponseDTO>> {
         const filter: QueryFilter<IUserDocument> = { role: Role.USER }
@@ -124,20 +114,17 @@ export class AdminService implements IAdminService {
         }
     }
     async getUserById(id: string): Promise<UserResponseDTO> {
-        try {
+        
             const user = await this._userRepo.findById(id)
             if (!user) {
                 throw new NotFoundError(MESSAGES.USER_NOT_FOUND)
             }
             const mappedUsers = UserMapper.toDTO(user)
             return mappedUsers
-        } catch (error) {
-            this._logger.error('Error in fetching user', { error })
-            throw new AppError('Failed to get User')
-        }
+      
     }
     async updateUserStatus(id: string, data: UpdateUserStatusDTO): Promise<UserResponseDTO> {
-        try {
+        
             const { isActive, reason } = data;
             this._logger.info('updating the user  status', {
                 id: id,
@@ -156,9 +143,6 @@ export class AdminService implements IAdminService {
             await this._emailService.sendBlockOrUnBlockEmail(updatedUser.email,updatedUser.name,isActive,reason)
             const mappedUser = UserMapper.toDTO(updatedUser)
             return mappedUser
-        } catch (error) {
-            this._logger.error('Error while updating user', { error })
-            throw new AppError('Error while Updating User')
-        }
+       
     }
 }
