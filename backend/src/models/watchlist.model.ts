@@ -16,3 +16,4 @@ const WatchListSchema = new Schema<IWatchListDocument>({
 }, { timestamps: true })
 
 export const Watchlist = mongoose.model<IWatchListDocument>('Watchlist', WatchListSchema)
+
