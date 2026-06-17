@@ -49,5 +49,8 @@ export const env = {
     },
     get CLOUDINARY_KEY() {
         return process.env.CLOUDINARY_KEY
+    },
+    get CLIENT_URL(){
+        return process.env.CLIENT_URL
     }
 }

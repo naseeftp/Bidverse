@@ -7,7 +7,7 @@ export interface ServerToClientEvents{  // this events emitted by backend and fr
      'conversation:updated':(data:{  //emitted to update the chat sidebar inbox list parameters  when a new message arrives your side bar need to resort itself to put the most recent conversation at the top
         conversationId:string;
         lastMessageSnippet:string;
-        lastMessageAt: Date
+        lastMessageAt: string;
      })=>void;
      'typing:status':(data:{conversationId:string;userId:string;isTyping:boolean})=>void;
      'messages:read':(data:{conversationId:string;userId:string})=>void;//Emitted when a participant opens an unread chat window.

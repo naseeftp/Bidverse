@@ -1,5 +1,7 @@
 import express, { Application } from "express";
 import dotenv from "dotenv"
+import { createServer } from "http";//NODE'S NATIVE SERVER WRAPPER
+import { socketService} from "./services/implementations/socket.service";
 import { env } from './config/env'
 import connectDB from "./config/db";
 import cors from 'cors'
@@ -21,6 +23,8 @@ import { LoggerService } from "./services/implementations/Logger.service";
 dotenv.config()
 const app: Application = express()
 const appLogger = new LoggerService("App")
+const httpServer=createServer(app)//WRAP THE EXPRESS INSTANCE IN AN HTTP SERVER
+
 app.use(cors({
     origin: "http://localhost:5173",
     credentials: true,
@@ -44,7 +48,8 @@ app.use(BASE_ROUTES.WATCH_LIST,WatchlistRoutes)
 app.use(errorHandler);
 const startServer = async () => {
     await connectDB()
-    app.listen(PORT, () => {
+    socketService.initialize(httpServer)
+    httpServer.listen(PORT, () => {
         appLogger.info(`your application running on port ${PORT}`)
     })
 }
