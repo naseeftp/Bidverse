@@ -1,8 +1,8 @@
-import { Document, Schema } from "mongoose";
+import { Document, Schema,Types} from "mongoose";
 import { roles } from "./user.type";
 
 export interface IParticipant {
-    userId: Schema.Types.ObjectId;
+    userId: Types.ObjectId;
     role: roles
 }
 
