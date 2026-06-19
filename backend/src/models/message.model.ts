@@ -1,6 +1,7 @@
 import mongoose, { Schema } from "mongoose";
 import { IMessageDocument } from "../types/message.type";
 import { Roles } from "../constants/constants";
+import { MessageType } from "../constants/constants";
 
 const AttachmentSchema = new Schema({
     url: { type: String, required: true },
@@ -39,7 +40,7 @@ const MessageSchema = new Schema<IMessageDocument>({
     },
     messageType: {
         type: String,
-        enum: ['text', 'image', 'video', 'audio', 'file'],
+        enum: Object.values(MessageType),
         default: 'text',
         required: true
     },

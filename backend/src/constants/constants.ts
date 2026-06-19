@@ -176,4 +176,12 @@ export enum AuctionType{
     LIVE='LIVE'
 }
 export const AuctionTypeValues=Object.values(AuctionType)
+export enum MessageType {
+    TEXT = 'text',
+    IMAGE = 'image',
+    VIDEO = 'video',
+    AUDIO = 'audio',
+    FILE = 'file'
+}
+
 
