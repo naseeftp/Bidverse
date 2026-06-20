@@ -13,7 +13,7 @@ export interface AttachmentDTO{
     mimeType: string
 }
 
-export interface IConversationDTO{
+export interface ConversationDTO{
     _id:string;
     participants:ParticipantDTO[];
     lastMessageId:string|null;
@@ -25,7 +25,7 @@ export interface IConversationDTO{
     updatedAt?:Date;
 }
 
-export interface IMessageDto {
+export interface MessageDto {
     _id: string;
     conversationId: string;
     senderId: string;
