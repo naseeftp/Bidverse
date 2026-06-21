@@ -8,7 +8,8 @@ export const BASE_ROUTES = {
     ADDRESS: '/address',
     PUBLIC: '/public',
     AUCTION_ITEM: '/auction-item',
-    WATCH_LIST: '/watch-list'
+    WATCH_LIST: '/watch-list',
+    CHAT:'/chat'
 } as const
 
 export const AUTH_ROUTES = {
@@ -77,4 +78,7 @@ export const WATCH_LIST_ROUTES = {
     ADD_TO_WATCH_LIST: '/add',
     MY_WATH_LIST: '/watch-list',
     REMOVE_ITEM:'/remove/:id'
+}
+export const CHAT_ROUTES={
+    GET_OR_CREATE_CONVO:'/conversation'
 }

@@ -1,0 +1,17 @@
+import { Router } from "express";
+import { CheckUserBlocked } from "../middlewares/check-user-blocked-middleware";
+import { protect,allowedTo } from "../middlewares/auth.middleware";
+import { CHAT_ROUTES } from "../constants/route.constant";
+import { Role } from "../dtos/Common.dto";
+import { chatController } from "../di/chat.container";
+
+const router=Router()
+router.use(protect);
+router.use(CheckUserBlocked)
+
+router.post(
+   CHAT_ROUTES.GET_OR_CREATE_CONVO,
+   allowedTo(Role.USER,Role.TENANT,Role.ADMIN),
+   (req,res,next)=>chatController.getOrCreateConversation(req,res,next)
+)
+export default router;

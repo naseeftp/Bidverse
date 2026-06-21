@@ -153,6 +153,11 @@ export const MESSAGES = {
     WATCHLIST_EXISTED:'Item Allredy existed on watchlist',
     WATCH_LIST_ITEM_NOT_FOUND:'Watchlist record not found',
 
+    CONV_CREATED:'Conversation finded or created',
+    REQ_USER_NOT_FOUND:'Requested user Not found',
+    RECEIVER_NOT_FOUNS:'Reciever User Not found',
+    TWO_PEOPLE_NEEDED:'A direct conversation must have exactly two participants',
+
     LOGOUT_SUCCESS: "Logout success",
     LOGOUT_FAILED: "Logout failed",
 
