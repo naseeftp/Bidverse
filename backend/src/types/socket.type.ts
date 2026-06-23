@@ -17,7 +17,7 @@ export interface ServerToClientEvents{  // this events emitted by backend and fr
         messageId: string; 
         isDeletedForEveryone: boolean; 
     }) => void;
-     "notification:new": (notification: any) => void;//Emitted for real-time background system alerts.
+    //  "notification:new": (notification: any) => void;//Emitted for real-time background system alerts.
 }
 
 export interface ClientToServerEvents{

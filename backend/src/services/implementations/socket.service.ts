@@ -110,9 +110,9 @@ export class SocketService {
         });
     }
 
-    public sendNotification(userId: string, notificationData: any): void {
-        this._io?.to(`user:${userId}`).emit("notification:new", notificationData);
-    }
+    // public sendNotification(userId: string, notificationData: any): void {
+    //     this._io?.to(`user:${userId}`).emit("notification:new", notificationData);
+    // }
 }
 
 export const socketService = new SocketService();
