@@ -8,11 +8,11 @@ class ChatService{
 async getOrCreateConversation(data:{receiverId:string,receiverRole:string}){
     try {
         const url=`${BASE_ROUTES.CHAT}${CHAT_ROUTES.GET_OR_CREATE_CONVO}`;
-        const response=await axiosInstance.post<ApiResponse<ConversationDTO>>(url,data)
+        const response=await axiosInstance.post<ConversationDTO,ApiResponse<ConversationDTO>>(url,data)
         return{
             success:true,
             data:response.data,
-            message:response
+            message:response.message
         }
 
     } catch(error){

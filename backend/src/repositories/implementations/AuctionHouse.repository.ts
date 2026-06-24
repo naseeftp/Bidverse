@@ -311,6 +311,7 @@ const skip = (page - 1) * limit;
                     id: { $toString: '$_id' },
                     name: '$name',
                     profileImage: { $ifNull: ['$ownerUser.profileImage', ''] },
+                    ownerId:{$toString:'$ownerUser._id'},
                     yearEstablished: '$yearEstablished',
                     briefDescription: '$briefDescription',
                     categories: '$categories',

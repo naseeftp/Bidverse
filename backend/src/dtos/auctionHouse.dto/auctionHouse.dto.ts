@@ -181,6 +181,7 @@ export interface AuctionHouseProfileDTO {
     id: string;
     name: string;
     profileImage:string,
+    ownerId?:string;
     yearEstablished: number;
     briefDescription: string;
     categories: string[];

@@ -124,6 +124,7 @@ export interface AuctionHouseProfileDTO {
     id: string;
     name: string;
     profileImage:string,
+    ownerId?:string;
     yearEstablished: number;
     briefDescription: string;
     categories: string[];
@@ -136,22 +137,7 @@ export interface AuctionHouseProfileDTO {
     phone: string;
     isVerified: boolean;
 }
-// export interface AuctionItemDTO {
-//     auctionItemId: string;
-//     title: string;
-//     status: string;
-//     type: string;
-//     currency: string;
-//     startingPrice: number;
-//     startTime: string;
-//     endTime: string;
-//     images: Array<{
-//         id: string;
-//         url: string;
-//         isPrimary: boolean;
-//         altText?: string;
-//     }>;
-// }
+
 
 export interface PublicAuctionHouseDetailDTO {
     auctionHouse: AuctionHouseProfileDTO;

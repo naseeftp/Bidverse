@@ -35,7 +35,6 @@ class watchlistService{
     try {
         const url=`${BASE_ROUTES.WATCH_LIST}${WATCH_LIST_ROUTES.MY_WATH_LIST}?page=${page}&limit=${limit}`;
         const response=await axiosInstance.get<WatchlistItemCardDTO,ApiResponse<{data:WatchlistItemCardDTO[];pagination:IPaginationMeta}>>(url)
-        console.log('response  ',response)
         const paginatedResult=response.data;
         return{
             success:true,
