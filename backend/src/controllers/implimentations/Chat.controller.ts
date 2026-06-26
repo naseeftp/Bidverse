@@ -25,4 +25,13 @@ export class ChatController implements IChatController{
             next(error)
         }
     }
+    async getUserConversations(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const userId=req.user.id;
+            const result=await this._ChatService.getUserConversations(userId);
+            SuccessResponse(res,MESSAGES.LIST_RETRIEVED,result,HttpStatus.OK)
+        } catch (error) {
+            next(error)
+        }
+    }
 }

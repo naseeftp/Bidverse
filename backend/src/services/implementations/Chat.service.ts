@@ -33,4 +33,13 @@ export class ChatService implements IChatService{
      const requestedId=participants[0]?.userId||'';
      return ChatMapper.toConversationDto(conversation,requestedId)
     }
+    async getUserConversations(userId: string): Promise<ConversationDTO[]> {
+       const userExist=await this._userRepo.findById(userId)
+       if(!userExist){
+         throw new NotFoundError(MESSAGES.USER_NOT_FOUND)
+       }
+       const conversations=await this._conversationRepo.findAllForUser(userId)
+       return conversations.map((conv)=>ChatMapper.toConversationDto(conv,userId))
+    }
+    
 }

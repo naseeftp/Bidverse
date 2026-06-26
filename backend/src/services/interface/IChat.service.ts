@@ -3,5 +3,5 @@ import { IGenericPaginatedResposnse } from "../../types/response.type";
 
 export interface IChatService{
  getOrCreateConversation(participants:{userId:string;role:string}[]):Promise<ConversationDTO>
- getUserConversation(userId:string):Promise<IGenericPaginatedResposnse<ConversationDTO>>
+ getUserConversations(userId:string):Promise<ConversationDTO[]>
 }

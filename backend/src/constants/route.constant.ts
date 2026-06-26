@@ -80,5 +80,6 @@ export const WATCH_LIST_ROUTES = {
     REMOVE_ITEM:'/remove/:id'
 }
 export const CHAT_ROUTES={
-    GET_OR_CREATE_CONVO:'/conversation'
+    GET_OR_CREATE_CONVO:'/conversation',
+    GET_USER_CONVO:'/user-conversations'
 }
