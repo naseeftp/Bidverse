@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAppSelector, useAppDispatch } from "../../hooks/redux.hooks";
 import { logout,setWatchlistCount} from "../../redux/user/auth.slice";
-import { ChevronDown, Heart, Menu, X } from "lucide-react";
+import { ChevronDown, Heart, Menu, X,MessageCircle} from "lucide-react";
 import authService from "../../services/auth.service";
 import watchListService from "../../services/watchList.service";
 import { apiErrorHandler } from "../../utils/error.handle";
@@ -91,7 +91,20 @@ const Navbar: React.FC = () => {
                   </span>
                 )}
               </button>
-
+               <button
+                onClick={() => navigate("/watch-list")}
+                title="View Watchlist"
+                className="relative p-2 text-[#6B6B6B] hover:text-[#C9653B] hover:bg-[#FFF9F4] rounded-xl transition-all duration-300 group cursor-pointer focus:outline-none"
+              >
+                <MessageCircle size={18} className="transition-transform group-hover:scale-105" />
+                
+                {watchlistCount > 0 && (
+                  <span className="absolute top-0.5 right-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-[#C9653B] text-[9px] font-black text-white ring-2 ring-white animate-in scale-in-50 duration-200 select-none">
+                    {watchlistCount}
+                  </span>
+                )}
+              </button>
+              
               <div className="relative hidden md:block" ref={dropdownRef}>
                 <button
                   onClick={() => setIsDropdownOpen(!isDropdownOpen)}
@@ -102,6 +115,7 @@ const Navbar: React.FC = () => {
                   </span>
                   <ChevronDown size={14} className={`text-[#6B6B6B] transition-transform duration-300 ${isDropdownOpen ? 'rotate-180' : ''}`} />
                 </button>
+
 
                 {isDropdownOpen && (
                   <div className="absolute right-0 mt-4 w-48 bg-white border border-[#E6E0DA] shadow-xl z-50 py-2 rounded-xl animate-in fade-in slide-in-from-top-2">

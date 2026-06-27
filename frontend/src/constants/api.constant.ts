@@ -6,7 +6,7 @@ export const BASE_ROUTES = {
     PUBLIC: '/public',
     AUCTION_ITEM: '/auction-item',
     WATCH_LIST: '/watch-list',
-     CHAT:'/chat'
+    CHAT: '/chat'
 
 }
 export const AUTH_ROUTES = {
@@ -71,9 +71,11 @@ export const AUCTION_ITEM_ROUTES = {
 export const WATCH_LIST_ROUTES = {
     ADD_TO_WATCH_LIST: '/add',
     MY_WATH_LIST: '/watch-list',
-    REMOVE_ITEM:'/remove'
+    REMOVE_ITEM: '/remove'
 }
 
-export const CHAT_ROUTES={
-    GET_OR_CREATE_CONVO:'/conversation'
+export const CHAT_ROUTES = {
+    GET_OR_CREATE_CONVO: '/conversation',
+    GET_USER_CONVO: '/user-conversations'
+
 }
