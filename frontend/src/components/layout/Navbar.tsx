@@ -92,7 +92,7 @@ const Navbar: React.FC = () => {
                 )}
               </button>
                <button
-                onClick={() => navigate("/watch-list")}
+                onClick={() => navigate("/chat")}
                 title="View Watchlist"
                 className="relative p-2 text-[#6B6B6B] hover:text-[#C9653B] hover:bg-[#FFF9F4] rounded-xl transition-all duration-300 group cursor-pointer focus:outline-none"
               >

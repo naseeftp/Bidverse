@@ -14,4 +14,9 @@ router.post(
    allowedTo(Role.USER,Role.TENANT,Role.ADMIN),
    (req,res,next)=>chatController.getOrCreateConversation(req,res,next)
 )
+router.get(
+   CHAT_ROUTES.GET_USER_CONVO,
+   allowedTo(Role.USER,Role.TENANT),
+   (req,res,next)=>chatController.getUserConversations(req,res,next)
+)
 export default router;
