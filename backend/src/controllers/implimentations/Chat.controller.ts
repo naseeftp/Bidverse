@@ -27,10 +27,8 @@ export class ChatController implements IChatController{
     }
     async getUserConversations(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
-            console.log("call reached")
             const userId=req.user.id;
             const result=await this._ChatService.getUserConversations(userId);
-            console.log("result in controller",result)
             SuccessResponse(res,MESSAGES.LIST_RETRIEVED,result,HttpStatus.OK)
         } catch (error) {
             next(error)

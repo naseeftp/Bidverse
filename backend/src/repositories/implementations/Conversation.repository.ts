@@ -35,7 +35,8 @@ export class ConversationRepository extends BaseRepository<IConversation> implem
     async findAllForUser(userId: string): Promise<IConversation[]> {
         const userObjectId = new Types.ObjectId(userId);
         return await this.model.find({ 'participants.userId': userObjectId })
-            .populate('lastMessage')
+            .populate('participants.userId')
+            // .populate('lastMessage')
             .exec() as IConversation[]
     }
     async updateLastMessageData(conversationId: string, messageId: string, snippet: string, timestamp: Date): Promise<void> {
