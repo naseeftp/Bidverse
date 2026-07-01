@@ -39,39 +39,8 @@ export class ConversationRepository extends BaseRepository<IConversation> implem
             // .populate('lastMessage')
             .exec() as IConversation[]
     }
-    async updateLastMessageData(conversationId: string, messageId: string, snippet: string, timestamp: Date): Promise<void> {
-        await this.model.findByIdAndUpdate(conversationId, {
-            $set: {
-                lastMessage: new Types.ObjectId(messageId),
-                lastMessageSnippet: snippet,
-                lastMessageAt: timestamp
-            }
-        }).exec()
-    }
-    async incrementUnreadForParticipants(conversationId: string, senderId: string): Promise<void> {
-        const conversation = await this.model.findById(conversationId);
-        if (!conversation) return;
-        const updatFileds: Record<string, number> = {}
-        conversation.participants.forEach(p => {
-            const PId = p.userId.toString();
-            if (PId !== senderId) {
-                updatFileds[`unreadCount.${PId}`] = 1;
-            }
-        });
-        if (Object.keys(updatFileds).length > 0) {
-            await this.model.findByIdAndUpdate(conversationId, {
-                $inc: updatFileds
-            }).exec()
-        }
-
-    }
-
-    async resetUnreadCount(conversationId: string, userId: string): Promise<void> {
-        const updateKey = `unreadCount.${userId}`;//computed property name
-        await this.model.findByIdAndUpdate(conversationId, {
-            $set: { [updateKey]: 0 } // if we dirctly use updatekey porperty name key name will store as update key not the actual value thats why we use in array
-        }).exec()
-    }
+   
+  
 
 
 }
