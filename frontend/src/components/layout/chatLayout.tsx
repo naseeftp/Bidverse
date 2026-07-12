@@ -121,16 +121,7 @@ export const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ roleTheme }) => {
               <p className="text-xs font-bold uppercase tracking-wider text-[#1F1F1F]">{activePatnerName}</p>
             </div>
             <div className="flex-1 p-6 overflow-y-auto space-y-4">
-              <div className="flex justify-start">
-                <div className="bg-white border border-[#E6E0DA] text-xs p-3 rounded-2xl max-w-md shadow-sm">
-                  Hello! How can I assist you with your current auction listing pipeline rules?
-                </div>
-              </div>
-              <div className="flex justify-end">
-                <div className={`text-xs p-3 rounded-2xl max-w-md shadow-sm ${currentStyle.activeBubble}`}>
-                  I need clarification regarding the bidding cycle expiration parameters.
-                </div>
-              </div>
+             
             </div>
             <div className="p-4 bg-white border-t border-[#E6E0DA] flex items-center gap-2">
               <input

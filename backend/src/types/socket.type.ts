@@ -21,6 +21,7 @@ export interface ServerToClientEvents{  // this events emitted by backend and fr
 }
 
 export interface ClientToServerEvents{
+    'message:send':(data:{conversationId:string;content:string})=>void;
     'user:online':(userId:string)=>void;
     "conversation:join": (conversationId: string) => void;//sent when user clicks a chat from their inbox list side bar  
     "conversation:leave": (conversationId: string) => void;//Sent when a user closes a chat screen or switches tabs.
@@ -30,5 +31,5 @@ export interface ClientToServerEvents{
 
 export interface SocketData {
     userId: string;
-    role: roles;
+    role: roles;             //Structure for custom variables attached directly to the network connection
 }

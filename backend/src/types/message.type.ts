@@ -1,4 +1,4 @@
-import { Document, Schema } from "mongoose";
+import { Document, Schema,Types} from "mongoose";
 import { roles } from "./user.type";
 
 export interface IMessageAttachment {
@@ -10,14 +10,14 @@ export interface IMessageAttachment {
 export type MessageFormat = 'text' | 'image' | 'video' | 'audio' | 'file';
 
 export interface IMessageDocument extends Document {
-    conversationId: Schema.Types.ObjectId;
-    senderId: Schema.Types.ObjectId;
+    conversationId: Types.ObjectId;
+    senderId: Types.ObjectId;
     senderRole: roles;
     content?: string;     // Optional if the message is purely a file attachment
     attachment?: IMessageAttachment;
     messageType: MessageFormat;
-    readBy: Schema.Types.ObjectId[];
-    deletedFor: Schema.Types.ObjectId[];
+    readBy: Types.ObjectId[];
+    deletedFor: Types.ObjectId[];
     isDeletedForEveryone: boolean;
     createdAt: Date;
     updatedAt: Date;
