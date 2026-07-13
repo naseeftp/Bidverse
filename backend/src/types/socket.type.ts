@@ -1,8 +1,8 @@
-import { IMessageDocument } from "./message.type";
+import { MessageDto } from "../dtos/user.dto/chat.dto";
 import { roles } from "./user.type";
 
 export interface ServerToClientEvents{  // this events emitted by backend and frontend should listen
-    'message:receive':(message:IMessageDocument)=>void;//emited when new chat message arrives when userA sends a message the server process it and broadcast to userB,User B's react frontend for 'message:receive' events to instantly append this new message without page refresh
+    'message:receive':(message:MessageDto)=>void;//emited when new chat message arrives when userA sends a message the server process it and broadcast to userB,User B's react frontend for 'message:receive' events to instantly append this new message without page refresh
     'message:error':(data:{error:string})=>void;//event emitted when something worong during the socket opearation
      'conversation:updated':(data:{  //emitted to update the chat sidebar inbox list parameters  when a new message arrives your side bar need to resort itself to put the most recent conversation at the top
         conversationId:string;

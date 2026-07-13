@@ -50,7 +50,7 @@ export class ChatService implements IChatService{
        const {conversationId,content}=payload
        const conversation=await this._conversationRepo.findById(conversationId);
        if(!conversation){
-         throw new NotFoundError('conversation not found')//change to message constant
+         throw new NotFoundError(MESSAGES.CONV_NOT_FOUND)
        }
        const isParticipant=conversation.participants.some((p)=>p.userId.toString()===senderId)
        if(!isParticipant){
@@ -64,13 +64,30 @@ export class ChatService implements IChatService{
 
        });
        const mappedMessage=ChatMapper.toMessageDocumentToDTO(newMessage)
-       // add logic to update last message snippet in db
        const senderSocketId=socketService.getUserSocketId(senderId)
        if(senderSocketId){
-         socketService.emitToRoomExcluding(conversationId,senderSocketId,'message:receive',newMessage)
+         socketService.emitToRoomExcluding(conversationId,senderSocketId,'message:receive',mappedMessage)
        }
-       //add event logic to update the side bar logic to update the snippet
+       else {
+         socketService.emitToRoom(conversationId, 'message:receive', mappedMessage);
+   }
        return mappedMessage
     }
+
+    async getMessages(conversationId: string): Promise<MessageDto[]> {
+       const isConversationExist=await this._conversationRepo.findById(conversationId);
+       if(!isConversationExist){
+         throw new NotFoundError(MESSAGES.CONV_NOT_FOUND)
+       }
+       const messages=await this._messageRepo.findAll({conversationId:conversationId})
+       if(!messages){
+       throw new NotFoundError('Messages not found')
+       }
+       const mappedMessages:MessageDto[]=messages.map((message)=>
+         ChatMapper.toMessageDocumentToDTO(message)
+      )
+      return mappedMessages
+    }
+    
     
 }

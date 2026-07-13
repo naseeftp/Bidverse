@@ -45,4 +45,13 @@ export class ChatController implements IChatController{
             next(error)
         }
     }
+    async getMessages(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const conversationId=req.params.id as string;
+            const response=await this._ChatService.getMessages(conversationId)
+            SuccessResponse(res,'messages retrieved',response,HttpStatus.OK)
+        } catch (error) {
+            next(error)
+        }
+    }
 }
