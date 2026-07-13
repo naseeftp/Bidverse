@@ -1,11 +1,12 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { Bell, User} from "lucide-react";
+import { Bell, User,MessageCircle} from "lucide-react";
 import { useAppSelector } from '../../../hooks/redux.hooks'
+import { useNavigate } from "react-router-dom";
 
 const TenantNavbar: React.FC = () => {
   const { isAuthenticated, user } = useAppSelector((state) => state.auth);
-
+  const navigate=useNavigate()
   return (
     <nav className="h-20 bg-white border-b border-[#E2E8F0] px-8 flex items-center justify-between sticky top-0 z-30">
 
@@ -25,6 +26,12 @@ const TenantNavbar: React.FC = () => {
           <div className="flex items-center gap-8">
             <button className="text-[#64748B] hover:text-[#2F6FED] transition-colors relative">
               <Bell size={20} strokeWidth={2} />
+              <span className="absolute top-0 right-0 w-2 h-2 bg-[#EF4444] rounded-full border-2 border-white"></span>
+            </button>
+             <button
+             onClick={()=>navigate('/tenant/chat')}
+             className="text-[#64748B] hover:text-[#2F6FED] transition-colors relative">
+              <MessageCircle size={20} strokeWidth={2} />
               <span className="absolute top-0 right-0 w-2 h-2 bg-[#EF4444] rounded-full border-2 border-white"></span>
             </button>
 

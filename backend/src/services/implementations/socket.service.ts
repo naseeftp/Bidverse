@@ -2,10 +2,7 @@ import { Server as SocketIOServer, Socket } from 'socket.io';
 import { Server as HttpServer } from 'http';
 import { env } from '../../config/env';
 import { ServerToClientEvents, ClientToServerEvents, SocketData } from '../../types/socket.type';
-import { IMessageDocument } from '../../types/message.type';
-import mongoose from 'mongoose';
-import { Message } from '../../models/message.model';
-import { MessageType } from '../../constants/constants';
+
 
 
 type TypedSocket = Socket<ClientToServerEvents, ServerToClientEvents, Record<string, never>, SocketData>
@@ -36,12 +33,12 @@ export class SocketService {
         };
         this._io.on('connection', (socket: TypedSocket) => {
             const userId = socket.handshake.auth.userId;
-            const role=socket.handshake.auth.role;
+            const role = socket.handshake.auth.role;
             if (userId) {
                 this._onlineUsers.set(userId, socket.id);
                 socket.data.userId = userId;
-                if(role){
-                    socket.data.role=role;
+                if (role) {
+                    socket.data.role = role;
                 }
                 this._io?.emit('user:status', { userId: userId, isOnline: true });
             }
@@ -53,47 +50,76 @@ export class SocketService {
                 const targetRoom = `room:${conversationId}`;
                 socket.leave(targetRoom)
             });
-            socket.on('message:send', async (data: { conversationId: string, content: string }) => {
-                try {
-                    const senderId = socket.data.userId;
-                    const sendRole = socket.data.role;
-                    if (!senderId||sendRole) {
-                        socket.emit('message:error', { error: "Authentication missing or profile role unspecified. Message rejected." });
-                        return;
-                    }
-                    const savedMessageDoc: IMessageDocument = await Message.create({
-                        conversationId: new mongoose.Types.ObjectId(data.conversationId),
-                        senderId: new mongoose.Types.ObjectId(senderId),
-                        senderRole: sendRole,
-                        content: data.content,
-                        messageType: MessageType.TEXT,
-                        readBy: [new mongoose.Types.ObjectId(senderId)],
-                        deletedFor: [],
-                        isDeletedForEveryone: false
-                    })
-                    const targetRoom = `room:${data.conversationId}`
-                    this._io?.to(targetRoom).emit('message:receive', savedMessageDoc);
 
-                    this._io?.to(targetRoom).emit('conversation:updated', {
-                        conversationId: data.conversationId,
-                        lastMessageSnippet: data.content.substring(0, 60),
-                        lastMessageAt: savedMessageDoc.createdAt.toISOString()
-                    });
-                } catch {
-                  socket.emit('message:error', { error: "Internal server failed to route your text frame." });
+            socket.on('typing:status', (data) => {
+                const targetRoom = `room:${data.conversationId}`
+                socket.to(targetRoom).emit('typing:status', {
+                    conversationId: data.conversationId,
+                    userId: data.userId,
+                    isTyping: data.isTyping
+                })
+            })
+            socket.on('message:send', (data) => {
+                if (!socket.data.userId) {
+                    socket.emit('message:error', { error: 'Authentication data missing from socket session.' });
+                    return;
                 }
-            });
-            socket.on('disconnect',()=>{
-                if(socket.data.userId){
+            })
+
+            socket.on('disconnect', () => {
+                if (socket.data.userId) {
                     this._onlineUsers.delete(socket.data.userId);
-                    this._io?.emit('user:status',{userId:socket.data.userId,isOnline:false})
+                    this._io?.emit('user:status', { userId: socket.data.userId, isOnline: false })
                 }
             })
 
         });
-        
+
 
     }
+    //methods for backend services and controllers
+    public isUserOnline(userId: string): boolean {
+        return this._onlineUsers.has(userId)
+    }
+    public getUserSocketId(userId: string): string | undefined {
+        return this._onlineUsers.get(userId)
+    }
+    public emitToUser<Ev extends keyof ServerToClientEvents>(
+        userId: string, event: Ev, payload: Parameters<ServerToClientEvents[Ev]>[0]
+    ): void {
+        const socketId = this.getUserSocketId(userId);
+        if (socketId && this._io) {
+            const emitter = this._io.to(socketId) as unknown as {
+                emit: (e: Ev, p: typeof payload) => void;
+            };
+            emitter.emit(event, payload);
+
+        }
+    }
+    public emitToRoom<Ev extends keyof ServerToClientEvents>(conversationId: string, event: Ev, payload: Parameters<ServerToClientEvents[Ev]>[0]): void {
+        if (!this._io) return;
+        const targetRoom = `room:${conversationId}`;
+        const emitter = this._io.to(targetRoom) as unknown as {
+            emit: (e: Ev, p: typeof payload) => void;
+        };
+        emitter.emit(event, payload);
+    }
+
+  public emitToRoomExcluding<Ev extends keyof ServerToClientEvents>(
+        conversationId: string,
+        excludeSocketId: string,
+        event: Ev,
+        payload: Parameters<ServerToClientEvents[Ev]>[0]
+    ): void {
+        if (!this._io) return;
+        const targetRoom = `room:${conversationId}`;
+
+        const emitter = this._io.to(targetRoom).except(excludeSocketId) as unknown as {
+            emit: (e: Ev, p: typeof payload) => void;
+        };
+        emitter.emit(event, payload);
+    }
+  
 }
 
 export const socketService = new SocketService();

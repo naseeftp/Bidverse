@@ -86,7 +86,7 @@ export const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ roleTheme }) => {
           ) : (
             conversations.map((conv) => {
               const isActive = conv._id === activeConversationId;
-              const partner = conv.participants[1];
+              // const partner = conv.participants[1];
 
               return (
                 <button
@@ -96,11 +96,11 @@ export const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ roleTheme }) => {
                     }`}
                 >
                   <div className="w-10 h-10 rounded-xl bg-[#F5F5F5] border border-[#E6E0DA] flex items-center justify-center font-bold text-xs uppercase text-[#6B6B6B]">
-                    {partner?.name?.substring(0, 2) || "CH"}
+                    {activePatnerName!.substring(0, 2) || "CH"}
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between">
-                      <p className="text-xs font-bold text-[#1F1F1F] truncate">{partner?.name || "Anonymous Operator"}</p>
+                      <p className="text-xs font-bold text-[#1F1F1F] truncate">{activePatnerName || "Anonymous Operator"}</p>
                       <span className="text-[10px] text-[#6B6B6B] font-mono">2:05 pm</span>
                     </div>
                     <p className="text-xs text-[#6B6B6B] truncate mt-0.5">

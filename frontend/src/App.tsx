@@ -48,6 +48,7 @@ import CreateAuctionPage from "./pages/tenant/createAuctionPage";
 import TenantAuctions from "./pages/tenant/myAuctions";
 import TenantAuctionDetailPage from "./pages/tenant/auctionDetailPage";
 import TenantEditAuctionPage from "./pages/tenant/updateAuctionPage";
+import TenantChatPage from "./pages/tenant/chatPage";
 
 import AdminLoginPage from "./pages/admin/LoginPage";
 import AdminDashboard from "./pages/admin/Dashboard";
@@ -105,9 +106,9 @@ function App() {
                </Route>
             </Route>
 
-
+             <Route path="/tenant/chat" element={<TenantChatPage/>}/>
             <Route element={<TenantLayout />}>
-
+               
                <Route element={<PublicRoute />}>
                   <Route path="/tenant/register" element={<TenantRegisterPage />} />
                   <Route path="/tenant/verify-otp" element={<TenantVerifyOtpPage />} />
@@ -116,7 +117,7 @@ function App() {
                   <Route path='/tenant/forgot-verify-otp' element={<TenantForgotPassVerifyOtp />} />
                   <Route path="/tenant/reset-password" element={<TenantResetPasswordPage />} />
                </Route>
-
+               
                <Route element={<ProtectedRoute allowedRoles={['tenant']} />}>
                   <Route path="/tenant/dashboard" element={<TenantDashboard />} />
                   <Route path='/tenant/verification-form' element={<TenantVerificationForm />}></Route>
@@ -129,11 +130,12 @@ function App() {
                   <Route path="/tenant/auctions" element={<TenantAuctions/>}/>
                   <Route path="/tenant/auctions/:id" element={<TenantAuctionDetailPage/>}/>
                   <Route path="/tenant/update-auctions/:id" element={<TenantEditAuctionPage/>}/>
+                  
 
                </Route>
 
             </Route>
-
+             
             <Route element={<AdminLayout />}>
                <Route element={<PublicRoute />}>
                   <Route path="/admin" element={<AdminLoginPage />} />
