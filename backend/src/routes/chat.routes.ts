@@ -19,4 +19,9 @@ router.get(
    allowedTo(Role.USER,Role.TENANT),
    (req,res,next)=>chatController.getUserConversations(req,res,next)
 )
+router.post(
+   CHAT_ROUTES.SEND_MESSAGE,
+   allowedTo(Role.USER,Role.TENANT,Role.ADMIN),
+   (req,res,next)=>chatController.sendMessage(req,res,next)
+)
 export default router;

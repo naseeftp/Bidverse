@@ -1,9 +1,9 @@
 import axiosInstance from "../api/axios.instance";
 import { BASE_ROUTES, CHAT_ROUTES } from "../constants/api.constant";
 import type { ApiResponse } from "../types/auth.type";
-import type { ConversationDTO } from "../types/chat.dto";
+import type { ConversationDTO, MessageDto } from "../types/chat.dto";
 import { apiErrorHandler } from "../utils/error.handle";
-
+import type { SendMessageInputDTO } from "../types/chat.dto";
 class ChatService {
     async getOrCreateConversation(data: { receiverId: string, receiverRole: string }) {
         try {
@@ -33,7 +33,19 @@ class ChatService {
 
         }
     }
-
+    async sendMessage(payload:SendMessageInputDTO){
+        try {
+            const url=`${BASE_ROUTES.CHAT}${CHAT_ROUTES.SEND_MESSAGE}`;
+            const response=await axiosInstance.post<MessageDto,ApiResponse<MessageDto>>(url,payload);
+            return{
+                success:true,
+                data:response.data,
+                message:response.message
+            }
+        } catch (error) {
+            return apiErrorHandler(error, 'Failed to send message')
+        }
+    }
 }
 
 export default new ChatService()

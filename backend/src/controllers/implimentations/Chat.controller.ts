@@ -3,7 +3,7 @@ import { IChatService } from "../../services/interface/IChat.service";
 import { Request, Response, NextFunction } from "express";
 import { SuccessResponse } from "../../utils/response.utility";
 import { HttpStatus, MESSAGES } from "../../constants/constants";
-
+import { Role } from "../../dtos/Common.dto";
 
 export class ChatController implements IChatController{
     constructor(
@@ -30,6 +30,17 @@ export class ChatController implements IChatController{
             const userId=req.user.id;
             const result=await this._ChatService.getUserConversations(userId);
             SuccessResponse(res,MESSAGES.LIST_RETRIEVED,result,HttpStatus.OK)
+        } catch (error) {
+            next(error)
+        }
+    }
+    async sendMessage(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const senderId=req.user.id;
+            const senderRole=req.user.role as Role;
+            const payload=req.body;
+            const result=await this._ChatService.sendMessage(senderId,senderRole,payload)
+            SuccessResponse(res,'message sended',result,HttpStatus.CREATED)
         } catch (error) {
             next(error)
         }

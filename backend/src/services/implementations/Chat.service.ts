@@ -1,18 +1,22 @@
 import { IChatService } from "../interface/IChat.service";
 import { IConversationRepository } from "../../repositories/interfaces/IConversation.repository";
 import { IUserRepository } from "../../repositories/interfaces/iUser.repository";
-
-import { ConversationDTO } from "../../dtos/user.dto/chat.dto";
+import { ConversationDTO, MessageDto, SendMessageInputDTO } from "../../dtos/user.dto/chat.dto";
 import { ChatMapper } from "../../mappers/chat.mappers";
-import { BadRequestError, NotFoundError } from "../../errors/AppError";
+import { BadRequestError, NotFoundError, UnauthorizedError } from "../../errors/AppError";
 import { MESSAGES } from "../../constants/constants";
+import { socketService, SocketService } from "./socket.service";
 import { Types } from "mongoose";
+import { IMessageRepository } from "../../repositories/interfaces/IMessage.repository";
+import { Role } from "../../dtos/Common.dto";
 
 export class ChatService implements IChatService{
     constructor(
         private _conversationRepo:IConversationRepository,
         private _userRepo:IUserRepository,
+        private _messageRepo:IMessageRepository
     ){}
+
     async getOrCreateConversation(participants: { userId: string; role: string; }[]): Promise<ConversationDTO> {
      const[participant1,participant2]=participants;
      if(!Types.ObjectId.isValid(participant1.userId)||!Types.ObjectId.isValid(participant2.userId)){
@@ -40,6 +44,33 @@ export class ChatService implements IChatService{
        }
        const conversations=await this._conversationRepo.findAllForUser(userId)
        return conversations.map((conv)=>ChatMapper.toConversationDto(conv,userId))
+    }
+
+    async sendMessage(senderId: string, senderRole:Role, payload: SendMessageInputDTO): Promise<MessageDto> {
+       const {conversationId,content}=payload
+       const conversation=await this._conversationRepo.findById(conversationId);
+       if(!conversation){
+         throw new NotFoundError('conversation not found')//change to message constant
+       }
+       const isParticipant=conversation.participants.some((p)=>p.userId.toString()===senderId)
+       if(!isParticipant){
+         throw new UnauthorizedError('Not memeber of this conversation')
+       }
+       const newMessage=await this._messageRepo.create({
+         conversationId:new Types.ObjectId(conversationId),
+          senderId:new Types.ObjectId(senderId),
+          senderRole,
+          content:content?.trim()
+
+       });
+       const mappedMessage=ChatMapper.toMessageDocumentToDTO(newMessage)
+       // add logic to update last message snippet in db
+       const senderSocketId=socketService.getUserSocketId(senderId)
+       if(senderSocketId){
+         socketService.emitToRoomExcluding(conversationId,senderSocketId,'message:receive',newMessage)
+       }
+       //add event logic to update the side bar logic to update the snippet
+       return mappedMessage
     }
     
 }

@@ -1,6 +1,9 @@
 import { ConversationDTO,ParticipantDTO} from "../dtos/user.dto/chat.dto";
 import { IConversation } from "../types/conversation.type";
 import { Types } from "mongoose";
+import { IMessageDocument } from "../types/message.type";
+import { MessageDto } from "../dtos/user.dto/chat.dto";
+import { MessageType } from "../constants/constants";
 
 export interface IPopulatedParticipantDoc{
     userId:{
@@ -31,6 +34,27 @@ static toConversationDto(conv:IConversation,currrentUserId?:string):Conversation
         createdAt:conv.createdAt,
         updatedAt:conv.updatedAt
     }
+}
+static toMessageDocumentToDTO(doc:IMessageDocument):MessageDto{
+    return {
+        _id: doc._id.toString(),
+        conversationId: doc.conversationId.toString(),
+        senderId: doc.senderId.toString(),
+        senderRole: doc.senderRole,
+        content: doc.content || '',
+        messageType: doc.messageType as MessageType,
+        attachment: doc.attachment ? {
+            url: doc.attachment.url,
+            fileName: doc.attachment.fileName,
+            fileSize: doc.attachment.fileSize,
+            mimeType: doc.attachment.mimeType
+        } : null,
+        isDeletedForEveryone: doc.isDeletedForEveryone,
+        readBy: Array.isArray(doc.readBy) 
+            ? doc.readBy.map(id => id.toString()) 
+            : [],
+        createdAt:doc.createdAt ? new Date(doc.createdAt) : new Date(),
+    };
 }
 
 }

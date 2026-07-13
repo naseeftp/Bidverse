@@ -4,6 +4,7 @@ import type { ConversationDTO } from "../../types/chat.dto";
 import chatService from "../../services/chat.service";
 import toast from "react-hot-toast";
 import { useAppSelector } from "../../hooks/redux.hooks";
+import { getSocket } from "../../services/socket.service";
 
 interface ChatWorkspaceProps {
   roleTheme: 'user' | 'tenant' | 'admin';
@@ -38,12 +39,13 @@ export const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ roleTheme }) => {
   const activeConversationId = searchParams.get('conversationId')
   const [loading, setLoading] = useState<Boolean>(true)
   const currentStyle = THEME_STYLES[roleTheme]
-  
+  const [typedMessage,setTypedMessage]=useState<string>('')
+
   const {user}=useAppSelector((state)=>state.auth)
   const currentUserId=user?.userId;
-  const activeConversation=conversations.find((conv)=>conv._id==activeConversationId)
-  const activeChatPartner=activeConversation?.participants.find((p)=>p.userId!=currentUserId)
-  const activePatnerName=activeChatPartner?.name
+ const activeConversation = conversations.find((conv) => conv._id === activeConversationId);
+  const activeChatPartner = activeConversation?.participants.find((p) => p.userId !== currentUserId);
+  const activePartnerName = activeChatPartner?.name || "Anonymous Operator";
   useEffect(() => {
     const fetchConversations = async () => {
       try {
@@ -62,6 +64,29 @@ export const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ roleTheme }) => {
     };
     fetchConversations()
   }, [])
+  //handle fetchmessages here->
+  
+  const handleSendMessage=async()=>{
+    if(!typedMessage.trim()||!activeConversationId) return;
+    const messageContent=typedMessage.trim();
+    setTypedMessage('');
+    try {
+      const response=await chatService.sendMessage({
+        conversationId:activeConversationId,
+        content:messageContent,
+        messageType:'text'
+      });
+      if(response.success&&response.data){
+        toast.success('message sended')
+        // add the logic for updating the last snippet locally
+      }else{
+        toast.error(response.message)
+      }
+    } catch {
+      toast.error("Message could not send");
+    }
+  }
+
   const handleSelectConversation = (id: string) => {
     setSearchParams({ conversationId: id })
   }
@@ -86,8 +111,8 @@ export const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ roleTheme }) => {
           ) : (
             conversations.map((conv) => {
               const isActive = conv._id === activeConversationId;
-              // const partner = conv.participants[1];
-
+              const chatPartner=conv.participants.find((p)=>p.userId!=currentUserId)
+              const partnerName=chatPartner?.name||'AnonyMous user'
               return (
                 <button
                   key={conv._id}
@@ -96,11 +121,11 @@ export const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ roleTheme }) => {
                     }`}
                 >
                   <div className="w-10 h-10 rounded-xl bg-[#F5F5F5] border border-[#E6E0DA] flex items-center justify-center font-bold text-xs uppercase text-[#6B6B6B]">
-                    {activePatnerName!.substring(0, 2) || "CH"}
+                    {partnerName.substring(0, 2) || "CH"}
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between">
-                      <p className="text-xs font-bold text-[#1F1F1F] truncate">{activePatnerName || "Anonymous Operator"}</p>
+                      <p className="text-xs font-bold text-[#1F1F1F] truncate">{partnerName || "Anonymous Operator"}</p>
                       <span className="text-[10px] text-[#6B6B6B] font-mono">2:05 pm</span>
                     </div>
                     <p className="text-xs text-[#6B6B6B] truncate mt-0.5">
@@ -118,7 +143,7 @@ export const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ roleTheme }) => {
           <div className="flex-1 flex flex-col h-full">
             <div className="p-4 bg-white border-b border-[#E6E0DA] flex items-center gap-3">
               <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
-              <p className="text-xs font-bold uppercase tracking-wider text-[#1F1F1F]">{activePatnerName}</p>
+              <p className="text-xs font-bold uppercase tracking-wider text-[#1F1F1F]">{activePartnerName}</p>
             </div>
             <div className="flex-1 p-6 overflow-y-auto space-y-4">
              
@@ -126,10 +151,14 @@ export const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ roleTheme }) => {
             <div className="p-4 bg-white border-t border-[#E6E0DA] flex items-center gap-2">
               <input
                 type="text"
+                value={typedMessage}
+                onChange={(e)=>setTypedMessage(e.target.value)}
                 placeholder="Type a message..."
                 className="flex-1 bg-[#FFF9F4] border border-[#E6E0DA] rounded-xl px-4 py-3 text-xs text-[#1F1F1F] focus:outline-none focus:border-[#C9653B]/60 transition-all"
               />
-              <button className={`px-5 py-3 text-xs font-bold uppercase tracking-wider text-white rounded-xl transition-all active:scale-95 cursor-pointer ${currentStyle.accent}`}>
+              <button 
+              onClick={handleSendMessage}
+              className={`px-5 py-3 text-xs font-bold uppercase tracking-wider text-white rounded-xl transition-all active:scale-95 cursor-pointer ${currentStyle.accent}`}>
                 Send
               </button>
             </div>

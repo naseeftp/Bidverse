@@ -19,7 +19,12 @@ export interface AttachmentDTO{
     fileSize: number;
     mimeType: string
 }
-
+export interface SendMessageInputDTO{
+    conversationId:string;
+    content?:string;
+    attachement?:AttachmentDTO|null;
+    messageType?:MessageType
+}
 export interface ConversationDTO{
     _id:string;
     participants:ParticipantDTO[];
