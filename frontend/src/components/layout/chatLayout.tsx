@@ -98,7 +98,7 @@ export const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ roleTheme }) => {
       }
     }
      fetchMessages()
-     const socket=getSocket();
+     const socket=getSocket(user?.userId,user?.role);
      socket.emit('conversation:join',activeConversationId)
      socket.on('message:receive',(newMessage:MessageDto)=>{
            if(newMessage.conversationId===activeConversationId){
@@ -130,7 +130,16 @@ export const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ roleTheme }) => {
         messageType: 'text'
       });
       if (response.success && response.data) {
-         
+         const newMessage = response.data;
+         setMessages((prev) => [...prev, newMessage]);
+         setConversation((prevConv) =>
+           prevConv.map((c) =>
+            c._id === activeConversationId
+              ? { ...c, lastMessageSnippet: newMessage.content }
+              : c
+          )
+        );
+       
       } else {
         toast.error(response.message)
       }
@@ -197,7 +206,7 @@ export const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ roleTheme }) => {
         </div>
       </div>
 
-      {/* Main Workspace Frame */}
+    
       <div className={`flex-1 flex flex-col ${currentStyle.bgLight}`}>
         {activeConversationId ? (
           <div className="flex-1 flex flex-col h-full">
@@ -220,7 +229,7 @@ export const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ roleTheme }) => {
                       className={`flex flex-col max-w-[70%] text-xs p-3 rounded-2xl shadow-sm tracking-wide ${
                         isSelf 
                           ? `${currentStyle.activeBubble} self-end rounded-tr-none` 
-                          : `${currentStyle.peerBubble} self-start rounded-tl-none` // FIX: Using fixed peerBubble theme
+                          : `${currentStyle.peerBubble} self-start rounded-tl-none` 
                       }`}
                     >
                       <p className="leading-relaxed">{msg.content}</p>
@@ -231,17 +240,17 @@ export const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ roleTheme }) => {
                   );
                 })
               )}
-              {/* Target baseline anchor point element used for scrolling */}
+            
               <div ref={messagesEndRef} />
             </div>
 
-            {/* Input Footer Controls */}
+          
             <div className="p-4 bg-white border-t border-[#E6E0DA] flex items-center gap-2">
               <input
                 type="text"
                 value={typedMessage}
                 onChange={(e) => setTypedMessage(e.target.value)}
-                onKeyDown={handleKeyDown} // FIX: Bound Enter key event trigger
+                onKeyDown={handleKeyDown} 
                 placeholder="Type a message..."
                 className="flex-1 bg-[#FFF9F4] border border-[#E6E0DA] rounded-xl px-4 py-3 text-xs text-[#1F1F1F] focus:outline-none focus:border-[#C9653B]/60 transition-all"
               />

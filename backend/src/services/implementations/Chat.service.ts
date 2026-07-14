@@ -63,6 +63,10 @@ export class ChatService implements IChatService{
           content:content?.trim()
 
        });
+       const updatingData={
+         _id:conversationId,lastMessageSnippet:content?.trim(),lastMessage:senderId,lastMessageAt:Date.now()
+       }
+       await conversation.updateOne(updatingData)
        const mappedMessage=ChatMapper.toMessageDocumentToDTO(newMessage)
        const senderSocketId=socketService.getUserSocketId(senderId)
        if(senderSocketId){
@@ -70,7 +74,7 @@ export class ChatService implements IChatService{
        }
        else {
          socketService.emitToRoom(conversationId, 'message:receive', mappedMessage);
-   }
+      }
        return mappedMessage
     }
 
