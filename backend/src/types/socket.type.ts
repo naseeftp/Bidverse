@@ -27,6 +27,7 @@ export interface ClientToServerEvents{
     "conversation:leave": (conversationId: string) => void;//Sent when a user closes a chat screen or switches tabs.
     "typing:status": (data: { conversationId: string; userId: string; isTyping: boolean }) => void;
     "messages:read": (data: { conversationId: string; userId: string }) => void;
+    'users:get_online':(callback:(onlineIds:string[])=>void)=>void
 }
 
 export interface SocketData {

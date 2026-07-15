@@ -46,6 +46,7 @@ export const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ roleTheme }) => {
   const [messages,setMessages]=useState<MessageDto[]>([])
   const [messagesLoading, setMessagesLoading] = useState<Boolean>(false);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
+  const [onlineUsers,setOnlineUsers]=useState<string[]>([])
 
   const { user } = useAppSelector((state) => state.auth)
   const currentStyle = THEME_STYLES[roleTheme]
@@ -53,13 +54,15 @@ export const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ roleTheme }) => {
   const activeConversation = conversations.find((conv) => conv._id === activeConversationId);
   const activeChatPartner = activeConversation?.participants.find((p) => p.userId !== currentUserId);
   const activePartnerName = activeChatPartner?.name || "Anonymous Operator";
-  
+  const isPartnerOnline= activeChatPartner? onlineUsers.includes(activeChatPartner.userId):false
+
   const scrollToBottom=()=>{
     messagesEndRef.current?.scrollIntoView({behavior:'smooth'})
   }
   useEffect(()=>{
     scrollToBottom();
   },[messages])
+
   useEffect(() => {
     const fetchConversations = async () => {
       try {
@@ -78,7 +81,8 @@ export const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ roleTheme }) => {
     };
     fetchConversations()
   }, [])
-  
+ 
+  //  need to add global status connection handler 
   useEffect(()=>{
     if(!activeConversationId) return;
     const fetchMessages=async()=>{

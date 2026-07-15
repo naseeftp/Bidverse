@@ -97,12 +97,12 @@ const Navbar: React.FC = () => {
                 className="relative p-2 text-[#6B6B6B] hover:text-[#C9653B] hover:bg-[#FFF9F4] rounded-xl transition-all duration-300 group cursor-pointer focus:outline-none"
               >
                 <MessageCircle size={18} className="transition-transform group-hover:scale-105" />
-                
+{/*                 
                 {watchlistCount > 0 && (
                   <span className="absolute top-0.5 right-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-[#C9653B] text-[9px] font-black text-white ring-2 ring-white animate-in scale-in-50 duration-200 select-none">
                     {watchlistCount}
                   </span>
-                )}
+                )} */}
               </button>
               
               <div className="relative hidden md:block" ref={dropdownRef}>
