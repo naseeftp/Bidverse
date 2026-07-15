@@ -1,5 +1,5 @@
-  import { z } from "zod";
-import { TVerificationStatus,TAuctionHouseCategory} from "../../types/auctionhouse.type";
+import { z } from "zod";
+import { TVerificationStatus, TAuctionHouseCategory } from "../../types/auctionhouse.type";
 import { AuctionHouseCategory } from "../../constants/constants";
 import { AuctionItemListDTO } from "./auctionItem.dto";
 
@@ -102,8 +102,8 @@ export const changeBusinessDetailsSchema = z.object({
     .max(50, 'City name too long'),
 
   fullAddress: z.string()
-      .min(5, 'Full address required')
-      .max(255, 'Address is too long'),
+    .min(5, 'Full address required')
+    .max(255, 'Address is too long'),
 
 })
 
@@ -150,7 +150,7 @@ export interface AdminAuctionHouseDetailDTO {
   businessName: string | null;
   yearEstablished: number | null;
   briefDescription: string | null;
-  category:TAuctionHouseCategory[]
+  category: TAuctionHouseCategory[]
   address: {
     city: string;
     state: string;
@@ -178,21 +178,21 @@ export interface AdminAuctionHouseDetailDTO {
 }
 
 export interface AuctionHouseProfileDTO {
-    id: string;
-    name: string;
-    profileImage:string,
-    ownerId?:string;
-    yearEstablished: number;
-    briefDescription: string;
-    categories: string[];
-    city: string;
-    state: string;
-    country: string;
-    fullAddress: string;
-    primaryContactName: string;
-    businessEmail: string;
-    phone: string;
-    isVerified: boolean;
+  id: string;
+  name: string;
+  profileImage: string,
+  ownerId?: string;
+  yearEstablished: number;
+  briefDescription: string;
+  categories: string[];
+  city: string;
+  state: string;
+  country: string;
+  fullAddress: string;
+  primaryContactName: string;
+  businessEmail: string;
+  phone: string;
+  isVerified: boolean;
 }
 // export interface AuctionItemDTO {
 //     auctionItemId: string;
@@ -212,10 +212,10 @@ export interface AuctionHouseProfileDTO {
 // }
 
 export interface PublicAuctionHouseDetailDTO {
-    auctionHouse: AuctionHouseProfileDTO;
-    items: AuctionItemListDTO[];
+  auctionHouse: AuctionHouseProfileDTO;
+  items: AuctionItemListDTO[];
 }
 
 
 export type AuctionHouseVerificationDTO = z.infer<typeof AuctionHouseVerificationSchema>
-export type ChangeBusinessDetailsDTO=z.infer<typeof changeBusinessDetailsSchema>
+export type ChangeBusinessDetailsDTO = z.infer<typeof changeBusinessDetailsSchema>

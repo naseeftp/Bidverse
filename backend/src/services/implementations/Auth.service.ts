@@ -17,7 +17,7 @@ export class AuthService implements IAuthService {
     constructor(private _userRepository: IUserRepository, private _logger: ILoggerService, private _otpService: IOTPService) { }
 
     async register(data: RegisterUserDTO, purpose: otpPurpose): Promise<{ email: string; expiresAt: Date }> {
-        if(data.name.trim().length===0){
+        if (data.name.trim().length === 0) {
             throw new ValidationError(MESSAGES.VALID_NAME)
         }
         await this._checkUserDoesNotExist(data.email, data.phone)
@@ -36,7 +36,7 @@ export class AuthService implements IAuthService {
             CONFIG.OTP_EXPIRY_MINUTES,
             purpose
         )
-        return { email: data.email, expiresAt: otpresult.expiresAt}
+        return { email: data.email, expiresAt: otpresult.expiresAt }
 
     }
     async verifyOtp(data: VerifyotpDTO): Promise<AuthResponseDTO<UserResponseDTO> | { email: string; message: string; verified: boolean; resetToken: string }> {

@@ -7,7 +7,7 @@ const UserSchema = new Schema<IUserDocument>({
     name: {
         type: String,
         required: true,
-        trim:true
+        trim: true
     },
     email: {
         type: String,
@@ -40,9 +40,9 @@ const UserSchema = new Schema<IUserDocument>({
         default: true,
 
     },
-    BlockingReson:{
-        type:String,
-        default:null,
+    BlockingReson: {
+        type: String,
+        default: null,
         required: false,
     },
     passwordResetToken: {

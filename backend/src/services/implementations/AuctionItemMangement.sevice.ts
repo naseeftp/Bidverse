@@ -9,137 +9,137 @@ import { IAuctionItem } from "../../types/auctionItem.type";
 import { AuctionItemMapper } from "../../mappers/auctionItem.mapper";
 import { IGenericPaginatedResposnse } from "../../types/response.type";
 
-export class AuctionItemMangementSevice implements IAuctionItemMangementSevice{
+export class AuctionItemMangementSevice implements IAuctionItemMangementSevice {
     constructor(
-        private _auctionItemRepo:IAuctionItemRepository,
-        private _auctionHouseRepo:IAuctionHouseRepository,
-        private _logger:ILoggerService
-    ){}
+        private _auctionItemRepo: IAuctionItemRepository,
+        private _auctionHouseRepo: IAuctionHouseRepository,
+        private _logger: ILoggerService
+    ) { }
 
     async createAuction(userId: string, data: CreateAuctionItemDTO): Promise<AuctionItemResponseDTO> {
-        this._logger.info('auction item creation requested',{houseowner:userId})
-        const houseExist=await this._auctionHouseRepo.findOne({userId:userId});
-        this._logger.info('auction house exist',{house:houseExist})
-        if(!houseExist){
+        this._logger.info('auction item creation requested', { houseowner: userId })
+        const houseExist = await this._auctionHouseRepo.findOne({ userId: userId });
+        this._logger.info('auction house exist', { house: houseExist })
+        if (!houseExist) {
             throw new NotFoundError(MESSAGES.AUCTION_HOUSE_NOT_FOUND)
         }
-        const houseId=houseExist._id;
-        if(!houseExist.isVerified){
+        const houseId = houseExist._id;
+        if (!houseExist.isVerified) {
             throw new ForbiddenError(MESSAGES.NOT_PERMITTED)
         }
-       const auctionItemData:Partial<IAuctionItem>={
-        ...data,
-        houseId:houseId,
-        status:AuctionItemStatus.PENDING_APPROVAL,
-        isApproved:false,
-        currentHighestBid:0,
-        images:data.images.map(img=>({
-            id:img.id,
-            url:img.url,
-            isPrimary:img.isPrimary,
-            altText:img.altText
-        }))
-       }
-       const createdItem=await this._auctionItemRepo.create(auctionItemData)
-       const hydratedObject = createdItem.toObject ? createdItem.toObject() : createdItem;
-       return AuctionItemMapper.toResponseDTO(hydratedObject)
+        const auctionItemData: Partial<IAuctionItem> = {
+            ...data,
+            houseId: houseId,
+            status: AuctionItemStatus.PENDING_APPROVAL,
+            isApproved: false,
+            currentHighestBid: 0,
+            images: data.images.map(img => ({
+                id: img.id,
+                url: img.url,
+                isPrimary: img.isPrimary,
+                altText: img.altText
+            }))
+        }
+        const createdItem = await this._auctionItemRepo.create(auctionItemData)
+        const hydratedObject = createdItem.toObject ? createdItem.toObject() : createdItem;
+        return AuctionItemMapper.toResponseDTO(hydratedObject)
     }
-    async listAdminAuctions(page: number, limit: number, search?: string,status?:string,type?:string): Promise<IGenericPaginatedResposnse<AuctionItemListDTO>> {
-        const {auctions,total}=await this._auctionItemRepo.listAllAuctionItems(page,limit,search,status,type)
-        return{
-            data:auctions,
-            pagination:{
-                totalItems:total,
-                itemsPerPage:limit,
-                currentPage:page,
-                totalPages:Math.ceil(total/limit),
-                hasNextPage:page*limit<total,
-                hasPrevPage:page>1
+    async listAdminAuctions(page: number, limit: number, search?: string, status?: string, type?: string): Promise<IGenericPaginatedResposnse<AuctionItemListDTO>> {
+        const { auctions, total } = await this._auctionItemRepo.listAllAuctionItems(page, limit, search, status, type)
+        return {
+            data: auctions,
+            pagination: {
+                totalItems: total,
+                itemsPerPage: limit,
+                currentPage: page,
+                totalPages: Math.ceil(total / limit),
+                hasNextPage: page * limit < total,
+                hasPrevPage: page > 1
             }
         }
     }
-    async listTenantAuctions(page:number,limit:number,search?:string,status?:string,type?:string, userId?: string): Promise<IGenericPaginatedResposnse<AuctionItemListDTO>> {
-        const house=await this._auctionHouseRepo.findOne({userId:userId});
-        if(!house){
+    async listTenantAuctions(page: number, limit: number, search?: string, status?: string, type?: string, userId?: string): Promise<IGenericPaginatedResposnse<AuctionItemListDTO>> {
+        const house = await this._auctionHouseRepo.findOne({ userId: userId });
+        if (!house) {
             throw new NotFoundError(MESSAGES.AUCTION_HOUSE_NOT_FOUND)
         };
-        const houseId=house._id as unknown as string;
-        const {auctions,total}=await this._auctionItemRepo.listAllAuctionItems(page,limit,search,status,type,houseId)
-          return{
-            data:auctions,
-            pagination:{
-                totalItems:total,
-                itemsPerPage:limit,
-                currentPage:page,
-                totalPages:Math.ceil(total/limit),
-                hasNextPage:page*limit<total,
-                hasPrevPage:page>1
+        const houseId = house._id as unknown as string;
+        const { auctions, total } = await this._auctionItemRepo.listAllAuctionItems(page, limit, search, status, type, houseId)
+        return {
+            data: auctions,
+            pagination: {
+                totalItems: total,
+                itemsPerPage: limit,
+                currentPage: page,
+                totalPages: Math.ceil(total / limit),
+                hasNextPage: page * limit < total,
+                hasPrevPage: page > 1
             }
         }
     }
-    
+
     async getAuctionDetails(itemId: string): Promise<AuctionItemDetailDTO | null> {
-        const auction=await this._auctionItemRepo.findById(itemId);
-        if(!auction){
+        const auction = await this._auctionItemRepo.findById(itemId);
+        if (!auction) {
             throw new NotFoundError(MESSAGES.AUCTION_NOT_FOUND)
         }
-        const result=await this._auctionItemRepo.getAuctionItemDetails(itemId);
+        const result = await this._auctionItemRepo.getAuctionItemDetails(itemId);
         return result
     }
     async updateAuctionStatus(data: updateAuctionStatusDTO): Promise<AuctionItemResponseDTO> {
-        const {itemId,status,reason}=data;
-        const auction= await this._auctionItemRepo.findById(itemId);
-        if(!auction){
+        const { itemId, status, reason } = data;
+        const auction = await this._auctionItemRepo.findById(itemId);
+        if (!auction) {
             throw new NotFoundError(MESSAGES.AUCTION_NOT_FOUND)
         }
         const isApproving = status === AuctionItemStatus.SCHEDULED;
-        const updateData={
-            status:status,
-            rejectionReason:status===AuctionItemStatus.REJECTED?reason:null,
-            isApproved:isApproving,
-            approvedAt:isApproving? new Date():null
-            
+        const updateData = {
+            status: status,
+            rejectionReason: status === AuctionItemStatus.REJECTED ? reason : null,
+            isApproved: isApproving,
+            approvedAt: isApproving ? new Date() : null
+
         }
-        const updatedAuction=await this._auctionItemRepo.updateById(itemId,updateData)
-        if(!updatedAuction){
-           throw new AppError('Failed to update auction') 
+        const updatedAuction = await this._auctionItemRepo.updateById(itemId, updateData)
+        if (!updatedAuction) {
+            throw new AppError('Failed to update auction')
         }
         return AuctionItemMapper.toResponseDTO(updatedAuction)
     }
 
     async editAuction(userId: string, itemId: string, data: UpdateAuctionDTO): Promise<AuctionItemResponseDTO> {
-        this._logger.info('auction item edit requested',{houseOwner:userId,item:itemId});
-        const houseExist=await this._auctionHouseRepo.findOne({userId:userId});
-        if(!houseExist){
+        this._logger.info('auction item edit requested', { houseOwner: userId, item: itemId });
+        const houseExist = await this._auctionHouseRepo.findOne({ userId: userId });
+        if (!houseExist) {
             throw new NotFoundError(MESSAGES.AUCTION_HOUSE_NOT_FOUND)
         }
-        const existingAuction=await this._auctionItemRepo.findById(itemId);
-        if(!existingAuction){
+        const existingAuction = await this._auctionItemRepo.findById(itemId);
+        if (!existingAuction) {
             throw new NotFoundError(MESSAGES.AUCTION_NOT_FOUND)
         }
-        if(existingAuction.houseId.toString()!==houseExist._id.toString()){
+        if (existingAuction.houseId.toString() !== houseExist._id.toString()) {
             throw new ForbiddenError(MESSAGES.NOT_PERMITTED)
         }
-        const uneditableStatuses=[AuctionItemStatus.SCHEDULED, AuctionItemStatus.PASSED, AuctionItemStatus.SOLD];
-        if(uneditableStatuses.includes(existingAuction.status)){
+        const uneditableStatuses = [AuctionItemStatus.SCHEDULED, AuctionItemStatus.PASSED, AuctionItemStatus.SOLD];
+        if (uneditableStatuses.includes(existingAuction.status)) {
             throw new ForbiddenError('Cannot modify an auction item that is scheduled, active, or concluded.');
         }
-        const updatePayload:Partial<IAuctionItem>={
+        const updatePayload: Partial<IAuctionItem> = {
             ...data,
-            status:AuctionItemStatus.PENDING_APPROVAL,
-            isApproved:false,
+            status: AuctionItemStatus.PENDING_APPROVAL,
+            isApproved: false,
 
         }
 
-        if(data.images){
-            updatePayload.images=data.images.map(img => ({
-            id: img.id,
-            url: img.url,
-            isPrimary: img.isPrimary,
-            altText: img.altText
-        }));
+        if (data.images) {
+            updatePayload.images = data.images.map(img => ({
+                id: img.id,
+                url: img.url,
+                isPrimary: img.isPrimary,
+                altText: img.altText
+            }));
         }
-        const updatedItem=await this._auctionItemRepo.updateById(itemId,updatePayload)
+        const updatedItem = await this._auctionItemRepo.updateById(itemId, updatePayload)
         if (!updatedItem) throw new AppError('Failed to execute auction modification updates');
         const hydratedObject = updatedItem.toObject ? updatedItem.toObject() : updatedItem;
         return AuctionItemMapper.toResponseDTO(hydratedObject);

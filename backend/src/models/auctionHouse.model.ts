@@ -23,9 +23,9 @@ const AuctionHouseSchema = new Schema<IAuctionHouseDocument>({
         type: String,
         required: true
     },
-    categories:{
-        type:[String],
-        required:true
+    categories: {
+        type: [String],
+        required: true
     },
     address: {
         city: {

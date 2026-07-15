@@ -10,7 +10,7 @@ import { changeBusinessDetailsSchema } from '../dtos/auctionHouse.dto/auctionHou
 export const ProfileValidators = {
     profileDeatailsChangeValidator: profileDetailChangeSchema,
     changePasswordValidator: changePasswordSchema,
-    changeEmailValidator:changeEmailSchema,
-    changeEmailVerificationValidator:changeEmailVerificationSchema,
-    changeBusinessDetailsValidator:changeBusinessDetailsSchema
+    changeEmailValidator: changeEmailSchema,
+    changeEmailVerificationValidator: changeEmailVerificationSchema,
+    changeBusinessDetailsValidator: changeBusinessDetailsSchema
 }

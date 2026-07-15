@@ -1,7 +1,7 @@
 import express, { Application } from "express";
 import dotenv from "dotenv"
 import { createServer } from "http";//NODE'S NATIVE SERVER WRAPPER
-import { socketService} from "./services/implementations/socket.service";
+import { socketService } from "./services/implementations/socket.service";
 import { env } from './config/env'
 import connectDB from "./config/db";
 import cors from 'cors'
@@ -25,7 +25,7 @@ import { LoggerService } from "./services/implementations/Logger.service";
 dotenv.config()
 const app: Application = express()
 const appLogger = new LoggerService("App")
-const httpServer=createServer(app)//WRAP THE EXPRESS INSTANCE IN AN HTTP SERVER
+const httpServer = createServer(app)//WRAP THE EXPRESS INSTANCE IN AN HTTP SERVER
 
 app.use(cors({
     origin: "http://localhost:5173",
@@ -42,11 +42,11 @@ app.use(BASE_ROUTES.AUTH, authRouter)
 app.use(BASE_ROUTES.AUCTION_HOUSE, auctionHouseRoutes)
 app.use(BASE_ROUTES.ADMIN, adminRoutes)
 app.use(BASE_ROUTES.PROFILE_MANAGEMENT, profileRoutes)
-app.use(BASE_ROUTES.ADDRESS,addressRoutess)
-app.use(BASE_ROUTES.PUBLIC,publicAuctionRoutes)
-app.use(BASE_ROUTES.AUCTION_ITEM,auctionItemRoutes)
-app.use(BASE_ROUTES.WATCH_LIST,WatchlistRoutes)
-app.use(BASE_ROUTES.CHAT,ChatRoutes)
+app.use(BASE_ROUTES.ADDRESS, addressRoutess)
+app.use(BASE_ROUTES.PUBLIC, publicAuctionRoutes)
+app.use(BASE_ROUTES.AUCTION_ITEM, auctionItemRoutes)
+app.use(BASE_ROUTES.WATCH_LIST, WatchlistRoutes)
+app.use(BASE_ROUTES.CHAT, ChatRoutes)
 
 app.use(errorHandler);
 const startServer = async () => {

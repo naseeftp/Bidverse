@@ -56,17 +56,17 @@ export class ProfileController implements IprofileController {
     }
     async changeEmailVerification(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
-            const userId=req.user.id;
-            const result=await this._profileService.changeEmailVerification(userId,req.body)
-            SuccessResponse(res,MESSAGES.EMAIL_UPDATED,result,HttpStatus.OK)
+            const userId = req.user.id;
+            const result = await this._profileService.changeEmailVerification(userId, req.body)
+            SuccessResponse(res, MESSAGES.EMAIL_UPDATED, result, HttpStatus.OK)
         } catch (error) {
             next(error)
         }
     }
     async changeEmailResendOtp(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
-            const result=await this._profileService.changeEmailResendOtp(req.body);
-            SuccessResponse(res,MESSAGES.OTP_RESENT,result,HttpStatus.OK)
+            const result = await this._profileService.changeEmailResendOtp(req.body);
+            SuccessResponse(res, MESSAGES.OTP_RESENT, result, HttpStatus.OK)
         } catch (error) {
             next(error)
         }
@@ -74,19 +74,19 @@ export class ProfileController implements IprofileController {
 
     async changeBusinessDetails(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
-            const userId=req.user.id 
-            const result=await this._profileService.changeBusinessDetails(userId,req.body)
-            SuccessResponse(res,MESSAGES.USER_DETAILS_UPDTD,result,HttpStatus.OK)
+            const userId = req.user.id
+            const result = await this._profileService.changeBusinessDetails(userId, req.body)
+            SuccessResponse(res, MESSAGES.USER_DETAILS_UPDTD, result, HttpStatus.OK)
         } catch (error) {
             next(error)
         }
     }
     async updateProfileImage(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
-            const userId=req.user.id;
-           const {profileImage} =req.body
-            const result=await this._profileService.updateProfileImage(userId,profileImage)
-            SuccessResponse(res,MESSAGES.PROFILE_PIC_UPADATED,result,HttpStatus.OK)
+            const userId = req.user.id;
+            const { profileImage } = req.body
+            const result = await this._profileService.updateProfileImage(userId, profileImage)
+            SuccessResponse(res, MESSAGES.PROFILE_PIC_UPADATED, result, HttpStatus.OK)
         } catch (error) {
             next(error)
         }

@@ -18,7 +18,7 @@ export const VerificationStatus = {
     APPROVED: 'approved',
     REJECTED: 'rejected',
     ACTION_REQUIRED: 'action_required',
-    NOT_SUBMITTED:'not_submitted'
+    NOT_SUBMITTED: 'not_submitted'
 }
 
 
@@ -35,21 +35,21 @@ export enum HttpStatus {
     INTERNAL_ERROR = StatusCodes.INTERNAL_SERVER_ERROR,
     GONE = StatusCodes.GONE,
 }
-export enum AddressLabel{
-    HOME='home',
-    OFFICE='office',
-    OTHER='other'
+export enum AddressLabel {
+    HOME = 'home',
+    OFFICE = 'office',
+    OTHER = 'other'
 }
-export const AddressLabelValues=Object.values(AddressLabel)
+export const AddressLabelValues = Object.values(AddressLabel)
 
 export enum AuctionHouseCategory {
-  FINE_ART = 'Fine Art & Antiquities',
-  LUXURY = 'Luxury & Estate Jewelry',
-  AUTOMOTIVE = 'Automotive & Vehicles',
-  REAL_ESTATE = 'Real Estate & Property',
-  INDUSTRIAL = 'Industrial & Heavy Equipment',
-  GENERAL_ESTATE = 'General Estate & Liquidation',
-  DIGITAL_ASSETS = 'Electronics & Digital Assets'
+    FINE_ART = 'Fine Art & Antiquities',
+    LUXURY = 'Luxury & Estate Jewelry',
+    AUTOMOTIVE = 'Automotive & Vehicles',
+    REAL_ESTATE = 'Real Estate & Property',
+    INDUSTRIAL = 'Industrial & Heavy Equipment',
+    GENERAL_ESTATE = 'General Estate & Liquidation',
+    DIGITAL_ASSETS = 'Electronics & Digital Assets'
 }
 
 export const AuctionHouseCategoryValues = Object.values(AuctionHouseCategory);
@@ -81,7 +81,7 @@ export const MESSAGES = {
     INVALID_ID_FORMAT: "Invalid ID format",
     ROUTE_NOT_FOUND: "Route not found",
 
-    VALID_NAME:'Please enter a valid Name',
+    VALID_NAME: 'Please enter a valid Name',
     USER_NOT_ACTIVE: "User is not active",
     USER_NOT_FOUND: "User not found",
     USER_BLOCKED: "Your account has been blocked",
@@ -91,7 +91,7 @@ export const MESSAGES = {
     OTP_RESENT: "OTP resent to your email.",
     REGISTRATION_COMPLETE: "Verification Complete!",
     PASSWORD_RESET_OTP: "OTP sent to your email for password reset.",
-    CHANGE_EMAIL_OTP:"OTP sent to your email for change Email",
+    CHANGE_EMAIL_OTP: "OTP sent to your email for change Email",
     OTP_VERIFIED: "OTP verified successfully",
     PASSWORD_RESET_SUCCESS: "Password reset successful. You can now login with your new password.",
     PASSWORD_CHANGE_SUCCESS: 'Password  Changing successful',
@@ -136,28 +136,28 @@ export const MESSAGES = {
     USER_STTS_UPDTD: 'User status updated successfully',
     USER_DETAILS_UPDTD: 'Details updated successfully',
     USER_DETAILS_UPDTD_FAILED: 'Details updation Failed',
-    PROFILE_PIC_UPADATED:'Profile Picture Updated',
-    EMAIL_UPDATED:'Email updated successfully',
-    ADDRES_NOT_FOUND:'Address Not found',
-    ADDRESS_DELETED:'Address Delated Successfully',
-    ADDRESS_EDITED:'Address Edited Successfully',
-    ADDRESS_CREATED:'Address Created Successfully',
-    NOT_PERMITTED:'You are not permitted to this Action',
-    AUCTION_CREATED:'Auction Created Successfully' ,
-    AUCTION_NOT_FOUND:'Auction Not found',
+    PROFILE_PIC_UPADATED: 'Profile Picture Updated',
+    EMAIL_UPDATED: 'Email updated successfully',
+    ADDRES_NOT_FOUND: 'Address Not found',
+    ADDRESS_DELETED: 'Address Delated Successfully',
+    ADDRESS_EDITED: 'Address Edited Successfully',
+    ADDRESS_CREATED: 'Address Created Successfully',
+    NOT_PERMITTED: 'You are not permitted to this Action',
+    AUCTION_CREATED: 'Auction Created Successfully',
+    AUCTION_NOT_FOUND: 'Auction Not found',
     AUCTION_RETRIEVED: 'Auction Retrieved successfully',
-    AUCTION_STATUS_UPDATED:'Auction status updated',
-    AUCTION_UPDATED:'Auction Details updated Successfully',
-    WATCHLIST_ADDED:'Item Added To WatchList Successfully',
-    WATCHLIST_DELETED:'Item Removed From WatchList Successfully',
-    WATCHLIST_EXISTED:'Item Allredy existed on watchlist',
-    WATCH_LIST_ITEM_NOT_FOUND:'Watchlist record not found',
+    AUCTION_STATUS_UPDATED: 'Auction status updated',
+    AUCTION_UPDATED: 'Auction Details updated Successfully',
+    WATCHLIST_ADDED: 'Item Added To WatchList Successfully',
+    WATCHLIST_DELETED: 'Item Removed From WatchList Successfully',
+    WATCHLIST_EXISTED: 'Item Allredy existed on watchlist',
+    WATCH_LIST_ITEM_NOT_FOUND: 'Watchlist record not found',
 
-    CONV_CREATED:'Conversation finded or created',
-    CONV_NOT_FOUND:'Conversation not found',
-    REQ_USER_NOT_FOUND:'Requested user Not found',
-    RECEIVER_NOT_FOUNS:'Reciever User Not found',
-    TWO_PEOPLE_NEEDED:'A direct conversation must have exactly two participants',
+    CONV_CREATED: 'Conversation finded or created',
+    CONV_NOT_FOUND: 'Conversation not found',
+    REQ_USER_NOT_FOUND: 'Requested user Not found',
+    RECEIVER_NOT_FOUNS: 'Reciever User Not found',
+    TWO_PEOPLE_NEEDED: 'A direct conversation must have exactly two participants',
 
     LOGOUT_SUCCESS: "Logout success",
     LOGOUT_FAILED: "Logout failed",
@@ -165,23 +165,23 @@ export const MESSAGES = {
 
 };
 
-export enum AuctionItemStatus{
-    DRAFT='DRAFT',
-    PENDING_APPROVAL='PENDING_APPROVAL',
-    REJECTED='REJECTED',
-    SCHEDULED='SCHEDULED',
-    SOLD='SOLD',
-    PASSED='PASSED',
-    CANCELLED_BY_HOUSE='CANCELLED_BY_HOUSE',
-    CANCELLED_BY_ADMIN='CANCELLED_BY_ADMIN',
+export enum AuctionItemStatus {
+    DRAFT = 'DRAFT',
+    PENDING_APPROVAL = 'PENDING_APPROVAL',
+    REJECTED = 'REJECTED',
+    SCHEDULED = 'SCHEDULED',
+    SOLD = 'SOLD',
+    PASSED = 'PASSED',
+    CANCELLED_BY_HOUSE = 'CANCELLED_BY_HOUSE',
+    CANCELLED_BY_ADMIN = 'CANCELLED_BY_ADMIN',
 }
-export const AuctionItemStatusValues=Object.values(AuctionItemStatus)
+export const AuctionItemStatusValues = Object.values(AuctionItemStatus)
 
-export enum AuctionType{
-    TIMED='TIMED',
-    LIVE='LIVE'
+export enum AuctionType {
+    TIMED = 'TIMED',
+    LIVE = 'LIVE'
 }
-export const AuctionTypeValues=Object.values(AuctionType)
+export const AuctionTypeValues = Object.values(AuctionType)
 export enum MessageType {
     TEXT = 'text',
     IMAGE = 'image',

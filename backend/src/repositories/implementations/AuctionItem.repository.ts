@@ -9,33 +9,33 @@ export class AuctionItemRepository extends BaseRepository<IAuctionItemDocument> 
     constructor() {
         super(AuctionItem)
     }
-    async listAllAuctionItems(page: number, limit: number, search?: string,status?:string|string[],type?:string,houseId?:string): Promise<{ auctions: AuctionItemListDTO[], total: number }> {
+    async listAllAuctionItems(page: number, limit: number, search?: string, status?: string | string[], type?: string, houseId?: string): Promise<{ auctions: AuctionItemListDTO[], total: number }> {
         const skip = (page - 1) * limit;
-        const pipeline:PipelineStage[]=[];
-             if(houseId){
-                pipeline.push({
-                    $match:{
-                       houseId:houseId 
-                    }
-                })
-             }
-             if(status){
-                pipeline.push({
-                    $match:{
-                        status:Array.isArray(status)?{$in:status}:status
-                    }
-                })
-             }
-             if(type){
-                pipeline.push({
-                    $match:{
-                        type:type
-                    }
-                })
-             }
-      
-            pipeline.push(
-                {
+        const pipeline: PipelineStage[] = [];
+        if (houseId) {
+            pipeline.push({
+                $match: {
+                    houseId: houseId
+                }
+            })
+        }
+        if (status) {
+            pipeline.push({
+                $match: {
+                    status: Array.isArray(status) ? { $in: status } : status
+                }
+            })
+        }
+        if (type) {
+            pipeline.push({
+                $match: {
+                    type: type
+                }
+            })
+        }
+
+        pipeline.push(
+            {
                 $lookup: {
                     from: 'auctionhouses',
                     localField: 'houseId',
@@ -50,9 +50,9 @@ export class AuctionItemRepository extends BaseRepository<IAuctionItemDocument> 
                     preserveNullAndEmptyArrays: true
                 }
             }
-            );
+        );
 
-        
+
         if (search && search.trim() !== '') {
             const searchRegex = { $regex: search.trim(), $options: 'i' };
             pipeline.push({
@@ -66,22 +66,22 @@ export class AuctionItemRepository extends BaseRepository<IAuctionItemDocument> 
         }
         pipeline.push({
             $facet: {
-               data: [
-                    {$skip:skip},
-                    {$limit:limit},
+                data: [
+                    { $skip: skip },
+                    { $limit: limit },
                     {
-                        $project:{
-                            _id:0,
-                            auctionItemId:{$toString:'$_id'},
-                            auctionHouseId:{$toString:'$houseId'},
-                            auctionName:'$title',
-                            auctionHouseName:{$ifNull:['$auctions.name','Unknown House']},
-                            auctionStatus:'$status',
-                            type:'$type',
-                            startTime:'$startTime',
-                            endTime:'$endTime',
-                            images:{$ifNull:['$images',[]]},
-                            startingPrice:'$startingPrice'
+                        $project: {
+                            _id: 0,
+                            auctionItemId: { $toString: '$_id' },
+                            auctionHouseId: { $toString: '$houseId' },
+                            auctionName: '$title',
+                            auctionHouseName: { $ifNull: ['$auctions.name', 'Unknown House'] },
+                            auctionStatus: '$status',
+                            type: '$type',
+                            startTime: '$startTime',
+                            endTime: '$endTime',
+                            images: { $ifNull: ['$images', []] },
+                            startingPrice: '$startingPrice'
                         }
                     }
                 ],
@@ -91,33 +91,33 @@ export class AuctionItemRepository extends BaseRepository<IAuctionItemDocument> 
                 ]
             }
         })
-        const results=await mongoose.model('AuctionItem').aggregate(pipeline)
+        const results = await mongoose.model('AuctionItem').aggregate(pipeline)
 
-        return{
-            auctions:results[0].data as AuctionItemListDTO[],
-            total:results[0].totalCount[0]?.count||0
+        return {
+            auctions: results[0].data as AuctionItemListDTO[],
+            total: results[0].totalCount[0]?.count || 0
         }
     }
     async getAuctionItemDetails(itemId: string): Promise<AuctionItemDetailDTO | null> {
-        if(!mongoose.Types.ObjectId.isValid(itemId)){
+        if (!mongoose.Types.ObjectId.isValid(itemId)) {
             return null
         }
-        const pipiline:PipelineStage[]=[
+        const pipiline: PipelineStage[] = [
             {
-                $match:{_id: new mongoose.Types.ObjectId(itemId)}
+                $match: { _id: new mongoose.Types.ObjectId(itemId) }
             },
             {
-                $lookup:{
-                    from:'auctionhouses',
-                    localField:'houseId',
-                    foreignField:'_id',
-                    as:'auction'
+                $lookup: {
+                    from: 'auctionhouses',
+                    localField: 'houseId',
+                    foreignField: '_id',
+                    as: 'auction'
                 }
             },
             {
-                $unwind:{
-                    path:"$auction",
-                    preserveNullAndEmptyArrays:true
+                $unwind: {
+                    path: "$auction",
+                    preserveNullAndEmptyArrays: true
                 }
             },
             {
@@ -144,7 +144,7 @@ export class AuctionItemRepository extends BaseRepository<IAuctionItemDocument> 
                     rejectionReason: 1,
                     createdAt: { $dateToString: { date: '$createdAt' } },
                     updatedAt: { $dateToString: { date: '$updatedAt' } },
-                    
+
                     auctionHouse: {
                         id: { $toString: '$auction._id' },
                         name: { $ifNull: ['$auction.name', 'Unknown Organization'] },
@@ -163,9 +163,9 @@ export class AuctionItemRepository extends BaseRepository<IAuctionItemDocument> 
                 }
             }
         ]
-        const result=await this.model.aggregate(pipiline)
-        return (result[0] as AuctionItemDetailDTO)||null
+        const result = await this.model.aggregate(pipiline)
+        return (result[0] as AuctionItemDetailDTO) || null
     }
-    
+
 
 }

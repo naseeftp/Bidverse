@@ -98,7 +98,7 @@ export class ProfileService implements IProfileService {
         if (!isPasswordMatch) {
             throw new UnauthorizedError(MESSAGES.PASSWORDS_NOT_MATCH)
         }
-        
+
         const userWithNewEmail = await this._userRepo.findByEmail(data.newEmail);
         if (userWithNewEmail) {
             throw new ConflictError(`NEW EMAIL ERROR:${MESSAGES.USER_EXISTS_EMAIL}`)
@@ -168,16 +168,16 @@ export class ProfileService implements IProfileService {
         return AuctionHouseMapper.toResponseDTO(updatedDocument)
     }
     async updateProfileImage(userId: string, imageUrl: string | null): Promise<UserResponseDTO> {
-        const existingUser=await this._userRepo.findById(userId);
-        if(!existingUser){
+        const existingUser = await this._userRepo.findById(userId);
+        if (!existingUser) {
             throw new NotFoundError(MESSAGES.USER_NOT_FOUND)
         };
-        const formData={
-            profileImage:imageUrl
+        const formData = {
+            profileImage: imageUrl
         }
-        
-        const updatedDocument=await this._userRepo.updateById(userId,formData);
-        if(!updatedDocument){
+
+        const updatedDocument = await this._userRepo.updateById(userId, formData);
+        if (!updatedDocument) {
             throw new NotFoundError(MESSAGES.USER_NOT_FOUND)
         }
         return UserMapper.toDTO(updatedDocument)

@@ -16,8 +16,8 @@ export class AdminController implements IAdminController {
         try {
             const page = Number(req.query.page) || 1;
             const limit = Number(req.query.limit) || 10;
-            const search=req.query.search as string;
-            const status=req.query.status as string
+            const search = req.query.search as string;
+            const status = req.query.status as string
             this._logger.info('admin fetching auction houses list', {
                 adminId: req.user?.id,
                 page,
@@ -25,7 +25,7 @@ export class AdminController implements IAdminController {
                 search,
                 status
             })
-            const result = await this._adminService.listAllAuctionHouses(page, limit,search,status);
+            const result = await this._adminService.listAllAuctionHouses(page, limit, search, status);
             SuccessResponse(
                 res,
                 MESSAGES.LIST_RETRIEVED,

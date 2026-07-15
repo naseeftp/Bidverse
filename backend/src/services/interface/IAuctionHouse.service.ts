@@ -1,4 +1,4 @@
-import { AuctionHouseResponseDTO, AuctionHouseVerificationDTO,AdminAuctionHouseDetailDTO} from "../../dtos/auctionHouse.dto/auctionHouse.dto";
+import { AuctionHouseResponseDTO, AuctionHouseVerificationDTO, AdminAuctionHouseDetailDTO } from "../../dtos/auctionHouse.dto/auctionHouse.dto";
 
 export interface IAuctionService {
     submitVerificationRequest(userId: string, data: AuctionHouseVerificationDTO): Promise<AuctionHouseResponseDTO>

@@ -92,13 +92,13 @@ export const changePasswordSchema = z.object({
   message: "Passwords do not match",
   path: ["confirmPassword"],
 });
-export const changeEmailSchema=z.object({
-oldEmail:z.string().email(),
-newEmail:z.string().email(),
-password:z.string().min(8,'passwords contain minimum 8 characters')
-.max(32,'Entered passwords are too long')
+export const changeEmailSchema = z.object({
+  oldEmail: z.string().email(),
+  newEmail: z.string().email(),
+  password: z.string().min(8, 'passwords contain minimum 8 characters')
+    .max(32, 'Entered passwords are too long')
 });
-export interface changeEmailResponseDto{
+export interface changeEmailResponseDto {
   email: string;
   expiresAt: Date;
 }
@@ -107,23 +107,23 @@ export const changeEmailVerificationSchema = z.object({
   otp: z.string().length(6, "OTP must be 6 digits"),
 });
 
-export interface UpdateProfilePicDTO{
-  profileImage:string|null;
+export interface UpdateProfilePicDTO {
+  profileImage: string | null;
 }
 
 
-export interface PublicAuctionHouseResponseDTO{
-  houseId:string;
-  bussinessName:string;
-  profileImage:string;
-  briefDescription:string;
-  yearEstablished:number;
-  isVerified:boolean;
-  categories:TAuctionHouseCategory[]
-  address:{
-    city:string;
-    state:string;
-    country:string
+export interface PublicAuctionHouseResponseDTO {
+  houseId: string;
+  bussinessName: string;
+  profileImage: string;
+  briefDescription: string;
+  yearEstablished: number;
+  isVerified: boolean;
+  categories: TAuctionHouseCategory[]
+  address: {
+    city: string;
+    state: string;
+    country: string
   }
 }
 
@@ -136,5 +136,5 @@ export type ResetPasswordDTO = z.infer<typeof ResetPasswordSchema>
 export type GoogleCallbackDTO = z.infer<typeof GoogleCallbackSchema>
 export type profileDetailChangeDTO = z.infer<typeof profileDetailChangeSchema>
 export type changePasswordDTO = z.infer<typeof changePasswordSchema>
-export type changeEmailDTO=z.infer<typeof changeEmailSchema>
-export type changeEmailVerificationDTO=z.infer<typeof changeEmailVerificationSchema>
+export type changeEmailDTO = z.infer<typeof changeEmailSchema>
+export type changeEmailVerificationDTO = z.infer<typeof changeEmailVerificationSchema>

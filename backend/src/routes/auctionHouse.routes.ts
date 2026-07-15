@@ -9,7 +9,7 @@ import { Role } from "../dtos/Common.dto";
 
 const router = Router();
 router.use(protect);
-router.use(CheckUserBlocked )
+router.use(CheckUserBlocked)
 router.post(
     AUCTION_HOUSE_ROUTES.VERIFY,
     allowedTo(Role.TENANT),
@@ -24,7 +24,7 @@ router.get(
 )
 router.get(
     AUCTION_HOUSE_ROUTES.UPLOAD_SIGNATURE,
-    allowedTo(Role.TENANT,Role.USER),
+    allowedTo(Role.TENANT, Role.USER),
     (req, res, next) => auctionHouseController.getUploadSignature(req, res, next)
 )
 

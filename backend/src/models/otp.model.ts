@@ -1,5 +1,5 @@
 import { IOTP } from '../types/otp.type'
-import { Schema, model, Model} from 'mongoose'
+import { Schema, model, Model } from 'mongoose'
 import { OtpPurpose } from '../constants/constants'
 const otpSchema = new Schema<IOTP>({
     email: {
@@ -13,7 +13,7 @@ const otpSchema = new Schema<IOTP>({
     },
     purpose: {
         type: String,
-        required:false,
+        required: false,
         enum: Object.values(OtpPurpose),
     },
     userData: {
@@ -33,6 +33,6 @@ const otpSchema = new Schema<IOTP>({
     }
 )
 otpSchema.index({ email: 1, otp: 1 })
-otpSchema.index({expiresAt:1},{expireAfterSeconds:0})
+otpSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 })
 const otpModel: Model<IOTP> = model<IOTP>('Otp', otpSchema)
 export default otpModel

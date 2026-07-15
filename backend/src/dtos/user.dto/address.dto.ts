@@ -22,25 +22,25 @@ export const createAddressSchema = z.object({
 })
 
 export interface AddressResponseDTO {
-  id: string; 
-  userId: string;
-  label: string;
-  recipientName: string;
-  phone: string;
-  altPhone?: string;
-  fullAddress: string;
-  pincode: string;
-  landMark?: string;
-  city: string;
-  state: string;
-  country: string;
-  isDefault: boolean;
-  isActive: boolean;
-  createdAt: string | Date;
-  updatedAt: string | Date;
+    id: string;
+    userId: string;
+    label: string;
+    recipientName: string;
+    phone: string;
+    altPhone?: string;
+    fullAddress: string;
+    pincode: string;
+    landMark?: string;
+    city: string;
+    state: string;
+    country: string;
+    isDefault: boolean;
+    isActive: boolean;
+    createdAt: string | Date;
+    updatedAt: string | Date;
 }
-export interface deleteAddressDTO{
-    isActive:boolean
+export interface deleteAddressDTO {
+    isActive: boolean
 }
 
 export type CreateAddressDTO = z.infer<typeof createAddressSchema>;

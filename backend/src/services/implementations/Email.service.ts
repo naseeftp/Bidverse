@@ -108,7 +108,7 @@ export class EmailService implements IEmailService {
             htmlContent = getAuctionHouseRejectedTemplate(businessName, businessEmail, reason!)
         }
         else {
-            htmlContent = getAuctionHouseApprovedTemplate(businessName,businessEmail)
+            htmlContent = getAuctionHouseApprovedTemplate(businessName, businessEmail)
         }
         await this.sendEmail({
             to: businessEmail,

@@ -9,13 +9,13 @@ export interface WatchlistItemCardDTO {
     addedAt: Date;
     auctionItemId: string;
     title: string;
-    status: AuctionItemStatus; 
+    status: AuctionItemStatus;
     currentBid: number;
     startingPrice: number;
     minimumIncrement: number;
     currency: string;
     endTime: Date;
-    startTime:Date;
-    type:AuctionType
+    startTime: Date;
+    type: AuctionType
     imageUrl: string;
 }

@@ -39,8 +39,8 @@ export class ConversationRepository extends BaseRepository<IConversation> implem
             // .populate('lastMessage')
             .exec() as IConversation[]
     }
-   
-  
+
+
 
 
 }

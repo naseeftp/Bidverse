@@ -46,7 +46,7 @@ export class AddressRepository extends BaseRepository<IAddressDocument> implemen
       return { docs, total }
    }
 
-   async findDuplicate(userId: string | Types.ObjectId, fullAddress: string,city: string, pincode: string): Promise<IAddressDocument | null> {
+   async findDuplicate(userId: string | Types.ObjectId, fullAddress: string, city: string, pincode: string): Promise<IAddressDocument | null> {
       const normalizedfullAddress = fullAddress.trim();
       const normalizedPincode = pincode.trim();
       const normalizedCity = city.trim();
@@ -55,8 +55,8 @@ export class AddressRepository extends BaseRepository<IAddressDocument> implemen
          isActive: true,
          city: normalizedCity,
          pincode: normalizedPincode,
-         fullAddress:{
-            $regex:new RegExp(`^${this.escapeRegex(normalizedfullAddress)}$`,'i')
+         fullAddress: {
+            $regex: new RegExp(`^${this.escapeRegex(normalizedfullAddress)}$`, 'i')
          }
 
       }).exec()

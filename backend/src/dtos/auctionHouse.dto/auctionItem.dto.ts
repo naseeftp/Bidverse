@@ -66,7 +66,7 @@ export const baseAuctionItemObjectSchema = z.object({
 export const createAuctionItemSchema = baseAuctionItemObjectSchema
     .refine((data) => data.endTime > data.startTime, {
         message: "The auction end time must occur after the start timeline has opened",
-        path: ["endTime"], 
+        path: ["endTime"],
     })
     .refine((data) => data.reservePrice >= data.startingPrice, {
         message: "Reserve price cannot be lower than the starting opening price",
@@ -120,7 +120,7 @@ export interface AuctionItemListDTO {
     type: AuctionType,
     startTime: string;
     endTime: string;
-    startingPrice:number
+    startingPrice: number
     images: {
         id: string;
         url: string;
@@ -194,6 +194,6 @@ export const updateAuctionStatusSchema = z.object({
 );
 
 export type CreateAuctionItemDTO = z.infer<typeof createAuctionItemSchema>
-export type UpdateAuctionDTO=Partial<CreateAuctionItemDTO>
+export type UpdateAuctionDTO = Partial<CreateAuctionItemDTO>
 export const updateAuctionSchema = baseAuctionItemObjectSchema.partial();
 export type updateAuctionStatusDTO = z.infer<typeof updateAuctionStatusSchema>

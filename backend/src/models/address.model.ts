@@ -58,15 +58,15 @@ const AddressSchema = new Schema<IAddressDocument>({
         required: true,
         trim: true
     },
-    isActive:{
-        type:Boolean,
-        default:true,
+    isActive: {
+        type: Boolean,
+        default: true,
     },
-    isDefault:{
-        type:Boolean,
-        default:false
+    isDefault: {
+        type: Boolean,
+        default: false
     }
 
-},{timestamps:true})
+}, { timestamps: true })
 
-export const Address=mongoose.model<IAddressDocument>('Address',AddressSchema)
+export const Address = mongoose.model<IAddressDocument>('Address', AddressSchema)

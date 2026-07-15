@@ -42,8 +42,8 @@ export class SocketService {
                 }
                 this._io?.emit('user:status', { userId: userId, isOnline: true });
             }
-            socket.on('users:get_online',(callback)=>{
-                const currentOnlineIds=Array.from(this._onlineUsers.keys());
+            socket.on('users:get_online', (callback) => {
+                const currentOnlineIds = Array.from(this._onlineUsers.keys());
                 callback(currentOnlineIds)
             })
             socket.on('conversation:join', (conversationId: string) => {
@@ -109,7 +109,7 @@ export class SocketService {
         emitter.emit(event, payload);
     }
 
-  public emitToRoomExcluding<Ev extends keyof ServerToClientEvents>(
+    public emitToRoomExcluding<Ev extends keyof ServerToClientEvents>(
         conversationId: string,
         excludeSocketId: string,
         event: Ev,
@@ -123,7 +123,7 @@ export class SocketService {
         };
         emitter.emit(event, payload);
     }
-  
+
 }
 
 export const socketService = new SocketService();

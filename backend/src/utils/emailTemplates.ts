@@ -187,8 +187,8 @@ export const getAccountUnblockedTemplate = (
 
 
 export const getAuctionHouseRejectedTemplate = (
-    auctionHouseName: string, 
-    businessEmail: string, 
+    auctionHouseName: string,
+    businessEmail: string,
     rejectionReason: string
 ): string => {
     return `
@@ -279,7 +279,7 @@ export const getAuctionHouseRejectedTemplate = (
 
 
 export const getAuctionHouseApprovedTemplate = (
-    auctionHouseName: string, 
+    auctionHouseName: string,
     businessEmail: string
 ): string => {
     return `

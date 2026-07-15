@@ -13,7 +13,7 @@ export interface IUser {
     profileImage?: string;
     googleId?: string;
     isActive: boolean;
-    BlockingReson?:string
+    BlockingReson?: string
     passwordResetToken?: string;
     passwordResetExpires: Date;
     createdAt?: Date;

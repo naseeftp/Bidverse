@@ -19,43 +19,43 @@ router.get(
 )
 router.patch(
     PROFILE_ROUTES.CHANGE_DETAILS,
-    allowedTo(Role.USER,Role.TENANT),
+    allowedTo(Role.USER, Role.TENANT),
     validator(ProfileValidators.profileDeatailsChangeValidator),
     (req, res, next) => profileController.changeProfileDetails(req, res, next)
 )
 router.patch(
     PROFILE_ROUTES.CHANGE_PASSWORD,
-    allowedTo(Role.USER,Role.TENANT),
+    allowedTo(Role.USER, Role.TENANT),
     validator(ProfileValidators.changePasswordValidator),
     (req, res, next) => profileController.changePassword(req, res, next)
 )
 router.patch(
     PROFILE_ROUTES.CHANGE_EMAIL,
-    allowedTo(Role.USER,Role.TENANT),
+    allowedTo(Role.USER, Role.TENANT),
     validator(ProfileValidators.changeEmailValidator),
-    (req,res,next)=>profileController.changeEmail(req,res,next)
+    (req, res, next) => profileController.changeEmail(req, res, next)
 )
 router.post(
     PROFILE_ROUTES.CHANGE_EMAIL_VERIFY,
-    allowedTo(Role.USER,Role.TENANT),
+    allowedTo(Role.USER, Role.TENANT),
     validator(ProfileValidators.changeEmailVerificationValidator),
-    (req,res,next)=>profileController.changeEmailVerification(req,res,next)
+    (req, res, next) => profileController.changeEmailVerification(req, res, next)
 )
 router.post(
     PROFILE_ROUTES.CHANGE_EMAIL_RESEND,
-    allowedTo(Role.USER,Role.TENANT),
+    allowedTo(Role.USER, Role.TENANT),
     validator(AuthValidators.validateResendOtpInput),
-    (req,res,next)=>profileController.changeEmailResendOtp(req,res,next)
+    (req, res, next) => profileController.changeEmailResendOtp(req, res, next)
 )
 router.patch(
     PROFILE_ROUTES.CHANGE_BUSINESS_DETAILS,
     allowedTo(Role.TENANT),
     validator(ProfileValidators.changeBusinessDetailsValidator),
-    (req,res,next)=>profileController.changeBusinessDetails(req,res,next)
+    (req, res, next) => profileController.changeBusinessDetails(req, res, next)
 )
 router.patch(
     PROFILE_ROUTES.HANDLE_PROFILE_IMG,
-    allowedTo(Role.TENANT,Role.USER),
-    (req,res,next)=>profileController.updateProfileImage(req,res,next)
+    allowedTo(Role.TENANT, Role.USER),
+    (req, res, next) => profileController.updateProfileImage(req, res, next)
 )
 export default router

@@ -15,29 +15,29 @@ const ParticipantSchema = new Schema({
     }
 }, { _id: false });// Prevents mongoose from creating an unnecessary nested auto-_id field
 
-const ConversationSchema=new Schema<IConversation>({
-    participants:{
-        type:[ParticipantSchema]
+const ConversationSchema = new Schema<IConversation>({
+    participants: {
+        type: [ParticipantSchema]
     },
-    lastMessage:{
-        type:Schema.Types.ObjectId,
-        ref:'Message',
-        default:null,
-        required:false,
+    lastMessage: {
+        type: Schema.Types.ObjectId,
+        ref: 'Message',
+        default: null,
+        required: false,
     },
-    lastMessageSnippet:{
-        type:String,
-        default:'',
-        trim:true
+    lastMessageSnippet: {
+        type: String,
+        default: '',
+        trim: true
     },
-    lastMessageAt:{
-        type:Date,
-        default:Date.now
+    lastMessageAt: {
+        type: Date,
+        default: Date.now
     },
-    unreadCount:{
-        type:Map,
-        of:Number,
-        default:new Map()
+    unreadCount: {
+        type: Map,
+        of: Number,
+        default: new Map()
     },
     status: {
         type: String,
@@ -52,10 +52,10 @@ const ConversationSchema=new Schema<IConversation>({
         type: Date
     }
 
-},{timestamps:true})
+}, { timestamps: true })
 
 ConversationSchema.index({ "participants.userId": 1, lastMessageAt: -1 });
 ConversationSchema.index({ "participants.userId": 1 });
 ConversationSchema.index({ status: 1 });
 
-export const Conversation= mongoose.model<IConversation>('Conversation', ConversationSchema)
+export const Conversation = mongoose.model<IConversation>('Conversation', ConversationSchema)

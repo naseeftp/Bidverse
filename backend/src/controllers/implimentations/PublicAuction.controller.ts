@@ -5,54 +5,54 @@ import { Request, Response, NextFunction } from "express";
 import { SuccessResponse } from "../../utils/response.utility";
 import { HttpStatus, MESSAGES } from "../../constants/constants";
 
-export class PublicAuctionController implements IPublicAuctionController{
+export class PublicAuctionController implements IPublicAuctionController {
     constructor(
-        private _publicAuctionService:IPublicAunctionService,
-        private _logger:ILoggerService
-    ){}
-   async  listAllPublicAuctionHouses(req: Request, res: Response, next: NextFunction): Promise<void> {
+        private _publicAuctionService: IPublicAunctionService,
+        private _logger: ILoggerService
+    ) { }
+    async listAllPublicAuctionHouses(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
-            const page=Number(req.query.page)||1;
-            const limit=Number(req.query.limit)||10;
-            const search=req.query.search as string
-            const category=req.query.category as string
-            this._logger.info('fetching public auction house list',{page:page,limit:limit,search:search,category:category})
-            const result=await this._publicAuctionService. listAllPublicAuctionHouses(page,limit,search,category)
-            SuccessResponse(res,MESSAGES.LIST_RETRIEVED,result,HttpStatus.OK)
+            const page = Number(req.query.page) || 1;
+            const limit = Number(req.query.limit) || 10;
+            const search = req.query.search as string
+            const category = req.query.category as string
+            this._logger.info('fetching public auction house list', { page: page, limit: limit, search: search, category: category })
+            const result = await this._publicAuctionService.listAllPublicAuctionHouses(page, limit, search, category)
+            SuccessResponse(res, MESSAGES.LIST_RETRIEVED, result, HttpStatus.OK)
         } catch (error) {
             next(error)
         }
     }
-        async getPublicAuctions(req: Request, res: Response, next: NextFunction): Promise<void> {
+    async getPublicAuctions(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
-            const page=Number(req.query.page)
-            const limit=Number(req.query.limit);
-            const search=req.query.search as string;
-            const type=req.query.type as string;
-            const result=await this._publicAuctionService.listPublicAuctions(page,limit,search,type)
-            SuccessResponse(res,MESSAGES.LIST_RETRIEVED,result,HttpStatus.OK)
+            const page = Number(req.query.page)
+            const limit = Number(req.query.limit);
+            const search = req.query.search as string;
+            const type = req.query.type as string;
+            const result = await this._publicAuctionService.listPublicAuctions(page, limit, search, type)
+            SuccessResponse(res, MESSAGES.LIST_RETRIEVED, result, HttpStatus.OK)
         } catch (error) {
             next(error)
         }
     }
-     async getAuctionDetails(req: Request, res: Response, next: NextFunction): Promise<void> {
+    async getAuctionDetails(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
-            const ItemId=req.params.id as string;
-            const result=await this._publicAuctionService.getAuctionDetail(ItemId)
-            SuccessResponse(res,MESSAGES.AUCTION_RETRIEVED,result,HttpStatus.OK)
+            const ItemId = req.params.id as string;
+            const result = await this._publicAuctionService.getAuctionDetail(ItemId)
+            SuccessResponse(res, MESSAGES.AUCTION_RETRIEVED, result, HttpStatus.OK)
         } catch (error) {
             next(error)
         }
     }
     async getHouseDetailsWithAuctions(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
-            const houseId=req.params.id as string;
-            const page=Number(req.query.page)||1;
-            const limit=Number(req.query.limit)||10;
-            const itemSearch=req.query.search as string;
-            const itemStatus=req.query.status as string;
-            const result=await this._publicAuctionService.getHouseDetailsWithAuctions(houseId,page,limit,itemSearch,itemStatus)
-            SuccessResponse(res,MESSAGES.LIST_RETRIEVED,result,HttpStatus.OK)
+            const houseId = req.params.id as string;
+            const page = Number(req.query.page) || 1;
+            const limit = Number(req.query.limit) || 10;
+            const itemSearch = req.query.search as string;
+            const itemStatus = req.query.status as string;
+            const result = await this._publicAuctionService.getHouseDetailsWithAuctions(houseId, page, limit, itemSearch, itemStatus)
+            SuccessResponse(res, MESSAGES.LIST_RETRIEVED, result, HttpStatus.OK)
         } catch (error) {
             next(error)
         }
