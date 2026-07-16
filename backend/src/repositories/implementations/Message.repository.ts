@@ -8,5 +8,8 @@ export class MessageRepository extends BaseRepository<IMessageDocument> implemen
     constructor() {
         super(Message)
     }
-
+    async findMessage(messageId:string):Promise<IMessageDocument|null>{
+        return this.model.findById(messageId)// temp method for fixing lint warning
+    }
+   
 }

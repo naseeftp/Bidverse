@@ -5,6 +5,7 @@ import { X, ZoomIn, ZoomOut, Square } from "lucide-react";
 interface ImageCropModalProps {
   imageSrc: string;
   onClose: () => void;
+  // eslint-disable-next-line no-unused-vars
   onCropComplete: (croppedFile: File) => void;
 }
 
@@ -25,8 +26,8 @@ const ImageCropModal: React.FC<ImageCropModalProps> = ({ imageSrc, onClose, onCr
     try {
       const image = new Image();
       image.src = imageSrc;
-      image.crossOrigin = "anonymous"; 
-      
+      image.crossOrigin = "anonymous";
+
       await new Promise((resolve, reject) => {
         image.onload = resolve;
         image.onerror = reject;
@@ -51,15 +52,15 @@ const ImageCropModal: React.FC<ImageCropModalProps> = ({ imageSrc, onClose, onCr
         onCropComplete(finalCroppedFile);
       }, "image/jpeg", 0.9);
 
-    } catch (error) {
-      console.error("Failed to generate canvas slice matrix:", error);
+    } catch {
+      // console.error("Failed to generate canvas slice matrix:", error);
     }
   };
 
   return (
     <div className="fixed inset-0 z-50 flex flex-col items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
       <div className="bg-white w-full max-w-lg rounded-xl overflow-hidden shadow-2xl flex flex-col">
-        
+
         <div className="px-6 py-4 border-b border-[#E2E8F0] flex justify-between items-center bg-white">
           <h3 className="font-bold text-[#0F172A] flex items-center gap-2">
             <Square size={16} className="text-[#2F6FED]" /> Frame Profile Picture
@@ -74,7 +75,7 @@ const ImageCropModal: React.FC<ImageCropModalProps> = ({ imageSrc, onClose, onCr
             image={imageSrc}
             crop={crop}
             zoom={zoom}
-            aspect={1} 
+            aspect={1}
             cropShape="round"
             showGrid={true}
             minZoom={0.5}

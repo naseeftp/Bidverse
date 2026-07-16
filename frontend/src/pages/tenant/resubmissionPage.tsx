@@ -37,9 +37,9 @@ const resubmissionSchema = yup.object({
         .min(1, 'Please select at least one operational category specialty')
         .required('Category specialty is required'),
     address: yup.object({
-        city: yup.string().trim().min(2,'City must be atleat 2 characters').max(50, 'City too long').required('Required'),
-        state: yup.string().trim().min(2,'State must be atleat 2 characters').max(50, 'State too long').required('Required'),
-        country: yup.string().trim().min(2,'Country must be atleat 2 characters').max(50, 'Country too long').required('Required'),
+        city: yup.string().trim().min(2, 'City must be atleat 2 characters').max(50, 'City too long').required('Required'),
+        state: yup.string().trim().min(2, 'State must be atleat 2 characters').max(50, 'State too long').required('Required'),
+        country: yup.string().trim().min(2, 'Country must be atleat 2 characters').max(50, 'Country too long').required('Required'),
         fullAddress: yup.string().min(5, 'Address too short').max(255, 'Address too long').required()
     }),
     contact: yup.object({
@@ -48,8 +48,8 @@ const resubmissionSchema = yup.object({
         phone: yup.string().matches(/^\d{10}$/, 'Phone must be exactly 10 digits').max(10, 'Phone cannot exceed 10 digits').required(),
     }),
     legal: yup.object({
-        registrationNumber: yup.string().trim().min(6,'Registration Number atleast 6 charactor').max(100, 'Registration number too long').required('Required'),
-        taxId: yup.string().trim().min(6,'TaxID atleast 6 charactor').max(50, 'Tax ID too long').required('Required'),
+        registrationNumber: yup.string().trim().min(6, 'Registration Number atleast 6 charactor').max(100, 'Registration number too long').required('Required'),
+        taxId: yup.string().trim().min(6, 'TaxID atleast 6 charactor').max(50, 'Tax ID too long').required('Required'),
     }),
     registrationCertificate: yup.mixed<File>().nullable().test("is-image", "Only image files (JPEG, PNG, WEBP) are allowed", (value) => {
         if (!value || !(value instanceof File)) return true;
@@ -209,6 +209,7 @@ const TenantVerificationResubmissionPage: React.FC = () => {
         currentUrl?: string,
         localPreviewUrl: string | null,
         selectedFile?: File | null,
+        // eslint-disable-next-line no-unused-vars
         onFileSelect: (file: File) => void,
         onClearFile: () => void
     }) => {

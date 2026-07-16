@@ -48,7 +48,7 @@ class ChatService {
     }
     async getMessages(conversationId:string){
         try {
-            let url=`${BASE_ROUTES.CHAT}${CHAT_ROUTES.GET_MESSAGES}/${conversationId}`;
+            const url=`${BASE_ROUTES.CHAT}${CHAT_ROUTES.GET_MESSAGES}/${conversationId}`;
             const response=await axiosInstance.get<MessageDto,ApiResponse<MessageDto[]>>(url)
             return{
                 success:true,

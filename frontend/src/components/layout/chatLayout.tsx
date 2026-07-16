@@ -40,13 +40,13 @@ export const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ roleTheme }) => {
   const [conversations, setConversation] = useState<ConversationDTO[]>([]);
   const [searchParams, setSearchParams] = useSearchParams()
   const activeConversationId = searchParams.get('conversationId')
-  const [loading, setLoading] = useState<Boolean>(true)
+  const [loading, setLoading] = useState<boolean>(true)
 
   const [typedMessage, setTypedMessage] = useState<string>('')
   const [messages,setMessages]=useState<MessageDto[]>([])
-  const [messagesLoading, setMessagesLoading] = useState<Boolean>(false);
+  const [messagesLoading, setMessagesLoading] = useState<boolean>(false);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
-  const [onlineUsers,setOnlineUsers]=useState<string[]>([])
+  // const [onlineUsers,setOnlineUsers]=useState<string[]>([])
 
   const { user } = useAppSelector((state) => state.auth)
   const currentStyle = THEME_STYLES[roleTheme]
@@ -54,7 +54,7 @@ export const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ roleTheme }) => {
   const activeConversation = conversations.find((conv) => conv._id === activeConversationId);
   const activeChatPartner = activeConversation?.participants.find((p) => p.userId !== currentUserId);
   const activePartnerName = activeChatPartner?.name || "Anonymous Operator";
-  const isPartnerOnline= activeChatPartner? onlineUsers.includes(activeChatPartner.userId):false
+  // const isPartnerOnline= activeChatPartner? onlineUsers.includes(activeChatPartner.userId):false
 
   const scrollToBottom=()=>{
     messagesEndRef.current?.scrollIntoView({behavior:'smooth'})
@@ -120,7 +120,7 @@ export const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ roleTheme }) => {
       socket.emit('conversation:leave',activeConversationId);
       socket.off('message:receive')
      }
-  },[activeConversationId])
+  },[activeConversationId,user?.userId,user?.role])
 
 
   const handleSendMessage = async () => {

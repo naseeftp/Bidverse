@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState,useCallback} from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { AuctionItemStatus, updateAuctionStatusSchema, type AuctionItemDetailDTO } from "../../types/auctionItem.dto";
 import toast from "react-hot-toast";
@@ -25,61 +25,65 @@ const AdminAuctionDetailPage: React.FC = () => {
     const [activeImage, setActiveImage] = useState<string>('');
     const [zoomPos, setZoomPos] = useState({ x: 0, y: 0 });
     const [isZoomed, setIsZoomed] = useState(false);
-    
-    const [modalOpen,setModalOpen]=useState(false);
-    const [modalType,setModalType]=useState<'APPROVE'|'REJECT'|null>(null);
+
+    const [modalOpen, setModalOpen] = useState(false);
+    const [modalType, setModalType] = useState<'APPROVE' | 'REJECT' | null>(null);
     const [rejectionReason, setRejectionReason] = useState("");
     const [validationError, setValidationError] = useState("");
     const [actionLoading, setActionLoading] = useState(false);
-    const fetchAuction = async () => {
+    const fetchAuction = useCallback(async () => {
         setLoading(true);
-        try {
-            const result = await auctionItemMangementService.getAuction(id!)
-            if (result.success && result.data) {
-                setAuction(result.data)
-                const primaryImage = result.data.images.find((img) => img.isPrimary)?.url || result.data.images?.[0]?.url
-                setActiveImage(primaryImage)
-            }
-            else {
-                toast.error(result.message)
-                navigate('/admin/auctions')
-            }
 
+        try {
+            const result = await auctionItemMangementService.getAuction(id!);
+
+            if (result.success && result.data) {
+                setAuction(result.data);
+
+                const primaryImage =
+                    result.data.images.find(img => img.isPrimary)?.url ||
+                    result.data.images?.[0]?.url;
+
+                setActiveImage(primaryImage);
+            } else {
+                toast.error(result.message);
+                navigate("/admin/auctions");
+            }
         } catch {
-            toast.error('failed to fetch auction details')
+            toast.error("Failed to fetch auction details");
             navigate("/admin/auctions");
         } finally {
-            setLoading(false)
+            setLoading(false);
         }
-    }
+    }, [id, navigate]);
+
     useEffect(() => {
         if (id) {
-            fetchAuction()
+            fetchAuction();
         }
-
-    }, [id,navigate])
-   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => { // creating an arrow fn that accept react mouse event bound to  specifally bound to html div element
-                                                                       // its allow us to access active mouse co ordinates (e.pagex e.pagey)
+    }, [id,fetchAuction]);
+    const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => { // creating an arrow fn that accept react mouse event bound to  specifally bound to html div element
+        // its allow us to access active mouse co ordinates (e.pagex e.pagey)
         const { left, top, width, height } = e.currentTarget.getBoundingClientRect(); // identifying where the image located in the screen and how big it is
         const x = ((e.pageX - left - window.scrollX) / width) * 100;
         const y = ((e.pageY - top - window.scrollY) / height) * 100;
         setZoomPos({ x, y });
     };
-   const openStatusModal=(type:'APPROVE'|'REJECT')=>{
-     setModalType(type);
-     setRejectionReason('');
-     setValidationError('');
-     setModalOpen(true)
-   }
-   
-   const handleUpdateStatus=async ()=>{
-    if(!auction) return;
-    const targetStatus=modalType==='APPROVE'?AuctionItemStatus.SCHEDULED:AuctionItemStatus.REJECTED;
-    const payload={
-        itemId:auction.auctionItemId,
-        status:targetStatus,
-        reason:modalType=='REJECT'?rejectionReason:null
+    const openStatusModal = (type: 'APPROVE' | 'REJECT') => {
+        setModalType(type);
+        setRejectionReason('');
+        setValidationError('');
+        setModalOpen(true)
     }
+
+    const handleUpdateStatus = async () => {
+        if (!auction) return;
+        const targetStatus = modalType === 'APPROVE' ? AuctionItemStatus.SCHEDULED : AuctionItemStatus.REJECTED;
+        const payload = {
+            itemId: auction.auctionItemId,
+            status: targetStatus,
+            reason: modalType == 'REJECT' ? rejectionReason : null
+        }
         try {
             await updateAuctionStatusSchema.validate(payload, { abortEarly: false });
             setValidationError("");
@@ -91,22 +95,22 @@ const AdminAuctionDetailPage: React.FC = () => {
         }
         setActionLoading(true)
         try {
-            const result=await auctionItemMangementService.updateAuctionStatus(payload);
-            if(result.success){
+            const result = await auctionItemMangementService.updateAuctionStatus(payload);
+            if (result.success) {
                 toast.success(result.message);
                 setModalOpen(false);
                 fetchAuction()
             }
-            else{
+            else {
                 toast.error(result.message)
             }
-        } catch{
+        } catch {
             toast.error('error while updating the auction status')
-        }finally{
+        } finally {
             setActionLoading(false)
         }
-   }
-  
+    }
+
     const handleCancelAuction = () => {
 
     }
@@ -123,7 +127,7 @@ const AdminAuctionDetailPage: React.FC = () => {
     const isHalted = auction.status === 'REJECTED' || auction.status === 'CANCELLED_BY_ADMIN';
     const haltNotice = auction.rejectionReason // later add auction cancellation reason
     return (
-        
+
         <div className="min-h-screen bg-[#F3F4F6] px-4 py-8 md:px-8 text-[#0F172A] font-sans">
             {isHalted && (
                 <style>{`
@@ -151,7 +155,7 @@ const AdminAuctionDetailPage: React.FC = () => {
                             <FaExclamationTriangle className="animate-pulse text-[#FDE047]" size={12} />
                             <span>System Alert ({auction.status.replace(/_/g, " ")}) :</span>
                         </div>
-                        
+
                         <div className="w-full overflow-hidden py-2 text-white font-mono font-bold text-xs tracking-wide">
                             <div className="animate-marquee-halt cursor-help">
                                 {haltNotice} &bull; <span className="text-amber-300">ACTION REASON </span> &bull; {haltNotice}
@@ -173,11 +177,11 @@ const AdminAuctionDetailPage: React.FC = () => {
             </div>
 
             <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-                
+
                 <div className="lg:col-span-7 space-y-6">
-                    
+
                     <div className="bg-white rounded-xl border border-[#E5E7EB] shadow-sm p-4">
-                        <div 
+                        <div
                             className="h-[450px] w-full rounded-lg overflow-hidden bg-[#F3F4F6] relative cursor-zoom-in"
                             onMouseMove={handleMouseMove}
                             onMouseEnter={() => setIsZoomed(true)}
@@ -186,12 +190,11 @@ const AdminAuctionDetailPage: React.FC = () => {
                             <img
                                 src={activeImage}
                                 alt={auction.title}
-                                className={`w-full h-full object-cover transition-transform duration-75 origin-center ${
-                                    isZoomed ? "scale-[2.2]" : "scale-100"
-                                }`}
+                                className={`w-full h-full object-cover transition-transform duration-75 origin-center ${isZoomed ? "scale-[2.2]" : "scale-100"
+                                    }`}
                                 style={isZoomed ? { transformOrigin: `${zoomPos.x}% ${zoomPos.y}%` } : undefined}
                             />
-                            
+
                             {!isZoomed && (
                                 <div className="absolute bottom-4 right-4 bg-[#111827]/80 text-white p-2 rounded-md pointer-events-none flex items-center gap-1.5 text-[10px] uppercase font-bold tracking-widest">
                                     <FaSearchPlus size={12} /> Hover to Zoom
@@ -205,9 +208,8 @@ const AdminAuctionDetailPage: React.FC = () => {
                                     <button
                                         key={img.id}
                                         onClick={() => setActiveImage(img.url)}
-                                        className={`w-20 h-16 rounded-md overflow-hidden border-2 flex-shrink-0 transition-all ${
-                                            activeImage === img.url ? "border-[#D4AF37] scale-95" : "border-[#E5E7EB] opacity-60 hover:opacity-100"
-                                        }`}
+                                        className={`w-20 h-16 rounded-md overflow-hidden border-2 flex-shrink-0 transition-all ${activeImage === img.url ? "border-[#D4AF37] scale-95" : "border-[#E5E7EB] opacity-60 hover:opacity-100"
+                                            }`}
                                     >
                                         <img src={img.url} alt={img.altText || "preview text"} className="w-full h-full object-cover" />
                                     </button>
@@ -218,7 +220,7 @@ const AdminAuctionDetailPage: React.FC = () => {
 
                     <div className="bg-white rounded-xl border border-[#E5E7EB] p-6 shadow-sm">
                         <h2 className="text-xs font-black uppercase tracking-widest text-[#0F172A] border-b border-[#E5E7EB] pb-3 mb-4">
-                           Auction Item Description
+                            Auction Item Description
                         </h2>
                         <p className="text-sm text-[#6B7280] leading-relaxed whitespace-pre-line font-medium">
                             {auction.description}
@@ -227,23 +229,22 @@ const AdminAuctionDetailPage: React.FC = () => {
                 </div>
 
                 <div className="lg:col-span-5 space-y-6">
-                    
+
                     <div className="bg-white rounded-xl border border-[#E5E7EB] p-6 shadow-sm space-y-5">
-                        
+
                         <div className="flex justify-between items-center">
                             <span className="inline-block px-2.5 py-0.5 bg-[#111827] text-[#D4AF37] font-black text-[9px] tracking-widest rounded uppercase">
                                 {auction.type} Auction
                             </span>
-                            
-                            <span className={`px-2 py-0.5 text-[9px] font-black tracking-widest uppercase rounded border ${
-                                auction.status === "PENDING_APPROVAL"
+
+                            <span className={`px-2 py-0.5 text-[9px] font-black tracking-widest uppercase rounded border ${auction.status === "PENDING_APPROVAL"
                                     ? "bg-amber-50 border-amber-200 text-amber-700"
                                     : auction.status === "DRAFT"
                                         ? "bg-slate-50 border-slate-200 text-slate-600"
-                                        :auction.status=='REJECTED'||auction.status.startsWith('CANCELLED')
-                                        ?"bg-red-50 border-red-200 text-red-700"
-                                        : "bg-emerald-50 border-emerald-200 text-emerald-700"
-                            }`}>
+                                        : auction.status == 'REJECTED' || auction.status.startsWith('CANCELLED')
+                                            ? "bg-red-50 border-red-200 text-red-700"
+                                            : "bg-emerald-50 border-emerald-200 text-emerald-700"
+                                }`}>
                                 {auction.status?.replace(/_/g, " ")}
                             </span>
                         </div>
@@ -254,7 +255,7 @@ const AdminAuctionDetailPage: React.FC = () => {
                             </h1>
                         </div>
 
-                   
+
                         <div className="bg-[#F3F4F6] border border-[#E5E7EB] rounded-xl p-4 grid grid-cols-2 gap-4">
                             <div>
                                 <span className="text-[9px] uppercase font-black text-[#6B7280] tracking-widest flex items-center gap-1">
@@ -274,7 +275,7 @@ const AdminAuctionDetailPage: React.FC = () => {
                             </div>
                         </div>
 
-                    
+
                         <div className="space-y-3 text-xs font-semibold border-y border-[#E5E7EB] py-4">
                             <div className="flex justify-between">
                                 <span className="text-[#6B7280] uppercase text-[10px] tracking-wider">Minimum Increment:</span>
@@ -292,27 +293,27 @@ const AdminAuctionDetailPage: React.FC = () => {
                             </div>
                         </div>
 
-                   
+
                         <div className="pt-2">
                             {isPendingReview ? (
                                 <div className="grid grid-cols-2 gap-4">
                                     <button
                                         disabled={actionLoading}
-                                        onClick={()=>openStatusModal('REJECT')}
+                                        onClick={() => openStatusModal('REJECT')}
                                         className="w-full bg-white border border-[#DC2626] text-[#DC2626] hover:bg-red-50 text-xs font-black uppercase tracking-widest py-3 rounded-xl transition-colors flex items-center justify-center gap-2 shadow-sm"
                                     >
                                         <FaTimesCircle /> Reject Request
                                     </button>
                                     <button
                                         disabled={actionLoading}
-                                        onClick={()=>openStatusModal('APPROVE')}
+                                        onClick={() => openStatusModal('APPROVE')}
                                         className="w-full bg-[#16A34A] hover:bg-emerald-700 text-white text-xs font-black uppercase tracking-widest py-3 rounded-xl transition-colors flex items-center justify-center gap-2 shadow-sm"
                                     >
                                         <FaCheckCircle /> Approve & Publish
                                     </button>
                                 </div>
                             ) : (
-                               auction.status=='SCHEDULED'&&  <button
+                                auction.status == 'SCHEDULED' && <button
                                     onClick={handleCancelAuction}
                                     className="w-full bg-[#111827] hover:bg-black text-[#D4AF37] text-xs font-black uppercase tracking-widest py-3.5 rounded-xl transition-all flex items-center justify-center gap-2 shadow-md"
                                 >
@@ -330,7 +331,7 @@ const AdminAuctionDetailPage: React.FC = () => {
                                     Submitting Auction House
                                 </h2>
                             </div>
-                            
+
                             <div>
                                 <div className="flex items-center gap-1.5">
                                     <h3 className="font-black text-sm text-[#0F172A]">{auction.auctionHouse.name}</h3>
@@ -344,7 +345,7 @@ const AdminAuctionDetailPage: React.FC = () => {
                             </div>
 
                             <div className="bg-[#F3F4F6] border border-[#E5E7EB] p-3 rounded-lg text-xs font-medium text-[#6B7280] leading-relaxed italic">
-                                "{auction.auctionHouse.briefDescription}"
+                                 &quot;{auction.auctionHouse.briefDescription}&quot;
                             </div>
 
                             <div className="grid grid-cols-2 gap-3 pt-1 text-[11px] font-semibold text-[#6B7280]">
@@ -392,7 +393,7 @@ const AdminAuctionDetailPage: React.FC = () => {
             {modalOpen && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn">
                     <div className="bg-white w-full max-w-md rounded-2xl border border-[#E5E7EB] shadow-2xl p-6 relative overflow-hidden animate-scaleIn">
-                        
+
                         {/* Header Area */}
                         <div className="flex items-center gap-3 mb-4">
                             <div className={`p-2.5 rounded-xl ${modalType === 'APPROVE' ? 'bg-emerald-50 text-[#16A34A]' : 'bg-red-50 text-[#DC2626]'}`}>
@@ -411,7 +412,7 @@ const AdminAuctionDetailPage: React.FC = () => {
                         <div className="space-y-4">
                             {modalType === 'APPROVE' ? (
                                 <p className="text-xs font-medium text-[#6B7280] leading-relaxed">
-                                    Are you completely sure you want to verify and approve <span className="font-bold text-[#0F172A]">"{auction.title}"</span>? This will schedule the asset for live public bidding matching its timeline parameters.
+                                    Are you completely sure you want to verify and approve <span className="font-bold text-[#0F172A]"> &quot;{auction.title}&quot;</span>? This will schedule the asset for live public bidding matching its timeline parameters.
                                 </p>
                             ) : (
                                 <div className="space-y-1.5">
@@ -426,9 +427,8 @@ const AdminAuctionDetailPage: React.FC = () => {
                                             if (validationError) setValidationError("");
                                         }}
                                         placeholder="Type administrative rationale parameters here (minimum 5 characters)..."
-                                        className={`w-full text-xs font-medium bg-[#F3F4F6] border rounded-xl p-3 text-[#0F172A] placeholder-[#9CA3AF] focus:outline-none focus:ring-1 transition-all ${
-                                            validationError ? 'border-[#DC2626] focus:ring-[#DC2626]' : 'border-[#E5E7EB] focus:ring-[#111827]'
-                                        }`}
+                                        className={`w-full text-xs font-medium bg-[#F3F4F6] border rounded-xl p-3 text-[#0F172A] placeholder-[#9CA3AF] focus:outline-none focus:ring-1 transition-all ${validationError ? 'border-[#DC2626] focus:ring-[#DC2626]' : 'border-[#E5E7EB] focus:ring-[#111827]'
+                                            }`}
                                     />
                                     {validationError && (
                                         <span className="text-[10px] font-bold tracking-wide text-[#DC2626] block mt-1 animate-slideDown">
@@ -439,7 +439,7 @@ const AdminAuctionDetailPage: React.FC = () => {
                             )}
                         </div>
 
-                    
+
                         <div className="flex items-center gap-3 mt-6 pt-4 border-t border-[#E5E7EB]">
                             <button
                                 type="button"
@@ -453,9 +453,8 @@ const AdminAuctionDetailPage: React.FC = () => {
                                 type="button"
                                 disabled={actionLoading}
                                 onClick={handleUpdateStatus}
-                                className={`w-1/2 text-white text-xs font-black uppercase tracking-widest py-3 rounded-xl transition-colors shadow-sm flex items-center justify-center gap-2 disabled:opacity-50 ${
-                                    modalType === 'APPROVE' ? 'bg-[#16A34A] hover:bg-emerald-700' : 'bg-[#111827] hover:bg-black'
-                                }`}
+                                className={`w-1/2 text-white text-xs font-black uppercase tracking-widest py-3 rounded-xl transition-colors shadow-sm flex items-center justify-center gap-2 disabled:opacity-50 ${modalType === 'APPROVE' ? 'bg-[#16A34A] hover:bg-emerald-700' : 'bg-[#111827] hover:bg-black'
+                                    }`}
                             >
                                 {actionLoading ? (
                                     <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>

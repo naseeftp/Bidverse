@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import type { AuctionItemDetailDTO } from "../types/auctionItem.dto";
 import toast from "react-hot-toast";
@@ -24,7 +24,7 @@ import { incrementWatchlistCount } from "../redux/user/auth.slice";
 const PublicAuctionDetailPage: React.FC = () => {
     const { itemId } = useParams<{ itemId: string }>();
     const navigate = useNavigate();
-    const dispatch=useAppDispatch()
+    const dispatch = useAppDispatch()
 
     const [loading, setLoading] = useState(false);
     const [auction, setAuction] = useState<AuctionItemDetailDTO | null>(null);
@@ -37,26 +37,33 @@ const PublicAuctionDetailPage: React.FC = () => {
     const [isWatched, setIsWathed] = useState<boolean>(false);
     const [isWatchlistLoading, setIsWatchlistLoading] = useState<boolean>(false)
 
-    const fetchAuctionDetail = async () => {
+    const fetchAuctionDetail = useCallback(async () => {
         if (!itemId) return;
+
         setLoading(true);
+
         try {
             const response = await publicAuctionService.getAuctionDetails(itemId);
+
             if (response.success && response.data) {
                 setAuction(response.data);
-                const primaryImage = response.data.images?.find((image) => image.isPrimary)?.url || response.data.images[0]?.url;
+
+                const primaryImage =
+                    response.data.images?.find(image => image.isPrimary)?.url ||
+                    response.data.images[0]?.url;
+
                 setActiveImage(primaryImage || "");
             } else {
                 toast.error(response.message);
-                navigate('/auctions');
+                navigate("/auctions");
             }
         } catch {
-            toast.error('Error while fetching auction details');
-            navigate('/auctions');
+            toast.error("Error while fetching auction details");
+            navigate("/auctions");
         } finally {
             setLoading(false);
         }
-    };
+    }, [itemId, navigate]);
 
     const handleWatchlistAction = async (e: React.MouseEvent<HTMLButtonElement>) => {
         e.stopPropagation();
@@ -83,8 +90,8 @@ const PublicAuctionDetailPage: React.FC = () => {
 
     useEffect(() => {
         fetchAuctionDetail();
-    }, [itemId, navigate]);
-
+    }, [fetchAuctionDetail]);
+    
     useEffect(() => {
         if (!auction || !auction.startTime || !auction.endTime) return;
 
@@ -312,11 +319,10 @@ const PublicAuctionDetailPage: React.FC = () => {
                             <button
                                 onClick={handleWatchlistAction}
                                 disabled={isWatchlistLoading || isWatched}
-                                className={`w-full py-2.5 rounded-lg font-bold text-xs uppercase tracking-wider transition-all focus:outline-none flex items-center justify-center gap-2 border border-[#E6E0DA] disabled:cursor-not-allowed ${
-                                    isWatched 
-                                        ? "bg-[#1F1F1F] text-white border-[#1F1F1F]" 
+                                className={`w-full py-2.5 rounded-lg font-bold text-xs uppercase tracking-wider transition-all focus:outline-none flex items-center justify-center gap-2 border border-[#E6E0DA] disabled:cursor-not-allowed ${isWatched
+                                        ? "bg-[#1F1F1F] text-white border-[#1F1F1F]"
                                         : "bg-white text-[#1F1F1F] hover:bg-[#FFF9F4]"
-                                }`}
+                                    }`}
                             >
                                 {isWatched ? (
                                     <>
@@ -406,7 +412,7 @@ const PublicAuctionDetailPage: React.FC = () => {
                         </div>
                         <div className="grid grid-cols-2 gap-2 text-xs font-bold">
                             <div>
-                                <span className="block text-[9px] uppercase tracking-wider text-[#6B6B6B]">Buyer's Premium</span>
+                                <span className="block text-[9px] uppercase tracking-wider text-[#6B6B6B]">Buyer&apos;s Premium</span>
                                 <span className="text-[#1F1F1F] font-black">{auction.buyerPremiumPercent || 0}% Flat Rate Invoice Addendum</span>
                             </div>
                             <div>

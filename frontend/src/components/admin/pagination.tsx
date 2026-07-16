@@ -5,6 +5,7 @@ interface PaginationProps {
   currentPage: number;
   paginationMeta: IPaginationMeta | null;
   isLoading: boolean;
+  // eslint-disable-next-line no-unused-vars
   onPageChange: (page: number) => void;
 }
 

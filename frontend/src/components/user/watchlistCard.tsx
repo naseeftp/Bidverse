@@ -3,11 +3,12 @@ import { useNavigate } from "react-router-dom";
 import type { WatchlistItemCardDTO } from "../../types/watchlist.dto";
 import watchListService from "../../services/watchList.service";
 import toast from "react-hot-toast";
-import { Trash2, Eye} from "lucide-react";
+import { Trash2, Eye } from "lucide-react";
 import { useAppDispatch } from "../../hooks/redux.hooks";
 import { decrementWatchlistCount } from "../../redux/user/auth.slice";
 interface WatchlistCardProps {
     item: WatchlistItemCardDTO;
+    // eslint-disable-next-line no-unused-vars
     onRemoveSuccess: (watchlistId: string) => void;
 }
 
@@ -27,13 +28,13 @@ const WatchlistCard: React.FC<WatchlistCardProps> = ({ item, onRemoveSuccess }) 
         label: "Checking",
         style: "bg-[#E6E0DA] text-[#6B6B6B]"
     });
-    const dispatch=useAppDispatch()
+    const dispatch = useAppDispatch()
 
-   
+
     const handleDeleteAction = async (e: React.MouseEvent<HTMLButtonElement>) => {
         e.stopPropagation();
         if (isDeleting) return;
-        
+
         try {
             setIsDeleting(true);
             const response = await watchListService.deleteFromWatchList(item.watchlistId);
@@ -69,7 +70,7 @@ const WatchlistCard: React.FC<WatchlistCardProps> = ({ item, onRemoveSuccess }) 
                     label: "Upcoming",
                     style: "bg-amber-50 text-amber-700 border border-amber-200"
                 });
-                
+
                 const diff = start - now;
                 setTimeLeft({
                     days: Math.floor(diff / (1000 * 60 * 60 * 24)),
@@ -101,7 +102,7 @@ const WatchlistCard: React.FC<WatchlistCardProps> = ({ item, onRemoveSuccess }) 
             }
         };
 
-        runTimer(); 
+        runTimer();
         const interval = setInterval(runTimer, 1000);
         return () => clearInterval(interval);
     }, [item]);
@@ -110,7 +111,7 @@ const WatchlistCard: React.FC<WatchlistCardProps> = ({ item, onRemoveSuccess }) 
 
     return (
         <div className="bg-white border border-[#E6E0DA] rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-200 flex flex-col w-full mx-auto group">
-            
+
             <div className="relative aspect-video bg-[#FFF9F4] overflow-hidden border-b border-[#E6E0DA]/60">
                 {item.imageUrl ? (
                     <img

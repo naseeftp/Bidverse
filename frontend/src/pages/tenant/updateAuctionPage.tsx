@@ -3,8 +3,8 @@ import { useForm, useFieldArray, type FieldArrayPath } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import toast from "react-hot-toast";
 import Cropper, { type Point, type Area } from "react-easy-crop";
-import { 
-  Gavel, Image as ImageIcon, Calendar, Percent, IndianRupee, Truck, Info, Loader2, Trash2, CheckCircle2, AlertOctagon 
+import {
+  Gavel, Image as ImageIcon, Calendar, Percent, IndianRupee, Truck, Info, Loader2, Trash2, CheckCircle2, AlertOctagon
 } from "lucide-react";
 import { useParams, useNavigate } from "react-router-dom";
 import { updateAuctionItemSchema, AuctionType, AuctionItemStatus } from "../../types/auctionItem.dto";
@@ -58,10 +58,10 @@ const TenantEditAuctionPage: React.FC = () => {
       try {
         setIsDataLoading(true);
         const result = await auctionItemMangementService.getAuction(id);
-        
+
         if (result.success && result.data) {
           const item = result.data;
-          
+
           setItemStatus(item.status);
           if (item.rejectionReason) {
             setRejectionReason(item.rejectionReason);
@@ -76,7 +76,7 @@ const TenantEditAuctionPage: React.FC = () => {
           reset({
             title: item.title,
             description: item.description,
-            type: item.type as any,
+            type: item.type as AuctionType,
             startingPrice: item.startingPrice,
             reservePrice: item.reservePrice,
             minimumIncrement: item.minimumIncrement,
@@ -84,8 +84,8 @@ const TenantEditAuctionPage: React.FC = () => {
             snipingProtectionMinutes: item.snipingProtectionMinutes,
             shippingCost: item.shippingCost,
             shippingTerms: item.shippingTerms,
-            startTime: formatToDateTimeLocal(item.startTime) as any,
-            endTime: formatToDateTimeLocal(item.endTime) as any,
+            startTime: formatToDateTimeLocal(item.startTime),
+            endTime: formatToDateTimeLocal(item.endTime),
             images: item.images.map(img => ({
               id: img.id,
               url: img.url,
@@ -121,7 +121,7 @@ const TenantEditAuctionPage: React.FC = () => {
     if (activeCropIndex === null) {
       setActiveCropIndex(0);
     }
-    e.target.value = ""; 
+    e.target.value = "";
   };
 
   const onCropComplete = useCallback((_croppedArea: Area, croppedAreaPixels: Area) => {
@@ -191,6 +191,7 @@ const TenantEditAuctionPage: React.FC = () => {
 
   const setPrimaryImageIndex = (targetIndex: number) => {
     watchedImages.forEach((_, index: number) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       setValue(`images.${index}.isPrimary` as any, index === targetIndex);
     });
   };
@@ -201,11 +202,11 @@ const TenantEditAuctionPage: React.FC = () => {
       setIsFormSubmitting(true);
 
       const imagesArray = (data.images || []) as IFormImage[];
-      const activeFields = attachedImages as any[]; 
+      const activeFields = attachedImages;
 
       const secureUploadPipelines = imagesArray.map(async (img, idx) => {
         const isNewLocalPreview = img.url.startsWith("blob:");
-        
+
         if (!isNewLocalPreview) {
           return {
             id: img.id || activeFields[idx]?.id || crypto.randomUUID(),
@@ -236,13 +237,13 @@ const TenantEditAuctionPage: React.FC = () => {
       };
 
       const result = await auctionItemMangementService.updateAuction(id, finalAuctionPayload);
-      
+
       if (result.success) {
-        toast.success(itemStatus === AuctionItemStatus.REJECTED 
-          ? "Item parameters updated and resubmitted successfully!" 
+        toast.success(itemStatus === AuctionItemStatus.REJECTED
+          ? "Item parameters updated and resubmitted successfully!"
           : "Auction specifications updated successfully!"
         );
-        
+
         imagesArray.forEach((img) => {
           if (img.url.startsWith("blob:")) URL.revokeObjectURL(img.url);
         });
@@ -273,14 +274,14 @@ const TenantEditAuctionPage: React.FC = () => {
 
   return (
     <div className="max-w-5xl mx-auto pb-20 px-6 pt-10 font-sans">
-      
+
       {itemStatus === AuctionItemStatus.REJECTED && rejectionReason && (
         <div className="mb-8 border-2 border-[#EF4444] bg-[#FEF2F2] rounded-2xl p-6 flex items-start gap-4 shadow-sm">
           <AlertOctagon className="text-[#EF4444] shrink-0 mt-0.5" size={22} />
           <div>
             <h3 className="text-sm font-black uppercase tracking-wider text-[#991B1B]">Listing Rejection Audit Log</h3>
             <p className="text-xs font-semibold text-[#B91C1C] mt-1 bg-white/60 p-3 rounded-lg border border-[#FEE2E2] font-mono">
-              "{rejectionReason}"
+               &quot;{rejectionReason}&quot;
             </p>
             <p className="text-[10px] font-bold uppercase text-[#7F1D1D] mt-3 tracking-wider">
               Note: Updating item parameters and re-publishing will clear flags and cue structural verification pipelines.
@@ -299,13 +300,13 @@ const TenantEditAuctionPage: React.FC = () => {
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
-        
+
         <div className="bg-white rounded-2xl p-8 border border-[#E2E8F0] shadow-sm space-y-6">
           <div className="flex items-center gap-3 pb-4 border-b border-[#F5F7FB]">
             <Gavel size={18} className="text-[#2F6FED]" />
             <h2 className="text-[12px] font-bold uppercase tracking-widest text-[#0F172A]">Listing Content Parameters</h2>
           </div>
-          
+
           <div className="space-y-1">
             <label className={labelStyle}>Auction Lot Title</label>
             <input {...register("title")} placeholder="Ex: Vintage Leather Chronograph Watch" className={inputStyle} />
@@ -350,7 +351,7 @@ const TenantEditAuctionPage: React.FC = () => {
               {watchedImages.map((imgField: IFormImage, idx: number) => (
                 <div key={imgField.id || idx} className={`relative rounded-xl border p-2 transition-all group ${imgField.isPrimary ? "border-[#2F6FED] bg-[#2F6FED]/5" : "border-[#E2E8F0]"}`}>
                   <img src={imgField.url} alt="Item configuration layout" className="w-full h-28 object-cover rounded-lg bg-slate-50" />
-                  
+
                   <div className="absolute top-4 right-4 flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-all">
                     <button type="button" onClick={() => setPrimaryImageIndex(idx)} className={`p-1.5 rounded-md text-white shadow transition-all ${imgField.isPrimary ? "bg-[#10B981]" : "bg-black/70 hover:bg-black"}`}>
                       <CheckCircle2 size={13} />
