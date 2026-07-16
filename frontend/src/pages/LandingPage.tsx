@@ -1,28 +1,28 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { useEffect,useRef} from 'react';
+import { useEffect, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import toast from 'react-hot-toast';
 
 const LandingPage: React.FC = () => {
-  const [searchParams,setSearchParams]=useSearchParams()
-  const toastShown=useRef(false)
-  useEffect(()=>{
-   if(toastShown.current) return
-   const errorType=searchParams.get('auth_error')
-   const reason=searchParams.get('reason');
-   if(errorType=='blocked'){
-    toast.error(`Your account has been blocked due to : ${reason}`)
-    toastShown.current=true
-    setSearchParams({})
-   }
-   if(errorType=='expired'){
-     toast.error('Session expired Please login Again')
-     toastShown.current=true
-     setSearchParams({})
-   }
+  const [searchParams, setSearchParams] = useSearchParams()
+  const toastShown = useRef(false)
+  useEffect(() => {
+    if (toastShown.current) return
+    const errorType = searchParams.get('auth_error')
+    const reason = searchParams.get('reason');
+    if (errorType == 'blocked') {
+      toast.error(`Your account has been blocked due to : ${reason}`)
+      toastShown.current = true
+      setSearchParams({})
+    }
+    if (errorType == 'expired') {
+      toast.error('Session expired Please login Again')
+      toastShown.current = true
+      setSearchParams({})
+    }
 
-  },[setSearchParams,searchParams])
+  }, [setSearchParams, searchParams])
   return (
 
     <div className="bg-[#FFF9F4] min-h-screen">

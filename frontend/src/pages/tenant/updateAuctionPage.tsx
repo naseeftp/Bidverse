@@ -281,7 +281,7 @@ const TenantEditAuctionPage: React.FC = () => {
           <div>
             <h3 className="text-sm font-black uppercase tracking-wider text-[#991B1B]">Listing Rejection Audit Log</h3>
             <p className="text-xs font-semibold text-[#B91C1C] mt-1 bg-white/60 p-3 rounded-lg border border-[#FEE2E2] font-mono">
-               &quot;{rejectionReason}&quot;
+              &quot;{rejectionReason}&quot;
             </p>
             <p className="text-[10px] font-bold uppercase text-[#7F1D1D] mt-3 tracking-wider">
               Note: Updating item parameters and re-publishing will clear flags and cue structural verification pipelines.

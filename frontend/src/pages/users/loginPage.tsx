@@ -69,39 +69,39 @@ const LoginPage: React.FC = () => {
     };
 
     const onSubmit = async (data: LoginFormData) => {
-    dispatch(setLoading(true));
-    try {
-        const loginData = { ...data, role: "user" as const };
-        
-        // Cast the result
-        const result = (await authService.login(loginData)) as LoginResponse;
+        dispatch(setLoading(true));
+        try {
+            const loginData = { ...data, role: "user" as const };
 
-        // 2. Access the nested 'data' property
-        if (result && result.success && result.data) {
-            const { token, user } = result.data;
+            // Cast the result
+            const result = (await authService.login(loginData)) as LoginResponse;
 
-            localStorage.setItem("accessToken", token);
-            
-            
-            dispatch(setAuthSuccess(user));
-            
-            toast.success(result.message || "Welcome to BidVerse");
-            navigate('/home');
-        } else {
-            
-            const errorMsg = result?.message || "Invalid email or password";
-            dispatch(setAuthError(errorMsg));
-            toast.error(errorMsg);
+            // 2. Access the nested 'data' property
+            if (result && result.success && result.data) {
+                const { token, user } = result.data;
+
+                localStorage.setItem("accessToken", token);
+
+
+                dispatch(setAuthSuccess(user));
+
+                toast.success(result.message || "Welcome to BidVerse");
+                navigate('/home');
+            } else {
+
+                const errorMsg = result?.message || "Invalid email or password";
+                dispatch(setAuthError(errorMsg));
+                toast.error(errorMsg);
+            }
+        } catch (error: unknown) {
+            const err = error as ApiError;
+            const serverMessage = err.response?.data?.message || "Invalid email or password";
+            dispatch(setAuthError(serverMessage));
+            toast.error(serverMessage);
+        } finally {
+            dispatch(setLoading(false));
         }
-    } catch (error: unknown) {
-        const err = error as ApiError;
-        const serverMessage = err.response?.data?.message || "Invalid email or password";
-        dispatch(setAuthError(serverMessage));
-        toast.error(serverMessage);
-    } finally {
-        dispatch(setLoading(false));
-    }
-};
+    };
 
     return (
         <div className="min-h-screen bg-[#FFF9F4] flex items-center justify-center px-6 font-sans">

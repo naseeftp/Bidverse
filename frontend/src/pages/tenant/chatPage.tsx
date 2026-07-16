@@ -1,7 +1,7 @@
 import { ChatWorkspace } from "../../components/layout/chatLayout";
 
-const TenantChatPage=()=>{
- return <ChatWorkspace roleTheme="tenant"/>
+const TenantChatPage = () => {
+    return <ChatWorkspace roleTheme="tenant" />
 }
 
-export  default TenantChatPage
+export default TenantChatPage

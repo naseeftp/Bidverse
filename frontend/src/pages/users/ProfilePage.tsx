@@ -27,7 +27,7 @@ const ProfilePage: React.FC = () => {
         };
         fetchData();
     }, []);
-    
+
     const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (!file) return;
@@ -48,7 +48,7 @@ const ProfilePage: React.FC = () => {
     const handleCropComplete = async (croppedFile: File) => {
         setImageToCrop(null);
         setIsUploading(true);
-        
+
         try {
             const secureUrl = await uploadservice.uploadSecurely(croppedFile);
             const response = await profileService.updateProfileImage({ profileImage: secureUrl });
@@ -86,7 +86,7 @@ const ProfilePage: React.FC = () => {
         }
         finally {
             setIsUploading(false)
-            
+
         }
     }
 
@@ -235,15 +235,15 @@ const ProfilePage: React.FC = () => {
                         </div>
                     </section>
 
-                  {imageToCrop&&(
-                    <ImageCropModal
-                    imageSrc={imageToCrop}
-                    onClose={()=>setImageToCrop(null)}
-                    onCropComplete={handleCropComplete}
-                    />
+                    {imageToCrop && (
+                        <ImageCropModal
+                            imageSrc={imageToCrop}
+                            onClose={() => setImageToCrop(null)}
+                            onCropComplete={handleCropComplete}
+                        />
 
-                   
-                  )}
+
+                    )}
 
                     {isDeleteModalOpen && (
                         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-fade-in">

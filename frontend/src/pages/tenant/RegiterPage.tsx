@@ -30,7 +30,7 @@ const TenantRegisterPage: React.FC = () => {
 
     const { register, handleSubmit, formState: { errors } } = useForm<RegisterDTO>({
         resolver: yupResolver(schema),
-        defaultValues: { 
+        defaultValues: {
             role: 'tenant',
             name: '',
             email: '',
@@ -52,17 +52,17 @@ const TenantRegisterPage: React.FC = () => {
         setLoading(true);
         try {
             const result = await authService.register(data);
-            
-            if (result && result.success&&result.data) {
+
+            if (result && result.success && result.data) {
                 toast.success(result.message || "Registration in progress! Verify your email");
-                const {email,expiresAt}=result.data
+                const { email, expiresAt } = result.data
                 localStorage.setItem('registrationData',
-                    JSON.stringify({email:email,expiresAt:expiresAt})
+                    JSON.stringify({ email: email, expiresAt: expiresAt })
                 )
-                dispatch(setRegistrationData({ 
-                    email: data.email, 
-                    role: 'tenant', 
-                    phone: data.phone 
+                dispatch(setRegistrationData({
+                    email: data.email,
+                    role: 'tenant',
+                    phone: data.phone
                 }));
 
                 navigate('/tenant/verify-otp');

@@ -24,7 +24,7 @@ export interface VerifyOtpDTO {
 
 export interface ResendOtpDTO {
     email: string;
-    role?:string
+    role?: string
 }
 export interface OtpResponseData {
     email: string;
@@ -54,13 +54,13 @@ export interface ResetPasswordDTO {
     confirmPassword: string;
     resetToken: string;
 }
-export interface IPaginationMeta{
-    totalItems:number;
-    itemsPerPage:number;
-    currentPage:number;
-    totalPages:number;
-    hasNextPage:boolean;
-    hasPrevPage:boolean;
+export interface IPaginationMeta {
+    totalItems: number;
+    itemsPerPage: number;
+    currentPage: number;
+    totalPages: number;
+    hasNextPage: boolean;
+    hasPrevPage: boolean;
 }
 export interface UserResponseDTO {
     id: string;
@@ -70,28 +70,28 @@ export interface UserResponseDTO {
     role: userRole;
     isActive: boolean;
     profileImage: string | null;
-    BlockingReson:string;
-    provider:'google'|'local'
+    BlockingReson: string;
+    provider: 'google' | 'local'
 }
 
-export interface PublicAuctionHouseResponseDTO{
-  houseId:string;
-  businessName:string;
-  profileImage:string;
-  briefDescription:string;
-  yearEstablished:number;
-  isVerified:boolean;
-  categories:TAuctionHouseCategory[]
-  address:{
-    city:string;
-    state:string;
-    country:string
-  }
+export interface PublicAuctionHouseResponseDTO {
+    houseId: string;
+    businessName: string;
+    profileImage: string;
+    briefDescription: string;
+    yearEstablished: number;
+    isVerified: boolean;
+    categories: TAuctionHouseCategory[]
+    address: {
+        city: string;
+        state: string;
+        country: string
+    }
 }
 
-export interface ApiResponse<T=unknown> {
+export interface ApiResponse<T = unknown> {
     success: boolean;
     message: string;
     data?: T
-    pagination?:IPaginationMeta
+    pagination?: IPaginationMeta
 }

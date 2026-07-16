@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { FaEye, FaEyeSlash} from "react-icons/fa";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { changePasswordSchema } from "../../types/profile.dto";
 import type { changePasswordDTO } from "../../types/profile.dto";
 import profileService from '../../services/profileManagement.service'
@@ -48,8 +48,8 @@ const TenantChangePasswordPage: React.FC = () => {
     return (
         <div className="min-h-screen bg-[#F5F7FB] flex items-center justify-center px-6 font-sans">
             <div className="bg-[#FFFFFF] border border-[#E2E8F0] w-full max-w-md p-10 shadow-sm rounded-xl">
-                
-              
+
+
                 <div className="text-center mb-8">
                     <p className="text-[#475569] text-sm mt-2">
                         Update your tenant administrative password
@@ -57,8 +57,8 @@ const TenantChangePasswordPage: React.FC = () => {
                 </div>
 
                 <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
-                    
-                   
+
+
                     <div>
                         <div className="flex justify-between items-end mb-2">
                             <label className="text-xs font-semibold uppercase tracking-wider text-[#475569]">
@@ -92,7 +92,7 @@ const TenantChangePasswordPage: React.FC = () => {
 
                     <div className="h-[1px] bg-[#F1F5F9] w-full"></div>
 
-                    
+
                     <div>
                         <label className="block text-xs font-semibold uppercase tracking-wider text-[#475569] mb-2">
                             New Password
@@ -115,7 +115,7 @@ const TenantChangePasswordPage: React.FC = () => {
                         {errors.newPassword && <p className="text-red-500 text-xs mt-1.5 font-medium">{errors.newPassword.message}</p>}
                     </div>
 
-                   
+
                     <div>
                         <label className="block text-xs font-semibold uppercase tracking-wider text-[#475569] mb-2">
                             Confirm New Password
@@ -138,7 +138,7 @@ const TenantChangePasswordPage: React.FC = () => {
                         {errors.confirmPassword && <p className="text-red-500 text-xs mt-1.5 font-medium">{errors.confirmPassword.message}</p>}
                     </div>
 
-                   
+
                     <button
                         type="submit"
                         disabled={isSubmitting}

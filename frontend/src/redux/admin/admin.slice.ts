@@ -12,7 +12,7 @@ interface FetchHousesResponse {
 }
 
 interface AdminState {
-    houses: AuctionHouseResponseDTO[]; 
+    houses: AuctionHouseResponseDTO[];
     loading: boolean;
     error: string | null;
     pagination: {

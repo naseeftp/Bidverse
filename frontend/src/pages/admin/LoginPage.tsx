@@ -8,7 +8,7 @@ import { useAppDispatch, useAppSelector } from "../../hooks/redux.hooks";
 import { setAuthError, setAuthSuccess, setLoading } from "../../redux/user/auth.slice";
 import authService from "../../services/auth.service";
 import toast from "react-hot-toast";
-import type{ JwtPayload } from "../../types/auth.type";
+import type { JwtPayload } from "../../types/auth.type";
 import { Roles } from "../../types/auth.type";
 
 interface IAdminLoginResponse {
@@ -36,7 +36,7 @@ const AdminLoginPage: React.FC = () => {
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
     const { loading } = useAppSelector((state) => state.auth);
-    
+
     const { register, handleSubmit, formState: { errors } } = useForm<IAdminLoginData>({
         resolver: yupResolver(schema),
     });
@@ -45,7 +45,7 @@ const AdminLoginPage: React.FC = () => {
         dispatch(setLoading(true));
         try {
             const loginData = { ...data, role: Roles.ADMIN };
-            
+
             // 2. Cast to the correct response type
             const result = (await authService.login(loginData)) as IAdminLoginResponse;
 

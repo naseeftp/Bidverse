@@ -5,7 +5,7 @@ export const VerificationStatus = {
     APPROVED: 'approved',
     REJECTED: 'rejected',
     ACTION_REQUIRED: 'action_required',
-    NOT_SUBMITTED:'not_submitted'
+    NOT_SUBMITTED: 'not_submitted'
 } as const
 
 export type TVerificationStatus = typeof VerificationStatus[keyof typeof VerificationStatus];
@@ -68,8 +68,8 @@ export interface AuctionHouseResponseDTO {
     documents: {
         registrationCertificateUrl: string;
         identityProofUrl: string;
-        registerNumber:string;
-        taxId:string
+        registerNumber: string;
+        taxId: string
     };
     status: TVerificationStatus;
     isVerified: boolean;
@@ -78,22 +78,22 @@ export interface AuctionHouseResponseDTO {
 
 }
 export interface AdminAuctionHouseDetailDTO {
-   
+
     userId: string;
     userEmail: string;
     userName: string;
-    userPhone:string;
-    profileImage:string;
+    userPhone: string;
+    profileImage: string;
     isGoogleSignup: boolean;
     isAccountBlocked: boolean;
 
-   
+
     houseId: string | null;
     businessName: string | null;
     yearEstablished: number | null;
     briefDescription: string | null;
-    category:TAuctionHouseCategory[]
-    
+    category: TAuctionHouseCategory[]
+
     address: {
         city: string;
         state: string;
@@ -114,7 +114,7 @@ export interface AdminAuctionHouseDetailDTO {
         taxId: string;
     } | null;
 
-    status:TVerificationStatus
+    status: TVerificationStatus
     rejectionReason: string | null;
     isVerified: boolean;
     createdAt: string | Date;
@@ -123,8 +123,8 @@ export interface AdminAuctionHouseDetailDTO {
 export interface AuctionHouseProfileDTO {
     id: string;
     name: string;
-    profileImage:string,
-    ownerId?:string;
+    profileImage: string,
+    ownerId?: string;
     yearEstablished: number;
     briefDescription: string;
     categories: string[];

@@ -26,14 +26,14 @@ const ResetPasswordPage: React.FC = () => {
   const navigate = useNavigate();
 
   const { isAuthenticated } = useAppSelector((state) => state.auth)
- 
+
   const [email, setEmail] = useState('')
   const [resetToken, setResetToken] = useState('')
 
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  
+
   const {
     register,
     handleSubmit,
@@ -47,7 +47,7 @@ const ResetPasswordPage: React.FC = () => {
     },
   });
 
-    useEffect(() => {
+  useEffect(() => {
     const storedData = localStorage.getItem('verifyotpdata')
 
 
@@ -99,7 +99,7 @@ const ResetPasswordPage: React.FC = () => {
       toast.error(errorMessage);
     } finally {
       setIsSubmitting(false);
-      
+
     }
   };
 

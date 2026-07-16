@@ -106,7 +106,7 @@ const TenantVerifyEmailPage: React.FC = () => {
             } else {
                 toast.error(result.message);
             }
-        } catch{
+        } catch {
             toast.error("OTP verification failed");
         } finally {
             setLoading(false);
@@ -122,7 +122,7 @@ const TenantVerifyEmailPage: React.FC = () => {
     return (
         <div className="min-h-screen flex items-center justify-center bg-[#F5F7FB] p-6 font-sans">
             <div className="max-w-md w-full bg-white border border-[#E2E8F0] p-10 shadow-sm rounded-xl">
-                
+
                 <div className="text-center mb-8">
                     <div className="inline-flex items-center justify-center w-14 h-14 bg-[#2F6FED10] text-[#2F6FED] rounded-full mb-4">
                         <FaShieldAlt size={28} />

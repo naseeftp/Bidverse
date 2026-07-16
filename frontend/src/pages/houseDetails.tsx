@@ -24,13 +24,13 @@ const PublicAuctionHouseDetailsPage: React.FC = () => {
   const [items, setItems] = useState<AuctionItemListDTO[]>([]);
   const [pagination, setPagination] = useState<IPaginationMeta | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
-  const [isChatLoading,setIsChatLoading]=useState<boolean>(false)
+  const [isChatLoading, setIsChatLoading] = useState<boolean>(false)
 
   const [page, setPage] = useState<number>(1);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [searchDebounce, setSearchDebounce] = useState<string>("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
-  
+
   const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -60,18 +60,18 @@ const PublicAuctionHouseDetailsPage: React.FC = () => {
       const response = await publicAuctionService.getHouseDetailsWithAuctions(
         houseId,
         page,
-        6, 
+        6,
         searchDebounce || undefined,
         statusFilter === "all" ? undefined : statusFilter
       );
 
       if (response.success && response.data && response.data.length > 0) {
         const pagePayload = response.data[0];
-        
+
         setHouse(pagePayload.auctionHouse || null);
         setItems(pagePayload.items || []);
         setPagination(response.pagination || null);
-        
+
       } else {
         toast.error(response.message || "Failed to locate institutional node");
         navigate("/auctions");
@@ -91,29 +91,29 @@ const PublicAuctionHouseDetailsPage: React.FC = () => {
   const handleStatusToggle = (status: string) => {
     setStatusFilter(status);
     setPage(1);
-    setIsDropdownOpen(false); 
+    setIsDropdownOpen(false);
   };
 
-  const handleInitiateChat=async()=>{
+  const handleInitiateChat = async () => {
     setIsChatLoading(true);
     try {
-      const payload={
-        receiverId:house?.ownerId??'',
-        receiverRole:'tenant'
+      const payload = {
+        receiverId: house?.ownerId ?? '',
+        receiverRole: 'tenant'
       }
-      const response=await chatService.getOrCreateConversation(payload)
-      if(response.success&&response.data){
-         navigate('/chat')
-      }else{
+      const response = await chatService.getOrCreateConversation(payload)
+      if (response.success && response.data) {
+        navigate('/chat')
+      } else {
         toast.error(response.message)
       }
     } catch {
       toast.error('failed to start conversation')
-    }finally{
+    } finally {
       setIsChatLoading(false)
     }
   }
- 
+
   const currentFilterLabel = ITEM_STATUS_FILTERS.find(f => f.value === statusFilter)?.label || "All Items";
 
   if (loading && !house) {
@@ -131,13 +131,13 @@ const PublicAuctionHouseDetailsPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-[#FFF9F4] text-[#1F1F1F] font-sans antialiased selection:bg-[#C9653B]/20">
-      
-      
+
+
       <header className="bg-white border-b border-[#E6E0DA] relative overflow-hidden">
         <div className="absolute inset-0 bg-[radial-gradient(#C9653B_1px,transparent_1px)] [background-size:16px_16px] opacity-[0.02]" />
-        
+
         <div className="max-w-7xl mx-auto px-6 py-16 sm:px-8 relative z-10">
-          <button 
+          <button
             onClick={() => navigate("/auctions")}
             className="inline-flex items-center gap-2 text-xs font-bold text-[#6B6B6B] hover:text-[#C9653B] transition-colors mb-10 uppercase tracking-widest group/back cursor-pointer"
           >
@@ -194,16 +194,16 @@ const PublicAuctionHouseDetailsPage: React.FC = () => {
 
               <div className="pt-2 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-y-2 gap-x-6 text-xs text-[#6B6B6B] font-medium border-t border-[#E6E0DA]/60">
                 <div className="flex items-center gap-2">
-                  <span className="text-[#C9653B] font-bold">Location:</span> 
+                  <span className="text-[#C9653B] font-bold">Location:</span>
                   <span>{house.fullAddress ? `${house.fullAddress}, ` : ""}{house.city}, {house.state}, {house.country}</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-[#C9653B] font-bold">Email:</span> 
+                  <span className="text-[#C9653B] font-bold">Email:</span>
                   <a href={`mailto:${house.businessEmail}`} className="hover:underline text-[#1F1F1F]">{house.businessEmail}</a>
                 </div>
                 {house.phone && (
                   <div className="flex items-center gap-2">
-                    <span className="text-[#C9653B] font-bold">Network:</span> 
+                    <span className="text-[#C9653B] font-bold">Network:</span>
                     <span>{house.phone}</span>
                   </div>
                 )}
@@ -233,10 +233,10 @@ const PublicAuctionHouseDetailsPage: React.FC = () => {
         </div>
       </header>
 
-  
+
       <main className="max-w-7xl mx-auto px-6 py-16 sm:px-8">
-        
-      
+
+
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 mb-12 w-full border-b border-[#E6E0DA] pb-8">
           <div>
             <h2 className="text-xl font-black tracking-tight text-[#1F1F1F] font-serif">
@@ -248,7 +248,7 @@ const PublicAuctionHouseDetailsPage: React.FC = () => {
           </div>
 
           <div className="flex flex-col sm:flex-row items-center gap-4 w-full lg:w-auto">
-          
+
             <div className="w-full sm:w-80 relative group/search">
               <span className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none text-[#6B6B6B]">
                 <svg className="w-4 h-4 fill-none stroke-current transition-colors duration-200 group-focus-within/search:text-[#C9653B]" viewBox="0 0 24 24" strokeWidth="2.5">
@@ -272,7 +272,7 @@ const PublicAuctionHouseDetailsPage: React.FC = () => {
               )}
             </div>
 
-         
+
             <div className="relative w-full sm:w-56" ref={dropdownRef}>
               <button
                 type="button"
@@ -280,10 +280,10 @@ const PublicAuctionHouseDetailsPage: React.FC = () => {
                 className="w-full bg-white border border-[#E6E0DA] rounded-2xl px-4 py-3.5 flex items-center justify-between text-xs font-bold tracking-wide uppercase text-[#1F1F1F] shadow-sm hover:border-[#C9653B] transition-all focus:outline-none cursor-pointer select-none"
               >
                 <span>{currentFilterLabel}</span>
-                <svg 
-                  className={`w-4 h-4 text-[#6B6B6B] transition-transform duration-200 ${isDropdownOpen ? "transform rotate-180 text-[#C9653B]" : ""}`} 
-                  fill="none" 
-                  stroke="currentColor" 
+                <svg
+                  className={`w-4 h-4 text-[#6B6B6B] transition-transform duration-200 ${isDropdownOpen ? "transform rotate-180 text-[#C9653B]" : ""}`}
+                  fill="none"
+                  stroke="currentColor"
                   viewBox="0 0 24 24"
                   strokeWidth="2.5"
                 >
@@ -300,11 +300,10 @@ const PublicAuctionHouseDetailsPage: React.FC = () => {
                         <button
                           key={filter.value}
                           onClick={() => handleStatusToggle(filter.value)}
-                          className={`w-full text-left px-4 py-3 text-xs font-bold tracking-wide uppercase transition-colors flex items-center justify-between cursor-pointer ${
-                            isSelected 
-                              ? "bg-[#C9653B]/5 text-[#C9653B]" 
+                          className={`w-full text-left px-4 py-3 text-xs font-bold tracking-wide uppercase transition-colors flex items-center justify-between cursor-pointer ${isSelected
+                              ? "bg-[#C9653B]/5 text-[#C9653B]"
                               : "text-[#6B6B6B] hover:text-[#1F1F1F] hover:bg-[#FFF9F4]"
-                          }`}
+                            }`}
                         >
                           <span>{filter.label}</span>
                           {isSelected && (
@@ -321,7 +320,7 @@ const PublicAuctionHouseDetailsPage: React.FC = () => {
           </div>
         </div>
 
-       
+
         {loading ? (
           <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3">
             {[1, 2, 3, 4, 5, 6].map((idx) => (
@@ -342,7 +341,7 @@ const PublicAuctionHouseDetailsPage: React.FC = () => {
           </div>
         )}
 
-      
+
         <div className="mt-12">
           <Pagination
             pagination={pagination}

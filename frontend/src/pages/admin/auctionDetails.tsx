@@ -1,4 +1,4 @@
-import React, { useEffect, useState,useCallback} from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { AuctionItemStatus, updateAuctionStatusSchema, type AuctionItemDetailDTO } from "../../types/auctionItem.dto";
 import toast from "react-hot-toast";
@@ -61,7 +61,7 @@ const AdminAuctionDetailPage: React.FC = () => {
         if (id) {
             fetchAuction();
         }
-    }, [id,fetchAuction]);
+    }, [id, fetchAuction]);
     const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => { // creating an arrow fn that accept react mouse event bound to  specifally bound to html div element
         // its allow us to access active mouse co ordinates (e.pagex e.pagey)
         const { left, top, width, height } = e.currentTarget.getBoundingClientRect(); // identifying where the image located in the screen and how big it is
@@ -238,12 +238,12 @@ const AdminAuctionDetailPage: React.FC = () => {
                             </span>
 
                             <span className={`px-2 py-0.5 text-[9px] font-black tracking-widest uppercase rounded border ${auction.status === "PENDING_APPROVAL"
-                                    ? "bg-amber-50 border-amber-200 text-amber-700"
-                                    : auction.status === "DRAFT"
-                                        ? "bg-slate-50 border-slate-200 text-slate-600"
-                                        : auction.status == 'REJECTED' || auction.status.startsWith('CANCELLED')
-                                            ? "bg-red-50 border-red-200 text-red-700"
-                                            : "bg-emerald-50 border-emerald-200 text-emerald-700"
+                                ? "bg-amber-50 border-amber-200 text-amber-700"
+                                : auction.status === "DRAFT"
+                                    ? "bg-slate-50 border-slate-200 text-slate-600"
+                                    : auction.status == 'REJECTED' || auction.status.startsWith('CANCELLED')
+                                        ? "bg-red-50 border-red-200 text-red-700"
+                                        : "bg-emerald-50 border-emerald-200 text-emerald-700"
                                 }`}>
                                 {auction.status?.replace(/_/g, " ")}
                             </span>
@@ -345,7 +345,7 @@ const AdminAuctionDetailPage: React.FC = () => {
                             </div>
 
                             <div className="bg-[#F3F4F6] border border-[#E5E7EB] p-3 rounded-lg text-xs font-medium text-[#6B7280] leading-relaxed italic">
-                                 &quot;{auction.auctionHouse.briefDescription}&quot;
+                                &quot;{auction.auctionHouse.briefDescription}&quot;
                             </div>
 
                             <div className="grid grid-cols-2 gap-3 pt-1 text-[11px] font-semibold text-[#6B7280]">

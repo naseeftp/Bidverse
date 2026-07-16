@@ -1,4 +1,4 @@
-import React, { useState, useEffect,useRef} from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useSearchParams } from "react-router-dom";
 import type { ConversationDTO, MessageDto } from "../../types/chat.dto";
 import chatService from "../../services/chat.service";
@@ -10,7 +10,7 @@ interface ChatWorkspaceProps {
   roleTheme: 'user' | 'tenant' | 'admin';
 }
 const THEME_STYLES = {
- user: {
+  user: {
     accent: "bg-[#1F1F1F]",
     text: "text-[#1F1F1F]",
     bgLight: "bg-[#FFF9F4]",
@@ -43,7 +43,7 @@ export const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ roleTheme }) => {
   const [loading, setLoading] = useState<boolean>(true)
 
   const [typedMessage, setTypedMessage] = useState<string>('')
-  const [messages,setMessages]=useState<MessageDto[]>([])
+  const [messages, setMessages] = useState<MessageDto[]>([])
   const [messagesLoading, setMessagesLoading] = useState<boolean>(false);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   // const [onlineUsers,setOnlineUsers]=useState<string[]>([])
@@ -56,12 +56,12 @@ export const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ roleTheme }) => {
   const activePartnerName = activeChatPartner?.name || "Anonymous Operator";
   // const isPartnerOnline= activeChatPartner? onlineUsers.includes(activeChatPartner.userId):false
 
-  const scrollToBottom=()=>{
-    messagesEndRef.current?.scrollIntoView({behavior:'smooth'})
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }
-  useEffect(()=>{
+  useEffect(() => {
     scrollToBottom();
-  },[messages])
+  }, [messages])
 
   useEffect(() => {
     const fetchConversations = async () => {
@@ -81,46 +81,46 @@ export const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ roleTheme }) => {
     };
     fetchConversations()
   }, [])
- 
+
   //  need to add global status connection handler 
-  useEffect(()=>{
-    if(!activeConversationId) return;
-    const fetchMessages=async()=>{
+  useEffect(() => {
+    if (!activeConversationId) return;
+    const fetchMessages = async () => {
       try {
         setMessagesLoading(true);
-        const response=await chatService.getMessages(activeConversationId)
-        if(response.success&&response.data){
+        const response = await chatService.getMessages(activeConversationId)
+        if (response.success && response.data) {
           setMessages(response.data)
-        }else{
+        } else {
           toast.error(response.message)
         }
       } catch {
         toast.error('Failed to get  chat history');
       }
-      finally{
+      finally {
         setMessagesLoading(false)
       }
     }
-     fetchMessages()
-     const socket=getSocket(user?.userId,user?.role);
-     socket.emit('conversation:join',activeConversationId)
-     socket.on('message:receive',(newMessage:MessageDto)=>{
-           if(newMessage.conversationId===activeConversationId){
-            setMessages((prev)=>[...prev,newMessage])
-           }
-           setConversation((prevConv) =>
-           prevConv.map((c) =>
-            c._id === activeConversationId
-              ? { ...c, lastMessageSnippet: newMessage.content }
-              : c
-          )
-        );
-     })
-     return ()=>{
-      socket.emit('conversation:leave',activeConversationId);
+    fetchMessages()
+    const socket = getSocket(user?.userId, user?.role);
+    socket.emit('conversation:join', activeConversationId)
+    socket.on('message:receive', (newMessage: MessageDto) => {
+      if (newMessage.conversationId === activeConversationId) {
+        setMessages((prev) => [...prev, newMessage])
+      }
+      setConversation((prevConv) =>
+        prevConv.map((c) =>
+          c._id === activeConversationId
+            ? { ...c, lastMessageSnippet: newMessage.content }
+            : c
+        )
+      );
+    })
+    return () => {
+      socket.emit('conversation:leave', activeConversationId);
       socket.off('message:receive')
-     }
-  },[activeConversationId,user?.userId,user?.role])
+    }
+  }, [activeConversationId, user?.userId, user?.role])
 
 
   const handleSendMessage = async () => {
@@ -134,16 +134,16 @@ export const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ roleTheme }) => {
         messageType: 'text'
       });
       if (response.success && response.data) {
-         const newMessage = response.data;
-         setMessages((prev) => [...prev, newMessage]);
-         setConversation((prevConv) =>
-           prevConv.map((c) =>
+        const newMessage = response.data;
+        setMessages((prev) => [...prev, newMessage]);
+        setConversation((prevConv) =>
+          prevConv.map((c) =>
             c._id === activeConversationId
               ? { ...c, lastMessageSnippet: newMessage.content }
               : c
           )
         );
-       
+
       } else {
         toast.error(response.message)
       }
@@ -162,7 +162,7 @@ export const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ roleTheme }) => {
 
   return (
     <div className="flex h-[calc(100vh-64px)] w-full bg-white border border-[#E6E0DA] rounded-3xl overflow-hidden shadow-sm">
-   
+
       <div className="w-80 md:w-96 border-r border-[#E6E0DA] flex flex-col bg-white">
         <div className="p-4 border-b border-[#E6E0DA] flex items-center justify-between">
           <h2 className="text-sm font-black font-serif tracking-wider uppercase text-[#1F1F1F]">
@@ -210,7 +210,7 @@ export const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ roleTheme }) => {
         </div>
       </div>
 
-    
+
       <div className={`flex-1 flex flex-col ${currentStyle.bgLight}`}>
         {activeConversationId ? (
           <div className="flex-1 flex flex-col h-full">
@@ -218,7 +218,7 @@ export const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ roleTheme }) => {
               <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
               <p className="text-xs font-bold uppercase tracking-wider text-[#1F1F1F]">{activePartnerName}</p>
             </div>
-            
+
             <div className="flex-1 p-6 overflow-y-auto space-y-4 flex flex-col">
               {messagesLoading ? (
                 <p className="text-xs text-center text-[#6B6B6B] font-mono py-8 animate-pulse">Retrieving communication logs...</p>
@@ -230,11 +230,10 @@ export const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ roleTheme }) => {
                   return (
                     <div
                       key={msg._id}
-                      className={`flex flex-col max-w-[70%] text-xs p-3 rounded-2xl shadow-sm tracking-wide ${
-                        isSelf 
-                          ? `${currentStyle.activeBubble} self-end rounded-tr-none` 
-                          : `${currentStyle.peerBubble} self-start rounded-tl-none` 
-                      }`}
+                      className={`flex flex-col max-w-[70%] text-xs p-3 rounded-2xl shadow-sm tracking-wide ${isSelf
+                          ? `${currentStyle.activeBubble} self-end rounded-tr-none`
+                          : `${currentStyle.peerBubble} self-start rounded-tl-none`
+                        }`}
                     >
                       <p className="leading-relaxed">{msg.content}</p>
                       <span className="text-[9px] mt-1 block text-right font-mono opacity-60">
@@ -244,17 +243,17 @@ export const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ roleTheme }) => {
                   );
                 })
               )}
-            
+
               <div ref={messagesEndRef} />
             </div>
 
-          
+
             <div className="p-4 bg-white border-t border-[#E6E0DA] flex items-center gap-2">
               <input
                 type="text"
                 value={typedMessage}
                 onChange={(e) => setTypedMessage(e.target.value)}
-                onKeyDown={handleKeyDown} 
+                onKeyDown={handleKeyDown}
                 placeholder="Type a message..."
                 className="flex-1 bg-[#FFF9F4] border border-[#E6E0DA] rounded-xl px-4 py-3 text-xs text-[#1F1F1F] focus:outline-none focus:border-[#C9653B]/60 transition-all"
               />

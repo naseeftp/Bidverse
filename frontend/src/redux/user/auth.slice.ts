@@ -15,7 +15,7 @@ interface AuthState {
     role: string;
     phone: string;
   } | null;
-  watchlistCount:number;
+  watchlistCount: number;
 }
 const token = localStorage.getItem("accessToken");
 const decodeToken = (token: string): JwtPayload | null => {
@@ -34,14 +34,14 @@ const initialState: AuthState = {
   loading: false,
   error: null,
   tempAuthData: null,
-  watchlistCount:0
+  watchlistCount: 0
 }
 
 const authSlice = createSlice({
   name: "auth",
   initialState,
   reducers: {
-    
+
     setRegistrationData: (state, action: PayloadAction<{ email: string, role: string, phone: string }>) => {
       state.tempAuthData = action.payload;
       state.error = null
@@ -83,5 +83,5 @@ const authSlice = createSlice({
   }
 })
 
-export const { setRegistrationData, setAuthSuccess, setAuthError, setLoading, logout,setWatchlistCount,decrementWatchlistCount,incrementWatchlistCount } = authSlice.actions
+export const { setRegistrationData, setAuthSuccess, setAuthError, setLoading, logout, setWatchlistCount, decrementWatchlistCount, incrementWatchlistCount } = authSlice.actions
 export default authSlice.reducer;

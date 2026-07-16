@@ -5,7 +5,7 @@ export const addressFormSchema = yup.object({
   label: yup.string().required("Please select a label"),
   recipientName: yup.string().trim('enter valid name').min(2).max(50).required("Name is required"),
   phone: yup.string().matches(/^\d{10}$/, "Must be exactly 10 digits").required(),
-  altPhone: yup.string().matches(/^\d{10}$/, "Must be exactly 10 digits").notOneOf([yup.ref('phone')],'Phone number and alternative Phone number cannot be same'),
+  altPhone: yup.string().matches(/^\d{10}$/, "Must be exactly 10 digits").notOneOf([yup.ref('phone')], 'Phone number and alternative Phone number cannot be same'),
   fullAddress: yup.string().min(5).max(255).required(),
   pincode: yup.string().min(4).max(10).required(),
   landMark: yup.string(),
@@ -33,8 +33,8 @@ export interface AddressResponseDTO {
   createdAt: string | Date;
   updatedAt: string | Date;
 }
-export interface deleteAddressDTO{
-    isActive:boolean
+export interface deleteAddressDTO {
+  isActive: boolean
 }
 
 export type addAddressDTO = yup.InferType<typeof addressFormSchema>

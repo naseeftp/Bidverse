@@ -184,8 +184,8 @@ const TenantAuctionDetailPage: React.FC = () => {
                                             key={img.id}
                                             onClick={() => setActiveImage(img.url)}
                                             className={`w-20 h-16 rounded-lg overflow-hidden border-2 flex-shrink-0 transition-all ${activeImage === img.url
-                                                    ? "border-[#2F6FED] scale-95 shadow-sm"
-                                                    : "border-[#E2E8F0] opacity-60 hover:opacity-100"
+                                                ? "border-[#2F6FED] scale-95 shadow-sm"
+                                                : "border-[#E2E8F0] opacity-60 hover:opacity-100"
                                                 }`}
                                         >
                                             <img src={img.url} alt={img.altText || "Item detail"} className="w-full h-full object-cover" />
@@ -215,12 +215,12 @@ const TenantAuctionDetailPage: React.FC = () => {
                                 </span>
 
                                 <span className={`px-2.5 py-1 text-[10px] font-bold tracking-wider uppercase rounded border ${auction.status === "PENDING_APPROVAL"
-                                        ? "bg-amber-50 border-amber-200 text-amber-700"
-                                        : auction.status === "DRAFT"
-                                            ? "bg-slate-100 border-slate-200 text-slate-600"
-                                            : auction.status === "REJECTED" || auction.status.startsWith('CANCELLED')
-                                                ? "bg-red-50 border-red-200 text-red-600"
-                                                : "bg-emerald-50 border-emerald-200 text-emerald-700"
+                                    ? "bg-amber-50 border-amber-200 text-amber-700"
+                                    : auction.status === "DRAFT"
+                                        ? "bg-slate-100 border-slate-200 text-slate-600"
+                                        : auction.status === "REJECTED" || auction.status.startsWith('CANCELLED')
+                                            ? "bg-red-50 border-red-200 text-red-600"
+                                            : "bg-emerald-50 border-emerald-200 text-emerald-700"
                                     }`}>
                                     {auction.status?.replace(/_/g, " ")}
                                 </span>

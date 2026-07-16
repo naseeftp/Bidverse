@@ -82,16 +82,16 @@ const TenantForgotPassVerifyOtp: React.FC = () => {
     setLoading(true);
     try {
 
-      const result = await authService.forgotpass({ email, role: 'tenant' }) ;
-      if (result && result.success&&result.data) {
-        const newExpiry=new Date(result.data.expiresAt).getTime()
+      const result = await authService.forgotpass({ email, role: 'tenant' });
+      if (result && result.success && result.data) {
+        const newExpiry = new Date(result.data.expiresAt).getTime()
         setExpiresAt(newExpiry);
         localStorage.setItem('forgotpassData',
           JSON.stringify(
             {
-              email:result.data.email,
-              expiresAt:result.data.expiresAt,
-              role:'tenant',
+              email: result.data.email,
+              expiresAt: result.data.expiresAt,
+              role: 'tenant',
               isForgotPassword: true
             }
           )
@@ -99,7 +99,7 @@ const TenantForgotPassVerifyOtp: React.FC = () => {
         setOtp(new Array(6).fill(""));
         toast.success(result.message);
       }
-      else{
+      else {
         toast.error(result.message)
       }
     } catch {
@@ -121,11 +121,11 @@ const TenantForgotPassVerifyOtp: React.FC = () => {
         purpose: 'forgot_password'
       }) as ServiceResponse;
 
-      if (result && result.success&&result.data) {
+      if (result && result.success && result.data) {
         localStorage.removeItem('forgotpassData')
         toast.success(result.message);
-          localStorage.setItem('verifyotpdata',
-          JSON.stringify({email:email,role:role,resetToken:result.data.resetToken})
+        localStorage.setItem('verifyotpdata',
+          JSON.stringify({ email: email, role: role, resetToken: result.data.resetToken })
         )
         navigate("/tenant/reset-password")
       } else {

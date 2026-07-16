@@ -4,25 +4,25 @@ import { apiErrorHandler } from "../utils/error.handle";
 import type { ApiResponse } from "../types/auth.type";
 import type { updateAuctionHouseStatusRequestDTO, UpdateUserStatusDTO } from '../types/admin.dto'
 import type { IPaginationMeta, UserResponseDTO } from "../types/auth.type";
-import type{AdminAuctionHouseDetailDTO} from '../types/auctionHouse.type'
+import type { AdminAuctionHouseDetailDTO } from '../types/auctionHouse.type'
 
 class AdminService {
-    async listAllAuctionHouses(page: number = 1, limit: number = 10,search?:string,status?:string) {
+    async listAllAuctionHouses(page: number = 1, limit: number = 10, search?: string, status?: string) {
         try {
-            let url=`${ADMIN_ROUTES.GET_AUCTION_HOUSES}?page=${page}&limit=${limit}`;
-            if(search){
-                url+=`&search=${encodeURIComponent(search)}`
+            let url = `${ADMIN_ROUTES.GET_AUCTION_HOUSES}?page=${page}&limit=${limit}`;
+            if (search) {
+                url += `&search=${encodeURIComponent(search)}`
             }
-            if(status&&status!='all'){
-                url+=`&status=${status}`
+            if (status && status != 'all') {
+                url += `&status=${status}`
             }
-            const response=await axiosInstance.get<AdminAuctionHouseDetailDTO,ApiResponse<{data:AdminAuctionHouseDetailDTO[],pagination:IPaginationMeta}>>(url)
-            const paginatedResult=response.data;
-            return{
-                success:true,
-                message:response.message,
-                data:paginatedResult?.data||[],
-                pagination:paginatedResult?.pagination
+            const response = await axiosInstance.get<AdminAuctionHouseDetailDTO, ApiResponse<{ data: AdminAuctionHouseDetailDTO[], pagination: IPaginationMeta }>>(url)
+            const paginatedResult = response.data;
+            return {
+                success: true,
+                message: response.message,
+                data: paginatedResult?.data || [],
+                pagination: paginatedResult?.pagination
             }
         } catch (error) {
             return apiErrorHandler(error, "Failed to fetch auction houses");
@@ -66,17 +66,17 @@ class AdminService {
         }
 
     }
-    async getUserById(id:string){
+    async getUserById(id: string) {
         try {
-            const url=`${ADMIN_ROUTES.GET_USER}/${id}`
-            const  response=await axiosInstance.get<UserResponseDTO,ApiResponse<UserResponseDTO>>(url) // Slot 1: The type of 'data' inside ApiResponse Slot 2: The final return type of the axios call (unwrapped by interceptor)
-              return {
-                success:true,
-                message:response.message,
-                data:response.data
+            const url = `${ADMIN_ROUTES.GET_USER}/${id}`
+            const response = await axiosInstance.get<UserResponseDTO, ApiResponse<UserResponseDTO>>(url) // Slot 1: The type of 'data' inside ApiResponse Slot 2: The final return type of the axios call (unwrapped by interceptor)
+            return {
+                success: true,
+                message: response.message,
+                data: response.data
             }
         } catch (error) {
-            return apiErrorHandler(error,'Failed To Fetch User Details')
+            return apiErrorHandler(error, 'Failed To Fetch User Details')
         }
     }
     async updateHouseStatus(id: string, data: updateAuctionHouseStatusRequestDTO) {
@@ -92,17 +92,17 @@ class AdminService {
             return apiErrorHandler(error, 'Failed to update status');
         }
     }
-    async updateUserStatus(id:string,data:UpdateUserStatusDTO){
+    async updateUserStatus(id: string, data: UpdateUserStatusDTO) {
         try {
-            const url=`${ADMIN_ROUTES.UPDATE_USER_STATUS}/${id}`
-            const response=await axiosInstance.patch<UserResponseDTO,ApiResponse<UserResponseDTO>>(url,data)
+            const url = `${ADMIN_ROUTES.UPDATE_USER_STATUS}/${id}`
+            const response = await axiosInstance.patch<UserResponseDTO, ApiResponse<UserResponseDTO>>(url, data)
             return {
-                success:true,
-                message:response.message,
-                data:response.data
+                success: true,
+                message: response.message,
+                data: response.data
             }
         } catch (error) {
-            return apiErrorHandler(error,'failed to update user status')
+            return apiErrorHandler(error, 'failed to update user status')
         }
     }
 

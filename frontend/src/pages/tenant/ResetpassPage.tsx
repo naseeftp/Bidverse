@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link,useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
@@ -33,18 +33,18 @@ const resetSchema = yup.object({
 
 const TenantResetPasswordPage: React.FC = () => {
   const navigate = useNavigate();
-  
+
   const { isAuthenticated } = useAppSelector((state) => state.auth)
 
   // const email = location.state?.email || "";
   // const resetToken = location.state?.resetToken || "";
-  
+
 
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [email,setEmail]=useState('');
-  const [resetToken,setResetToken]=useState('')
+  const [email, setEmail] = useState('');
+  const [resetToken, setResetToken] = useState('')
   const {
     register,
     handleSubmit,
@@ -58,21 +58,21 @@ const TenantResetPasswordPage: React.FC = () => {
     },
   });
 
-    useEffect(() => {
-    const storedData=localStorage.getItem('verifyotpdata')
-    
+  useEffect(() => {
+    const storedData = localStorage.getItem('verifyotpdata')
+
     if (!storedData) {
       toast.error("Unauthorized. Please verify your business email first.");
       navigate("/tenant/forgot-pass");
       return
     }
-     const parsedData=JSON.parse(storedData??'')
-     setEmail(parsedData.email);
-     setResetToken(parsedData.resetToken)
-     setValue("email", parsedData.email);
-     setValue("resetToken", parsedData.resetToken);
-     
-  }, [navigate,setValue]);
+    const parsedData = JSON.parse(storedData ?? '')
+    setEmail(parsedData.email);
+    setResetToken(parsedData.resetToken)
+    setValue("email", parsedData.email);
+    setValue("resetToken", parsedData.resetToken);
+
+  }, [navigate, setValue]);
   const onSubmit = async (data: ResetPasswordDTO) => {
     setIsSubmitting(true);
     try {
@@ -94,7 +94,7 @@ const TenantResetPasswordPage: React.FC = () => {
       toast.error(error.response?.data?.message || "Failed to update password.");
     } finally {
       setIsSubmitting(false);
-      
+
     }
   };
 

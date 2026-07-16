@@ -61,7 +61,7 @@ const ChangeEmailVerifyPage: React.FC = () => {
 
     const handleResend = async () => {
         try {
-            const result = await profileService.changeEmailResendOtp({email})
+            const result = await profileService.changeEmailResendOtp({ email })
             if (result.success && result.data) {
                 const newExpiry = new Date(result.data.expiresAt).getTime();
                 setExpiresAt(newExpiry);
@@ -123,7 +123,7 @@ const ChangeEmailVerifyPage: React.FC = () => {
             } else {
                 toast.error(result.message);
             }
-        } catch{
+        } catch {
             toast.error("OTP verification failed");
         } finally {
             setLoading(false);
@@ -204,8 +204,8 @@ const ChangeEmailVerifyPage: React.FC = () => {
                     {timeLeft > 0 ? (
                         <span
                             className={`text-[10px] font-bold uppercase italic ${timeLeft < 15
-                                    ? "text-[#D98880]"
-                                    : "text-[#B37E27]"
+                                ? "text-[#D98880]"
+                                : "text-[#B37E27]"
                                 }`}
                         >
                             Expires in {formatTime(timeLeft)}

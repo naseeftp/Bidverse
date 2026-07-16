@@ -5,7 +5,7 @@ class UploadService {
     async uploadSecurely(file: File): Promise<string> {
         try {
             const response = await axiosInstance.get(AUCTION_HOUSE_ROUTES.GET_UPLOAD_SIGNATURE)
-            
+
             const actualData = response.data.data || response.data
             const { signature, timestamp, folder, cloudName, apiKey } = actualData
             // const { signature, timestamp, folder, cloudName, apiKey } = response.data
@@ -23,7 +23,7 @@ class UploadService {
             return result.secure_url
 
         }
-        catch{
+        catch {
             throw new Error("Failed to upload document to cloud storage.");
         }
     }

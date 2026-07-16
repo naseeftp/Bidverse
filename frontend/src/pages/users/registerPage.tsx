@@ -29,10 +29,10 @@ const RegisterPage: React.FC = () => {
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
 
-    
+
     const { register, handleSubmit, formState: { errors } } = useForm<RegisterDTO>({
         resolver: yupResolver(schema),
-        defaultValues: { 
+        defaultValues: {
             role: 'user',
             name: '',
             email: '',
@@ -49,21 +49,21 @@ const RegisterPage: React.FC = () => {
     const onSubmit = async (data: RegisterDTO) => {
         setLoading(true);
         setServerError(null);
-        
+
         try {
             const result = await authService.register(data);
-            if (result && result.success&&result.data) {
+            if (result && result.success && result.data) {
                 toast.success(result.message || "Registration in progress! Verify your email");
-                const {email,expiresAt}=result.data
-                localStorage.setItem('registrationData',JSON.stringify({
-                  email:email,
-                  expiresAt:expiresAt
+                const { email, expiresAt } = result.data
+                localStorage.setItem('registrationData', JSON.stringify({
+                    email: email,
+                    expiresAt: expiresAt
 
                 }))
-                dispatch(setRegistrationData({ 
-                    email: data.email, 
-                    role: 'user', 
-                    phone: data.phone 
+                dispatch(setRegistrationData({
+                    email: data.email,
+                    role: 'user',
+                    phone: data.phone
                 }));
 
                 navigate('/verify-otp');
@@ -96,17 +96,17 @@ const RegisterPage: React.FC = () => {
                         {serverError}
                     </div>
                 )}
-        
+
                 <form onSubmit={handleSubmit(onSubmit)} className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <input type="hidden" {...register('role')} />
 
                     {/* Full Name */}
                     <div className="md:col-span-2">
                         <label className="block text-[10px] font-bold uppercase tracking-[0.2em] text-[#6B6B6B] mb-2">Full Name</label>
-                        <input 
-                            {...register('name')} 
-                            className={`w-full bg-[#FFF9F4] border ${errors.name ? 'border-red-400' : 'border-[#E6E0DA]'} px-4 py-3 text-sm text-[#1F1F1F] focus:outline-none focus:border-[#C9653B] transition-colors`} 
-                            placeholder="Naseef" 
+                        <input
+                            {...register('name')}
+                            className={`w-full bg-[#FFF9F4] border ${errors.name ? 'border-red-400' : 'border-[#E6E0DA]'} px-4 py-3 text-sm text-[#1F1F1F] focus:outline-none focus:border-[#C9653B] transition-colors`}
+                            placeholder="Naseef"
                         />
                         {errors.name && <p className="text-[#D98880] text-[10px] mt-1 uppercase font-bold">{errors.name.message}</p>}
                     </div>
@@ -114,11 +114,11 @@ const RegisterPage: React.FC = () => {
                     {/* Email */}
                     <div>
                         <label className="block text-[10px] font-bold uppercase tracking-[0.2em] text-[#6B6B6B] mb-2">Email Address</label>
-                        <input 
-                            {...register('email')} 
+                        <input
+                            {...register('email')}
                             type="email"
-                            className={`w-full bg-[#FFF9F4] border ${errors.email ? 'border-red-400' : 'border-[#E6E0DA]'} px-4 py-3 text-sm text-[#1F1F1F] focus:outline-none focus:border-[#C9653B] transition-colors`} 
-                            placeholder="email@example.com" 
+                            className={`w-full bg-[#FFF9F4] border ${errors.email ? 'border-red-400' : 'border-[#E6E0DA]'} px-4 py-3 text-sm text-[#1F1F1F] focus:outline-none focus:border-[#C9653B] transition-colors`}
+                            placeholder="email@example.com"
                         />
                         {errors.email && <p className="text-[#D98880] text-[10px] mt-1 uppercase font-bold">{errors.email.message}</p>}
                     </div>
@@ -126,10 +126,10 @@ const RegisterPage: React.FC = () => {
                     {/* Phone Number */}
                     <div>
                         <label className="block text-[10px] font-bold uppercase tracking-[0.2em] text-[#6B6B6B] mb-2">Phone Number</label>
-                        <input 
-                            {...register('phone')} 
-                            className={`w-full bg-[#FFF9F4] border ${errors.phone ? 'border-red-400' : 'border-[#E6E0DA]'} px-4 py-3 text-sm text-[#1F1F1F] focus:outline-none focus:border-[#C9653B] transition-colors`} 
-                            placeholder="0123456789" 
+                        <input
+                            {...register('phone')}
+                            className={`w-full bg-[#FFF9F4] border ${errors.phone ? 'border-red-400' : 'border-[#E6E0DA]'} px-4 py-3 text-sm text-[#1F1F1F] focus:outline-none focus:border-[#C9653B] transition-colors`}
+                            placeholder="0123456789"
                         />
                         {errors.phone && <p className="text-[#D98880] text-[10px] mt-1 uppercase font-bold">{errors.phone.message}</p>}
                     </div>
@@ -137,11 +137,11 @@ const RegisterPage: React.FC = () => {
                     {/* Password */}
                     <div>
                         <label className="block text-[10px] font-bold uppercase tracking-[0.2em] text-[#6B6B6B] mb-2">Password</label>
-                        <input 
-                            type="password" 
-                            {...register('password')} 
-                            className={`w-full bg-[#FFF9F4] border ${errors.password ? 'border-red-400' : 'border-[#E6E0DA]'} px-4 py-3 text-sm text-[#1F1F1F] focus:outline-none focus:border-[#C9653B] transition-colors`} 
-                            placeholder="••••••••" 
+                        <input
+                            type="password"
+                            {...register('password')}
+                            className={`w-full bg-[#FFF9F4] border ${errors.password ? 'border-red-400' : 'border-[#E6E0DA]'} px-4 py-3 text-sm text-[#1F1F1F] focus:outline-none focus:border-[#C9653B] transition-colors`}
+                            placeholder="••••••••"
                         />
                         {errors.password && <p className="text-[#D98880] text-[10px] mt-1 uppercase font-bold">{errors.password.message}</p>}
                     </div>
@@ -149,18 +149,18 @@ const RegisterPage: React.FC = () => {
                     {/* Confirm Password */}
                     <div>
                         <label className="block text-[10px] font-bold uppercase tracking-[0.2em] text-[#6B6B6B] mb-2">Confirm Password</label>
-                        <input 
-                            type="password" 
-                            {...register('confirmPassword')} 
-                            className={`w-full bg-[#FFF9F4] border ${errors.confirmPassword ? 'border-red-400' : 'border-[#E6E0DA]'} px-4 py-3 text-sm text-[#1F1F1F] focus:outline-none focus:border-[#C9653B] transition-colors`} 
-                            placeholder="••••••••" 
+                        <input
+                            type="password"
+                            {...register('confirmPassword')}
+                            className={`w-full bg-[#FFF9F4] border ${errors.confirmPassword ? 'border-red-400' : 'border-[#E6E0DA]'} px-4 py-3 text-sm text-[#1F1F1F] focus:outline-none focus:border-[#C9653B] transition-colors`}
+                            placeholder="••••••••"
                         />
                         {errors.confirmPassword && <p className="text-[#D98880] text-[10px] mt-1 uppercase font-bold">{errors.confirmPassword.message}</p>}
                     </div>
 
-                    <button 
-                        type="submit" 
-                        disabled={loading} 
+                    <button
+                        type="submit"
+                        disabled={loading}
                         className="md:col-span-2 w-full bg-[#C9653B] text-white py-4 text-xs font-bold uppercase tracking-widest hover:bg-[#1F1F1F] transition-all duration-300 disabled:opacity-50"
                     >
                         {loading ? 'Verifying...' : 'Create Bidder Account'}

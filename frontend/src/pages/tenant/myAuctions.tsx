@@ -152,8 +152,8 @@ const TenantAuctions: React.FC = () => {
                                         <div className="absolute top-3 left-3 flex flex-col gap-1.5 items-start">
 
                                             <span className={`px-2.5 py-1 text-[9px] font-black tracking-wider uppercase rounded-md shadow-sm border ${item.type === "LIVE"
-                                                    ? "bg-[#0F172A] text-white border-[#0F172A]"
-                                                    : "bg-white text-[#0F172A] border-[#E2E8F0]"
+                                                ? "bg-[#0F172A] text-white border-[#0F172A]"
+                                                : "bg-white text-[#0F172A] border-[#E2E8F0]"
                                                 }`}>
                                                 {item.type}
                                             </span>
@@ -168,12 +168,12 @@ const TenantAuctions: React.FC = () => {
                                                     #{item.auctionItemId?.slice(-8).toUpperCase()}
                                                 </span>
                                                 <span className={`px-2 py-0.5 text-[9px] font-bold tracking-wide uppercase rounded-md border ${item.auctionStatus === "SCHEDULED" || item.auctionStatus === "SOLD"
-                                                        ? "bg-emerald-50 border-emerald-200 text-emerald-700"
-                                                        : item.auctionStatus === "PENDING_APPROVAL"
-                                                            ? "bg-amber-50 border-amber-200 text-amber-700"
-                                                            : item.auctionStatus === "DRAFT"
-                                                                ? "bg-slate-50 border-slate-200 text-slate-600"
-                                                                : "bg-rose-50 border-rose-200 text-rose-700"
+                                                    ? "bg-emerald-50 border-emerald-200 text-emerald-700"
+                                                    : item.auctionStatus === "PENDING_APPROVAL"
+                                                        ? "bg-amber-50 border-amber-200 text-amber-700"
+                                                        : item.auctionStatus === "DRAFT"
+                                                            ? "bg-slate-50 border-slate-200 text-slate-600"
+                                                            : "bg-rose-50 border-rose-200 text-rose-700"
                                                     }`}>
                                                     {item.auctionStatus?.replace(/_/g, " ")}
                                                 </span>

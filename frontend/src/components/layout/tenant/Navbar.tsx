@@ -1,16 +1,16 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { Bell, User,MessageCircle} from "lucide-react";
+import { Bell, User, MessageCircle } from "lucide-react";
 import { useAppSelector } from '../../../hooks/redux.hooks'
 import { useNavigate } from "react-router-dom";
 
 const TenantNavbar: React.FC = () => {
   const { isAuthenticated, user } = useAppSelector((state) => state.auth);
-  const navigate=useNavigate()
+  const navigate = useNavigate()
   return (
     <nav className="h-20 bg-white border-b border-[#E2E8F0] px-8 flex items-center justify-between sticky top-0 z-30">
 
-      
+
       <div className="flex items-center">
         {!isAuthenticated && (
           <Link to="/tenant/login" className="text-xl font-bold tracking-tight text-[#0F172A]">
@@ -19,7 +19,7 @@ const TenantNavbar: React.FC = () => {
         )}
       </div>
 
-      
+
       {isAuthenticated ? (
         <>
 
@@ -28,9 +28,9 @@ const TenantNavbar: React.FC = () => {
               <Bell size={20} strokeWidth={2} />
               <span className="absolute top-0 right-0 w-2 h-2 bg-[#EF4444] rounded-full border-2 border-white"></span>
             </button>
-             <button
-             onClick={()=>navigate('/tenant/chat')}
-             className="text-[#64748B] hover:text-[#2F6FED] transition-colors relative">
+            <button
+              onClick={() => navigate('/tenant/chat')}
+              className="text-[#64748B] hover:text-[#2F6FED] transition-colors relative">
               <MessageCircle size={20} strokeWidth={2} />
               <span className="absolute top-0 right-0 w-2 h-2 bg-[#EF4444] rounded-full border-2 border-white"></span>
             </button>
@@ -42,7 +42,7 @@ const TenantNavbar: React.FC = () => {
                 <span className="text-[11px] font-bold tracking-tight text-[#0F172A]">
                   {user?.name || "Auction Admin"}
                 </span>
-               
+
               </div>
               <div className="w-10 h-10 bg-[#2F6FED] rounded-xl flex items-center justify-center text-white group-hover:bg-[#1E40AF] transition-all shadow-lg shadow-blue-500/20">
                 <User size={20} />
@@ -51,7 +51,7 @@ const TenantNavbar: React.FC = () => {
           </div>
         </>
       ) : (
-       
+
         <div className="flex items-center gap-4">
           <Link
             to="/tenant/login"

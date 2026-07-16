@@ -214,8 +214,8 @@ const TenantVerificationForm: React.FC = () => {
                       key={categoryStr}
                       onClick={() => handleCategoryToggle(categoryStr)}
                       className={`flex items-center justify-between text-left px-4 py-3 rounded-xl border text-xs font-medium transition-all ${isChecked
-                          ? 'border-[#2F6FED] bg-[#2F6FED]/5 text-[#2F6FED] font-bold'
-                          : 'border-[#E2E8F0] bg-white text-[#475569] hover:border-[#CBD5E1]'
+                        ? 'border-[#2F6FED] bg-[#2F6FED]/5 text-[#2F6FED] font-bold'
+                        : 'border-[#E2E8F0] bg-white text-[#475569] hover:border-[#CBD5E1]'
                         }`}
                     >
                       <span>{categoryStr}</span>

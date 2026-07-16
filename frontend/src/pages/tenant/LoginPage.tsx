@@ -7,8 +7,8 @@ import { FcGoogle } from "react-icons/fc";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { useAppDispatch, useAppSelector } from "../../hooks/redux.hooks";
 import { setAuthError, setAuthSuccess, setLoading } from "../../redux/user/auth.slice";
-import { Roles } from "../../types/auth.type"; 
-import type{ userRole } from "../../types/auth.type";
+import { Roles } from "../../types/auth.type";
+import type { userRole } from "../../types/auth.type";
 import type { JwtPayload } from "../../types/auth.type";
 import authService from "../../services/auth.service";
 import toast from "react-hot-toast";
@@ -26,7 +26,7 @@ interface AuthSuccessData {
     };
 }
 
-type LoginResponse = 
+type LoginResponse =
     | { success: true; message: string; data: AuthSuccessData }
     | { success: false; message: string; data?: never };
 

@@ -3,12 +3,12 @@ import { useForm, useFieldArray } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 
 import toast from "react-hot-toast";
-import Cropper, {type Point, type Area } from "react-easy-crop";
-import { 
-  Gavel, Image as ImageIcon, Calendar, Percent, IndianRupee, Truck, Info, Loader2, Trash2, CheckCircle2 
+import Cropper, { type Point, type Area } from "react-easy-crop";
+import {
+  Gavel, Image as ImageIcon, Calendar, Percent, IndianRupee, Truck, Info, Loader2, Trash2, CheckCircle2
 } from "lucide-react";
 import { createAuctionItemSchema } from "../../types/auctionItem.dto";
-import  type { CreateAuctionItemDTO } from "../../types/auctionItem.dto";
+import type { CreateAuctionItemDTO } from "../../types/auctionItem.dto";
 import uploadservice from "../../services/uploadservice";
 import auctionItemMangementService from "../../services/auctionItemMangement.service";
 import { AuctionType } from "../../types/auctionItem.dto";
@@ -28,7 +28,7 @@ const CreateAuctionPage: React.FC = () => {
   const [crop, setCrop] = useState<Point>({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);//zoom crop croppedAreapixels are state variables diroctly  pass to react-easy crop for track positioning
   const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null);//hold the exact pixel cordinates and diamensions of the image area you want to cut out
-  const navigate=useNavigate();
+  const navigate = useNavigate();
   const { register, handleSubmit, control, setValue, watch, formState: { errors } } = useForm<CreateAuctionItemDTO>({
     resolver: yupResolver(createAuctionItemSchema),
     defaultValues: { images: [] }
@@ -56,14 +56,14 @@ const CreateAuctionPage: React.FC = () => {
     if (activeCropIndex === null) {
       setActiveCropIndex(0);
     }
-    e.target.value = ""; 
+    e.target.value = "";
   };
 
   const onCropComplete = useCallback((_croppedArea: Area, croppedAreaPixels: Area) => {
     setCroppedAreaPixels(croppedAreaPixels);
   }, []);
 
-  
+
   const processCroppedBlob = async (activeItem: ICropQueueItem, pixelCrop: Area): Promise<File> => {
     const image = new Image();   // instantiate an invisible html img elemnt  in your browser's background engine memory                               
     image.src = activeItem.rawUrl;  //and binds it to the local temporary file location tracker                           //this fn act as virtual knife
@@ -97,18 +97,18 @@ const CreateAuctionPage: React.FC = () => {
 
     try {
       const finishedCroppedFile = await processCroppedBlob(activeItem, croppedAreaPixels);
-      
+
       const frontendPreviewUrl = URL.createObjectURL(finishedCroppedFile);// now we have new file instance that ,that broser shows on the screen
 
       appendImageField({
         id: activeItem.id,
-        url: frontendPreviewUrl, 
-        isPrimary: attachedImages.length === 0, 
+        url: frontendPreviewUrl,
+        isPrimary: attachedImages.length === 0,
         altText: ""
       });
 
       advanceOrCloseCropModal();
-    } catch  {
+    } catch {
       toast.error("Image optimization failed. Please retry.");
     }
   };
@@ -121,7 +121,7 @@ const CreateAuctionPage: React.FC = () => {
       setActiveCropIndex(activeCropIndex + 1);
       setZoom(1);
     } else {
-  
+
       setCropQueue([]);
       setActiveCropIndex(null);
     }
@@ -134,7 +134,7 @@ const CreateAuctionPage: React.FC = () => {
   };
 
 
-  const onSubmit = async (data:CreateAuctionItemDTO) => {
+  const onSubmit = async (data: CreateAuctionItemDTO) => {
     try {
       setIsFormSubmitting(true);
 
@@ -161,16 +161,16 @@ const CreateAuctionPage: React.FC = () => {
       };
 
       const result = await auctionItemMangementService.createAuctionItem(finalAuctionPayload);
-      if(result.success){
+      if (result.success) {
         toast.success(result.message)
         data.images.forEach((img) => URL.revokeObjectURL(img.url));
         navigate('/tenant/dashboard')
       }
-      else{
+      else {
         toast.error(result.message)
       }
-      
-      
+
+
     } catch {
       toast.error("Failed to catalog auction request parameter limits.");
     } finally {
@@ -190,14 +190,14 @@ const CreateAuctionPage: React.FC = () => {
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
-        
-        
+
+
         <div className="bg-white rounded-2xl p-8 border border-[#E2E8F0] shadow-sm space-y-6">
           <div className="flex items-center gap-3 pb-4 border-b border-[#F5F7FB]">
             <Gavel size={18} className="text-[#2F6FED]" />
             <h2 className="text-[12px] font-bold uppercase tracking-widest text-[#0F172A]">Listing Content Parameters</h2>
           </div>
-          
+
           <div className="space-y-1">
             <label className={labelStyle}>Auction Lot Title</label>
             <input {...register("title")} placeholder="Ex: Vintage Leather Chronograph Watch (150-Word Ceiling)" className={inputStyle} />
@@ -224,7 +224,7 @@ const CreateAuctionPage: React.FC = () => {
           </div>
         </div>
 
-      
+
         <div className="bg-white rounded-2xl p-8 border border-[#E2E8F0] shadow-sm space-y-6">
           <div className="flex items-center gap-3 pb-4 border-b border-[#F5F7FB]">
             <ImageIcon size={18} className="text-[#2F6FED]" />
@@ -238,13 +238,13 @@ const CreateAuctionPage: React.FC = () => {
           </div>
           {errors.images && <p className={errorStyle}>{errors.images.message}</p>}
 
-       
+
           {watchedImages.length > 0 && (
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-4">
               {watchedImages.map((imgField, idx) => (
                 <div key={imgField.id} className={`relative rounded-xl border p-2 transition-all group ${imgField.isPrimary ? "border-[#2F6FED] bg-[#2F6FED]/5" : "border-[#E2E8F0]"}`}>
                   <img src={imgField.url} alt="Item attachment aspect preview" className="w-full h-28 object-cover rounded-lg bg-slate-50" />
-                  
+
                   <div className="absolute top-4 right-4 flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-all">
                     <button type="button" onClick={() => setPrimaryImageIndex(idx)} className={`p-1.5 rounded-md text-white shadow transition-all ${imgField.isPrimary ? "bg-[#10B981]" : "bg-black/70 hover:bg-black"}`}>
                       <CheckCircle2 size={13} />
@@ -267,7 +267,7 @@ const CreateAuctionPage: React.FC = () => {
           )}
         </div>
 
-        
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           <div className="bg-white rounded-2xl p-8 border border-[#E2E8F0] shadow-sm space-y-4">
             <div className="flex items-center gap-3 mb-2">
@@ -311,7 +311,7 @@ const CreateAuctionPage: React.FC = () => {
           </div>
         </div>
 
-      
+
         <div className="bg-white rounded-2xl p-8 border border-[#E2E8F0] shadow-sm space-y-4">
           <div className="flex items-center gap-3 pb-2 border-b border-[#F5F7FB]">
             <Calendar size={17} className="text-[#2F6FED]" />
@@ -331,7 +331,7 @@ const CreateAuctionPage: React.FC = () => {
           </div>
         </div>
 
-      
+
         <div className="bg-white rounded-2xl p-8 border border-[#E2E8F0] shadow-sm space-y-4">
           <div className="flex items-center gap-3 pb-2 border-b border-[#F5F7FB]">
             <Truck size={17} className="text-[#2F6FED]" />
@@ -349,7 +349,7 @@ const CreateAuctionPage: React.FC = () => {
           </div>
         </div>
 
-       
+
         <div className="flex flex-col items-center gap-6 mt-12">
           <button type="submit" disabled={isFormSubmitting} className="w-full md:w-auto bg-[#2F6FED] text-white px-20 py-4 rounded-xl font-bold text-sm uppercase tracking-widest hover:bg-[#2557C8] transition-all flex items-center justify-center gap-3 shadow-lg shadow-blue-500/20 disabled:opacity-50">
             {isFormSubmitting ? (
@@ -366,11 +366,11 @@ const CreateAuctionPage: React.FC = () => {
         </div>
       </form>
 
-     
+
       {activeCropIndex !== null && cropQueue[activeCropIndex] && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
           <div className="bg-white rounded-2xl max-w-2xl w-full flex flex-col overflow-hidden max-h-[90vh]">
-            
+
             <div className="px-6 py-4 border-b border-[#E2E8F0] flex justify-between items-center bg-[#F8FAFC]">
               <div>
                 <h3 className="text-xs font-black uppercase tracking-widest text-[#0F172A]">Image Cropping Workspace</h3>
@@ -379,24 +379,24 @@ const CreateAuctionPage: React.FC = () => {
               <button type="button" onClick={() => advanceOrCloseCropModal()} className="text-xs font-bold uppercase tracking-wider text-[#94A3B8] hover:text-black">Skip Image</button>
             </div>
 
-           
-          <div className="relative flex-1 bg-neutral-900 w-full min-h-[350px] max-h-[500px] overflow-hidden">
-  <Cropper
-    image={cropQueue[activeCropIndex].rawUrl}
-    crop={crop}
-    zoom={zoom}
-    aspect={4 / 3}
-    objectFit="contain"
-    minZoom={0.2}              
-    maxZoom={3}
-    restrictPosition={false}   
-    onCropChange={setCrop}
-    onZoomChange={setZoom}
-    onCropComplete={onCropComplete}
-  />
-</div>
 
-            
+            <div className="relative flex-1 bg-neutral-900 w-full min-h-[350px] max-h-[500px] overflow-hidden">
+              <Cropper
+                image={cropQueue[activeCropIndex].rawUrl}
+                crop={crop}
+                zoom={zoom}
+                aspect={4 / 3}
+                objectFit="contain"
+                minZoom={0.2}
+                maxZoom={3}
+                restrictPosition={false}
+                onCropChange={setCrop}
+                onZoomChange={setZoom}
+                onCropComplete={onCropComplete}
+              />
+            </div>
+
+
             <div className="p-6 bg-white border-t border-[#E2E8F0] space-y-4">
               <div className="space-y-1">
                 <div className="flex justify-between text-[9px] font-bold uppercase tracking-wider text-[#475569]">

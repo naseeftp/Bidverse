@@ -27,7 +27,7 @@ export const fetchAuctionProfile = createAsyncThunk(
             if (!result.success) {
                 return rejectWithValue(result.message)
             }
-            
+
             return result as unknown as AuctionHouseResponseDTO;
         } catch {
             return rejectWithValue('Unexpected error happened')

@@ -9,7 +9,7 @@ import type { ApiResponse, JwtPayload } from '../../types/auth.type';
 
 interface RegistrationResult {
   token: string;
-  user:JwtPayload 
+  user: JwtPayload
 }
 
 
@@ -28,7 +28,7 @@ const TenantVerifyOtpPage: React.FC = () => {
 
   const tempAuthData = useAppSelector((state) => state.auth.tempAuthData);
 
-  const [email,setEmail]=useState('')
+  const [email, setEmail] = useState('')
   const [otp, setOtp] = useState<string[]>(new Array(6).fill(""));
   const [loading, setLoading] = useState(false);
   const [expiresAt, setExpiresAt] = useState<number | null>(null);
@@ -43,16 +43,16 @@ const TenantVerifyOtpPage: React.FC = () => {
   const bgLight = "#F5F7FB";
 
   useEffect(() => {
-    const storedData=localStorage.getItem('registrationData')
+    const storedData = localStorage.getItem('registrationData')
     if (!storedData) {
       navigate("/tenant/register");
       return;
     }
-    const parseData=JSON.parse(storedData);
+    const parseData = JSON.parse(storedData);
     setEmail(parseData.email);
     setExpiresAt(new Date(parseData.expiresAt).getTime())
-   
-  }, [email, navigate,expiresAt]);
+
+  }, [email, navigate, expiresAt]);
 
   useEffect(() => {
     if (!expiresAt) return;
@@ -95,14 +95,14 @@ const TenantVerifyOtpPage: React.FC = () => {
     setLoading(true);
 
     try {
-      const result=await authService.resendOtp({ email });
-      if (result?.success&&result.data) {
-        const newExpiry=new Date(result.data.expiresAt).getTime()
+      const result = await authService.resendOtp({ email });
+      if (result?.success && result.data) {
+        const newExpiry = new Date(result.data.expiresAt).getTime()
         setExpiresAt(newExpiry)
         localStorage.setItem('registrationData',
           JSON.stringify({
             email,
-            expiresAt:newExpiry
+            expiresAt: newExpiry
           })
         )
         toast.success(result.message);
@@ -128,7 +128,7 @@ const TenantVerifyOtpPage: React.FC = () => {
       const result: ApiResponse<RegistrationResult> = await authService.verifyOtp({
         email,
         otp: otpString,
-        role: role 
+        role: role
       });
 
       if (result?.success && result.data) {
@@ -157,7 +157,7 @@ const TenantVerifyOtpPage: React.FC = () => {
   return (
     <div className={`min-h-screen flex items-center justify-center bg-[${bgLight}] p-6 font-sans`}>
       <div className="max-w-md w-full bg-white border border-[#E2E8F0] p-10 md:p-12 rounded-2xl shadow-sm">
-        
+
         <div className="text-center mb-10">
           <h2 className={`text-3xl font-extrabold text-[${deepNavy}] tracking-tight`}>
             Verify your House
@@ -191,7 +191,7 @@ const TenantVerifyOtpPage: React.FC = () => {
           >
             {loading ? "Verifying..." : "Confirm Verification"}
           </button>
-        </form> 
+        </form>
 
         <div className="mt-10 pt-8 border-t border-[#E2E8F0] text-center">
           <p className={`text-[11px] font-semibold uppercase tracking-wider text-[${slateGrey}] mb-3`}>

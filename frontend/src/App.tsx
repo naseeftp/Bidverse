@@ -61,7 +61,7 @@ import AdminAuctionDetailPage from "./pages/admin/auctionDetails";
 import { useSocketAuth } from "./hooks/useSocketauth";
 
 function App() {
-  useSocketAuth()
+   useSocketAuth()
 
    return (
       <Router>
@@ -71,10 +71,10 @@ function App() {
 
             <Route element={<MainLayout />}>
                <Route path="/auth-success" element={<AuthSuccessPage />} />
-               <Route path="/auction-houses" element={<PublicAuctionHouses/>}/>
-               <Route path="/auctions" element={<PublicAuctions/>}/>
-               <Route path="/auctions/:itemId" element={<PublicAuctionDetailPage/>}/>
-               <Route path="/auction-house/:houseId" element={<PublicAuctionHouseDetailsPage/>}/>
+               <Route path="/auction-houses" element={<PublicAuctionHouses />} />
+               <Route path="/auctions" element={<PublicAuctions />} />
+               <Route path="/auctions/:itemId" element={<PublicAuctionDetailPage />} />
+               <Route path="/auction-house/:houseId" element={<PublicAuctionHouseDetailsPage />} />
 
                <Route element={<PublicRoute />}>
                   <Route path="/" element={<LandingPage />} />
@@ -90,25 +90,25 @@ function App() {
                   <Route path="/home" element={<UserHomePage />} />
                   <Route path="/profile" element={<ProfilePage />} />
                   <Route path="/change-password" element={<ChangePasswordPage />} />
-                  <Route path="/change-email" element={<ChangeEmailPage/>}/>
-                  <Route path="/change-email-verify" element={<ChangeEmailVerifyPage/>}/>
-                  <Route path="/watch-list" element={<WatchlistPage/>} />
-                  <Route path="/chat" element={<ChatPage/>} />
+                  <Route path="/change-email" element={<ChangeEmailPage />} />
+                  <Route path="/change-email-verify" element={<ChangeEmailVerifyPage />} />
+                  <Route path="/watch-list" element={<WatchlistPage />} />
+                  <Route path="/chat" element={<ChatPage />} />
 
                </Route>
             </Route>
 
-            <Route element={<UsertLayout/>}>
+            <Route element={<UsertLayout />}>
                <Route element={<ProtectedRoute allowedRoles={['user']} />}>
                   <Route path="/dashboard" element={<Dashboard />} />
-                  <Route path="/addresses" element={<AddressPage/>} />
-                  
+                  <Route path="/addresses" element={<AddressPage />} />
+
                </Route>
             </Route>
 
-             <Route path="/tenant/chat" element={<TenantChatPage/>}/>
+            <Route path="/tenant/chat" element={<TenantChatPage />} />
             <Route element={<TenantLayout />}>
-               
+
                <Route element={<PublicRoute />}>
                   <Route path="/tenant/register" element={<TenantRegisterPage />} />
                   <Route path="/tenant/verify-otp" element={<TenantVerifyOtpPage />} />
@@ -117,25 +117,25 @@ function App() {
                   <Route path='/tenant/forgot-verify-otp' element={<TenantForgotPassVerifyOtp />} />
                   <Route path="/tenant/reset-password" element={<TenantResetPasswordPage />} />
                </Route>
-               
+
                <Route element={<ProtectedRoute allowedRoles={['tenant']} />}>
                   <Route path="/tenant/dashboard" element={<TenantDashboard />} />
                   <Route path='/tenant/verification-form' element={<TenantVerificationForm />}></Route>
-                  <Route path="/tenant/resubmit-verification" element={<TenantVerificationResubmissionPage/>}/>
-                  <Route path="/tenant/profile" element={<TenantProfilePage/>}/>
-                  <Route path="/tenant/changePassword" element={<TenantChangePasswordPage/>}/>
-                  <Route path="/tenant/changeEmail" element={<TenantChangeEmailPage/>}/>
-                  <Route path="/tenant/changeEmail-verify" element={<TenantVerifyEmailPage />}/>
-                  <Route path="/tenant/create-auction" element={<CreateAuctionPage/>}/>
-                  <Route path="/tenant/auctions" element={<TenantAuctions/>}/>
-                  <Route path="/tenant/auctions/:id" element={<TenantAuctionDetailPage/>}/>
-                  <Route path="/tenant/update-auctions/:id" element={<TenantEditAuctionPage/>}/>
-                  
+                  <Route path="/tenant/resubmit-verification" element={<TenantVerificationResubmissionPage />} />
+                  <Route path="/tenant/profile" element={<TenantProfilePage />} />
+                  <Route path="/tenant/changePassword" element={<TenantChangePasswordPage />} />
+                  <Route path="/tenant/changeEmail" element={<TenantChangeEmailPage />} />
+                  <Route path="/tenant/changeEmail-verify" element={<TenantVerifyEmailPage />} />
+                  <Route path="/tenant/create-auction" element={<CreateAuctionPage />} />
+                  <Route path="/tenant/auctions" element={<TenantAuctions />} />
+                  <Route path="/tenant/auctions/:id" element={<TenantAuctionDetailPage />} />
+                  <Route path="/tenant/update-auctions/:id" element={<TenantEditAuctionPage />} />
+
 
                </Route>
 
             </Route>
-             
+
             <Route element={<AdminLayout />}>
                <Route element={<PublicRoute />}>
                   <Route path="/admin" element={<AdminLoginPage />} />
@@ -145,9 +145,9 @@ function App() {
                   <Route path="/admin/auction-houses" element={<AuctionHouseTable />} />
                   <Route path="/admin/auction-house/:id" element={<AuctionHouseDetailPage />} />
                   <Route path='/admin/users' element={<UsersListPage />} />
-                  <Route path='/admin/user/:id' element={<UserDetailPage/>} />
-                  <Route path="/admin/auctions" element={<AdminAuctionsListPage/>}/>
-                  <Route path="/admin/auctions/:id" element={<AdminAuctionDetailPage/>}/>
+                  <Route path='/admin/user/:id' element={<UserDetailPage />} />
+                  <Route path="/admin/auctions" element={<AdminAuctionsListPage />} />
+                  <Route path="/admin/auctions/:id" element={<AdminAuctionDetailPage />} />
                </Route>
             </Route>
 

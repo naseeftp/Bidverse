@@ -1,8 +1,8 @@
 import type { TVerificationStatus } from "./auctionHouse.type";
 import * as Yup from 'yup';
 export interface updateAuctionHouseStatusRequestDTO {
-    status: TVerificationStatus,
-    reason?: string | null
+  status: TVerificationStatus,
+  reason?: string | null
 }
 
 export const updateUserStatusSchema = Yup.object().shape({

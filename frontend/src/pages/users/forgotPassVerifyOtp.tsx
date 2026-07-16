@@ -133,7 +133,7 @@ const ForgotPassVerifyOtp: React.FC = () => {
         toast.success("Email verified. Set your new password.");
         localStorage.removeItem('forgotpassData')
         localStorage.setItem('verifyotpdata',
-          JSON.stringify({email:email,role:role,resetToken:result.data.resetToken})
+          JSON.stringify({ email: email, role: role, resetToken: result.data.resetToken })
         )
         navigate("/reset-password");
       } else {

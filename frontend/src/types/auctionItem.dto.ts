@@ -167,7 +167,7 @@ export interface AuctionItemListDTO {
     type: AuctionType;
     startTime: string;
     endTime: string;
-    startingPrice:number
+    startingPrice: number
     images: {
         id: string;
         url: string;
@@ -257,12 +257,12 @@ export const updateAuctionItemSchema = yup.object()
         'Reserve price cannot be lower than the starting opening price',
         function (value) {
             const data = value as Partial<CreateAuctionItemDTO>;
-            
-            if (!data || data.startingPrice === undefined || data.startingPrice === null || 
+
+            if (!data || data.startingPrice === undefined || data.startingPrice === null ||
                 data.reservePrice === undefined || data.reservePrice === null) {
-                return true; 
+                return true;
             }
-            
+
             return data.reservePrice >= data.startingPrice;
         }
     )
@@ -273,7 +273,7 @@ export const updateAuctionItemSchema = yup.object()
             const data = value as Partial<CreateAuctionItemDTO>;
 
             if (!data || !data.startTime || !data.endTime) {
-                return true; 
+                return true;
             }
 
             const start = new Date(data.startTime);
@@ -284,5 +284,5 @@ export const updateAuctionItemSchema = yup.object()
             return end > start;
         }
     );
- export type UpdateAuctionItemDTO = yup.InferType<typeof updateAuctionItemSchema>;
- export type UpdateAuctionStatusDTO = yup.InferType<typeof updateAuctionStatusSchema>
+export type UpdateAuctionItemDTO = yup.InferType<typeof updateAuctionItemSchema>;
+export type UpdateAuctionStatusDTO = yup.InferType<typeof updateAuctionStatusSchema>

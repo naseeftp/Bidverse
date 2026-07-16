@@ -77,14 +77,14 @@ const AddressPage: React.FC = () => {
                 toast.error(result.message)
             }
         } catch {
-            toast.error(isEditing?'Failed to update Address':'Failed to add Address');
+            toast.error(isEditing ? 'Failed to update Address' : 'Failed to add Address');
         }
     }
-    const closeModal=async()=>{
+    const closeModal = async () => {
         setIsModalOpen(false);
         setIsEditing(false);
         setCurrentAddressId(null);
-        reset({isDefault:false})
+        reset({ isDefault: false })
     }
     const openDeleteModal = async (addressId: string) => {
         setAddressToDelete(addressId)
@@ -116,7 +116,7 @@ const AddressPage: React.FC = () => {
             <div className="flex justify-between items-center mb-8">
                 <h1 className="text-2xl font-bold text-[#1F1F1F]">Your Addresses</h1>
                 <button
-                    onClick={() => {setIsEditing(false);setIsModalOpen(true);reset({isDefault:false})}}
+                    onClick={() => { setIsEditing(false); setIsModalOpen(true); reset({ isDefault: false }) }}
                     className="bg-[#C9653B] text-white px-6 py-2.5 rounded-lg font-bold hover:opacity-90 transition-all shadow-sm"
                 >
                     Add Address +
@@ -153,7 +153,7 @@ const AddressPage: React.FC = () => {
                                     </p>
                                     <div className="mt-6 pt-4 border-t border-[#E6E0DA] flex items-center justify-between">
                                         <button
-                                            onClick={()=>openEditModal(address)}
+                                            onClick={() => openEditModal(address)}
                                             className="text-sm font-bold text-[#C9653B] hover:opacity-80 transition-opacity"
                                         >
                                             Edit Address
@@ -186,8 +186,8 @@ const AddressPage: React.FC = () => {
 
                         <div className="p-6 border-b border-[#E6E0DA] flex justify-between items-center">
                             <h2 className="text-xl font-bold text-[#1F1F1F]">
-                                {isEditing?'Edit Your Address':' Add New Shipping Address'}
-                                </h2>
+                                {isEditing ? 'Edit Your Address' : ' Add New Shipping Address'}
+                            </h2>
                             <button onClick={() => setIsModalOpen(false)} className="text-[#6B6B6B] hover:text-[#1F1F1F]">
                                 <X size={24} />
                             </button>
@@ -211,7 +211,7 @@ const AddressPage: React.FC = () => {
                                 <div>
                                     <label className="block text-sm font-bold text-[#6B6B6B] mb-1">Alternative Phone (Optional)</label>
                                     <input {...register("altPhone")} className="w-full p-3 border border-[#E6E0DA] rounded-lg" placeholder="10 digits" />
-                                    {errors.altPhone&&<p className="text-[#991B1B] text-xs mt-1">{errors.altPhone.message}</p>}
+                                    {errors.altPhone && <p className="text-[#991B1B] text-xs mt-1">{errors.altPhone.message}</p>}
                                 </div>
 
 
@@ -294,7 +294,7 @@ const AddressPage: React.FC = () => {
                                     type="submit"
                                     className="flex-1 px-6 py-3 rounded-lg font-bold text-white bg-[#C9653B] shadow-md hover:opacity-95"
                                 >
-                                   {isEditing?'Update Address':' Save Address'}
+                                    {isEditing ? 'Update Address' : ' Save Address'}
                                 </button>
                             </div>
                         </form>

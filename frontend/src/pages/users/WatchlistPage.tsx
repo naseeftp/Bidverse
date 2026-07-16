@@ -1,4 +1,4 @@
-import React, { useState, useEffect,useCallback } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import watchListService from "../../services/watchList.service";
 import type { IPaginationMeta } from "../../types/auth.type";
 import type { WatchlistItemCardDTO } from "../../types/watchlist.dto";

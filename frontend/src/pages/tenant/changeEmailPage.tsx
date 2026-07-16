@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm } from 'react-hook-form';
 import { yupResolver } from "@hookform/resolvers/yup";
-import { FaEye, FaEyeSlash} from "react-icons/fa";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { changeEmailSchema } from "../../types/profile.dto";
 import type { changeEmailDTO } from '../../types/profile.dto'
 import profileService from '../../services/profileManagement.service'
@@ -50,19 +50,19 @@ const TenantChangeEmailPage: React.FC = () => {
     return (
         <div className="min-h-screen bg-[#F5F7FB] flex items-center justify-center px-6 font-sans">
             <div className="bg-[#FFFFFF] border border-[#E2E8F0] w-full max-w-md p-10 shadow-sm rounded-xl">
-                
-               
+
+
                 <div className="text-center mb-8">
-                   
+
                     <h2 className="text-2xl font-bold text-[#0F172A] tracking-tight">
                         Change Email
                     </h2>
-                 
+
                 </div>
 
                 <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
-                    
-                    
+
+
                     <div>
                         <label className="block text-xs font-semibold uppercase tracking-wider text-[#475569] mb-2">
                             Current Email Address
@@ -80,7 +80,7 @@ const TenantChangeEmailPage: React.FC = () => {
                         )}
                     </div>
 
-                    
+
                     <div>
                         <label className="block text-xs font-semibold uppercase tracking-wider text-[#475569] mb-2">
                             New Email Address
@@ -100,7 +100,7 @@ const TenantChangeEmailPage: React.FC = () => {
 
                     <div className="h-[1px] bg-[#F1F5F9] w-full my-2"></div>
 
-                    
+
                     <div>
                         <label className="block text-xs font-semibold uppercase tracking-wider text-[#475569] mb-2">
                             Confirm Password

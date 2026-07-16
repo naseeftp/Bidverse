@@ -33,7 +33,7 @@ const TenantProfilePage: React.FC = () => {
     const [selectedImgSrc, setSelectedImgSrc] = useState<string | null>(null);
     const [isCropModalOpen, setIsCropModalOpen] = useState(false);
 
-  
+
     const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (!file) return;
@@ -248,7 +248,7 @@ const TenantProfilePage: React.FC = () => {
 
                             <div className="flex flex-col items-center text-center w-full md:w-auto min-w-[120px] gap-3 pt-1">
                                 <div className="w-24 h-24 rounded-full bg-[#F1F5F9] border border-[#E2E8F0] flex items-center justify-center overflow-hidden shadow-inner">
-                                  
+
                                     {house?.profileImage ? (
                                         <img src={house.profileImage} alt="User" className="w-full h-full object-cover" />
                                     ) : (
@@ -442,15 +442,15 @@ const TenantProfilePage: React.FC = () => {
                             </div>
                         </div>
                     </section>
-                    {isCropModalOpen&&selectedImgSrc&&(
-                        <ImageCropModal 
-                        imageSrc={selectedImgSrc}
-                        onClose={()=>{
-                            setIsCropModalOpen(false);
-                            setSelectedImgSrc(null);
-                            if(fileInputRef.current) fileInputRef.current.value=''
-                        }}
-                        onCropComplete={handleCropExecution}
+                    {isCropModalOpen && selectedImgSrc && (
+                        <ImageCropModal
+                            imageSrc={selectedImgSrc}
+                            onClose={() => {
+                                setIsCropModalOpen(false);
+                                setSelectedImgSrc(null);
+                                if (fileInputRef.current) fileInputRef.current.value = ''
+                            }}
+                            onCropComplete={handleCropExecution}
                         />
                     )}
 

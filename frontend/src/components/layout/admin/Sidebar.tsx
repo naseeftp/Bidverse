@@ -27,8 +27,8 @@ const AdminSidebar: React.FC = () => {
 
         { name: "Dashboard", path: "/admin/dashboard", icon: <FaThLarge /> },
         { name: "User Management", path: "/admin/users", icon: <FaUsers /> },
-        { name: "Auction Houses", path: "/admin/auction-houses", icon: < FaStore/> },
-        { name: "Auctions", path: "/admin/auctions", icon: <FaGavel />},
+        { name: "Auction Houses", path: "/admin/auction-houses", icon: < FaStore /> },
+        { name: "Auctions", path: "/admin/auctions", icon: <FaGavel /> },
 
 
     ];

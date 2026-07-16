@@ -22,7 +22,7 @@ const AuthSuccessPage = () => {
             dispatch(setAuthSuccess(decoded));
 
             // 4. THE FINAL STEP: Go to Home!
-            navigate('/home'); 
+            navigate('/home');
         } else {
             navigate('/login');
         }

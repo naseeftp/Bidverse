@@ -91,7 +91,7 @@ const PublicAuctionDetailPage: React.FC = () => {
     useEffect(() => {
         fetchAuctionDetail();
     }, [fetchAuctionDetail]);
-    
+
     useEffect(() => {
         if (!auction || !auction.startTime || !auction.endTime) return;
 
@@ -320,8 +320,8 @@ const PublicAuctionDetailPage: React.FC = () => {
                                 onClick={handleWatchlistAction}
                                 disabled={isWatchlistLoading || isWatched}
                                 className={`w-full py-2.5 rounded-lg font-bold text-xs uppercase tracking-wider transition-all focus:outline-none flex items-center justify-center gap-2 border border-[#E6E0DA] disabled:cursor-not-allowed ${isWatched
-                                        ? "bg-[#1F1F1F] text-white border-[#1F1F1F]"
-                                        : "bg-white text-[#1F1F1F] hover:bg-[#FFF9F4]"
+                                    ? "bg-[#1F1F1F] text-white border-[#1F1F1F]"
+                                    : "bg-white text-[#1F1F1F] hover:bg-[#FFF9F4]"
                                     }`}
                             >
                                 {isWatched ? (

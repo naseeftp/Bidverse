@@ -45,18 +45,18 @@ const PublicAuctions: React.FC = () => {
         <div className="min-h-screen bg-[#FFF9F4] text-[#1F1F1F] px-4 py-8 md:px-8">
             <div className="max-w-7xl mx-auto">
 
-            
+
                 <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6 mb-8 pb-6 border-b border-[#E6E0DA]/60">
-                    
-                
+
+
                     <div className="max-w-md">
                         <h1 className="text-3xl font-bold tracking-tight text-[#1F1F1F] mb-2">Find Auctions....</h1>
                         <p className="text-sm text-[#6B6B6B]">Explore verified active Auctions and Participate.</p>
                     </div>
 
-                  
+
                     <div className="flex flex-col sm:flex-row items-center gap-3 w-full lg:w-auto sm:max-w-xl">
-                   
+
                         <div className="relative w-full sm:w-80">
                             <input
                                 type="text"
@@ -72,7 +72,7 @@ const PublicAuctions: React.FC = () => {
                             </div>
                         </div>
 
-                  
+
                         <div className="relative w-full sm:w-44">
                             <select
                                 value={typeFilter}
@@ -93,7 +93,7 @@ const PublicAuctions: React.FC = () => {
 
                 </div>
 
-              
+
                 {loading ? (
                     <div className="flex justify-center items-center h-64">
                         <div className="w-8 h-8 border-4 border-[#C9653B] border-t-transparent rounded-full animate-spin"></div>

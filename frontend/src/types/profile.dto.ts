@@ -77,21 +77,21 @@ export const changeBussinessDetailsSchema = yup.object({
     .matches(/^\d{10}$/, 'Phone must be 10 digits')
     .max(10, "Phone cannot exceed 10 digits"),
 
-    city: yup.string()
+  city: yup.string()
     .min(1, 'City is required')
     .max(50, 'City name too long'),
 
   fullAddress: yup.string()
-      .min(5, 'Full address required')
-      .max(255, 'Address is too long'),
- 
+    .min(5, 'Full address required')
+    .max(255, 'Address is too long'),
+
 })
-export interface UpdateProfilePicDTO{
-  profileImage:string|null;
+export interface UpdateProfilePicDTO {
+  profileImage: string | null;
 }
 
 export type ProfileDetailChangeFormData = yup.InferType<typeof profileDetailChangeSchema>;
 export type changePasswordDTO = yup.InferType<typeof changePasswordSchema>
 export type changeEmailDTO = yup.InferType<typeof changeEmailSchema>
 export type changeEmailVerificationDTO = yup.InferType<typeof changeEmailVerificationSchema>
-export type changeBussinessDetailsDTO=yup.InferType<typeof changeBussinessDetailsSchema>
+export type changeBussinessDetailsDTO = yup.InferType<typeof changeBussinessDetailsSchema>

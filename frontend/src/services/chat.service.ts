@@ -22,38 +22,38 @@ class ChatService {
     async getUserConversations() {
         try {
             const url = `${BASE_ROUTES.CHAT}${CHAT_ROUTES.GET_USER_CONVO}`;
-            const response=await axiosInstance.get<ConversationDTO,ApiResponse<ConversationDTO[]>>(url)
+            const response = await axiosInstance.get<ConversationDTO, ApiResponse<ConversationDTO[]>>(url)
             return {
-                success:true,
-                data:response.data,
-                message:response.message
+                success: true,
+                data: response.data,
+                message: response.message
             }
         } catch (error) {
             return apiErrorHandler(error, 'Failed get conversation')
 
         }
     }
-    async sendMessage(payload:SendMessageInputDTO){
+    async sendMessage(payload: SendMessageInputDTO) {
         try {
-            const url=`${BASE_ROUTES.CHAT}${CHAT_ROUTES.SEND_MESSAGE}`;
-            const response=await axiosInstance.post<MessageDto,ApiResponse<MessageDto>>(url,payload);
-            return{
-                success:true,
-                data:response.data,
-                message:response.message
+            const url = `${BASE_ROUTES.CHAT}${CHAT_ROUTES.SEND_MESSAGE}`;
+            const response = await axiosInstance.post<MessageDto, ApiResponse<MessageDto>>(url, payload);
+            return {
+                success: true,
+                data: response.data,
+                message: response.message
             }
         } catch (error) {
             return apiErrorHandler(error, 'Failed to send message')
         }
     }
-    async getMessages(conversationId:string){
+    async getMessages(conversationId: string) {
         try {
-            const url=`${BASE_ROUTES.CHAT}${CHAT_ROUTES.GET_MESSAGES}/${conversationId}`;
-            const response=await axiosInstance.get<MessageDto,ApiResponse<MessageDto[]>>(url)
-            return{
-                success:true,
-                message:response.message,
-                data:response.data
+            const url = `${BASE_ROUTES.CHAT}${CHAT_ROUTES.GET_MESSAGES}/${conversationId}`;
+            const response = await axiosInstance.get<MessageDto, ApiResponse<MessageDto[]>>(url)
+            return {
+                success: true,
+                message: response.message,
+                data: response.data
             }
         } catch (error) {
             return apiErrorHandler(error, 'Failed to retrieve messages')

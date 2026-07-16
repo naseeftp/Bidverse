@@ -25,7 +25,7 @@ const PublicAuctionHouses: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [search, setSearch] = useState("");
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
-  const navigate=useNavigate()
+  const navigate = useNavigate()
   useEffect(() => {
     const delayedDebounceFn = setTimeout(() => {
       setSearch(searchQuery);
@@ -220,8 +220,8 @@ const PublicAuctionHouses: React.FC = () => {
 
                   <div className="px-8 pb-8">
                     <button
-                    onClick={()=>navigate(`/auction-house/${house.houseId}`)}
-                    className="w-full bg-[#C9653B] hover:bg-[#B2532E] text-white font-bold text-xs py-3.5 px-4 rounded-2xl transition-all duration-300 shadow-sm hover:shadow-lg hover:shadow-[#C9653B]/10 cursor-pointer flex items-center justify-center gap-2 group/btn">
+                      onClick={() => navigate(`/auction-house/${house.houseId}`)}
+                      className="w-full bg-[#C9653B] hover:bg-[#B2532E] text-white font-bold text-xs py-3.5 px-4 rounded-2xl transition-all duration-300 shadow-sm hover:shadow-lg hover:shadow-[#C9653B]/10 cursor-pointer flex items-center justify-center gap-2 group/btn">
                       <span>Visit Auction House</span>
                       <svg className="w-3.5 h-3.5 transform group-hover/btn:translate-x-1 transition-transform duration-200" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
