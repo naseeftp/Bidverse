@@ -1,9 +1,8 @@
 import { IOTP } from "../../types/otp.type";
 import otpModel from '../../models/otp.model'
-import { IOtpRepository } from "../interfaces/IOtp.repository";
 import { BaseRepository } from "./Base.repository";
 
-export class OtpRepository extends BaseRepository<IOTP> implements IOtpRepository {
+export class OtpRepository extends BaseRepository<IOTP> {
     constructor() {
         super(otpModel)
     }
@@ -13,4 +12,5 @@ export class OtpRepository extends BaseRepository<IOTP> implements IOtpRepositor
     async updateOtp(email: string, data: { otp: string | null; expiresAt: Date }): Promise<IOTP | null> {
         return await this.model.findOneAndUpdate({ email }, { $set: data }, { new: true }).exec();
     }
+    
 }

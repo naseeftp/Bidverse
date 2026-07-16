@@ -48,7 +48,7 @@ export class OtpService implements IOTPService {
 
         }
         if (isOtpExpired(otprecord.expiresAt)) {
-            await this._otpRepository.deleteById(otprecord._id);
+            await this._otpRepository.deleteByEmail(email);
             throw new ValidationError(MESSAGES.OTP_INVALID_OR_EXPIRED)
 
         }
@@ -56,7 +56,7 @@ export class OtpService implements IOTPService {
     }
     async resendOtp(email: string, expiryMinutes: number = 1, maxSessionAge: number = 30): Promise<{ email: string; expiresAt: Date }> {
 
-        const otprecord = await this._otpRepository.findOneByField("email", email)
+        const otprecord = await this._otpRepository.findByEmail(email)
 
         if (!otprecord) {
             throw new AppError(MESSAGES.OTP_SESSION_EXPIRED_RESEND, HttpStatus.GONE)
@@ -64,12 +64,12 @@ export class OtpService implements IOTPService {
         const sessionAge = Date.now() - new Date(otprecord.createdAt!).getTime()
         const maxSessionAgeMs = maxSessionAge * 60 * 1000;
         if (sessionAge > maxSessionAgeMs) {
-            await this._otpRepository.deleteByFilter({ email });
+            await this._otpRepository.deleteByEmail(email);
             throw new AppError(MESSAGES.OTP_SESSION_EXPIRED_RESEND, HttpStatus.GONE);
         }
         const newOtp = genarateOtp(6);
         const newExpiresAt = getOtpExpiry(expiryMinutes);
-        await this._otpRepository.updateById(otprecord._id.toString(), {
+        await this._otpRepository.updateOtp(otprecord._id.toString(), {
             otp: newOtp,
             expiresAt: newExpiresAt
         })
@@ -77,7 +77,7 @@ export class OtpService implements IOTPService {
         return { email, expiresAt: newExpiresAt };
     }
     async deleteOtp(email: string): Promise<void> {
-        await this._otpRepository.deleteByFilter({ email })
+        await this._otpRepository.deleteByEmail(email)
     }
 
 }

@@ -5,15 +5,16 @@ import { ProfileService } from "../services/implementations/Profile.service";
 import { ProfileController } from "../controllers/implimentations/Profile.controller";
 import { OtpService } from "../services/implementations/Otp.service";
 import { EmailService } from "../services/implementations/Email.service";
-import { OtpRepository } from "../repositories/implementations/Otp.repository";
+import { RedisOtpRepository } from "../repositories/implementations/RedisOtp.repository";
 
 const userRepo = new UserRepository()
 const auctionHouseRepo = new AuctionHouseRepository()
 const emailLogger = new LoggerService('EmailLogger')
 const otpLogger = new LoggerService('OtpLogget')
-const otpRepo = new OtpRepository()
+
+const rediOtpRepo = new RedisOtpRepository()
 const emailservice = new EmailService(emailLogger)
-const otpService = new OtpService(otpRepo, otpLogger, emailservice)
+const otpService = new OtpService(rediOtpRepo, otpLogger, emailservice)
 const profiServiceleLogger = new LoggerService('ProfileLogger')
 const profileService = new ProfileService(userRepo, auctionHouseRepo, profiServiceleLogger, otpService)
 const profileControllerLogger = new LoggerService('profileControllerLogger')

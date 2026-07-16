@@ -4,6 +4,7 @@ import { createServer } from "http";//NODE'S NATIVE SERVER WRAPPER
 import { socketService } from "./services/implementations/socket.service";
 import { env } from './config/env'
 import connectDB from "./config/db";
+import { connectRedis } from "./config/redisClient";
 import cors from 'cors'
 import cookieParser from "cookie-parser";
 import { errorHandler } from "./middlewares/error-handler.middleware";
@@ -51,6 +52,7 @@ app.use(BASE_ROUTES.CHAT, ChatRoutes)
 app.use(errorHandler);
 const startServer = async () => {
     await connectDB()
+    await connectRedis()
     socketService.initialize(httpServer)
     httpServer.listen(PORT, () => {
         appLogger.info(`your application running on port ${PORT}`)

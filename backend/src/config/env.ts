@@ -26,7 +26,7 @@ export const env = {
     get REFRESH_TOKEN_SECRET() {
         return process.env.REFRESH_TOKEN_SECRET
     },
-    get REFRESH_TOKEN_MAX_AGE(){
+    get REFRESH_TOKEN_MAX_AGE() {
         return process.env.REFRESH_TOKEN_MAX_AGE
     },
     get NODE_ENV() {
@@ -50,7 +50,19 @@ export const env = {
     get CLOUDINARY_KEY() {
         return process.env.CLOUDINARY_KEY
     },
-    get CLIENT_URL(){
+    get CLIENT_URL() {
         return process.env.CLIENT_URL
+    },
+    get REDIS_PORT() {
+        return process.env.REDIS_PORT
+    },
+    get REDIS_HOST() {
+        return process.env.REDIS_HOST
+    },
+    get REDIS_PASS() {
+        return process.env.REDIS_PASSWORD
+    },
+    get REDIS_USER_NAME() {
+        return process.env.REDIS_USER_NAME
     }
 }
