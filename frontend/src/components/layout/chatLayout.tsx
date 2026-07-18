@@ -85,7 +85,7 @@ export const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ roleTheme }) => {
 
   useEffect(() => {
     if (!activeConversationId) return;
-    const socket=getSocket()
+    const socket = getSocket()
     const fetchMessages = async () => {
       try {
         setMessagesLoading(true);
@@ -103,29 +103,53 @@ export const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ roleTheme }) => {
       }
     }
     fetchMessages()
-    socket.emit('conversation:join',activeConversationId);
-    return ()=>{
-      socket.emit('conversation:leave',activeConversationId)
+    socket.emit('conversation:join', activeConversationId);
+    return () => {
+      socket.emit('conversation:leave', activeConversationId)
     }
 
   }, [activeConversationId, user?.userId, user?.role])
-  
-  useEffect(()=>{
-  const socket=getSocket();
-  const handleRecieveMessage=(newMessage:MessageDto)=>{
-    if(newMessage.conversationId==activeConversationId){
-      setMessages((prev)=>[...prev,newMessage])
-    }
-  }  
-  socket.on('message:receive',handleRecieveMessage)
 
-  return ()=>{
-    socket.off('message:receive',handleRecieveMessage)
-  }
-  },[activeConversationId])
+  useEffect(() => {
+    const socket = getSocket();
+    const handleRecieveMessage = (newMessage: MessageDto) => {
+      if (newMessage.conversationId == activeConversationId) {
+        setMessages((prev) => [...prev, newMessage])
+      }
+    }
+    const handleConversationUpdated = (data: {
+      conversationId: string,
+      lastMessageSnippet: string;
+      lastMessageAt: string
+    }) => {
+      setConversation((prevConversations) => {
+        const targetIndex = prevConversations.findIndex(c => c._id === data.conversationId)
+        if (targetIndex === -1) return prevConversations;
+        const updatedConversations = [...prevConversations];
+        updatedConversations[targetIndex] = {
+          ...updatedConversations[targetIndex],
+          lastMessageSnippet: data.lastMessageSnippet,
+          updatedAt: new Date(data.lastMessageAt)
+        }
+        return updatedConversations.sort((a, b) => {
+          const timeA = a.updatedAt ? new Date(a.updatedAt).getTime() : 0;
+          const timeB = b.updatedAt ? new Date(b.updatedAt).getTime() : 0;
+          return timeB - timeA;
+        });
+      })
+
+    }
+
+    socket.on('message:receive', handleRecieveMessage)
+    socket.on('conversation:updated', handleConversationUpdated)
+
+    return () => {
+      socket.off('message:receive', handleRecieveMessage)
+      socket.off('conversation:updated', handleConversationUpdated)
+    }
+  }, [activeConversationId])
 
   const handleSendMessage = async () => {
-    const socket=getSocket()
     if (!typedMessage.trim() || !activeConversationId) return;
     const messageContent = typedMessage.trim();
     setTypedMessage('');
@@ -135,10 +159,7 @@ export const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ roleTheme }) => {
         content: messageContent,
         messageType: 'text'
       });
-      // socket.emit('message:send',{
-      //   conversationId:activeConversationId,
-      //   content:messageContent
-      // })
+
       if (response.success && response.data) {
         const newMessage = response.data;
         setMessages((prev) => [...prev, newMessage]);
@@ -237,8 +258,8 @@ export const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ roleTheme }) => {
                     <div
                       key={msg._id}
                       className={`flex flex-col max-w-[70%] text-xs p-3 rounded-2xl shadow-sm tracking-wide ${isSelf
-                          ? `${currentStyle.activeBubble} self-end rounded-tr-none`
-                          : `${currentStyle.peerBubble} self-start rounded-tl-none`
+                        ? `${currentStyle.activeBubble} self-end rounded-tr-none`
+                        : `${currentStyle.peerBubble} self-start rounded-tl-none`
                         }`}
                     >
                       <p className="leading-relaxed">{msg.content}</p>

@@ -64,12 +64,18 @@ export class ChatService implements IChatService {
       content: content?.trim()
 
     });
+    const now=new Date()
     const updatingData = {
-      _id: conversationId, lastMessageSnippet: content?.trim(), lastMessage: senderId, lastMessageAt: Date.now()
+      _id: conversationId, lastMessageSnippet: content?.trim(), lastMessage: senderId, lastMessageAt: now
     }
     await conversation.updateOne(updatingData)
     const mappedMessage = ChatMapper.toMessageDocumentToDTO(newMessage)
     socketService.emitToRoom(conversationId,'message:receive',mappedMessage)
+    socketService.emitToRoom(conversationId,'conversation:updated',{
+      conversationId,
+      lastMessageSnippet:mappedMessage.content,
+      lastMessageAt:now.toISOString()
+    })
     return mappedMessage
   }
 
