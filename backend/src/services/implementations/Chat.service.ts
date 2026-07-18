@@ -8,6 +8,8 @@ import { MESSAGES } from "../../constants/constants";
 import { Types } from "mongoose";
 import { IMessageRepository } from "../../repositories/interfaces/IMessage.repository";
 import { Role } from "../../dtos/Common.dto";
+import { socketService, SocketService } from "./socket.service";
+
 
 export class ChatService implements IChatService {
   constructor(
@@ -67,7 +69,7 @@ export class ChatService implements IChatService {
     }
     await conversation.updateOne(updatingData)
     const mappedMessage = ChatMapper.toMessageDocumentToDTO(newMessage)
-
+    socketService.emitToRoom(conversationId,'message:receive',mappedMessage)
     return mappedMessage
   }
 

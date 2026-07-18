@@ -31,7 +31,7 @@ export class SocketService {
     private setUpeventListners(): void {
       if (!this._io) {
             return;
-        } // 1. Closes the if statement cleanly
+        } 
 
         this._io.on('connection', (socket: TypedSocket) => {
             const userId = socket.handshake.auth.userId;
@@ -46,6 +46,14 @@ export class SocketService {
                 
                 this._io?.emit('user:status', { userId: userId, isOnline: true });
             }
+            socket.on('conversation:join',(conversationId:string)=>{
+              const roomName=`room:${conversationId}`
+              socket.join(roomName)
+            })
+            socket.on('conversation:leave',(conversationId:string)=>{
+                const roomName=`room:${conversationId}`;
+                socket.leave(roomName)
+            })
             socket.on('disconnect', () => {
                 if (socket.data.userId) {
                     this._onlineUsers.delete(socket.data.userId);

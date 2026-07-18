@@ -4,7 +4,7 @@ import type { ConversationDTO, MessageDto } from "../../types/chat.dto";
 import chatService from "../../services/chat.service";
 import toast from "react-hot-toast";
 import { useAppSelector } from "../../hooks/redux.hooks";
-
+import { getSocket } from "../../services/socket.service";
 
 interface ChatWorkspaceProps {
   roleTheme: 'user' | 'tenant' | 'admin';
@@ -85,6 +85,7 @@ export const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ roleTheme }) => {
 
   useEffect(() => {
     if (!activeConversationId) return;
+    const socket=getSocket()
     const fetchMessages = async () => {
       try {
         setMessagesLoading(true);
@@ -102,11 +103,29 @@ export const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ roleTheme }) => {
       }
     }
     fetchMessages()
-    
-  }, [activeConversationId, user?.userId, user?.role])
+    socket.emit('conversation:join',activeConversationId);
+    return ()=>{
+      socket.emit('conversation:leave',activeConversationId)
+    }
 
+  }, [activeConversationId, user?.userId, user?.role])
+  
+  useEffect(()=>{
+  const socket=getSocket();
+  const handleRecieveMessage=(newMessage:MessageDto)=>{
+    if(newMessage.conversationId==activeConversationId){
+      setMessages((prev)=>[...prev,newMessage])
+    }
+  }  
+  socket.on('message:receive',handleRecieveMessage)
+
+  return ()=>{
+    socket.off('message:receive',handleRecieveMessage)
+  }
+  },[activeConversationId])
 
   const handleSendMessage = async () => {
+    const socket=getSocket()
     if (!typedMessage.trim() || !activeConversationId) return;
     const messageContent = typedMessage.trim();
     setTypedMessage('');
@@ -116,6 +135,10 @@ export const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ roleTheme }) => {
         content: messageContent,
         messageType: 'text'
       });
+      // socket.emit('message:send',{
+      //   conversationId:activeConversationId,
+      //   content:messageContent
+      // })
       if (response.success && response.data) {
         const newMessage = response.data;
         setMessages((prev) => [...prev, newMessage]);
