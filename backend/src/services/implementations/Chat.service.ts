@@ -5,7 +5,6 @@ import { ConversationDTO, MessageDto, SendMessageInputDTO } from "../../dtos/use
 import { ChatMapper } from "../../mappers/chat.mappers";
 import { BadRequestError, NotFoundError, UnauthorizedError } from "../../errors/AppError";
 import { MESSAGES } from "../../constants/constants";
-import { socketService } from "./socket.service";
 import { Types } from "mongoose";
 import { IMessageRepository } from "../../repositories/interfaces/IMessage.repository";
 import { Role } from "../../dtos/Common.dto";
@@ -68,13 +67,7 @@ export class ChatService implements IChatService {
     }
     await conversation.updateOne(updatingData)
     const mappedMessage = ChatMapper.toMessageDocumentToDTO(newMessage)
-    const senderSocketId = socketService.getUserSocketId(senderId)
-    if (senderSocketId) {
-      socketService.emitToRoomExcluding(conversationId, senderSocketId, 'message:receive', mappedMessage)
-    }
-    else {
-      socketService.emitToRoom(conversationId, 'message:receive', mappedMessage);
-    }
+
     return mappedMessage
   }
 

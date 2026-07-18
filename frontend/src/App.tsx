@@ -58,10 +58,11 @@ import UsersListPage from "./pages/admin/usersList";
 import UserDetailPage from "./pages/admin/userDetailPage";
 import AdminAuctionsListPage from "./pages/admin/auctions";
 import AdminAuctionDetailPage from "./pages/admin/auctionDetails";
-import { useSocketAuth } from "./hooks/useSocketauth";
+
+import { useSocketSync } from "./hooks/useSocketSync";
 
 function App() {
-   useSocketAuth()
+useSocketSync()
 
    return (
       <Router>

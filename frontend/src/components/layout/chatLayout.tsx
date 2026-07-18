@@ -4,7 +4,7 @@ import type { ConversationDTO, MessageDto } from "../../types/chat.dto";
 import chatService from "../../services/chat.service";
 import toast from "react-hot-toast";
 import { useAppSelector } from "../../hooks/redux.hooks";
-import { getSocket } from "../../services/socket.service";
+
 
 interface ChatWorkspaceProps {
   roleTheme: 'user' | 'tenant' | 'admin';
@@ -102,24 +102,7 @@ export const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ roleTheme }) => {
       }
     }
     fetchMessages()
-    const socket = getSocket(user?.userId, user?.role);
-    socket.emit('conversation:join', activeConversationId)
-    socket.on('message:receive', (newMessage: MessageDto) => {
-      if (newMessage.conversationId === activeConversationId) {
-        setMessages((prev) => [...prev, newMessage])
-      }
-      setConversation((prevConv) =>
-        prevConv.map((c) =>
-          c._id === activeConversationId
-            ? { ...c, lastMessageSnippet: newMessage.content }
-            : c
-        )
-      );
-    })
-    return () => {
-      socket.emit('conversation:leave', activeConversationId);
-      socket.off('message:receive')
-    }
+    
   }, [activeConversationId, user?.userId, user?.role])
 
 

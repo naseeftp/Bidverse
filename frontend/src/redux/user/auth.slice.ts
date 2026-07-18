@@ -2,8 +2,6 @@ import { createSlice } from "@reduxjs/toolkit";
 import type { PayloadAction } from '@reduxjs/toolkit'; // is a ts type dscrb exactly wht actn look like when it carries data
 import type { JwtPayload } from '../../types/auth.type'
 
-
-
 interface AuthState {
   user: JwtPayload | null;
   role: "user" | "tenant" | null;
@@ -47,10 +45,16 @@ const authSlice = createSlice({
       state.error = null
     },
 
-    setAuthSuccess: (state, action: PayloadAction<JwtPayload>) => {
-      state.user = action.payload;
-      state.role = action.payload.role as "user" | "tenant";
-      state.isAuthenticated = true;
+    setAuthSuccess: (state, action: PayloadAction<JwtPayload & { _id?: string; id?: string }>) => {
+      const payload=action.payload;
+      const verifiedId = payload.userId || payload._id || payload.id || "";
+      state.user={
+        ...payload,
+        userId:verifiedId 
+      }
+    
+      state.role =payload.role as "user" | "tenant";
+      state.isAuthenticated = !!verifiedId;
       state.tempAuthData = null;
       state.error = null
     },

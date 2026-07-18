@@ -27,60 +27,35 @@ export class SocketService {
         })
         this.setUpeventListners()
     }
+   
     private setUpeventListners(): void {
-        if (!this._io) {
-            return
-        };
+      if (!this._io) {
+            return;
+        } // 1. Closes the if statement cleanly
+
         this._io.on('connection', (socket: TypedSocket) => {
             const userId = socket.handshake.auth.userId;
             const role = socket.handshake.auth.role;
+            
             if (userId) {
                 this._onlineUsers.set(userId, socket.id);
                 socket.data.userId = userId;
                 if (role) {
                     socket.data.role = role;
                 }
+                
                 this._io?.emit('user:status', { userId: userId, isOnline: true });
             }
-            socket.on('users:get_online',(callback)=>{
-                const currentOnlineIds=Array.from(this._onlineUsers.keys());
-                callback(currentOnlineIds)
-            })
-            socket.on('conversation:join', (conversationId: string) => {
-                const targetRoom = `room:${conversationId}`;
-                socket.join(targetRoom);
-            })
-            socket.on('conversation:leave', (conversationId: string) => {
-                const targetRoom = `room:${conversationId}`;
-                socket.leave(targetRoom)
-            });
-
-            socket.on('typing:status', (data) => {
-                const targetRoom = `room:${data.conversationId}`
-                socket.to(targetRoom).emit('typing:status', {
-                    conversationId: data.conversationId,
-                    userId: data.userId,
-                    isTyping: data.isTyping
-                })
-            })
-            socket.on('message:send', () => {  // here
-                if (!socket.data.userId) {
-                    socket.emit('message:error', { error: 'Authentication data missing from socket session.' });
-                    return;
-                }
-            })
-
             socket.on('disconnect', () => {
                 if (socket.data.userId) {
                     this._onlineUsers.delete(socket.data.userId);
-                    this._io?.emit('user:status', { userId: socket.data.userId, isOnline: false })
+                    this._io?.emit('user:status', { userId: socket.data.userId, isOnline: false });
                 }
-            })
-
+                
+            }); 
+            
         });
-
-
-    }
+}
     //methods for backend services and controllers
     public isUserOnline(userId: string): boolean {
         return this._onlineUsers.has(userId)
