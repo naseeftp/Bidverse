@@ -61,6 +61,15 @@ export class SocketService {
                 }
                 
             }); 
+
+            socket.on('typing:status',(data:{conversationId:string,userId:string,isTyping:boolean})=>{
+                this.emitToRoomExcluding(
+                    data.conversationId,
+                    socket.id,
+                    'typing:status',
+                    data
+                )
+            })
             
         });
 }

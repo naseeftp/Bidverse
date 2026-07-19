@@ -47,6 +47,9 @@ export const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ roleTheme }) => {
   const [messagesLoading, setMessagesLoading] = useState<boolean>(false);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
+  const [typingUsers, setTypingUsers] = useState<Record<string, boolean>>({})
+  let isCurrentlytyping = useRef<boolean>(false)
+  const isTypingTimeOut = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const { user } = useAppSelector((state) => state.auth)
   const currentStyle = THEME_STYLES[roleTheme]
@@ -105,7 +108,12 @@ export const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ roleTheme }) => {
     fetchMessages()
     socket.emit('conversation:join', activeConversationId);
     return () => {
-      socket.emit('conversation:leave', activeConversationId)
+      socket.emit('conversation:leave', activeConversationId);
+      if (isTypingTimeOut.current) {
+        clearTimeout(isTypingTimeOut.current)
+      }
+      isCurrentlytyping.current = false
+      setTypingUsers({})
     }
 
   }, [activeConversationId, user?.userId, user?.role])
@@ -140,19 +148,66 @@ export const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ roleTheme }) => {
 
     }
 
+    const handleTypingStatus = (data: { conversationId: string, userId: string, isTyping: boolean }) => {
+      if (data.conversationId !== activeConversationId) return;
+      setTypingUsers((prev) => {
+        const newState = { ...prev };
+        if (data.isTyping) {
+          newState[data.userId] = true
+        } else {
+          delete newState[data.userId]
+        }
+        return newState
+      })
+    }
+
     socket.on('message:receive', handleRecieveMessage)
     socket.on('conversation:updated', handleConversationUpdated)
+    socket.on('typing:status', handleTypingStatus)
 
     return () => {
       socket.off('message:receive', handleRecieveMessage)
       socket.off('conversation:updated', handleConversationUpdated)
+      socket.off('typing:status', handleTypingStatus)
     }
   }, [activeConversationId])
+
+  const handleInptChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setTypedMessage(e.target.value);
+    if (!currentUserId || !activeConversationId) return;
+    const socket = getSocket();
+    if (!isCurrentlytyping.current) {
+      isCurrentlytyping.current = true;
+      socket.emit('typing:status', {
+        conversationId: activeConversationId,
+        userId: currentUserId,
+        isTyping: true
+      })
+    }
+    if (isTypingTimeOut.current) clearTimeout(isTypingTimeOut.current);
+    isTypingTimeOut.current = setTimeout(() => {
+      socket.emit('typing:status', {
+        conversationId: activeConversationId,
+        userId: currentUserId,
+        isTyping: false
+      })
+      isCurrentlytyping.current=false;
+    }, 2000)
+
+
+  }
 
   const handleSendMessage = async () => {
     if (!typedMessage.trim() || !activeConversationId) return;
     const messageContent = typedMessage.trim();
     setTypedMessage('');
+    if (isTypingTimeOut.current) clearTimeout(isTypingTimeOut.current);
+    isCurrentlytyping.current = false;
+    getSocket().emit('typing:status', {
+      conversationId: activeConversationId,
+      userId: currentUserId,
+      isTyping: false
+    })
     try {
       const response = await chatService.sendMessage({
         conversationId: activeConversationId,
@@ -187,6 +242,7 @@ export const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ roleTheme }) => {
     setSearchParams({ conversationId: id })
   }
 
+  const isPartnerTyping = !!typingUsers[activeChatPartner?.userId || '']
   return (
     <div className="flex h-[calc(100vh-64px)] w-full bg-white border border-[#E6E0DA] rounded-3xl overflow-hidden shadow-sm">
 
@@ -210,14 +266,23 @@ export const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ roleTheme }) => {
               const isActive = conv._id === activeConversationId;
               const chatPartner = conv.participants.find((p) => p.userId !== currentUserId);
               const partnerName = chatPartner?.name || 'Anonymous user';
+              const isPartnerTyping = !!typingUsers[chatPartner?.userId || '']
               return (
                 <button
                   key={conv._id}
                   onClick={() => handleSelectConversation(conv._id)}
                   className={`w-full text-left p-4 transition-all flex items-start gap-3 cursor-pointer ${isActive ? currentStyle.sidebarActive : "hover:bg-[#FFF9F4]/60"}`}
                 >
-                  <div className="w-10 h-10 rounded-xl bg-[#F5F5F5] border border-[#E6E0DA] flex items-center justify-center font-bold text-xs uppercase text-[#6B6B6B]">
-                    {partnerName.substring(0, 2) || "CH"}
+                  <div className="relative">
+                    <div className="w-10 h-10 rounded-xl bg-[#F5F5F5] border border-[#E6E0DA] flex items-center justify-center font-bold text-xs uppercase text-[#6B6B6B]">
+                      {partnerName.substring(0, 2) || "CH"}
+                    </div>
+                    {isPartnerTyping && (
+                      <span className="absolute -top-1 -right-1 flex h-3 w-3">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                        <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
+                      </span>
+                    )}
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between">
@@ -270,6 +335,16 @@ export const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ roleTheme }) => {
                   );
                 })
               )}
+              {isPartnerTyping && (
+                <div className="flex items-center gap-2 text-[11px] text-[#6B6B6B] bg-[#F5F5F5] border border-[#E6E0DA] self-start px-3 py-2 rounded-2xl rounded-tl-none tracking-wide animate-pulse shadow-sm">
+                  <div className="flex gap-1 items-center mt-0.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#6B6B6B] animate-bounce [animation-delay:-0.3s]"></span>
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#6B6B6B] animate-bounce [animation-delay:-0.15s]"></span>
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#6B6B6B] animate-bounce"></span>
+                  </div>
+                  <span className="font-mono text-[10px] uppercase ml-1">{activePartnerName} is typing...</span>
+                </div>
+              )}
 
               <div ref={messagesEndRef} />
             </div>
@@ -279,7 +354,7 @@ export const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ roleTheme }) => {
               <input
                 type="text"
                 value={typedMessage}
-                onChange={(e) => setTypedMessage(e.target.value)}
+                onChange={handleInptChange}
                 onKeyDown={handleKeyDown}
                 placeholder="Type a message..."
                 className="flex-1 bg-[#FFF9F4] border border-[#E6E0DA] rounded-xl px-4 py-3 text-xs text-[#1F1F1F] focus:outline-none focus:border-[#C9653B]/60 transition-all"
