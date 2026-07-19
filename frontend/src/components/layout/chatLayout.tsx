@@ -9,6 +9,7 @@ import { getSocket } from "../../services/socket.service";
 interface ChatWorkspaceProps {
   roleTheme: 'user' | 'tenant' | 'admin';
 }
+
 const THEME_STYLES = {
   user: {
     accent: "bg-[#1F1F1F]",
@@ -38,139 +39,151 @@ const THEME_STYLES = {
 
 export const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ roleTheme }) => {
   const [conversations, setConversation] = useState<ConversationDTO[]>([]);
-  const [searchParams, setSearchParams] = useSearchParams()
-  const activeConversationId = searchParams.get('conversationId')
-  const [loading, setLoading] = useState<boolean>(true)
+  const [searchParams, setSearchParams] = useSearchParams();
+  const activeConversationId = searchParams.get('conversationId');
+  const [loading, setLoading] = useState<boolean>(true);
 
-  const [typedMessage, setTypedMessage] = useState<string>('')
-  const [messages, setMessages] = useState<MessageDto[]>([])
+  const [typedMessage, setTypedMessage] = useState<string>('');
+  const [messages, setMessages] = useState<MessageDto[]>([]);
   const [messagesLoading, setMessagesLoading] = useState<boolean>(false);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
-  const [typingUsers, setTypingUsers] = useState<Record<string, boolean>>({})
-  let isCurrentlytyping = useRef<boolean>(false)
-  const isTypingTimeOut = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const [typingUsers, setTypingUsers] = useState<Record<string, Record<string, boolean>>>({});
+  let isCurrentlytyping = useRef<boolean>(false);
+  const isTypingTimeOut = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const { user } = useAppSelector((state) => state.auth)
-  const currentStyle = THEME_STYLES[roleTheme]
+  const { user } = useAppSelector((state) => state.auth);
+  const currentStyle = THEME_STYLES[roleTheme];
   const currentUserId = user?.userId;
   const activeConversation = conversations.find((conv) => conv._id === activeConversationId);
   const activeChatPartner = activeConversation?.participants.find((p) => p.userId !== currentUserId);
   const activePartnerName = activeChatPartner?.name || "Anonymous Operator";
 
-
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+  
   useEffect(() => {
     scrollToBottom();
-  }, [messages])
+  }, [messages]);
 
   useEffect(() => {
     const fetchConversations = async () => {
       try {
         const response = await chatService.getUserConversations();
         if (response.success && response.data) {
-          setConversation(response.data)
-        }
-        else {
-          toast.error(response.message)
+          setConversation(response.data);
+        } else {
+          toast.error(response.message);
         }
       } catch {
-        toast.error('failed to get conversations')
+        toast.error('failed to get conversations');
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
     };
-    fetchConversations()
-  }, [])
-
+    fetchConversations();
+  }, []);
 
   useEffect(() => {
     if (!activeConversationId) return;
-    const socket = getSocket()
+    const socket = getSocket();
     const fetchMessages = async () => {
       try {
         setMessagesLoading(true);
-        const response = await chatService.getMessages(activeConversationId)
+        const response = await chatService.getMessages(activeConversationId);
         if (response.success && response.data) {
-          setMessages(response.data)
+          setMessages(response.data);
         } else {
-          toast.error(response.message)
+          toast.error(response.message);
         }
       } catch {
-        toast.error('Failed to get  chat history');
+        toast.error('Failed to get chat history');
+      } finally {
+        setMessagesLoading(false);
       }
-      finally {
-        setMessagesLoading(false)
-      }
-    }
-    fetchMessages()
+    };
+    fetchMessages();
     socket.emit('conversation:join', activeConversationId);
+
     return () => {
       socket.emit('conversation:leave', activeConversationId);
       if (isTypingTimeOut.current) {
-        clearTimeout(isTypingTimeOut.current)
+        clearTimeout(isTypingTimeOut.current);
       }
-      isCurrentlytyping.current = false
-      setTypingUsers({})
-    }
-
-  }, [activeConversationId, user?.userId, user?.role])
-
+      isCurrentlytyping.current = false;
+     setTypingUsers((prev) => {
+        const newState = { ...prev };
+        delete newState[activeConversationId];
+        return newState;
+      });
+    };
+  }, [activeConversationId, user?.userId, user?.role]);
   useEffect(() => {
     const socket = getSocket();
-    const handleRecieveMessage = (newMessage: MessageDto) => {
-      if (newMessage.conversationId == activeConversationId) {
-        setMessages((prev) => [...prev, newMessage])
-      }
+    if (conversations && conversations.length > 0) {
+      conversations.forEach((conv) => {
+        socket.emit('conversation:join', conv._id);
+      });
     }
+    const handleRecieveMessage = (newMessage: MessageDto) => {
+      if (newMessage.conversationId === activeConversationId) {
+        setMessages((prev) => [...prev, newMessage]);
+      }
+    };
+
     const handleConversationUpdated = (data: {
-      conversationId: string,
+      conversationId: string;
       lastMessageSnippet: string;
-      lastMessageAt: string
+      lastMessageAt: string;
     }) => {
       setConversation((prevConversations) => {
-        const targetIndex = prevConversations.findIndex(c => c._id === data.conversationId)
+        const targetIndex = prevConversations.findIndex(c => c._id === data.conversationId);
         if (targetIndex === -1) return prevConversations;
         const updatedConversations = [...prevConversations];
         updatedConversations[targetIndex] = {
           ...updatedConversations[targetIndex],
           lastMessageSnippet: data.lastMessageSnippet,
           updatedAt: new Date(data.lastMessageAt)
-        }
+        };
         return updatedConversations.sort((a, b) => {
           const timeA = a.updatedAt ? new Date(a.updatedAt).getTime() : 0;
           const timeB = b.updatedAt ? new Date(b.updatedAt).getTime() : 0;
           return timeB - timeA;
         });
-      })
-
-    }
-
-    const handleTypingStatus = (data: { conversationId: string, userId: string, isTyping: boolean }) => {
-      if (data.conversationId !== activeConversationId) return;
-      setTypingUsers((prev) => {
-        const newState = { ...prev };
+      });
+    };
+    const handleTypingStatus = (data: { conversationId: string; userId: string; isTyping: boolean }) => {
+    setTypingUsers((prev) => {
+        const roomState = { ...(prev[data.conversationId] || {}) };
         if (data.isTyping) {
-          newState[data.userId] = true
+          roomState[data.userId] = true;
         } else {
-          delete newState[data.userId]
+          delete roomState[data.userId];
         }
-        return newState
-      })
-    }
+        return {
+          ...prev,
+          [data.conversationId]: roomState
+        };
+      });
+    };
 
-    socket.on('message:receive', handleRecieveMessage)
-    socket.on('conversation:updated', handleConversationUpdated)
-    socket.on('typing:status', handleTypingStatus)
+    socket.on('message:receive', handleRecieveMessage);
+    socket.on('conversation:updated', handleConversationUpdated);
+    socket.on('typing:status', handleTypingStatus);
 
     return () => {
-      socket.off('message:receive', handleRecieveMessage)
-      socket.off('conversation:updated', handleConversationUpdated)
-      socket.off('typing:status', handleTypingStatus)
-    }
-  }, [activeConversationId])
+      socket.off('message:receive', handleRecieveMessage);
+      socket.off('conversation:updated', handleConversationUpdated);
+      socket.off('typing:status', handleTypingStatus);
+      
+      if (conversations && conversations.length > 0) {
+        conversations.forEach((conv) => {
+          socket.emit('conversation:leave', conv._id);
+        });
+      }
+    };
+  }, [activeConversationId, conversations]);
 
   const handleInptChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setTypedMessage(e.target.value);
@@ -182,7 +195,7 @@ export const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ roleTheme }) => {
         conversationId: activeConversationId,
         userId: currentUserId,
         isTyping: true
-      })
+      });
     }
     if (isTypingTimeOut.current) clearTimeout(isTypingTimeOut.current);
     isTypingTimeOut.current = setTimeout(() => {
@@ -190,12 +203,10 @@ export const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ roleTheme }) => {
         conversationId: activeConversationId,
         userId: currentUserId,
         isTyping: false
-      })
-      isCurrentlytyping.current=false;
-    }, 2000)
-
-
-  }
+      });
+      isCurrentlytyping.current = false;
+    }, 2000);
+  };
 
   const handleSendMessage = async () => {
     if (!typedMessage.trim() || !activeConversationId) return;
@@ -207,7 +218,7 @@ export const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ roleTheme }) => {
       conversationId: activeConversationId,
       userId: currentUserId,
       isTyping: false
-    })
+    });
     try {
       const response = await chatService.sendMessage({
         conversationId: activeConversationId,
@@ -225,27 +236,30 @@ export const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ roleTheme }) => {
               : c
           )
         );
-
       } else {
-        toast.error(response.message)
+        toast.error(response.message);
       }
     } catch {
       toast.error("Message could not send");
     }
-  }
+  };
+
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       handleSendMessage();
     }
   };
+  
   const handleSelectConversation = (id: string) => {
-    setSearchParams({ conversationId: id })
-  }
+    setSearchParams({ conversationId: id });
+  };
 
-  const isPartnerTyping = !!typingUsers[activeChatPartner?.userId || '']
+  const activeRoomTypingObj = typingUsers[activeConversationId || ''] || {};
+  const isPartnerTyping = !!activeRoomTypingObj[activeChatPartner?.userId || ''];
+
   return (
     <div className="flex h-[calc(100vh-64px)] w-full bg-white border border-[#E6E0DA] rounded-3xl overflow-hidden shadow-sm">
-
+      
       <div className="w-80 md:w-96 border-r border-[#E6E0DA] flex flex-col bg-white">
         <div className="p-4 border-b border-[#E6E0DA] flex items-center justify-between">
           <h2 className="text-sm font-black font-serif tracking-wider uppercase text-[#1F1F1F]">
@@ -266,7 +280,9 @@ export const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ roleTheme }) => {
               const isActive = conv._id === activeConversationId;
               const chatPartner = conv.participants.find((p) => p.userId !== currentUserId);
               const partnerName = chatPartner?.name || 'Anonymous user';
-              const isPartnerTyping = !!typingUsers[chatPartner?.userId || '']
+              const currentRoomTypingObj = typingUsers[conv._id] || {};
+              const isConvPartnerTyping = !!currentRoomTypingObj[chatPartner?.userId || ''];
+              
               return (
                 <button
                   key={conv._id}
@@ -277,12 +293,12 @@ export const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ roleTheme }) => {
                     <div className="w-10 h-10 rounded-xl bg-[#F5F5F5] border border-[#E6E0DA] flex items-center justify-center font-bold text-xs uppercase text-[#6B6B6B]">
                       {partnerName.substring(0, 2) || "CH"}
                     </div>
-                    {isPartnerTyping && (
+                    {/* {isConvPartnerTyping && (
                       <span className="absolute -top-1 -right-1 flex h-3 w-3">
                         <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                         <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
                       </span>
-                    )}
+                    )} */}
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between">
@@ -292,7 +308,11 @@ export const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ roleTheme }) => {
                       </span>
                     </div>
                     <p className="text-xs text-[#6B6B6B] truncate mt-0.5">
-                      {conv.lastMessageSnippet || "No message data transmissions inside room."}
+                      {isConvPartnerTyping ? (
+                        <span className="text-emerald-600 font-medium italic">typing...</span>
+                      ) : (
+                        conv.lastMessageSnippet || "No message data transmissions inside room."
+                      )}
                     </p>
                   </div>
                 </button>
@@ -302,7 +322,7 @@ export const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ roleTheme }) => {
         </div>
       </div>
 
-
+  
       <div className={`flex-1 flex flex-col ${currentStyle.bgLight}`}>
         {activeConversationId ? (
           <div className="flex-1 flex flex-col h-full">
@@ -349,7 +369,6 @@ export const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ roleTheme }) => {
               <div ref={messagesEndRef} />
             </div>
 
-
             <div className="p-4 bg-white border-t border-[#E6E0DA] flex items-center gap-2">
               <input
                 type="text"
@@ -378,4 +397,4 @@ export const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ roleTheme }) => {
       </div>
     </div>
   );
-}
+};
