@@ -70,6 +70,11 @@ export class SocketService {
                     data
                 )
             })
+
+            socket.on('users:get_online',(callback:(onlineIds:string[])=>void)=>{
+                const onlineUserIds=Array.from(this._onlineUsers.keys())
+                callback(onlineUserIds)
+            })
             
         });
 }

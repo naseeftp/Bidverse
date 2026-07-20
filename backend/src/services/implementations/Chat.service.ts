@@ -8,7 +8,7 @@ import { MESSAGES } from "../../constants/constants";
 import { Types } from "mongoose";
 import { IMessageRepository } from "../../repositories/interfaces/IMessage.repository";
 import { Role } from "../../dtos/Common.dto";
-import { socketService, SocketService } from "./socket.service";
+import { socketService} from "./socket.service";
 
 
 export class ChatService implements IChatService {
