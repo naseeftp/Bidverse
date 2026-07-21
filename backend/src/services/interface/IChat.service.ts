@@ -5,4 +5,5 @@ export interface IChatService {
     getUserConversations(userId: string): Promise<ConversationDTO[]>
     sendMessage(senderId: string, senderRole: Role, payload: SendMessageInputDTO): Promise<MessageDto>
     getMessages(conversationId: string): Promise<MessageDto[]>
+    deleteForEveryOne(messageId:string,senderId:string):Promise<MessageDto>
 }

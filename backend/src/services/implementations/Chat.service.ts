@@ -3,13 +3,13 @@ import { IConversationRepository } from "../../repositories/interfaces/IConversa
 import { IUserRepository } from "../../repositories/interfaces/iUser.repository";
 import { ConversationDTO, MessageDto, SendMessageInputDTO } from "../../dtos/user.dto/chat.dto";
 import { ChatMapper } from "../../mappers/chat.mappers";
-import { BadRequestError, NotFoundError, UnauthorizedError } from "../../errors/AppError";
+import { AppError, BadRequestError, NotFoundError, UnauthorizedError } from "../../errors/AppError";
 import { MESSAGES } from "../../constants/constants";
 import { Types } from "mongoose";
 import { IMessageRepository } from "../../repositories/interfaces/IMessage.repository";
 import { Role } from "../../dtos/Common.dto";
 import { socketService} from "./socket.service";
-
+import { MESSAGE_TIME_CONFIG } from "../../constants/constants";
 
 export class ChatService implements IChatService {
   constructor(
@@ -93,6 +93,24 @@ export class ChatService implements IChatService {
     )
     return mappedMessages
   }
+  async deleteForEveryOne(messageId: string, senderId: string): Promise<MessageDto> {
+    const isMessageExist=await this._messageRepo.findById(messageId);
+    if(!isMessageExist){
+      throw new NotFoundError(MESSAGES.MESSAGE_NOT_FOUND)
+    }
+    if(isMessageExist.senderId.toString()!==senderId){
+      throw new UnauthorizedError(MESSAGES.NOT_PERMITTED)
+    }
+    const MessageAge=Date.now()-new Date(isMessageExist.createdAt).getTime();
+    if(MessageAge>MESSAGE_TIME_CONFIG.MAX_DELETE_WINDOW){
+      throw new AppError("Time limit exceeded: You can only delete messages for everyone within 15 minutes.")
+    }
+    const updatedMessage=await this._messageRepo.deleteForEveryOne( messageId,senderId)
+    if(!updatedMessage){
+      throw new NotFoundError('Failed to delete message or message was already deleted')
+    }
+    return ChatMapper.toMessageDocumentToDTO(updatedMessage!)
 
+  }
 
 }

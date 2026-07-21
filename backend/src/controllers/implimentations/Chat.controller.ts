@@ -54,4 +54,14 @@ export class ChatController implements IChatController {
             next(error)
         }
     }
+    async deleteForEveryOne(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const senderId=req.user.id;
+            const messageId=req.params.id as string;
+            const result=await this._ChatService.deleteForEveryOne(messageId,senderId)
+            SuccessResponse(res,MESSAGES.MESSAGE_DELETED,result,HttpStatus.OK)
+        } catch (error) {
+         next(error)   
+        }
+    }
 }

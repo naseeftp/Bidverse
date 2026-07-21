@@ -61,8 +61,6 @@ export const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ roleTheme }) => {
   const activeChatPartner = activeConversation?.participants.find((p) => p.userId !== currentUserId);
   const activePartnerName = activeChatPartner?.name || "Anonymous Operator";
 
-
-
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };

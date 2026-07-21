@@ -29,4 +29,9 @@ router.get(
    allowedTo(Role.USER, Role.TENANT, Role.ADMIN),
    (req, res, next) => chatController.getMessages(req, res, next)
 )
+router.delete(
+   CHAT_ROUTES.DELETE_EVERYONE,
+   allowedTo(Role.USER, Role.TENANT, Role.ADMIN),
+   (req,res,next)=>chatController.deleteForEveryOne(req,res,next)
+)
 export default router;

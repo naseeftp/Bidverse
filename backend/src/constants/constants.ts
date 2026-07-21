@@ -158,6 +158,8 @@ export const MESSAGES = {
     REQ_USER_NOT_FOUND: 'Requested user Not found',
     RECEIVER_NOT_FOUNS: 'Reciever User Not found',
     TWO_PEOPLE_NEEDED: 'A direct conversation must have exactly two participants',
+    MESSAGE_NOT_FOUND:'Message Not Foud',
+    MESSAGE_DELETED:'Message deleted',
 
     LOGOUT_SUCCESS: "Logout success",
     LOGOUT_FAILED: "Logout failed",
@@ -188,6 +190,10 @@ export enum MessageType {
     VIDEO = 'video',
     AUDIO = 'audio',
     FILE = 'file'
+}
+
+export const MESSAGE_TIME_CONFIG={
+    MAX_DELETE_WINDOW:15*60*1000
 }
 
 
