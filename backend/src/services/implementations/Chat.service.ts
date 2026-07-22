@@ -109,7 +109,18 @@ export class ChatService implements IChatService {
     if(!updatedMessage){
       throw new NotFoundError('Failed to delete message or message was already deleted')
     }
-    return ChatMapper.toMessageDocumentToDTO(updatedMessage!)
+    
+  const mappedMessage= ChatMapper.toMessageDocumentToDTO(updatedMessage)
+  socketService.emitToRoom(
+    mappedMessage.conversationId.toString(),
+    'message:deleted',
+    {
+      conversationId:mappedMessage.conversationId.toString(),
+      messageId:mappedMessage._id.toString(),
+      isDeletedForEveryone:true
+    }
+  )
+  return mappedMessage
 
   }
 

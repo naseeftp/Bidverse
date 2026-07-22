@@ -59,6 +59,19 @@ class ChatService {
             return apiErrorHandler(error, 'Failed to retrieve messages')
         }
     }
+    async deleteForEveryOne(messageId:string){
+        try {
+            let url=`${BASE_ROUTES.CHAT}${CHAT_ROUTES.DELETE_EVERYONE}/${messageId}`;
+            const response=await axiosInstance.delete<MessageDto,ApiResponse<MessageDto>>(url)
+            return{
+                success:true,
+                message:response.message,
+                data:response.data
+            }
+        } catch (error) {
+         return apiErrorHandler(error, 'Failed to delete message')
+        }
+    }
 }
 
 export default new ChatService()

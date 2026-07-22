@@ -37,6 +37,8 @@ const THEME_STYLES = {
   },
 };
 
+const DELETE_TIME_WINDOW = 15 * 60 * 1000;
+
 export const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ roleTheme }) => {
   const [conversations, setConversation] = useState<ConversationDTO[]>([]);
   const [searchParams, setSearchParams] = useSearchParams();
@@ -49,7 +51,8 @@ export const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ roleTheme }) => {
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
   const [typingUsers, setTypingUsers] = useState<Record<string, Record<string, boolean>>>({});
-  const [onlineUsers,setOnlineUsers]=useState<Set<string>>(new Set())
+  const [onlineUsers, setOnlineUsers] = useState<Set<string>>(new Set());
+  const [openMenuId, setOpenMenuId] = useState<string | null>(null);
 
   let isCurrentlytyping = useRef<boolean>(false);
   const isTypingTimeOut = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -70,6 +73,12 @@ export const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ roleTheme }) => {
   }, [messages]);
 
   useEffect(() => {
+    const handleOutsideClick = () => setOpenMenuId(null);
+    window.addEventListener("click", handleOutsideClick);
+    return () => window.removeEventListener("click", handleOutsideClick);
+  }, []);
+
+  useEffect(() => {
     const fetchConversations = async () => {
       try {
         const response = await chatService.getUserConversations();
@@ -79,7 +88,7 @@ export const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ roleTheme }) => {
           toast.error(response.message);
         }
       } catch {
-        toast.error('failed to get conversations');
+        toast.error('Failed to get conversations');
       } finally {
         setLoading(false);
       }
@@ -135,9 +144,9 @@ export const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ roleTheme }) => {
       }
     };
 
-    socket.emit('users:get_online',(onlineIds:string[])=>{
-      setOnlineUsers(new Set(onlineIds))
-    })
+    socket.emit('users:get_online', (onlineIds: string[]) => {
+      setOnlineUsers(new Set(onlineIds));
+    });
 
     const handleConversationUpdated = (data: {
       conversationId: string;
@@ -176,28 +185,54 @@ export const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ roleTheme }) => {
       });
     };
 
-    const handleUserStatus=(data:{userId:string,isOnline:boolean})=>{
-      setOnlineUsers((prev)=>{
-        const next=new Set(prev);
-        if(data.isOnline){
-          next.add(data.userId)
-        }else{
-          next.delete(data.userId)
+    const handleUserStatus = (data: { userId: string; isOnline: boolean }) => {
+      setOnlineUsers((prev) => {
+        const next = new Set(prev);
+        if (data.isOnline) {
+          next.add(data.userId);
+        } else {
+          next.delete(data.userId);
         }
-        return next
+        return next;
+      });
+    };
+
+    const handleMessageDeleted = (data: { conversationId: string; messageId: string; isDeletedForEveryone: boolean }) => {
+      if (data.conversationId === activeConversationId) {
+      setMessages((prevMessages) =>
+          prevMessages.map((msg) =>
+            msg._id === data.messageId
+              ? { ...msg, content: 'This message was deleted.', isDeletedForEveryone: true }
+              : msg
+          )
+        );
+      }
+      setConversation((prevConversations)=>
+      prevConversations.map((conv)=>{
+        if(conv._id===data.conversationId){
+          return {
+            ...conv,
+            lastMessageSnippet: "This message was deleted."
+          };
+        }
+        return conv;
       })
-    }
+    
+    )
+    };
 
     socket.on('message:receive', handleRecieveMessage);
     socket.on('conversation:updated', handleConversationUpdated);
     socket.on('typing:status', handleTypingStatus);
-    socket.on('user:status',handleUserStatus)
+    socket.on('user:status', handleUserStatus);
+    socket.on('message:deleted', handleMessageDeleted);
 
     return () => {
       socket.off('message:receive', handleRecieveMessage);
       socket.off('conversation:updated', handleConversationUpdated);
       socket.off('typing:status', handleTypingStatus);
-      socket.off('user:status',handleUserStatus)
+      socket.off('user:status', handleUserStatus);
+      socket.off('message:deleted', handleMessageDeleted);
       if (conversations && conversations.length > 0) {
         conversations.forEach((conv) => {
           socket.emit('conversation:leave', conv._id);
@@ -249,7 +284,7 @@ export const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ roleTheme }) => {
 
       if (response.success && response.data) {
         const newMessage = response.data;
-        setMessages((prev) => [...prev, newMessage]);
+     
         setConversation((prevConv) =>
           prevConv.map((c) =>
             c._id === activeConversationId
@@ -265,6 +300,28 @@ export const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ roleTheme }) => {
     }
   };
 
+  const handleDeleteMessage = async (messageId: string) => {
+    try {
+      setOpenMenuId(null);
+      const response = await chatService.deleteForEveryOne(messageId);
+      if (response.success) {
+        toast.success('Message deleted');
+        
+        setMessages((prev) =>
+          prev.map((m) =>
+            m._id === messageId
+              ? { ...m, content: "This message was deleted.", isDeletedForEveryone: true }
+              : m
+          )
+        );
+      } else {
+        toast.error(response.message);
+      }
+    } catch {
+      toast.error('Failed to delete message');
+    }
+  };
+
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       handleSendMessage();
@@ -276,166 +333,199 @@ export const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ roleTheme }) => {
   };
 
   const activeRoomTypingObj = typingUsers[activeConversationId || ''] || {};
-const isPartnerTyping = !!activeRoomTypingObj[activeChatPartner?.userId || ''];
+  const isPartnerTyping = !!activeRoomTypingObj[activeChatPartner?.userId || ''];
 
-return (
-  <div className="flex h-[calc(100vh-64px)] w-full bg-white border border-[#E6E0DA] rounded-3xl overflow-hidden shadow-sm">
+  return (
+    <div className="flex h-[calc(100vh-64px)] w-full bg-white border border-[#E6E0DA] rounded-3xl overflow-hidden shadow-sm">
+      <div className="w-80 md:w-96 border-r border-[#E6E0DA] flex flex-col bg-white">
+        <div className="p-4 border-b border-[#E6E0DA] flex items-center justify-between">
+          <h2 className="text-sm font-black font-serif tracking-wider uppercase text-[#1F1F1F]">
+            Conversations
+          </h2>
+          <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-widest text-white ${currentStyle.accent}`}>
+            {roleTheme} Node
+          </span>
+        </div>
 
-    <div className="w-80 md:w-96 border-r border-[#E6E0DA] flex flex-col bg-white">
-      <div className="p-4 border-b border-[#E6E0DA] flex items-center justify-between">
-        <h2 className="text-sm font-black font-serif tracking-wider uppercase text-[#1F1F1F]">
-          Conversations
-        </h2>
-        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-widest text-white ${currentStyle.accent}`}>
-          {roleTheme} Node
-        </span>
+        <div className="flex-1 overflow-y-auto divide-y divide-[#E6E0DA]/60">
+          {loading ? (
+            <p className="text-xs text-center text-[#6B6B6B] font-mono py-8 animate-pulse">Syncing channels...</p>
+          ) : conversations.length === 0 ? (
+            <p className="text-xs text-center text-[#6B6B6B] py-8">No conversation routes active.</p>
+          ) : (
+            conversations.map((conv) => {
+              const isActive = conv._id === activeConversationId;
+              const chatPartner = conv.participants.find((p) => p.userId !== currentUserId);
+              const partnerName = chatPartner?.name || 'Anonymous user';
+              const currentRoomTypingObj = typingUsers[conv._id] || {};
+              const isConvPartnerTyping = !!currentRoomTypingObj[chatPartner?.userId || ''];
+              const isPartnerOnline = chatPartner?.userId ? onlineUsers.has(chatPartner.userId) : false;
+
+              return (
+                <button
+                  key={conv._id}
+                  onClick={() => handleSelectConversation(conv._id)}
+                  className={`w-full text-left p-4 transition-all flex items-start gap-3 cursor-pointer ${isActive ? currentStyle.sidebarActive : "hover:bg-[#FFF9F4]/60"}`}
+                >
+                  <div className="relative">
+                    <div className="w-10 h-10 rounded-xl bg-[#F5F5F5] border border-[#E6E0DA] flex items-center justify-center font-bold text-xs uppercase text-[#6B6B6B]">
+                      {partnerName.substring(0, 2) || "CH"}
+                    </div>
+                    <span className={`absolute -bottom-0.5 -right-0.5 block h-2.5 w-2.5 rounded-full border-2 border-white transition-colors duration-300 ${isPartnerOnline ? 'bg-emerald-500' : 'bg-gray-300'}`} />
+                  </div>
+
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between">
+                      <p className="text-xs font-bold text-[#1F1F1F] truncate">{partnerName}</p>
+                      <span className="text-[10px] text-[#6B6B6B] font-mono">
+                        {conv.updatedAt ? new Date(conv.updatedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : "Active"}
+                      </span>
+                    </div>
+                    <p className="text-xs text-[#6B6B6B] truncate mt-0.5">
+                      {isConvPartnerTyping ? (
+                        <span className="text-emerald-600 font-medium italic">typing...</span>
+                      ) : (
+                        conv.lastMessageSnippet || "No message data transmissions inside room."
+                      )}
+                    </p>
+                  </div>
+                </button>
+              );
+            })
+          )}
+        </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto divide-y divide-[#E6E0DA]/60">
-        {loading ? (
-          <p className="text-xs text-center text-[#6B6B6B] font-mono py-8 animate-pulse">Syncing channels...</p>
-        ) : conversations.length === 0 ? (
-          <p className="text-xs text-center text-[#6B6B6B] py-8">No conversation routes active.</p>
-        ) : (
-          conversations.map((conv) => {
-            const isActive = conv._id === activeConversationId;
-            const chatPartner = conv.participants.find((p) => p.userId !== currentUserId);
-            const partnerName = chatPartner?.name || 'Anonymous user';
-            const currentRoomTypingObj = typingUsers[conv._id] || {};
-            const isConvPartnerTyping = !!currentRoomTypingObj[chatPartner?.userId || ''];
-            
-            const isPartnerOnline = chatPartner?.userId ? onlineUsers.has(chatPartner.userId) : false;
+   
+      <div className={`flex-1 flex flex-col ${currentStyle.bgLight}`}>
+        {activeConversationId ? (
+          <div className="flex-1 flex flex-col h-full">
+         
+            <div className="p-4 bg-white border-b border-[#E6E0DA] flex items-center gap-3">
+              <div className="relative flex items-center gap-2">
+                <span className="relative flex h-2.5 w-2.5">
+                  {activeChatPartner?.userId && onlineUsers.has(activeChatPartner.userId) ? (
+                    <>
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+                    </>
+                  ) : (
+                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-gray-300"></span>
+                  )}
+                </span>
+                <p className="text-xs font-bold uppercase tracking-wider text-[#1F1F1F]">
+                  {activePartnerName}
+                  <span className="text-[10px] lowercase font-normal text-[#6B6B6B] ml-2 font-mono">
+                    ({activeChatPartner?.userId && onlineUsers.has(activeChatPartner.userId) ? 'online' : 'offline'})
+                  </span>
+                </p>
+              </div>
+            </div>
 
-            return (
+          
+            <div className="flex-1 p-6 overflow-y-auto space-y-4 flex flex-col">
+              {messagesLoading ? (
+                <p className="text-xs text-center text-[#6B6B6B] font-mono py-8 animate-pulse">Retrieving communication logs...</p>
+              ) : messages.length === 0 ? (
+                <p className="text-xs text-center text-[#6B6B6B] py-8 m-auto font-mono">Channel initialization complete. Start transmitting.</p>
+              ) : (
+                messages.map((msg) => {
+                  const isSelf = msg.senderId === currentUserId;
+                  const messageAge = Date.now() - new Date(msg.createdAt!).getTime();
+                  const canDelete = isSelf && messageAge <= DELETE_TIME_WINDOW && !msg.isDeletedForEveryone;
+
+                  return (
+                    <div
+                      key={msg._id}
+                      className={`group relative flex flex-col max-w-[70%] text-xs p-3 rounded-2xl shadow-sm tracking-wide ${
+                        isSelf
+                          ? `${currentStyle.activeBubble} self-end rounded-tr-none`
+                          : `${currentStyle.peerBubble} self-start rounded-tl-none`
+                      }`}
+                    >
+                     
+                      {canDelete && (
+                        <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity z-10">
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setOpenMenuId(openMenuId === msg._id ? null : msg._id);
+                            }}
+                            className="p-1 rounded hover:bg-white/20 text-xs font-bold leading-none cursor-pointer"
+                            title="Options"
+                          >
+                            ⋮
+                          </button>
+
+                          {openMenuId === msg._id && (
+                            <div className="absolute right-0 top-6 bg-white text-[#1F1F1F] shadow-lg rounded-lg py-1 border border-[#E6E0DA] z-20 w-36">
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleDeleteMessage(msg._id);
+                                }}
+                                className="w-full text-left px-3 py-1.5 text-[11px] text-red-600 hover:bg-red-50 flex items-center gap-1.5 cursor-pointer font-medium"
+                              >
+                                Delete for everyone
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      )}
+
+                      <p className={`leading-relaxed ${canDelete ? 'pr-5' : ''}`}>
+                        {msg.content}
+                      </p>
+                      
+                      <span className="text-[9px] mt-1 block text-right font-mono opacity-60">
+                        {msg.createdAt ? new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ""}
+                      </span>
+                    </div>
+                  );
+                })
+              )}
+
+              {isPartnerTyping && (
+                <div className="flex items-center gap-2 text-[11px] text-[#6B6B6B] bg-[#F5F5F5] border border-[#E6E0DA] self-start px-3 py-2 rounded-2xl rounded-tl-none tracking-wide animate-pulse shadow-sm">
+                  <div className="flex gap-1 items-center mt-0.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#6B6B6B] animate-bounce [animation-delay:-0.3s]"></span>
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#6B6B6B] animate-bounce [animation-delay:-0.15s]"></span>
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#6B6B6B] animate-bounce"></span>
+                  </div>
+                  <span className="font-mono text-[10px] uppercase ml-1">{activePartnerName} is typing...</span>
+                </div>
+              )}
+
+              <div ref={messagesEndRef} />
+            </div>
+
+           
+            <div className="p-4 bg-white border-t border-[#E6E0DA] flex items-center gap-2">
+              <input
+                type="text"
+                value={typedMessage}
+                onChange={handleInptChange}
+                onKeyDown={handleKeyDown}
+                placeholder="Type a message..."
+                className="flex-1 bg-[#FFF9F4] border border-[#E6E0DA] rounded-xl px-4 py-3 text-xs text-[#1F1F1F] focus:outline-none focus:border-[#C9653B]/60 transition-all"
+              />
               <button
-                key={conv._id}
-                onClick={() => handleSelectConversation(conv._id)}
-                className={`w-full text-left p-4 transition-all flex items-start gap-3 cursor-pointer ${isActive ? currentStyle.sidebarActive : "hover:bg-[#FFF9F4]/60"}`}
+                onClick={handleSendMessage}
+                className={`px-5 py-3 text-xs font-bold uppercase tracking-wider text-white rounded-xl transition-all active:scale-95 cursor-pointer ${currentStyle.accent}`}
               >
-                <div className="relative">
-                  <div className="w-10 h-10 rounded-xl bg-[#F5F5F5] border border-[#E6E0DA] flex items-center justify-center font-bold text-xs uppercase text-[#6B6B6B]">
-                    {partnerName.substring(0, 2) || "CH"}
-                  </div>
-                  <span className={`absolute -bottom-0.5 -right-0.5 block h-2.5 w-2.5 rounded-full border-2 border-white transition-colors duration-300 ${isPartnerOnline ? 'bg-emerald-500' : 'bg-gray-300'}`} />
-                </div>
-
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center justify-between">
-                    <p className="text-xs font-bold text-[#1F1F1F] truncate">{partnerName}</p>
-                    <span className="text-[10px] text-[#6B6B6B] font-mono">
-                      {conv.updatedAt ? new Date(conv.updatedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : "Active"}
-                    </span>
-                  </div>
-                  <p className="text-xs text-[#6B6B6B] truncate mt-0.5">
-                    {isConvPartnerTyping ? (
-                      <span className="text-emerald-600 font-medium italic">typing...</span>
-                    ) : (
-                      conv.lastMessageSnippet || "No message data transmissions inside room."
-                    )}
-                  </p>
-                </div>
+                Send
               </button>
-            );
-          })
+            </div>
+          </div>
+        ) : (
+          <div className="flex-1 flex flex-col items-center justify-center p-8 text-center">
+            <h3 className="text-xs font-bold uppercase tracking-widest text-[#1F1F1F]">No Conversation Open</h3>
+            <p className="text-[11px] text-[#6B6B6B] max-w-xs mt-1">
+              Click on a conversation to continue chatting.
+            </p>
+          </div>
         )}
       </div>
     </div>
-
-   
-    <div className={`flex-1 flex flex-col ${currentStyle.bgLight}`}>
-      {activeConversationId ? (
-        <div className="flex-1 flex flex-col h-full">
-          
-       
-          <div className="p-4 bg-white border-b border-[#E6E0DA] flex items-center gap-3">
-            <div className="relative flex items-center gap-2">
-              <span className="relative flex h-2.5 w-2.5">
-                {activeChatPartner?.userId && onlineUsers.has(activeChatPartner.userId) ? (
-                  <>
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
-                  </>
-                ) : (
-                  <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-gray-300"></span>
-                )}
-              </span>
-              <p className="text-xs font-bold uppercase tracking-wider text-[#1F1F1F]">
-                {activePartnerName}
-                <span className="text-[10px] lowercase font-normal text-[#6B6B6B] ml-2 font-mono">
-                  ({activeChatPartner?.userId && onlineUsers.has(activeChatPartner.userId) ? 'online' : 'offline'})
-                </span>
-              </p>
-            </div>
-          </div>
-
-   
-          <div className="flex-1 p-6 overflow-y-auto space-y-4 flex flex-col">
-            {messagesLoading ? (
-              <p className="text-xs text-center text-[#6B6B6B] font-mono py-8 animate-pulse">Retrieving communication logs...</p>
-            ) : messages.length === 0 ? (
-              <p className="text-xs text-center text-[#6B6B6B] py-8 m-auto font-mono">Channel initialization complete. Start transmitting.</p>
-            ) : (
-              messages.map((msg) => {
-                const isSelf = msg.senderId === currentUserId;
-                return (
-                  <div
-                    key={msg._id}
-                    className={`flex flex-col max-w-[70%] text-xs p-3 rounded-2xl shadow-sm tracking-wide ${isSelf
-                      ? `${currentStyle.activeBubble} self-end rounded-tr-none`
-                      : `${currentStyle.peerBubble} self-start rounded-tl-none`
-                    }`}
-                  >
-                    <p className="leading-relaxed">{msg.content}</p>
-                    <span className="text-[9px] mt-1 block text-right font-mono opacity-60">
-                      {msg.createdAt ? new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ""}
-                    </span>
-                  </div>
-                );
-              })
-            )}
-
-       
-            {isPartnerTyping && (
-              <div className="flex items-center gap-2 text-[11px] text-[#6B6B6B] bg-[#F5F5F5] border border-[#E6E0DA] self-start px-3 py-2 rounded-2xl rounded-tl-none tracking-wide animate-pulse shadow-sm">
-                <div className="flex gap-1 items-center mt-0.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#6B6B6B] animate-bounce [animation-delay:-0.3s]"></span>
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#6B6B6B] animate-bounce [animation-delay:-0.15s]"></span>
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#6B6B6B] animate-bounce"></span>
-                </div>
-                <span className="font-mono text-[10px] uppercase ml-1">{activePartnerName} is typing...</span>
-              </div>
-            )}
-
-            <div ref={messagesEndRef} />
-          </div>
-
-         
-          <div className="p-4 bg-white border-t border-[#E6E0DA] flex items-center gap-2">
-            <input
-              type="text"
-              value={typedMessage}
-              onChange={handleInptChange}
-              onKeyDown={handleKeyDown}
-              placeholder="Type a message..."
-              className="flex-1 bg-[#FFF9F4] border border-[#E6E0DA] rounded-xl px-4 py-3 text-xs text-[#1F1F1F] focus:outline-none focus:border-[#C9653B]/60 transition-all"
-            />
-            <button
-              onClick={handleSendMessage}
-              className={`px-5 py-3 text-xs font-bold uppercase tracking-wider text-white rounded-xl transition-all active:scale-95 cursor-pointer ${currentStyle.accent}`}
-            >
-              Send
-            </button>
-          </div>
-        </div>
-      ) : (
-        <div className="flex-1 flex flex-col items-center justify-center p-8 text-center">
-          <h3 className="text-xs font-bold uppercase tracking-widest text-[#1F1F1F]">No Conversation Open</h3>
-          <p className="text-[11px] text-[#6B6B6B] max-w-xs mt-1">
-            Click on a conversation to Continue Chat
-          </p>
-        </div>
-      )}
-    </div>
-  </div>
-);
+  );
 };
