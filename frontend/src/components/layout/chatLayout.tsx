@@ -6,6 +6,7 @@ import toast from "react-hot-toast";
 import { useAppSelector } from "../../hooks/redux.hooks";
 import { getSocket } from "../../services/socket.service";
 
+
 interface ChatWorkspaceProps {
   roleTheme: 'user' | 'tenant' | 'admin';
 }
@@ -37,7 +38,7 @@ const THEME_STYLES = {
   },
 };
 
-const DELETE_TIME_WINDOW = 15 * 60 * 1000;
+const EDIT_DELETE_TIME_WINDOW = 15 * 60 * 1000;
 
 export const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ roleTheme }) => {
   const [conversations, setConversation] = useState<ConversationDTO[]>([]);
@@ -53,6 +54,10 @@ export const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ roleTheme }) => {
   const [typingUsers, setTypingUsers] = useState<Record<string, Record<string, boolean>>>({});
   const [onlineUsers, setOnlineUsers] = useState<Set<string>>(new Set());
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
+
+  const [editingMessage, setEditingMessage] = useState<MessageDto | null>(null);
+  const [editInputText, setEditInputText] = useState<string>('');
+  const [isSubmittingEdit, setIsSubmittingEdit] = useState<boolean>(false);
 
   let isCurrentlytyping = useRef<boolean>(false);
   const isTypingTimeOut = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -199,7 +204,7 @@ export const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ roleTheme }) => {
 
     const handleMessageDeleted = (data: { conversationId: string; messageId: string; isDeletedForEveryone: boolean }) => {
       if (data.conversationId === activeConversationId) {
-      setMessages((prevMessages) =>
+        setMessages((prevMessages) =>
           prevMessages.map((msg) =>
             msg._id === data.messageId
               ? { ...msg, content: 'This message was deleted.', isDeletedForEveryone: true }
@@ -207,18 +212,18 @@ export const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ roleTheme }) => {
           )
         );
       }
-      setConversation((prevConversations)=>
-      prevConversations.map((conv)=>{
-        if(conv._id===data.conversationId){
-          return {
-            ...conv,
-            lastMessageSnippet: "This message was deleted."
-          };
-        }
-        return conv;
-      })
-    
-    )
+      setConversation((prevConversations) =>
+        prevConversations.map((conv) => {
+          if (conv._id === data.conversationId) {
+            return {
+              ...conv,
+              lastMessageSnippet: "This message was deleted."
+            };
+          }
+          return conv;
+        })
+
+      )
     };
 
     socket.on('message:receive', handleRecieveMessage);
@@ -284,7 +289,7 @@ export const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ roleTheme }) => {
 
       if (response.success && response.data) {
         const newMessage = response.data;
-     
+
         setConversation((prevConv) =>
           prevConv.map((c) =>
             c._id === activeConversationId
@@ -306,7 +311,7 @@ export const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ roleTheme }) => {
       const response = await chatService.deleteForEveryOne(messageId);
       if (response.success) {
         toast.success('Message deleted');
-        
+
         setMessages((prev) =>
           prev.map((m) =>
             m._id === messageId
@@ -322,6 +327,49 @@ export const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ roleTheme }) => {
     }
   };
 
+  const handleOpenEditModal = (msg: MessageDto) => {
+    setEditingMessage(msg);
+    setOpenMenuId(null);
+    setEditInputText(msg.content)
+  }
+  const handleCloseEditModal = () => {
+    setEditingMessage(null);
+    setEditInputText('');
+  }
+
+  const handleSaveEdit = async () => {
+    if (!editingMessage || !editInputText.trim()) return
+    try {
+      setIsSubmittingEdit(true);
+      const trimmedText = editInputText.trim();
+      const response = await chatService.editMessage(editingMessage._id, trimmedText)
+      if (response.success) {
+        setMessages((prev) =>
+          prev.map((m) =>
+            m._id === editingMessage._id ? { ...m, content: trimmedText } : m
+          )
+        )
+
+        if (activeConversationId) {
+          setConversation((prev) =>
+            prev.map((c) =>
+              c._id === activeConversationId ?
+                { ...c, lastMessageSnippet: trimmedText } : c
+            )
+          )
+        }
+        handleCloseEditModal()
+      }
+      else {
+        toast.error(response.message)
+      }
+    } catch {
+      toast.error('Failed to edit message');
+    } finally {
+      setIsSubmittingEdit(false)
+    }
+  }
+
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       handleSendMessage();
@@ -334,7 +382,7 @@ export const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ roleTheme }) => {
 
   const activeRoomTypingObj = typingUsers[activeConversationId || ''] || {};
   const isPartnerTyping = !!activeRoomTypingObj[activeChatPartner?.userId || ''];
-
+  const validateEditString = editInputText.trim().length > 0
   return (
     <div className="flex h-[calc(100vh-64px)] w-full bg-white border border-[#E6E0DA] rounded-3xl overflow-hidden shadow-sm">
       <div className="w-80 md:w-96 border-r border-[#E6E0DA] flex flex-col bg-white">
@@ -396,11 +444,11 @@ export const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ roleTheme }) => {
         </div>
       </div>
 
-   
+
       <div className={`flex-1 flex flex-col ${currentStyle.bgLight}`}>
         {activeConversationId ? (
           <div className="flex-1 flex flex-col h-full">
-         
+
             <div className="p-4 bg-white border-b border-[#E6E0DA] flex items-center gap-3">
               <div className="relative flex items-center gap-2">
                 <span className="relative flex h-2.5 w-2.5">
@@ -422,7 +470,7 @@ export const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ roleTheme }) => {
               </div>
             </div>
 
-          
+
             <div className="flex-1 p-6 overflow-y-auto space-y-4 flex flex-col">
               {messagesLoading ? (
                 <p className="text-xs text-center text-[#6B6B6B] font-mono py-8 animate-pulse">Retrieving communication logs...</p>
@@ -432,19 +480,18 @@ export const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ roleTheme }) => {
                 messages.map((msg) => {
                   const isSelf = msg.senderId === currentUserId;
                   const messageAge = Date.now() - new Date(msg.createdAt!).getTime();
-                  const canDelete = isSelf && messageAge <= DELETE_TIME_WINDOW && !msg.isDeletedForEveryone;
+                  const canModify = isSelf && messageAge <= EDIT_DELETE_TIME_WINDOW && !msg.isDeletedForEveryone;
 
                   return (
                     <div
                       key={msg._id}
-                      className={`group relative flex flex-col max-w-[70%] text-xs p-3 rounded-2xl shadow-sm tracking-wide ${
-                        isSelf
-                          ? `${currentStyle.activeBubble} self-end rounded-tr-none`
-                          : `${currentStyle.peerBubble} self-start rounded-tl-none`
-                      }`}
+                      className={`group relative flex flex-col max-w-[70%] text-xs p-3 rounded-2xl shadow-sm tracking-wide ${isSelf
+                        ? `${currentStyle.activeBubble} self-end rounded-tr-none`
+                        : `${currentStyle.peerBubble} self-start rounded-tl-none`
+                        }`}
                     >
-                     
-                      {canDelete && (
+
+                      {canModify && (
                         <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity z-10">
                           <button
                             onClick={(e) => {
@@ -462,6 +509,15 @@ export const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ roleTheme }) => {
                               <button
                                 onClick={(e) => {
                                   e.stopPropagation();
+                                  handleOpenEditModal(msg);
+                                }}
+                                className="w-full text-left px-3 py-1.5 text-[11px] text-gray-700 hover:bg-gray-100 flex items-center gap-1.5 cursor-pointer font-medium"
+                              >
+                                Edit message
+                              </button>
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
                                   handleDeleteMessage(msg._id);
                                 }}
                                 className="w-full text-left px-3 py-1.5 text-[11px] text-red-600 hover:bg-red-50 flex items-center gap-1.5 cursor-pointer font-medium"
@@ -473,10 +529,10 @@ export const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ roleTheme }) => {
                         </div>
                       )}
 
-                      <p className={`leading-relaxed ${canDelete ? 'pr-5' : ''}`}>
+                      <p className={`leading-relaxed ${canModify ? 'pr-5' : ''}`}>
                         {msg.content}
                       </p>
-                      
+
                       <span className="text-[9px] mt-1 block text-right font-mono opacity-60">
                         {msg.createdAt ? new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ""}
                       </span>
@@ -499,7 +555,7 @@ export const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ roleTheme }) => {
               <div ref={messagesEndRef} />
             </div>
 
-           
+
             <div className="p-4 bg-white border-t border-[#E6E0DA] flex items-center gap-2">
               <input
                 type="text"
@@ -526,6 +582,56 @@ export const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ roleTheme }) => {
           </div>
         )}
       </div>
+      {editingMessage && (
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-xs flex items-center justify-center z-50 p-4">
+          <div className="bg-white border border-[#E6E0DA] rounded-2xl w-full max-w-md shadow-2xl p-6 space-y-4">
+            <div className="flex items-center justify-between border-b border-[#E6E0DA] pb-3">
+              <h3 className="text-xs font-bold uppercase tracking-wider text-[#1F1F1F]">
+                Edit Message
+              </h3>
+              <button
+                onClick={handleCloseEditModal}
+                className="text-gray-400 hover:text-gray-600 text-sm font-bold cursor-pointer"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="space-y-2">
+              <textarea
+                value={editInputText}
+                onChange={(e) => setEditInputText(e.target.value)}
+                placeholder="Type your updated message..."
+                rows={4}
+                className="w-full bg-[#FFF9F4] border border-[#E6E0DA] rounded-xl p-3 text-xs text-[#1F1F1F] focus:outline-none focus:border-[#C9653B]/60 transition-all resize-none"
+                autoFocus
+              />
+            </div>
+
+            <div className="flex justify-end gap-2 pt-2 border-t border-[#E6E0DA]">
+              <button
+                type="button"
+                onClick={handleCloseEditModal}
+                className="px-4 py-2 text-xs font-semibold text-gray-600 hover:bg-gray-100 rounded-xl cursor-pointer"
+              >
+                Cancel
+              </button>
+
+              {validateEditString && (
+                <button
+                  type="button"
+                  disabled={isSubmittingEdit}
+                  onClick={handleSaveEdit}
+                  className={`px-5 py-2 text-xs font-bold uppercase tracking-wider text-white rounded-xl transition-all cursor-pointer ${currentStyle.accent
+                    } ${isSubmittingEdit ? 'opacity-50 cursor-not-allowed' : ''}`}
+                >
+                  {isSubmittingEdit ? 'Saving...' : 'Submit'}
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

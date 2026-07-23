@@ -8,7 +8,7 @@ import { MESSAGES } from "../../constants/constants";
 import { Types } from "mongoose";
 import { IMessageRepository } from "../../repositories/interfaces/IMessage.repository";
 import { Role } from "../../dtos/Common.dto";
-import { socketService} from "./socket.service";
+import { socketService } from "./socket.service";
 import { MESSAGE_TIME_CONFIG } from "../../constants/constants";
 
 export class ChatService implements IChatService {
@@ -64,17 +64,17 @@ export class ChatService implements IChatService {
       content: content?.trim()
 
     });
-    const now=new Date()
+    const now = new Date()
     const updatingData = {
       _id: conversationId, lastMessageSnippet: content?.trim(), lastMessage: senderId, lastMessageAt: now
     }
     await conversation.updateOne(updatingData)
     const mappedMessage = ChatMapper.toMessageDocumentToDTO(newMessage)
-    socketService.emitToRoom(conversationId,'message:receive',mappedMessage)
-    socketService.emitToRoom(conversationId,'conversation:updated',{
+    socketService.emitToRoom(conversationId, 'message:receive', mappedMessage)
+    socketService.emitToRoom(conversationId, 'conversation:updated', {
       conversationId,
-      lastMessageSnippet:mappedMessage.content,
-      lastMessageAt:now.toISOString()
+      lastMessageSnippet: mappedMessage.content,
+      lastMessageAt: now.toISOString()
     })
     return mappedMessage
   }
@@ -94,34 +94,55 @@ export class ChatService implements IChatService {
     return mappedMessages
   }
   async deleteForEveryOne(messageId: string, senderId: string): Promise<MessageDto> {
-    const isMessageExist=await this._messageRepo.findById(messageId);
-    if(!isMessageExist){
+    const isMessageExist = await this._messageRepo.findById(messageId);
+    if (!isMessageExist) {
       throw new NotFoundError(MESSAGES.MESSAGE_NOT_FOUND)
     }
-    if(isMessageExist.senderId.toString()!==senderId){
+    if (isMessageExist.senderId.toString() !== senderId) {
       throw new UnauthorizedError(MESSAGES.NOT_PERMITTED)
     }
-    const MessageAge=Date.now()-new Date(isMessageExist.createdAt).getTime();
-    if(MessageAge>MESSAGE_TIME_CONFIG.MAX_DELETE_WINDOW){
+    const MessageAge = Date.now() - new Date(isMessageExist.createdAt).getTime();
+    if (MessageAge > MESSAGE_TIME_CONFIG.MAX_DELETE_WINDOW) {
       throw new AppError("Time limit exceeded: You can only delete messages for everyone within 15 minutes.")
     }
-    const updatedMessage=await this._messageRepo.deleteForEveryOne( messageId,senderId)
-    if(!updatedMessage){
+    const updatedMessage = await this._messageRepo.deleteForEveryOne(messageId, senderId)
+    if (!updatedMessage) {
       throw new NotFoundError('Failed to delete message or message was already deleted')
     }
-    
-  const mappedMessage= ChatMapper.toMessageDocumentToDTO(updatedMessage)
-  socketService.emitToRoom(
-    mappedMessage.conversationId.toString(),
-    'message:deleted',
-    {
-      conversationId:mappedMessage.conversationId.toString(),
-      messageId:mappedMessage._id.toString(),
-      isDeletedForEveryone:true
-    }
-  )
-  return mappedMessage
+
+    const mappedMessage = ChatMapper.toMessageDocumentToDTO(updatedMessage)
+    socketService.emitToRoom(
+      mappedMessage.conversationId.toString(),
+      'message:deleted',
+      {
+        conversationId: mappedMessage.conversationId.toString(),
+        messageId: mappedMessage._id.toString(),
+        isDeletedForEveryone: true
+      }
+    )
+    return mappedMessage
 
   }
+
+  async editMessage(messageId: string, senderId: string, newContent: string): Promise<MessageDto> {
+    const isMessageExist = await this._messageRepo.findById(messageId);
+    if (!isMessageExist) {
+      throw new NotFoundError(MESSAGES.MESSAGE_NOT_FOUND)
+    };
+    if (isMessageExist.senderId.toString() !== senderId) {
+      throw new UnauthorizedError(MESSAGES.NOT_PERMITTED)
+    }
+    const messageAge = Date.now() - new Date(isMessageExist.createdAt).getTime();
+    if (messageAge >= MESSAGE_TIME_CONFIG.MAX_EDIT_WINDOW) {
+      throw new AppError("Time limit exceeded: You can only Edit messages for everyone within 15 minutes.")
+    }
+    const updatedMessage = await this._messageRepo.editMessage(messageId, newContent);
+    if (!updatedMessage) {
+      throw new NotFoundError('Failed to edit message')
+    }
+    const mappedMessage = ChatMapper.toMessageDocumentToDTO(updatedMessage)
+    return mappedMessage
+  }
+
 
 }

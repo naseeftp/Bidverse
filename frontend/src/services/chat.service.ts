@@ -72,6 +72,19 @@ class ChatService {
          return apiErrorHandler(error, 'Failed to delete message')
         }
     }
+    async editMessage(messageId:string,newContent:string){
+        try {
+            let url=`${BASE_ROUTES.CHAT}${CHAT_ROUTES.EDIT_MESSAGE}/${messageId}`
+            const response=await axiosInstance.patch<MessageDto,ApiResponse<MessageDto>>(url,{content:newContent});
+            return{
+                success:true,
+                data:response.data,
+                message:response.message
+            }
+        } catch (error) {
+           return apiErrorHandler(error, 'Failed to edit message')
+        }
+    }
 }
 
 export default new ChatService()

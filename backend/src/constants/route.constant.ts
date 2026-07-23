@@ -84,5 +84,6 @@ export const CHAT_ROUTES = {
     GET_USER_CONVO: '/user-conversations',
     SEND_MESSAGE: '/send-message',
     GET_MESSAGES: '/get-messages/:id',
-    DELETE_EVERYONE:'/delete-for-everyone/:id'
+    DELETE_EVERYONE:'/delete-for-everyone/:id',
+    EDIT_MESSAGE:'/edit-message/:id'
 }

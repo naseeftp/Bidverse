@@ -34,4 +34,8 @@ router.delete(
    allowedTo(Role.USER, Role.TENANT, Role.ADMIN),
    (req,res,next)=>chatController.deleteForEveryOne(req,res,next)
 )
+router.patch(CHAT_ROUTES.EDIT_MESSAGE,
+   allowedTo(Role.USER,Role.TENANT,Role.ADMIN),
+   (req,res,next)=>chatController.editMessage(req,res,next)
+)
 export default router;

@@ -9,19 +9,26 @@ export class MessageRepository extends BaseRepository<IMessageDocument> implemen
     constructor() {
         super(Message)
     }
-    async deleteForEveryOne(messageId:string,senderId:string):Promise<IMessageDocument|null>{
+    async deleteForEveryOne(messageId: string, senderId: string): Promise<IMessageDocument | null> {
         return this.model.findOneAndUpdate(
             {
-                _id:new Types.ObjectId(messageId),
-                senderId:new Types.ObjectId(senderId),
-                isDeletedForEveryone:false
-            },{
-                $set:{
-                    isDeletedForEveryone:true,
-                    content:'this content was deleted',
-                    attachment:null
-                }
-            },{new:true}
+                _id: new Types.ObjectId(messageId),
+                senderId: new Types.ObjectId(senderId),
+                isDeletedForEveryone: false
+            }, {
+            $set: {
+                isDeletedForEveryone: true,
+                content: 'this content was deleted',
+                attachment: null
+            }
+        }, { new: true }
         ).exec()
+    }
+    async editMessage(messageId: string, newContent: string): Promise<IMessageDocument | null> {
+        return this.model.findByIdAndUpdate(messageId, {
+            $set: {
+                content: newContent.trim()
+            }
+        }, { new: true }).exec()
     }
 }

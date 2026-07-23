@@ -158,8 +158,9 @@ export const MESSAGES = {
     REQ_USER_NOT_FOUND: 'Requested user Not found',
     RECEIVER_NOT_FOUNS: 'Reciever User Not found',
     TWO_PEOPLE_NEEDED: 'A direct conversation must have exactly two participants',
-    MESSAGE_NOT_FOUND:'Message Not Foud',
-    MESSAGE_DELETED:'Message deleted',
+    MESSAGE_NOT_FOUND: 'Message Not Foud',
+    MESSAGE_DELETED: 'Message deleted',
+    MESSAGE_EDITED: 'Message edited',
 
     LOGOUT_SUCCESS: "Logout success",
     LOGOUT_FAILED: "Logout failed",
@@ -192,8 +193,9 @@ export enum MessageType {
     FILE = 'file'
 }
 
-export const MESSAGE_TIME_CONFIG={
-    MAX_DELETE_WINDOW:15*60*1000
+export const MESSAGE_TIME_CONFIG = {
+    MAX_DELETE_WINDOW: 15 * 60 * 1000,
+    MAX_EDIT_WINDOW: 15 * 60 * 1000
 }
 
 

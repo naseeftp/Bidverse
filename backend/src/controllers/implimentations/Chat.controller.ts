@@ -64,4 +64,15 @@ export class ChatController implements IChatController {
          next(error)   
         }
     }
+    async editMessage(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const senderId=req.user.id;
+            const messageId=req.params.id as string;
+            const {content}=req.body;
+            const result=await this._ChatService.editMessage(messageId,senderId,content)
+            SuccessResponse(res,MESSAGES.MESSAGE_EDITED,result,HttpStatus.OK)
+        } catch (error) {
+            next(error)
+        }
+    }
 }
