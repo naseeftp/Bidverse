@@ -17,6 +17,7 @@ export interface ServerToClientEvents {  // this events emitted by backend and f
         messageId: string;
         isDeletedForEveryone: boolean;
     }) => void;
+    'message:edited':(data:{conversationId:string,messageId:string,newContent:string,isLastMessage: boolean;})=>void;
     //  "notification:new": (notification: any) => void;//Emitted for real-time background system alerts.
 }
 

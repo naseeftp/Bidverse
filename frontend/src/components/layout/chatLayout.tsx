@@ -226,11 +226,37 @@ export const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ roleTheme }) => {
       )
     };
 
+    const handleMessageEdited = (data: {
+      conversationId: string;
+      messageId: string;
+      newContent: string,
+      isLastMessage: boolean
+    }) => {
+      if (data.conversationId === activeConversationId) {
+        setMessages((prevMessages) =>
+          prevMessages.map((msg) =>
+            msg._id === data.messageId ? { ...msg, content: data.newContent } : msg
+          )
+        )
+      }
+      if (data.isLastMessage) {
+        setConversation((prevConversations) =>
+          prevConversations.map((conv) =>
+            conv._id === data.conversationId
+              ? { ...conv, lastMessageSnippet: data.newContent }
+              : conv
+          )
+        );
+      }
+
+    }
+
     socket.on('message:receive', handleRecieveMessage);
     socket.on('conversation:updated', handleConversationUpdated);
     socket.on('typing:status', handleTypingStatus);
     socket.on('user:status', handleUserStatus);
     socket.on('message:deleted', handleMessageDeleted);
+    socket.on('message:edited', handleMessageEdited)
 
     return () => {
       socket.off('message:receive', handleRecieveMessage);
@@ -238,6 +264,7 @@ export const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ roleTheme }) => {
       socket.off('typing:status', handleTypingStatus);
       socket.off('user:status', handleUserStatus);
       socket.off('message:deleted', handleMessageDeleted);
+      socket.off('message:edited', handleMessageEdited)
       if (conversations && conversations.length > 0) {
         conversations.forEach((conv) => {
           socket.emit('conversation:leave', conv._id);

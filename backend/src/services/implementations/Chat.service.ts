@@ -65,11 +65,14 @@ export class ChatService implements IChatService {
 
     });
     const now = new Date()
+
+
+
+    const mappedMessage = ChatMapper.toMessageDocumentToDTO(newMessage)
     const updatingData = {
-      _id: conversationId, lastMessageSnippet: content?.trim(), lastMessage: senderId, lastMessageAt: now
+      _id: conversationId, lastMessageSnippet: content?.trim(), lastMessage: mappedMessage._id, lastMessageAt: now
     }
     await conversation.updateOne(updatingData)
-    const mappedMessage = ChatMapper.toMessageDocumentToDTO(newMessage)
     socketService.emitToRoom(conversationId, 'message:receive', mappedMessage)
     socketService.emitToRoom(conversationId, 'conversation:updated', {
       conversationId,
@@ -140,7 +143,25 @@ export class ChatService implements IChatService {
     if (!updatedMessage) {
       throw new NotFoundError('Failed to edit message')
     }
-    const mappedMessage = ChatMapper.toMessageDocumentToDTO(updatedMessage)
+    const mappedMessage = ChatMapper.toMessageDocumentToDTO(updatedMessage);
+    const conversationId = mappedMessage.conversationId.toString()
+    const conversation = await this._conversationRepo.findById(conversationId)
+
+    const lastMessageId = conversation?.lastMessage!.toString()
+    const isLastMessage = lastMessageId === mappedMessage._id.toString()
+    if (isLastMessage) {
+      await this._conversationRepo.updateById(conversationId, { lastMessageSnippet: newContent })
+    }
+
+    socketService.emitToRoom(
+      conversationId,
+      'message:edited', {
+      conversationId,
+      messageId: mappedMessage._id.toString(),
+      newContent: mappedMessage.content,
+      isLastMessage
+    }
+    )
     return mappedMessage
   }
 
