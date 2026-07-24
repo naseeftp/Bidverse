@@ -82,12 +82,12 @@ export class ChatService implements IChatService {
     return mappedMessage
   }
 
-  async getMessages(conversationId: string): Promise<MessageDto[]> {
+  async getMessages(conversationId: string,userId:string): Promise<MessageDto[]> {
     const isConversationExist = await this._conversationRepo.findById(conversationId);
     if (!isConversationExist) {
       throw new NotFoundError(MESSAGES.CONV_NOT_FOUND)
     }
-    const messages = await this._messageRepo.findAll({ conversationId: conversationId })
+    const messages = await this._messageRepo.findMessages(conversationId,userId)
     if (!messages) {
       throw new NotFoundError('Messages not found')
     }
