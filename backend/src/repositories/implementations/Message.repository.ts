@@ -10,12 +10,12 @@ export class MessageRepository extends BaseRepository<IMessageDocument> implemen
         super(Message)
     }
     async findMessages(conversationId: string, userId: string): Promise<IMessageDocument[] | null> {
-        const userObjectId=new Types.ObjectId(userId);
+        const userObjectId = new Types.ObjectId(userId);
         return this.model.find(
             {
-                conversationId:new Types.ObjectId(conversationId),
-                deletedFor:{$ne:userObjectId},
-                isDeletedForEveryone:{$ne:true}
+                conversationId: new Types.ObjectId(conversationId),
+                deletedFor: { $ne: userObjectId },
+                isDeletedForEveryone: { $ne: true }
             }
         ).exec()
 

@@ -82,12 +82,12 @@ export class ChatService implements IChatService {
     return mappedMessage
   }
 
-  async getMessages(conversationId: string,userId:string): Promise<MessageDto[]> {
+  async getMessages(conversationId: string, userId: string): Promise<MessageDto[]> {
     const isConversationExist = await this._conversationRepo.findById(conversationId);
     if (!isConversationExist) {
       throw new NotFoundError(MESSAGES.CONV_NOT_FOUND)
     }
-    const messages = await this._messageRepo.findMessages(conversationId,userId)
+    const messages = await this._messageRepo.findMessages(conversationId, userId)
     if (!messages) {
       throw new NotFoundError('Messages not found')
     }
@@ -96,6 +96,7 @@ export class ChatService implements IChatService {
     )
     return mappedMessages
   }
+
   async deleteForEveryOne(messageId: string, senderId: string): Promise<MessageDto> {
     const isMessageExist = await this._messageRepo.findById(messageId);
     if (!isMessageExist) {
@@ -114,6 +115,20 @@ export class ChatService implements IChatService {
     }
 
     const mappedMessage = ChatMapper.toMessageDocumentToDTO(updatedMessage)
+    const conversationId = mappedMessage.conversationId.toString();
+    const conversation = await this._conversationRepo.findById(conversationId);
+    const lastMessageId = conversation?.lastMessage!.toString()
+    const isLastMessage = lastMessageId === mappedMessage._id.toString()
+    const messages = await this._messageRepo.findAll({ conversationId: conversationId })
+    const secondLastMessage = messages[messages.length - 2];
+    const secondLastMessageId = secondLastMessage._id;
+    const secondLastMessageContent = secondLastMessage.content;
+    if (isLastMessage) {
+      await this._conversationRepo.updateById(
+        conversationId,
+        { lastMessageSnippet: secondLastMessageContent, lastMessage: secondLastMessageId }
+      )
+    }
     socketService.emitToRoom(
       mappedMessage.conversationId.toString(),
       'message:deleted',
