@@ -4,6 +4,7 @@ import type { ApiResponse } from "../types/auth.type";
 import type { ConversationDTO, MessageDto } from "../types/chat.dto";
 import { apiErrorHandler } from "../utils/error.handle";
 import type { SendMessageInputDTO } from "../types/chat.dto";
+
 class ChatService {
     async getOrCreateConversation(data: { receiverId: string, receiverRole: string }) {
         try {
@@ -84,6 +85,20 @@ class ChatService {
         } catch (error) {
            return apiErrorHandler(error, 'Failed to edit message')
         }
+    }
+
+    async deleteForMe(messageId:string){
+      try {
+        let url=`${BASE_ROUTES.CHAT}${CHAT_ROUTES.DELETE_FOR_ME}/${messageId}`;
+        const response=await axiosInstance.patch<MessageDto,ApiResponse<MessageDto>>(url);
+        return{
+            success:true,
+            message:response.message,
+            data:response.data
+        }
+      } catch (error) {
+         return apiErrorHandler(error, 'Failed to delete message')
+      }
     }
 }
 

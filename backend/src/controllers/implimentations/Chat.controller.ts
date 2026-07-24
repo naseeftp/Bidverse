@@ -56,21 +56,31 @@ export class ChatController implements IChatController {
     }
     async deleteForEveryOne(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
-            const senderId=req.user.id;
-            const messageId=req.params.id as string;
-            const result=await this._ChatService.deleteForEveryOne(messageId,senderId)
-            SuccessResponse(res,MESSAGES.MESSAGE_DELETED,result,HttpStatus.OK)
+            const senderId = req.user.id;
+            const messageId = req.params.id as string;
+            const result = await this._ChatService.deleteForEveryOne(messageId, senderId)
+            SuccessResponse(res, MESSAGES.MESSAGE_DELETED, result, HttpStatus.OK)
         } catch (error) {
-         next(error)   
+            next(error)
         }
     }
     async editMessage(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
-            const senderId=req.user.id;
-            const messageId=req.params.id as string;
-            const {content}=req.body;
-            const result=await this._ChatService.editMessage(messageId,senderId,content)
-            SuccessResponse(res,MESSAGES.MESSAGE_EDITED,result,HttpStatus.OK)
+            const senderId = req.user.id;
+            const messageId = req.params.id as string;
+            const { content } = req.body;
+            const result = await this._ChatService.editMessage(messageId, senderId, content)
+            SuccessResponse(res, MESSAGES.MESSAGE_EDITED, result, HttpStatus.OK)
+        } catch (error) {
+            next(error)
+        }
+    }
+    async deleteForMe(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const messageId = req.params.id as string;
+            const userId = req.user.id;
+            const result = await this._ChatService.deleteForMe(messageId, userId);
+            SuccessResponse(res, MESSAGES.MESSAGE_DELETED, result, HttpStatus.OK)
         } catch (error) {
             next(error)
         }

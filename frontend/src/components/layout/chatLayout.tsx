@@ -354,6 +354,24 @@ export const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ roleTheme }) => {
     }
   };
 
+  const handleDeleteForMe = async (messageId: string) => {
+    try {
+      setOpenMenuId(null);
+      const response = await chatService.deleteForMe(messageId);
+      if (response.success) {
+          setMessages((prevMessages) =>
+          prevMessages.filter((m) => m._id !== messageId)
+        )
+      }
+      else {
+        toast.error(response.message)
+      }
+    } catch {
+      toast.error('Failed to delete message');
+    }
+
+  }
+
   const handleOpenEditModal = (msg: MessageDto) => {
     setEditingMessage(msg);
     setOpenMenuId(null);
@@ -518,7 +536,7 @@ export const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ roleTheme }) => {
                         }`}
                     >
 
-                      {canModify && (
+                      {!msg.isDeletedForEveryone && (
                         <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity z-10">
                           <button
                             onClick={(e) => {
@@ -532,31 +550,49 @@ export const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ roleTheme }) => {
                           </button>
 
                           {openMenuId === msg._id && (
-                            <div className="absolute right-0 top-6 bg-white text-[#1F1F1F] shadow-lg rounded-lg py-1 border border-[#E6E0DA] z-20 w-36">
+                            <div className="absolute right-0 top-6 bg-white text-[#1F1F1F] shadow-lg rounded-lg py-1 border border-[#E6E0DA] z-20 w-40">
+
+                              {canModify && (
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleOpenEditModal(msg);
+                                  }}
+                                  className="w-full text-left px-3 py-1.5 text-[11px] text-gray-700 hover:bg-gray-100 flex items-center gap-1.5 cursor-pointer font-medium"
+                                >
+                                  Edit message
+                                </button>
+                              )}
+
+
                               <button
                                 onClick={(e) => {
                                   e.stopPropagation();
-                                  handleOpenEditModal(msg);
+                                  handleDeleteForMe(msg._id);
                                 }}
                                 className="w-full text-left px-3 py-1.5 text-[11px] text-gray-700 hover:bg-gray-100 flex items-center gap-1.5 cursor-pointer font-medium"
                               >
-                                Edit message
+                                Delete for me
                               </button>
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleDeleteMessage(msg._id);
-                                }}
-                                className="w-full text-left px-3 py-1.5 text-[11px] text-red-600 hover:bg-red-50 flex items-center gap-1.5 cursor-pointer font-medium"
-                              >
-                                Delete for everyone
-                              </button>
+
+
+                              {canModify && (
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleDeleteMessage(msg._id);
+                                  }}
+                                  className="w-full text-left px-3 py-1.5 text-[11px] text-red-600 hover:bg-red-50 flex items-center gap-1.5 cursor-pointer font-medium border-t border-[#E6E0DA]/50"
+                                >
+                                  Delete for everyone
+                                </button>
+                              )}
                             </div>
                           )}
                         </div>
                       )}
 
-                      <p className={`leading-relaxed ${canModify ? 'pr-5' : ''}`}>
+                      <p className="leading-relaxed pr-5">
                         {msg.content}
                       </p>
 
@@ -565,7 +601,9 @@ export const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ roleTheme }) => {
                       </span>
                     </div>
                   );
-                })
+                }
+
+                )
               )}
 
               {isPartnerTyping && (

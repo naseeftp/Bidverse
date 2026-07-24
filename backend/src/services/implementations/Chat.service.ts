@@ -165,5 +165,18 @@ export class ChatService implements IChatService {
     return mappedMessage
   }
 
+  async deleteForMe(messageId: string, userId: string): Promise<MessageDto> {
+    const isMessageExist = await this._messageRepo.findById(messageId);
+    if (!isMessageExist) {
+      throw new NotFoundError(MESSAGES.MESSAGE_NOT_FOUND)
+    };
+    const result = await this._messageRepo.deleteForMe(messageId, userId);
+    if (!result) {
+      throw new AppError('Messages is not found or allrdy deleted')
+    }
+    const mappedMessage = ChatMapper.toMessageDocumentToDTO(result)
+    return mappedMessage
+  }
+
 
 }

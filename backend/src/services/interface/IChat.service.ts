@@ -7,4 +7,5 @@ export interface IChatService {
     getMessages(conversationId: string): Promise<MessageDto[]>
     deleteForEveryOne(messageId: string, senderId: string): Promise<MessageDto>
     editMessage(messageId: string, senderId: string, newContent: string): Promise<MessageDto>
+    deleteForMe(messageId: string, userId: string): Promise<MessageDto>
 }

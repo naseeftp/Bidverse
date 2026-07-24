@@ -8,4 +8,5 @@ export interface IChatController {
     getMessages(req: Request, res: Response, next: NextFunction): Promise<void>;
     deleteForEveryOne(req: Request, res: Response, next: NextFunction): Promise<void>;
     editMessage(req: Request, res: Response, next: NextFunction): Promise<void>;
+    deleteForMe(req: Request, res: Response, next: NextFunction): Promise<void>;
 }

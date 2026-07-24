@@ -32,10 +32,16 @@ router.get(
 router.delete(
    CHAT_ROUTES.DELETE_EVERYONE,
    allowedTo(Role.USER, Role.TENANT, Role.ADMIN),
-   (req,res,next)=>chatController.deleteForEveryOne(req,res,next)
+   (req, res, next) => chatController.deleteForEveryOne(req, res, next)
 )
 router.patch(CHAT_ROUTES.EDIT_MESSAGE,
-   allowedTo(Role.USER,Role.TENANT,Role.ADMIN),
-   (req,res,next)=>chatController.editMessage(req,res,next)
+   allowedTo(Role.USER, Role.TENANT, Role.ADMIN),
+   (req, res, next) => chatController.editMessage(req, res, next)
+)
+router.patch(
+   CHAT_ROUTES.DELETE_FOR_ME,
+   allowedTo(Role.USER, Role.TENANT, Role.ADMIN),
+   (req, res, next) => chatController.deleteForMe(req, res, next)
+
 )
 export default router;

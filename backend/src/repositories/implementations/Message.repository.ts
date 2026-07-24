@@ -31,4 +31,17 @@ export class MessageRepository extends BaseRepository<IMessageDocument> implemen
             }
         }, { new: true }).exec()
     }
+    async deleteForMe(messageId: string, userId: string): Promise<IMessageDocument | null> {
+        return this.model.findByIdAndUpdate(
+            messageId,
+            {
+                $addToSet: {
+                    deletedFor: new Types.ObjectId(userId)
+                }
+            }, { new: true }
+        ).exec()
+    }
+
+
+
 }
