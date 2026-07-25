@@ -161,6 +161,7 @@ export const MESSAGES = {
     MESSAGE_NOT_FOUND: 'Message Not Foud',
     MESSAGE_DELETED: 'Message deleted',
     MESSAGE_EDITED: 'Message edited',
+    MESSAGE_READED:'Message readed',
 
     LOGOUT_SUCCESS: "Logout success",
     LOGOUT_FAILED: "Logout failed",

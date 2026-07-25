@@ -10,7 +10,7 @@ export interface ServerToClientEvents {  // this events emitted by backend and f
         lastMessageAt: string;
     }) => void;
     'typing:status': (data: { conversationId: string; userId: string; isTyping: boolean }) => void;
-    'messages:read': (data: { conversationId: string; userId: string }) => void;//Emitted when a participant opens an unread chat window.
+    'messages:read': (data: { conversationId: string; userId: string,messageIds?:string[]}) => void;//Emitted when a participant opens an unread chat window.
     "user:status": (data: { userId: string; isOnline: boolean }) => void;//Emitted when someone logs in or disconnects from the app.
     "message:deleted": (data: {
         conversationId: string;

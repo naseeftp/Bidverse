@@ -6,4 +6,5 @@ export interface IMessageRepository extends IBaseRepository<IMessageDocument> {
     deleteForEveryOne(messageId: string, senderId: string): Promise<IMessageDocument | null>
     editMessage(messageId: string, newContent: string): Promise<IMessageDocument | null>
     deleteForMe(messageId: string, userId: string): Promise<IMessageDocument | null>
+    marKAsRead(conversationId:string,userId:string):Promise<string[]>
 }

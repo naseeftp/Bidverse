@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useSearchParams } from "react-router-dom";
 import type { ConversationDTO, MessageDto } from "../../types/chat.dto";
 import chatService from "../../services/chat.service";
@@ -83,6 +83,28 @@ export const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ roleTheme }) => {
     return () => window.removeEventListener("click", handleOutsideClick);
   }, []);
 
+  const markConversationAsRead = useCallback(async (conversationId: string) => {
+    try {
+      await chatService.markMessageRead(conversationId);
+      const socket = getSocket();
+      socket.emit('messages:read', { conversationId, userId: currentUserId });
+      setConversation((prev) =>
+        prev.map((c) => (c._id === conversationId ? { ...c, unreadCount: 0 } : c))
+      );
+      setMessages((prev) =>
+      prev.map((m) => {
+        if (m.senderId !== currentUserId && !m.readBy?.includes(currentUserId || '')) {
+          return { ...m, readBy: [...(m.readBy || []), currentUserId || ''] };
+        }
+        return m;
+      })
+    );
+    } catch {
+
+    }
+  }, [currentUserId]);
+
+
   useEffect(() => {
     const fetchConversations = async () => {
       try {
@@ -110,6 +132,7 @@ export const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ roleTheme }) => {
         const response = await chatService.getMessages(activeConversationId);
         if (response.success && response.data) {
           setMessages(response.data);
+          markConversationAsRead(activeConversationId)
         } else {
           toast.error(response.message);
         }
@@ -134,7 +157,7 @@ export const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ roleTheme }) => {
         return newState;
       });
     };
-  }, [activeConversationId, user?.userId, user?.role]);
+  }, [activeConversationId, user?.userId, user?.role, markConversationAsRead]);
 
   useEffect(() => {
     const socket = getSocket();
@@ -146,9 +169,33 @@ export const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ roleTheme }) => {
     const handleRecieveMessage = (newMessage: MessageDto) => {
       if (newMessage.conversationId === activeConversationId) {
         setMessages((prev) => [...prev, newMessage]);
+        if (newMessage.senderId !== currentUserId) {
+          markConversationAsRead(activeConversationId);
+        } else {
+          setConversation((prev) =>
+            prev.map((c) =>
+              c._id === newMessage.conversationId
+                ? { ...c, unreadCount: (c.unreadCount || 0) + 1 }
+                : c
+            )
+          );
+        }
       }
+
     };
 
+    const handleReadStatus = (data: { conversationId: string; userId: string }) => {
+      if (data.conversationId === activeConversationId && data.userId !== currentUserId) {
+        setMessages((prev) =>
+       prev.map((m) => {
+        if (m.senderId === currentUserId && !m.readBy?.includes(data.userId)) {
+          return { ...m, readBy: [...(m.readBy || []), data.userId] };
+        }
+        return m;
+      })
+    );
+      }
+    }
     socket.emit('users:get_online', (onlineIds: string[]) => {
       setOnlineUsers(new Set(onlineIds));
     });
@@ -257,6 +304,7 @@ export const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ roleTheme }) => {
     socket.on('user:status', handleUserStatus);
     socket.on('message:deleted', handleMessageDeleted);
     socket.on('message:edited', handleMessageEdited)
+    socket.on('messages:read', handleReadStatus)
 
     return () => {
       socket.off('message:receive', handleRecieveMessage);
@@ -265,6 +313,7 @@ export const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ roleTheme }) => {
       socket.off('user:status', handleUserStatus);
       socket.off('message:deleted', handleMessageDeleted);
       socket.off('message:edited', handleMessageEdited)
+      socket.off('messages:read', handleReadStatus)
       if (conversations && conversations.length > 0) {
         conversations.forEach((conv) => {
           socket.emit('conversation:leave', conv._id);
@@ -359,7 +408,7 @@ export const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ roleTheme }) => {
       setOpenMenuId(null);
       const response = await chatService.deleteForMe(messageId);
       if (response.success) {
-          setMessages((prevMessages) =>
+        setMessages((prevMessages) =>
           prevMessages.filter((m) => m._id !== messageId)
         )
       }
@@ -453,7 +502,7 @@ export const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ roleTheme }) => {
               const currentRoomTypingObj = typingUsers[conv._id] || {};
               const isConvPartnerTyping = !!currentRoomTypingObj[chatPartner?.userId || ''];
               const isPartnerOnline = chatPartner?.userId ? onlineUsers.has(chatPartner.userId) : false;
-
+              const unreadCount = conv.unreadCount || 0;
               return (
                 <button
                   key={conv._id}
@@ -481,6 +530,11 @@ export const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ roleTheme }) => {
                         conv.lastMessageSnippet || "No message data transmissions inside room."
                       )}
                     </p>
+                    {!isActive && unreadCount > 0 && (
+                      <span className="ml-auto flex-shrink-0 bg-red-500 text-white text-[10px] font-bold h-4 min-w-[16px] px-1 rounded-full flex items-center justify-center">
+                        {unreadCount > 99 ? '99+' : unreadCount}
+                      </span>
+                    )}
                   </div>
                 </button>
               );
@@ -599,6 +653,15 @@ export const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ roleTheme }) => {
                       <span className="text-[9px] mt-1 block text-right font-mono opacity-60">
                         {msg.createdAt ? new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ""}
                       </span>
+                      {isSelf && !msg.isDeletedForEveryone && (
+                        <span className="text-[10px] leading-none" title={msg.readBy?.includes(activeChatPartner?.userId || '') ? "Read" : "Sent"}>
+                          {msg.readBy?.includes(activeChatPartner?.userId || '') ? (
+                            <span className="text-sky-400 font-bold">✓✓</span>
+                          ) : (
+                            <span className="opacity-60">✓</span>
+                          )}
+                        </span>
+                      )}
                     </div>
                   );
                 }

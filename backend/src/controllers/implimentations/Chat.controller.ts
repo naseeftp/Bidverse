@@ -86,4 +86,14 @@ export class ChatController implements IChatController {
             next(error)
         }
     }
+    async markMessageRead(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const conversationId=req.params.id as string;
+            const userId=req.user.id;
+            const result=await this._ChatService.markMessageRead(conversationId,userId)
+            SuccessResponse(res,MESSAGES.MESSAGE_READED,result,HttpStatus.OK)
+        } catch (error) {
+            next(error)
+        }
+    }
 }

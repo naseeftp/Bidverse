@@ -54,6 +54,26 @@ export class MessageRepository extends BaseRepository<IMessageDocument> implemen
         ).exec()
     }
 
+    async marKAsRead(conversationId: string, userId: string): Promise<string[]> {
+        const userObjectId = new Types.ObjectId(userId);
+        const convObjectId = new Types.ObjectId(conversationId);
 
+        const unreadMessages = await this.model.find({
+            conversationId: convObjectId,
+            senderId: { $ne: userObjectId },
+            readBy: { $ne: userObjectId },
+            isDeletedForEveryone: false,
+            deletedFor: { $ne: userObjectId }
+        }).select('_id')
+
+        if (unreadMessages.length == 0) return [];
+        const unreadIds = unreadMessages.map((msg) => msg._id);//striping away object wrapper
+        await Message.updateMany(
+            { _id: { $in: unreadIds } },
+            { $addToSet: { readBy: userObjectId } }
+        )
+
+        return unreadIds.map((id) => id.toString())
+    }
 
 }

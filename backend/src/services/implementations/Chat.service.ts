@@ -1,7 +1,7 @@
 import { IChatService } from "../interface/IChat.service";
 import { IConversationRepository } from "../../repositories/interfaces/IConversation.repository";
 import { IUserRepository } from "../../repositories/interfaces/iUser.repository";
-import { ConversationDTO, MessageDto, SendMessageInputDTO } from "../../dtos/user.dto/chat.dto";
+import { ConversationDTO, MarkReadResponseDTO, MessageDto, SendMessageInputDTO } from "../../dtos/user.dto/chat.dto";
 import { ChatMapper } from "../../mappers/chat.mappers";
 import { AppError, BadRequestError, NotFoundError, UnauthorizedError } from "../../errors/AppError";
 import { MESSAGES } from "../../constants/constants";
@@ -119,8 +119,8 @@ export class ChatService implements IChatService {
     const conversation = await this._conversationRepo.findById(conversationId);
     const lastMessageId = conversation?.lastMessage!.toString()
     const isLastMessage = lastMessageId === mappedMessage._id.toString()
-    const messages = await this._messageRepo.findAll({ conversationId: conversationId })
-    const secondLastMessage = messages[messages.length - 2];
+    const messages = await this._messageRepo.findAll({ conversationId: conversationId,isDeletedForEveryone:false})
+    const secondLastMessage = messages[messages.length -1];
     const secondLastMessageId = secondLastMessage._id;
     const secondLastMessageContent = secondLastMessage.content;
     if (isLastMessage) {
@@ -192,6 +192,32 @@ export class ChatService implements IChatService {
     const mappedMessage = ChatMapper.toMessageDocumentToDTO(result)
     return mappedMessage
   }
+  
+  async markMessageRead(conversationId: string, userId: string): Promise<MarkReadResponseDTO> {
+    const conversation=await this._conversationRepo.findById(conversationId);
+    if(!conversation){
+      throw new NotFoundError(MESSAGES.CONV_NOT_FOUND)
+    }
+    const isParticipant=conversation.participants.some(
+      (p) =>p.userId.toString()===userId
+    ) 
+    if(!isParticipant){
+      throw new UnauthorizedError(MESSAGES.NOT_PERMITTED)
+    }
+    const updatedMessageIds=await this._messageRepo.marKAsRead(conversationId,userId);
+    if(updatedMessageIds.length>0){
+      socketService.emitToRoom(conversationId,'messages:read',{
+        conversationId,
+        userId,
+        messageIds:updatedMessageIds
+      })
+    }
 
+    return{
+      conversationId,
+      readerId:userId,
+      updatedMessageIds
+    }
+  }
 
 }

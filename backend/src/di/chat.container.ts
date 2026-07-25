@@ -7,5 +7,5 @@ import { MessageRepository } from "../repositories/implementations/Message.repos
 const convRepo = new ConversationRepository();
 const userRepo = new UserRepository();
 const messageRepo = new MessageRepository()
-const chatService = new ChatService(convRepo, userRepo, messageRepo);
+export const chatService = new ChatService(convRepo, userRepo, messageRepo);
 export const chatController = new ChatController(chatService)

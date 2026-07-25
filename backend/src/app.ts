@@ -2,6 +2,7 @@ import express, { Application } from "express";
 import dotenv from "dotenv"
 import { createServer } from "http";//NODE'S NATIVE SERVER WRAPPER
 import { socketService } from "./services/implementations/socket.service";
+import { chatService } from "./di/chat.container";
 import { env } from './config/env'
 import connectDB from "./config/db";
 import { connectRedis } from "./config/redisClient";
@@ -54,6 +55,7 @@ const startServer = async () => {
     await connectDB()
     await connectRedis()
     socketService.initialize(httpServer)
+    socketService.setChatService(chatService)
     httpServer.listen(PORT, () => {
         appLogger.info(`your application running on port ${PORT}`)
     })

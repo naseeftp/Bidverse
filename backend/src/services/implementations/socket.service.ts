@@ -2,7 +2,7 @@ import { Server as SocketIOServer, Socket } from 'socket.io';
 import { Server as HttpServer } from 'http';
 import { env } from '../../config/env';
 import { ServerToClientEvents, ClientToServerEvents, SocketData } from '../../types/socket.type';
-
+import { IChatService } from '../interface/IChat.service';
 
 
 type TypedSocket = Socket<ClientToServerEvents, ServerToClientEvents, Record<string, never>, SocketData>
@@ -11,7 +11,12 @@ type TypedServer = SocketIOServer<ClientToServerEvents, ServerToClientEvents, Re
 export class SocketService {
     private _io: TypedServer | null = null;
     private _onlineUsers = new Map<string, string>()// used to store user id sockt id, Map stred in server ram
-
+    private _chatService: IChatService | null = null
+    
+    public setChatService(chatService: IChatService): void {
+    this._chatService = chatService;
+    }
+      
     public initialize(server: HttpServer): void {
         const envOrgins = [env.CLIENT_URL]
             .filter((url): url is string => !!url)
@@ -27,31 +32,31 @@ export class SocketService {
         })
         this.setUpeventListners()
     }
-   
+
     private setUpeventListners(): void {
-      if (!this._io) {
+        if (!this._io) {
             return;
-        } 
+        }
 
         this._io.on('connection', (socket: TypedSocket) => {
             const userId = socket.handshake.auth.userId;
             const role = socket.handshake.auth.role;
-            
+
             if (userId) {
                 this._onlineUsers.set(userId, socket.id);
                 socket.data.userId = userId;
                 if (role) {
                     socket.data.role = role;
                 }
-                
+
                 this._io?.emit('user:status', { userId: userId, isOnline: true });
             }
-            socket.on('conversation:join',(conversationId:string)=>{
-              const roomName=`room:${conversationId}`
-              socket.join(roomName)
+            socket.on('conversation:join', (conversationId: string) => {
+                const roomName = `room:${conversationId}`
+                socket.join(roomName)
             })
-            socket.on('conversation:leave',(conversationId:string)=>{
-                const roomName=`room:${conversationId}`;
+            socket.on('conversation:leave', (conversationId: string) => {
+                const roomName = `room:${conversationId}`;
                 socket.leave(roomName)
             })
             socket.on('disconnect', () => {
@@ -59,10 +64,10 @@ export class SocketService {
                     this._onlineUsers.delete(socket.data.userId);
                     this._io?.emit('user:status', { userId: socket.data.userId, isOnline: false });
                 }
-                
-            }); 
 
-            socket.on('typing:status',(data:{conversationId:string,userId:string,isTyping:boolean})=>{
+            });
+
+            socket.on('typing:status', (data: { conversationId: string, userId: string, isTyping: boolean }) => {
                 this.emitToRoomExcluding(
                     data.conversationId,
                     socket.id,
@@ -71,13 +76,25 @@ export class SocketService {
                 )
             })
 
-            socket.on('users:get_online',(callback:(onlineIds:string[])=>void)=>{
-                const onlineUserIds=Array.from(this._onlineUsers.keys())
+            socket.on('users:get_online', (callback: (onlineIds: string[]) => void) => {
+                const onlineUserIds = Array.from(this._onlineUsers.keys())
                 callback(onlineUserIds)
             })
-            
+
+            socket.on('messages:read', async (data: { conversationId: string; userId: string }) => {
+                try {
+                    const activeUserId = socket.data.userId || data.userId;
+                    if (!this._chatService) return;
+
+                   
+                    await this._chatService.markMessageRead(data.conversationId, activeUserId);
+                } catch{
+
+                }
+            })
+
         });
-}
+    }
     //methods for backend services and controllers
     public isUserOnline(userId: string): boolean {
         return this._onlineUsers.has(userId)
@@ -106,7 +123,7 @@ export class SocketService {
         emitter.emit(event, payload);
     }
 
-  public emitToRoomExcluding<Ev extends keyof ServerToClientEvents>(
+    public emitToRoomExcluding<Ev extends keyof ServerToClientEvents>(
         conversationId: string,
         excludeSocketId: string,
         event: Ev,
@@ -120,7 +137,7 @@ export class SocketService {
         };
         emitter.emit(event, payload);
     }
-  
+
 }
 
 export const socketService = new SocketService();

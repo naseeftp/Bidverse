@@ -43,3 +43,10 @@ export interface MessageDto {
     isDeletedForEveryone: boolean;
     createdAt?: Date;
 }
+
+export interface MarkReadResponseDTO
+{
+    conversationId:string;
+    readerId:string;
+    updatedMessageIds:string[]
+}

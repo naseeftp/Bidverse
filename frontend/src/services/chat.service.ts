@@ -1,7 +1,7 @@
 import axiosInstance from "../api/axios.instance";
 import { BASE_ROUTES, CHAT_ROUTES } from "../constants/api.constant";
 import type { ApiResponse } from "../types/auth.type";
-import type { ConversationDTO, MessageDto } from "../types/chat.dto";
+import type { ConversationDTO, MarkReadResponseDTO, MessageDto } from "../types/chat.dto";
 import { apiErrorHandler } from "../utils/error.handle";
 import type { SendMessageInputDTO } from "../types/chat.dto";
 
@@ -99,6 +99,20 @@ class ChatService {
       } catch (error) {
          return apiErrorHandler(error, 'Failed to delete message')
       }
+    }
+
+    async markMessageRead(conversationId:string){
+        try {
+            let url=`${BASE_ROUTES.CHAT}${CHAT_ROUTES.MARK_AS_READED}/${conversationId}`;
+            const response=await axiosInstance.patch<MarkReadResponseDTO,ApiResponse<MarkReadResponseDTO>>(url)
+            return{
+                success:true,
+                data:response.data,
+                message:response.message
+            }
+        } catch (error) {
+            return apiErrorHandler(error, 'Failed to read message')
+        }
     }
 }
 

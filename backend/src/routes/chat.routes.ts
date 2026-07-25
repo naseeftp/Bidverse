@@ -44,4 +44,10 @@ router.patch(
    (req, res, next) => chatController.deleteForMe(req, res, next)
 
 )
+router.patch(
+   CHAT_ROUTES.MARK_AS_READED,
+      allowedTo(Role.USER, Role.TENANT, Role.ADMIN),
+      (req,res,next)=>chatController.markMessageRead(req,res,next)
+
+)
 export default router;
