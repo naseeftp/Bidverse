@@ -92,13 +92,13 @@ export const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ roleTheme }) => {
         prev.map((c) => (c._id === conversationId ? { ...c, unreadCount: 0 } : c))
       );
       setMessages((prev) =>
-      prev.map((m) => {
-        if (m.senderId !== currentUserId && !m.readBy?.includes(currentUserId || '')) {
-          return { ...m, readBy: [...(m.readBy || []), currentUserId || ''] };
-        }
-        return m;
-      })
-    );
+        prev.map((m) => {
+          if (m.senderId !== currentUserId && !m.readBy?.includes(currentUserId || '')) {
+            return { ...m, readBy: [...(m.readBy || []), currentUserId || ''] };
+          }
+          return m;
+        })
+      );
     } catch {
 
     }
@@ -175,7 +175,12 @@ export const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ roleTheme }) => {
           setConversation((prev) =>
             prev.map((c) =>
               c._id === newMessage.conversationId
-                ? { ...c, unreadCount: (c.unreadCount || 0) + 1 }
+                ? {
+                  ...c,
+                  lastMessageSnippet: newMessage.content,
+                  updatedAt: new Date(newMessage.createdAt!),
+                  unreadCount: (c.unreadCount || 0) + 1,
+                }
                 : c
             )
           );
@@ -187,13 +192,13 @@ export const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ roleTheme }) => {
     const handleReadStatus = (data: { conversationId: string; userId: string }) => {
       if (data.conversationId === activeConversationId && data.userId !== currentUserId) {
         setMessages((prev) =>
-       prev.map((m) => {
-        if (m.senderId === currentUserId && !m.readBy?.includes(data.userId)) {
-          return { ...m, readBy: [...(m.readBy || []), data.userId] };
-        }
-        return m;
-      })
-    );
+          prev.map((m) => {
+            if (m.senderId === currentUserId && !m.readBy?.includes(data.userId)) {
+              return { ...m, readBy: [...(m.readBy || []), data.userId] };
+            }
+            return m;
+          })
+        );
       }
     }
     socket.emit('users:get_online', (onlineIds: string[]) => {
@@ -204,15 +209,22 @@ export const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ roleTheme }) => {
       conversationId: string;
       lastMessageSnippet: string;
       lastMessageAt: string;
+      unreadCountMap?: Record<string, number>
     }) => {
       setConversation((prevConversations) => {
         const targetIndex = prevConversations.findIndex(c => c._id === data.conversationId);
         if (targetIndex === -1) return prevConversations;
         const updatedConversations = [...prevConversations];
+        const isCurrentActive = data.conversationId === activeConversationId
+        const userUnreadCount = data.unreadCountMap && currentUserId
+          ? data.unreadCountMap[currentUserId] || 0
+          : 0;
+
         updatedConversations[targetIndex] = {
           ...updatedConversations[targetIndex],
           lastMessageSnippet: data.lastMessageSnippet,
-          updatedAt: new Date(data.lastMessageAt)
+          updatedAt: new Date(data.lastMessageAt),
+          unreadCount: isCurrentActive ? 0 : userUnreadCount,  // Don't show unread badge if user is actively viewing this room  
         };
         return updatedConversations.sort((a, b) => {
           const timeA = a.updatedAt ? new Date(a.updatedAt).getTime() : 0;
@@ -472,6 +484,11 @@ export const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ roleTheme }) => {
 
   const handleSelectConversation = (id: string) => {
     setSearchParams({ conversationId: id });
+
+    setConversation((prev) =>   //clear unread count for selected conversation
+      prev.map((c) => (c._id === id ? { ...c, unreadCount: 0 } : c))
+    );
+    markConversationAsRead(id)
   };
 
   const activeRoomTypingObj = typingUsers[activeConversationId || ''] || {};
@@ -523,18 +540,21 @@ export const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ roleTheme }) => {
                         {conv.updatedAt ? new Date(conv.updatedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : "Active"}
                       </span>
                     </div>
-                    <p className="text-xs text-[#6B6B6B] truncate mt-0.5">
-                      {isConvPartnerTyping ? (
-                        <span className="text-emerald-600 font-medium italic">typing...</span>
-                      ) : (
-                        conv.lastMessageSnippet || "No message data transmissions inside room."
+                    <div className="flex items-center justify-between mt-1">
+                      <p className="text-xs text-[#6B6B6B] truncate flex-1 mr-2">
+                        {isConvPartnerTyping ? (
+                          <span className="text-emerald-600 font-medium italic">typing...</span>
+                        ) : (
+                          conv.lastMessageSnippet || "No messages yet."
+                        )}
+                      </p>
+
+                      {!isActive && unreadCount > 0 && (
+                        <span className="flex-shrink-0 bg-red-500 text-white text-[10px] font-bold h-4 min-w-[16px] px-1 rounded-full flex items-center justify-center animate-pulse">
+                          {unreadCount > 99 ? '99+' : unreadCount}
+                        </span>
                       )}
-                    </p>
-                    {!isActive && unreadCount > 0 && (
-                      <span className="ml-auto flex-shrink-0 bg-red-500 text-white text-[10px] font-bold h-4 min-w-[16px] px-1 rounded-full flex items-center justify-center">
-                        {unreadCount > 99 ? '99+' : unreadCount}
-                      </span>
-                    )}
+                    </div>
                   </div>
                 </button>
               );

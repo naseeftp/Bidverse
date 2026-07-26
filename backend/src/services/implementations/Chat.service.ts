@@ -65,19 +65,37 @@ export class ChatService implements IChatService {
 
     });
     const now = new Date()
-
-
-
     const mappedMessage = ChatMapper.toMessageDocumentToDTO(newMessage)
-    const updatingData = {
-      _id: conversationId, lastMessageSnippet: content?.trim(), lastMessage: mappedMessage._id, lastMessageAt: now
-    }
-    await conversation.updateOne(updatingData)
+    const recipientIds = conversation.participants
+      .map(p => p.userId.toString())
+      .filter(id => id !== senderId);
+
+    recipientIds.forEach(recipientId => {
+      const currentCount = conversation.unreadCount?.get(recipientId) || 0;
+      conversation.unreadCount.set(recipientId, currentCount + 1);
+    })
+
+    conversation.lastMessageSnippet = content?.trim();
+    conversation.lastMessage = new Types.ObjectId(newMessage._id.toString());
+    conversation.lastMessageAt = now;
+
+    await conversation.save();
+
+    const unreadMapObject: Record<string, number> = {};
+    conversation.unreadCount.forEach((val, key) => {
+      unreadMapObject[key] = val;
+    });
+
+    // const updatingData = {
+    //   _id: conversationId, lastMessageSnippet: content?.trim(), lastMessage: mappedMessage._id, lastMessageAt: now
+    // }
+    // await conversation.updateOne(updatingData)
     socketService.emitToRoom(conversationId, 'message:receive', mappedMessage)
     socketService.emitToRoom(conversationId, 'conversation:updated', {
       conversationId,
       lastMessageSnippet: mappedMessage.content,
-      lastMessageAt: now.toISOString()
+      lastMessageAt: now.toISOString(),
+      unreadCountMap: unreadMapObject
     })
     return mappedMessage
   }
@@ -205,13 +223,18 @@ export class ChatService implements IChatService {
       throw new UnauthorizedError(MESSAGES.NOT_PERMITTED)
     }
     const updatedMessageIds=await this._messageRepo.marKAsRead(conversationId,userId);
-    if(updatedMessageIds.length>0){
-      socketService.emitToRoom(conversationId,'messages:read',{
+    if(conversation.unreadCount){
+      conversation.unreadCount.set(userId,0)
+      await conversation.save()
+    }
+
+     socketService.emitToRoom(conversationId,'messages:read',{
         conversationId,
         userId,
-        messageIds:updatedMessageIds
+        messageIds:updatedMessageIds,
+        unreadCount:0,
       })
-    }
+    
 
     return{
       conversationId,

@@ -8,7 +8,7 @@ export interface IParticipant {
 
 export interface IConversation extends Document {
     participants: IParticipant[];
-    lastMessage?: Schema.Types.ObjectId;
+    lastMessage?: Types.ObjectId;
     lastMessageSnippet?: string;
     lastMessageAt: Date;
     unreadCount: Map<string, number> //Key: userId (string) , Value: unread total
