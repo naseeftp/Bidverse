@@ -16,7 +16,7 @@ router.post(
 )
 router.get(
    CHAT_ROUTES.GET_USER_CONVO,
-   allowedTo(Role.USER, Role.TENANT),
+   allowedTo(Role.USER, Role.TENANT,Role.ADMIN),
    (req, res, next) => chatController.getUserConversations(req, res, next)
 )
 router.post(

@@ -58,6 +58,7 @@ import UsersListPage from "./pages/admin/usersList";
 import UserDetailPage from "./pages/admin/userDetailPage";
 import AdminAuctionsListPage from "./pages/admin/auctions";
 import AdminAuctionDetailPage from "./pages/admin/auctionDetails";
+import AdminChatPage from "./pages/admin/chatPage";
 
 import { useSocketSync } from "./hooks/useSocketSync";
 
@@ -136,7 +137,7 @@ useSocketSync()
                </Route>
 
             </Route>
-
+            <Route path="/admin/chat" element={<AdminChatPage/>} />
             <Route element={<AdminLayout />}>
                <Route element={<PublicRoute />}>
                   <Route path="/admin" element={<AdminLoginPage />} />
