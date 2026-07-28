@@ -301,8 +301,8 @@ const PublicAuctionHouseDetailsPage: React.FC = () => {
                           key={filter.value}
                           onClick={() => handleStatusToggle(filter.value)}
                           className={`w-full text-left px-4 py-3 text-xs font-bold tracking-wide uppercase transition-colors flex items-center justify-between cursor-pointer ${isSelected
-                              ? "bg-[#C9653B]/5 text-[#C9653B]"
-                              : "text-[#6B6B6B] hover:text-[#1F1F1F] hover:bg-[#FFF9F4]"
+                            ? "bg-[#C9653B]/5 text-[#C9653B]"
+                            : "text-[#6B6B6B] hover:text-[#1F1F1F] hover:bg-[#FFF9F4]"
                             }`}
                         >
                           <span>{filter.label}</span>

@@ -148,6 +148,7 @@ export class AuctionItemRepository extends BaseRepository<IAuctionItemDocument> 
                     auctionHouse: {
                         id: { $toString: '$auction._id' },
                         name: { $ifNull: ['$auction.name', 'Unknown Organization'] },
+                        ownerId:{$toString:'$auction.userId'},
                         yearEstablished: '$auction.yearEstablished',
                         briefDescription: '$auction.briefDescription',
                         categories: { $ifNull: ['$auction.categories', []] },

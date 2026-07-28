@@ -20,6 +20,7 @@ import {
 import watchListService from "../services/watchList.service";
 import { useAppDispatch } from "../hooks/redux.hooks";
 import { incrementWatchlistCount } from "../redux/user/auth.slice";
+import chatService from "../services/chat.service";
 
 const PublicAuctionDetailPage: React.FC = () => {
     const { itemId } = useParams<{ itemId: string }>();
@@ -36,18 +37,15 @@ const PublicAuctionDetailPage: React.FC = () => {
 
     const [isWatched, setIsWathed] = useState<boolean>(false);
     const [isWatchlistLoading, setIsWatchlistLoading] = useState<boolean>(false)
+    const [isChatLoading, setIsChatLoading] = useState<boolean>(false)
 
     const fetchAuctionDetail = useCallback(async () => {
         if (!itemId) return;
-
         setLoading(true);
-
         try {
             const response = await publicAuctionService.getAuctionDetails(itemId);
-
             if (response.success && response.data) {
                 setAuction(response.data);
-
                 const primaryImage =
                     response.data.images?.find(image => image.isPrimary)?.url ||
                     response.data.images[0]?.url;
@@ -64,6 +62,27 @@ const PublicAuctionDetailPage: React.FC = () => {
             setLoading(false);
         }
     }, [itemId, navigate]);
+
+    const handleInitiateChat=async ()=>{
+        setIsChatLoading(true)
+        try {
+            const payload={
+               receiverId: auction?.auctionHouse.ownerId??'',
+               receiverRole: 'tenant'
+            }
+            const response=await chatService.getOrCreateConversation(payload)
+            if(response.success&&response.data){
+                navigate('/chat')
+            }
+            else{
+                toast.error(response.message)
+            }
+        } catch {
+           toast.error('failed to start conversation') 
+        }finally{
+            setIsChatLoading(false)
+        }
+    }
 
     const handleWatchlistAction = async (e: React.MouseEvent<HTMLButtonElement>) => {
         e.stopPropagation();
@@ -289,13 +308,15 @@ const PublicAuctionDetailPage: React.FC = () => {
                                     {auction.currency || "INR"} {auction.startingPrice?.toLocaleString()}
                                 </p>
                             </div>
-                            <div>
-                                {/* <span className="text-[9px] uppercase font-bold text-[#6B6B6B] tracking-widest flex items-center gap-1">
-                                    <FaCoins className="text-[#6B6B6B]" /> Reserve Price
-                                </span> */}
-                                {/* <p className="text-base font-black text-[#1F1F1F] mt-1">
-                                    {auction.reservePrice ? `${auction.currency || "INR"} ${auction.reservePrice.toLocaleString()}` : "No Reserve"}
-                                </p> */}
+                            <div className="flex flex-col justify-end">
+                                <button
+                                    disabled={isChatLoading}
+                                    onClick={handleInitiateChat}
+                                    className="w-full h-10 px-3 bg-[#1F1F1F] hover:bg-[#C9653B] text-white text-xs font-bold uppercase tracking-wider rounded-lg transition-colors duration-200 flex items-center justify-center gap-2 cursor-pointer shadow-sm"
+                                >
+                                    <FaCoins className="text-amber-400 text-xs" />
+                                    Enquire Now
+                                </button>
                             </div>
                         </div>
 

@@ -209,6 +209,7 @@ export interface AuctionItemDetailDTO {
     auctionHouse: {
         id: string;
         name: string;
+        ownerId:string,
         yearEstablished: number;
         briefDescription: string;
         categories: string[];
