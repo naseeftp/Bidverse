@@ -20,6 +20,11 @@ export class ChatService implements IChatService {
 
   async getOrCreateConversation(participants: { userId: string; role: string; }[]): Promise<ConversationDTO> {
     const [participant1, participant2] = participants;
+
+    if(participant2.role==Role.ADMIN){
+      const admin=await this._userRepo.findOne({role:Role.ADMIN});
+      participant2.userId=admin?._id.toString()??""
+    }
     if (!Types.ObjectId.isValid(participant1.userId) || !Types.ObjectId.isValid(participant2.userId)) {
       throw new BadRequestError(MESSAGES.INVALID_ID_FORMAT)
     }

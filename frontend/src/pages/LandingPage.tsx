@@ -57,8 +57,11 @@ const LandingPage: React.FC = () => {
 
 
           <button className="border border-[#1F1F1F] text-[#1F1F1F] px-12 py-5 text-sm font-bold uppercase tracking-widest hover:bg-[#1F1F1F] hover:text-white transition-all">
-            Become Seller
-          </button>
+            <Link to='/tenant/register'>
+             Become Seller
+            </Link>
+           
+       </button>
         </div>
       </section>
 
