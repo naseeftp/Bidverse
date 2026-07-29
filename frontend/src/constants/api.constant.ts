@@ -82,5 +82,7 @@ export const CHAT_ROUTES = {
     DELETE_EVERYONE: '/delete-for-everyone',
     DELETE_FOR_ME: '/delete-for-me',
     EDIT_MESSAGE: '/edit-message',
-    MARK_AS_READED:'/mark-readed'
+    MARK_AS_READED:'/mark-readed',
+    UNREAD_COUNT:'/unread-conv-count'
+
 }

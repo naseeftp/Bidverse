@@ -162,6 +162,7 @@ export const MESSAGES = {
     MESSAGE_DELETED: 'Message deleted',
     MESSAGE_EDITED: 'Message edited',
     MESSAGE_READED:'Message readed',
+    ACTION_SUCCESS:'Action currently doing is success',
 
     LOGOUT_SUCCESS: "Logout success",
     LOGOUT_FAILED: "Logout failed",

@@ -16,7 +16,7 @@ router.post(
 )
 router.get(
    CHAT_ROUTES.GET_USER_CONVO,
-   allowedTo(Role.USER, Role.TENANT,Role.ADMIN),
+   allowedTo(Role.USER, Role.TENANT, Role.ADMIN),
    (req, res, next) => chatController.getUserConversations(req, res, next)
 )
 router.post(
@@ -46,8 +46,14 @@ router.patch(
 )
 router.patch(
    CHAT_ROUTES.MARK_AS_READED,
-      allowedTo(Role.USER, Role.TENANT, Role.ADMIN),
-      (req,res,next)=>chatController.markMessageRead(req,res,next)
+   allowedTo(Role.USER, Role.TENANT, Role.ADMIN),
+   (req, res, next) => chatController.markMessageRead(req, res, next)
+
+)
+router.get(
+   CHAT_ROUTES.UNREAD_COUNT,
+   allowedTo(Role.USER, Role.TENANT, Role.ADMIN),
+   (req, res, next) => chatController.getUnreadCountForUser(req, res, next)
 
 )
 export default router;

@@ -21,9 +21,9 @@ export class ChatService implements IChatService {
   async getOrCreateConversation(participants: { userId: string; role: string; }[]): Promise<ConversationDTO> {
     const [participant1, participant2] = participants;
 
-    if(participant2.role==Role.ADMIN){
-      const admin=await this._userRepo.findOne({role:Role.ADMIN});
-      participant2.userId=admin?._id.toString()??""
+    if (participant2.role == Role.ADMIN) {
+      const admin = await this._userRepo.findOne({ role: Role.ADMIN });
+      participant2.userId = admin?._id.toString() ?? ""
     }
     if (!Types.ObjectId.isValid(participant1.userId) || !Types.ObjectId.isValid(participant2.userId)) {
       throw new BadRequestError(MESSAGES.INVALID_ID_FORMAT)
@@ -91,10 +91,7 @@ export class ChatService implements IChatService {
       unreadMapObject[key] = val;
     });
 
-    // const updatingData = {
-    //   _id: conversationId, lastMessageSnippet: content?.trim(), lastMessage: mappedMessage._id, lastMessageAt: now
-    // }
-    // await conversation.updateOne(updatingData)
+
     socketService.emitToRoom(conversationId, 'message:receive', mappedMessage)
     socketService.emitToRoom(conversationId, 'conversation:updated', {
       conversationId,
@@ -142,8 +139,8 @@ export class ChatService implements IChatService {
     const conversation = await this._conversationRepo.findById(conversationId);
     const lastMessageId = conversation?.lastMessage!.toString()
     const isLastMessage = lastMessageId === mappedMessage._id.toString()
-    const messages = await this._messageRepo.findAll({ conversationId: conversationId,isDeletedForEveryone:false})
-    const secondLastMessage = messages[messages.length -1];
+    const messages = await this._messageRepo.findAll({ conversationId: conversationId, isDeletedForEveryone: false })
+    const secondLastMessage = messages[messages.length - 1];
     const secondLastMessageId = secondLastMessage._id;
     const secondLastMessageContent = secondLastMessage.content;
     if (isLastMessage) {
@@ -215,37 +212,42 @@ export class ChatService implements IChatService {
     const mappedMessage = ChatMapper.toMessageDocumentToDTO(result)
     return mappedMessage
   }
-  
+
   async markMessageRead(conversationId: string, userId: string): Promise<MarkReadResponseDTO> {
-    const conversation=await this._conversationRepo.findById(conversationId);
-    if(!conversation){
+    const conversation = await this._conversationRepo.findById(conversationId);
+    if (!conversation) {
       throw new NotFoundError(MESSAGES.CONV_NOT_FOUND)
     }
-    const isParticipant=conversation.participants.some(
-      (p) =>p.userId.toString()===userId
-    ) 
-    if(!isParticipant){
+    const isParticipant = conversation.participants.some(
+      (p) => p.userId.toString() === userId
+    )
+    if (!isParticipant) {
       throw new UnauthorizedError(MESSAGES.NOT_PERMITTED)
     }
-    const updatedMessageIds=await this._messageRepo.marKAsRead(conversationId,userId);
-    if(conversation.unreadCount){
-      conversation.unreadCount.set(userId,0)
+    const updatedMessageIds = await this._messageRepo.marKAsRead(conversationId, userId);
+    if (conversation.unreadCount) {
+      conversation.unreadCount.set(userId, 0)
       await conversation.save()
     }
 
-     socketService.emitToRoom(conversationId,'messages:read',{
-        conversationId,
-        userId,
-        messageIds:updatedMessageIds,
-        unreadCount:0,
-      })
-    
-
-    return{
+    socketService.emitToRoom(conversationId, 'messages:read', {
       conversationId,
-      readerId:userId,
+      userId,
+      messageIds: updatedMessageIds,
+      unreadCount: 0,
+    })
+    return {
+      conversationId,
+      readerId: userId,
       updatedMessageIds
     }
+  }
+  async getUnreadCountForUser(userId: string): Promise<number> {
+    const userExist = await this._userRepo.findById(userId);
+    if (!userExist) {
+      throw new NotFoundError(MESSAGES.USER_NOT_FOUND)
+    }
+    return this._conversationRepo.getUnreadCountForUser(userId)
   }
 
 }

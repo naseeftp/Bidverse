@@ -14,6 +14,7 @@ interface AuthState {
     phone: string;
   } | null;
   watchlistCount: number;
+  consversationUnreadCount: number,
 }
 const token = localStorage.getItem("accessToken");
 const decodeToken = (token: string): JwtPayload | null => {
@@ -32,7 +33,8 @@ const initialState: AuthState = {
   loading: false,
   error: null,
   tempAuthData: null,
-  watchlistCount: 0
+  watchlistCount: 0,
+  consversationUnreadCount: 0,
 }
 
 const authSlice = createSlice({
@@ -46,14 +48,14 @@ const authSlice = createSlice({
     },
 
     setAuthSuccess: (state, action: PayloadAction<JwtPayload & { _id?: string; id?: string }>) => {
-      const payload=action.payload;
+      const payload = action.payload;
       const verifiedId = payload.userId || payload._id || payload.id || "";
-      state.user={
+      state.user = {
         ...payload,
-        userId:verifiedId 
+        userId: verifiedId
       }
-    
-      state.role =payload.role as "user" | "tenant";
+
+      state.role = payload.role as "user" | "tenant";
       state.isAuthenticated = !!verifiedId;
       state.tempAuthData = null;
       state.error = null
@@ -72,6 +74,7 @@ const authSlice = createSlice({
       state.isAuthenticated = false;
       state.tempAuthData = null;
       state.watchlistCount = 0;
+      state.consversationUnreadCount = 0;
       localStorage.removeItem("accessToken")
     },
     setWatchlistCount: (state, action: PayloadAction<number>) => {
@@ -82,10 +85,23 @@ const authSlice = createSlice({
     },
     decrementWatchlistCount: (state) => {
       state.watchlistCount = Math.max(0, state.watchlistCount - 1);
-    }
+    },
 
+    setUnreadConversationCount: (state, action: PayloadAction<number>) => {
+      state.consversationUnreadCount = action.payload;
+    },
+    incrementUnreadConversationCount: (state) => {
+      state.consversationUnreadCount += 1;
+    },
+    decrementUnreadConversationCount: (state) => {
+      state.consversationUnreadCount = Math.max(0, state.consversationUnreadCount - 1);
+    }
   }
 })
 
-export const { setRegistrationData, setAuthSuccess, setAuthError, setLoading, logout, setWatchlistCount, decrementWatchlistCount, incrementWatchlistCount } = authSlice.actions
+export const { setRegistrationData, setAuthSuccess, setAuthError, setLoading, logout,
+  setWatchlistCount, decrementWatchlistCount, incrementWatchlistCount,
+  setUnreadConversationCount, incrementUnreadConversationCount, decrementUnreadConversationCount
+
+} = authSlice.actions
 export default authSlice.reducer;

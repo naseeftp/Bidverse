@@ -48,8 +48,8 @@ export class ChatController implements IChatController {
     async getMessages(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
             const conversationId = req.params.id as string;
-            const userId=req.user.id
-            const response = await this._ChatService.getMessages(conversationId,userId)
+            const userId = req.user.id
+            const response = await this._ChatService.getMessages(conversationId, userId)
             SuccessResponse(res, 'messages retrieved', response, HttpStatus.OK)
         } catch (error) {
             next(error)
@@ -88,10 +88,19 @@ export class ChatController implements IChatController {
     }
     async markMessageRead(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
-            const conversationId=req.params.id as string;
-            const userId=req.user.id;
-            const result=await this._ChatService.markMessageRead(conversationId,userId)
-            SuccessResponse(res,MESSAGES.MESSAGE_READED,result,HttpStatus.OK)
+            const conversationId = req.params.id as string;
+            const userId = req.user.id;
+            const result = await this._ChatService.markMessageRead(conversationId, userId)
+            SuccessResponse(res, MESSAGES.MESSAGE_READED, result, HttpStatus.OK)
+        } catch (error) {
+            next(error)
+        }
+    }
+    async getUnreadCountForUser(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const userId = req.user.id;
+            const result = await this._ChatService.getUnreadCountForUser(userId)
+            SuccessResponse(res, MESSAGES.ACTION_SUCCESS, result, HttpStatus.OK)
         } catch (error) {
             next(error)
         }

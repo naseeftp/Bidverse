@@ -1,14 +1,16 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAppSelector, useAppDispatch } from "../../hooks/redux.hooks";
-import { logout, setWatchlistCount } from "../../redux/user/auth.slice";
+import { logout, setWatchlistCount,setUnreadConversationCount} from "../../redux/user/auth.slice";
 import { ChevronDown, Heart, Menu, X, MessageCircle } from "lucide-react";
 import authService from "../../services/auth.service";
 import watchListService from "../../services/watchList.service";
 import { apiErrorHandler } from "../../utils/error.handle";
+import chatService from "../../services/chat.service";
+import toast from "react-hot-toast";
 
 const Navbar: React.FC = () => {
-  const { user, isAuthenticated, watchlistCount } = useAppSelector((state) => state.auth);
+  const { user, isAuthenticated, watchlistCount,consversationUnreadCount} = useAppSelector((state) => state.auth);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -32,6 +34,25 @@ const Navbar: React.FC = () => {
       fetchInitialCount();
     }
   }, [isAuthenticated, dispatch]);
+  useEffect(()=>{
+    if(isAuthenticated){
+      const fetchUnreadConvCount=async ()=>{
+       try {
+         const response=await chatService.getUnreadCountForUser()
+         if(response.success&& typeof response.data=='number'){
+           dispatch(setUnreadConversationCount(response.data))
+         }
+         else{
+          toast.error(response.message)
+         }
+       } catch (error) {
+        return apiErrorHandler(error, 'Failed to get NavBar UnreadMessage Count count')
+       }
+      }
+      fetchUnreadConvCount()
+    }
+
+  },[isAuthenticated, dispatch])
 
   useEffect(() => {
     setIsMobileMenuOpen(false);
@@ -97,12 +118,12 @@ const Navbar: React.FC = () => {
                 className="relative p-2 text-[#6B6B6B] hover:text-[#C9653B] hover:bg-[#FFF9F4] rounded-xl transition-all duration-300 group cursor-pointer focus:outline-none"
               >
                 <MessageCircle size={18} className="transition-transform group-hover:scale-105" />
-                {/*                 
-                {watchlistCount > 0 && (
+                               
+                {consversationUnreadCount > 0 && (
                   <span className="absolute top-0.5 right-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-[#C9653B] text-[9px] font-black text-white ring-2 ring-white animate-in scale-in-50 duration-200 select-none">
-                    {watchlistCount}
+                    {consversationUnreadCount}
                   </span>
-                )} */}
+                )} 
               </button>
 
               <div className="relative hidden md:block" ref={dropdownRef}>

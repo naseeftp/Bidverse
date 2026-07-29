@@ -10,4 +10,5 @@ export interface IChatController {
     editMessage(req: Request, res: Response, next: NextFunction): Promise<void>;
     deleteForMe(req: Request, res: Response, next: NextFunction): Promise<void>;
     markMessageRead(req: Request, res: Response, next: NextFunction): Promise<void>;
+    getUnreadCountForUser(req: Request, res: Response, next: NextFunction): Promise<void>
 }

@@ -1,19 +1,45 @@
 import React, { useEffect, useState } from "react";
 import type { AdminAuctionHouseDetailDTO } from '../../types/auctionHouse.type'
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 
 import {
-
   ShieldCheck,
   Lock,
   ArrowRight,
   AlertCircle,
   RefreshCcw,
+  Plus,
+  MessageSquare,
 } from "lucide-react";
+import chatService from "../../services/chat.service";
 import auctionHouseService from "../../services/auctionHouse.service";
 
 const TenantDashboard: React.FC = () => {
   const [house, setHouse] = useState<AdminAuctionHouseDetailDTO | null>(null)
+  const [isChatLoading, setIsChatLoading] = useState<boolean>(false);
+  const navigate = useNavigate()
+  const handleInitiateChat = async () => {
+    setIsChatLoading(true)
+    try {
+      const payload = {
+        receiverId: '',
+        receiverRole: 'admin'
+      }
+      const response = await chatService.getOrCreateConversation(payload)
+      if (response.success && response.data) {
+        navigate('/tenant/chat')
+      }
+      else {
+        toast.error(response.message)
+      }
+    } catch {
+      toast.error('failed to start conversation')
+    } finally {
+      setIsChatLoading(false)
+    }
+  }
+
 
 
   const fetchAuctionProfile = async () => {
@@ -26,6 +52,7 @@ const TenantDashboard: React.FC = () => {
   useEffect(() => {
     fetchAuctionProfile()
   }, [])
+
   if (status !== "approved") {
     return (
       <div className="min-h-screen bg-[#F5F7FB] flex items-center justify-center px-6">
@@ -45,7 +72,6 @@ const TenantDashboard: React.FC = () => {
 
           <div className="text-[#475569] text-base font-medium leading-relaxed mb-10">
             {status === "pending" && (
-
               <p>Our compliance team is reviewing your documents. You&apos;ll receive full access shortly.</p>
             )}
 
@@ -96,21 +122,47 @@ const TenantDashboard: React.FC = () => {
           </div>
         </div>
       </div>
-
     );
   }
 
   return (
-    <div>
-      <Link to='/tenant/create-auction'>
-        <button>create Auction</button>
-      </Link>
+    <div className="min-h-screen bg-[#F5F7FB] p-8 relative">
+
+      <div className="max-w-7xl mx-auto flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-[#0F172A] tracking-tight">Dashboard</h1>
+          <p className="text-sm text-[#475569] font-medium mt-1">Manage and create auctions for your business</p>
+        </div>
+
+        <Link to='/tenant/create-auction'>
+          <button className="group px-6 py-3.5 rounded-xl font-bold text-xs uppercase tracking-widest bg-[#2F6FED] text-white hover:bg-[#2557C8] shadow-md shadow-[#2F6FED]/20 transition-all flex items-center gap-2">
+            <Plus size={18} className="group-hover:scale-110 transition-transform" />
+            Create Auction
+          </button>
+        </Link>
+      </div>
+
+
+      <div className="fixed bottom-8 right-8 z-50">
+        <button
+          onClick={handleInitiateChat}
+          disabled={isChatLoading}
+          className="relative group flex items-center gap-3 bg-[#0F172A] text-white px-5 py-4 rounded-full shadow-xl hover:bg-[#2F6FED] transition-all duration-300"
+          aria-label="Chat with Platform Support"
+        >
+
+          <span className="absolute -inset-0.5 rounded-full bg-[#2F6FED] opacity-75 blur animate-pulse group-hover:opacity-100 transition duration-1000"></span>
+
+          <div className="relative flex items-center gap-3">
+            <MessageSquare size={20} className="animate-bounce" />
+            <span className="text-xs font-bold uppercase tracking-widest pr-1">
+              Chat Support
+            </span>
+          </div>
+        </button>
+      </div>
     </div>
-
-  )
-
-
-
+  );
 };
 
 export default TenantDashboard;

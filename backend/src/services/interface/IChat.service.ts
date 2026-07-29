@@ -9,4 +9,5 @@ export interface IChatService {
     editMessage(messageId: string, senderId: string, newContent: string): Promise<MessageDto>
     deleteForMe(messageId: string, userId: string): Promise<MessageDto>
     markMessageRead(conversationId:string,userId:string):Promise<MarkReadResponseDTO>
+    getUnreadCountForUser(userId:string):Promise<number>
 }

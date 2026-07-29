@@ -114,6 +114,20 @@ class ChatService {
             return apiErrorHandler(error, 'Failed to read message')
         }
     }
+    async getUnreadCountForUser(){
+        try {
+            const url=`${BASE_ROUTES.CHAT}${CHAT_ROUTES.UNREAD_COUNT}`;
+            const response=await axiosInstance.get<number,ApiResponse<number>>(url)
+            console.log('resonse--------',response)
+            return{
+                success:true,
+                data:response.data,
+                message:response.message
+            }
+        } catch (error) {
+            return apiErrorHandler(error, 'Failed to get Unread Count')
+        }
+    }
 }
 
 export default new ChatService()
