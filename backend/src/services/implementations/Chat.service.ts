@@ -99,6 +99,9 @@ export class ChatService implements IChatService {
       lastMessageAt: now.toISOString(),
       unreadCountMap: unreadMapObject
     })
+    recipientIds.forEach((recipientId) => {
+      socketService.emitToUser(recipientId, 'chat:activity', undefined as never)
+    })
     return mappedMessage
   }
 
@@ -236,6 +239,7 @@ export class ChatService implements IChatService {
       messageIds: updatedMessageIds,
       unreadCount: 0,
     })
+    socketService.emitToUser(userId, 'chat:activity', undefined as never)
     return {
       conversationId,
       readerId: userId,

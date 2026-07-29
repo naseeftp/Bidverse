@@ -1,11 +1,23 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Bell, User, MessageCircle } from "lucide-react";
 import { useAppSelector } from '../../../hooks/redux.hooks'
 import { useNavigate } from "react-router-dom";
+import { getSocket } from "../../../services/socket.service";
+import { useUnreadCount } from "../../../hooks/useUnreadConvCount";
 
 const TenantNavbar: React.FC = () => {
   const { isAuthenticated, user } = useAppSelector((state) => state.auth);
+  const { unreadCount, refreshCount } = useUnreadCount()
+  useEffect(() => {
+    const socket = getSocket();
+    if (!socket) return;
+
+    socket.on("chat:activity", refreshCount);
+    return () => {
+      socket.off("chat:activity", refreshCount);
+    };
+  }, [refreshCount]);
   const navigate = useNavigate()
   return (
     <nav className="h-20 bg-white border-b border-[#E2E8F0] px-8 flex items-center justify-between sticky top-0 z-30">
@@ -18,8 +30,6 @@ const TenantNavbar: React.FC = () => {
           </Link>
         )}
       </div>
-
-
       {isAuthenticated ? (
         <>
 
@@ -28,11 +38,19 @@ const TenantNavbar: React.FC = () => {
               <Bell size={20} strokeWidth={2} />
               <span className="absolute top-0 right-0 w-2 h-2 bg-[#EF4444] rounded-full border-2 border-white"></span>
             </button>
+
             <button
-              onClick={() => navigate('/tenant/chat')}
-              className="text-[#64748B] hover:text-[#2F6FED] transition-colors relative">
-              <MessageCircle size={20} strokeWidth={2} />
-              <span className="absolute top-0 right-0 w-2 h-2 bg-[#EF4444] rounded-full border-2 border-white"></span>
+              onClick={() => navigate("/tenant/chat")}
+              title="View Watchlist"
+              className="relative p-2 text-[#6B6B6B] hover:text-[#C9653B] hover:bg-[#FFF9F4] rounded-xl transition-all duration-300 group cursor-pointer focus:outline-none"
+            >
+              <MessageCircle size={18} className="transition-transform group-hover:scale-105" />
+
+              {unreadCount > 0 && (
+                <span className="absolute top-0.5 right-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-[#C9653B] text-[9px] font-black text-white ring-2 ring-white animate-in scale-in-50 duration-200 select-none">
+                  {unreadCount > 99 ? '99+' : unreadCount}
+                </span>
+              )}
             </button>
 
             <div className="h-8 w-[1px] bg-[#E2E8F0]"></div>

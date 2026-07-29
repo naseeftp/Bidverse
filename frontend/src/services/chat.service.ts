@@ -118,7 +118,6 @@ class ChatService {
         try {
             const url=`${BASE_ROUTES.CHAT}${CHAT_ROUTES.UNREAD_COUNT}`;
             const response=await axiosInstance.get<number,ApiResponse<number>>(url)
-            console.log('resonse--------',response)
             return{
                 success:true,
                 data:response.data,
