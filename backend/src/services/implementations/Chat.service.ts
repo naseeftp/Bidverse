@@ -100,7 +100,7 @@ export class ChatService implements IChatService {
       unreadCountMap: unreadMapObject
     })
     recipientIds.forEach((recipientId) => {
-      socketService.emitToUser(recipientId, 'chat:activity', undefined as never)
+      socketService.emitToUser(recipientId, 'chat:activity', undefined as never)//when a socket event doesn't require any payload data.
     })
     return mappedMessage
   }

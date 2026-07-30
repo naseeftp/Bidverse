@@ -62,7 +62,7 @@ class ChatService {
     }
     async deleteForEveryOne(messageId:string){
         try {
-            let url=`${BASE_ROUTES.CHAT}${CHAT_ROUTES.DELETE_EVERYONE}/${messageId}`;
+            const url=`${BASE_ROUTES.CHAT}${CHAT_ROUTES.DELETE_EVERYONE}/${messageId}`;
             const response=await axiosInstance.delete<MessageDto,ApiResponse<MessageDto>>(url)
             return{
                 success:true,
@@ -75,7 +75,7 @@ class ChatService {
     }
     async editMessage(messageId:string,newContent:string){
         try {
-            let url=`${BASE_ROUTES.CHAT}${CHAT_ROUTES.EDIT_MESSAGE}/${messageId}`
+            const url=`${BASE_ROUTES.CHAT}${CHAT_ROUTES.EDIT_MESSAGE}/${messageId}`
             const response=await axiosInstance.patch<MessageDto,ApiResponse<MessageDto>>(url,{content:newContent});
             return{
                 success:true,
@@ -89,7 +89,7 @@ class ChatService {
 
     async deleteForMe(messageId:string){
       try {
-        let url=`${BASE_ROUTES.CHAT}${CHAT_ROUTES.DELETE_FOR_ME}/${messageId}`;
+        const url=`${BASE_ROUTES.CHAT}${CHAT_ROUTES.DELETE_FOR_ME}/${messageId}`;
         const response=await axiosInstance.patch<MessageDto,ApiResponse<MessageDto>>(url);
         return{
             success:true,
@@ -103,7 +103,7 @@ class ChatService {
 
     async markMessageRead(conversationId:string){
         try {
-            let url=`${BASE_ROUTES.CHAT}${CHAT_ROUTES.MARK_AS_READED}/${conversationId}`;
+            const url=`${BASE_ROUTES.CHAT}${CHAT_ROUTES.MARK_AS_READED}/${conversationId}`;
             const response=await axiosInstance.patch<MarkReadResponseDTO,ApiResponse<MarkReadResponseDTO>>(url)
             return{
                 success:true,

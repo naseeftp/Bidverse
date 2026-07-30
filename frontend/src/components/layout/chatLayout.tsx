@@ -59,7 +59,7 @@ export const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ roleTheme }) => {
   const [editInputText, setEditInputText] = useState<string>('');
   const [isSubmittingEdit, setIsSubmittingEdit] = useState<boolean>(false);
 
-  let isCurrentlytyping = useRef<boolean>(false);
+  const isCurrentlytyping = useRef<boolean>(false);
   const isTypingTimeOut = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const { user } = useAppSelector((state) => state.auth);
@@ -100,7 +100,7 @@ export const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ roleTheme }) => {
         })
       );
     } catch {
-
+       toast.error('failed to markas read')
     }
   }, [currentUserId]);
 

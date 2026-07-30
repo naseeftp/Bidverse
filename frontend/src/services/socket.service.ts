@@ -20,7 +20,7 @@ export const connectSocket=(userId:string,role:string)=>{
     const s=getSocket(userId,role);
     if(s.connected) return;
     s.auth={userId,role}
-    s.off('connect'),
+    s.off('connect');
     s.connect()
 }
 

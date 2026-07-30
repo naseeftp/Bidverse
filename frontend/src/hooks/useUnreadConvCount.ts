@@ -4,7 +4,7 @@ import { setUnreadConversationCount } from "../redux/user/auth.slice";
 import chatService from "../services/chat.service";
 
 export const useUnreadCount = () => {
-    const dispatch = useAppDispatch();
+     const dispatch = useAppDispatch();
     const { isAuthenticated, consversationUnreadCount } = useAppSelector((state) => state.auth);
 
     const refreshCount = useCallback(async () => {

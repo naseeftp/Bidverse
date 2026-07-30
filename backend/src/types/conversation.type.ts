@@ -1,4 +1,4 @@
-import { Document, Schema, Types } from "mongoose";
+import { Document,Types } from "mongoose";
 import { roles } from "./user.type";
 
 export interface IParticipant {

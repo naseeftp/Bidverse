@@ -3,6 +3,7 @@ import { Server as HttpServer } from 'http';
 import { env } from '../../config/env';
 import { ServerToClientEvents, ClientToServerEvents, SocketData } from '../../types/socket.type';
 import { IChatService } from '../interface/IChat.service';
+import { AppError } from '../../errors/AppError';
 
 
 type TypedSocket = Socket<ClientToServerEvents, ServerToClientEvents, Record<string, never>, SocketData>
@@ -89,7 +90,7 @@ export class SocketService {
                    
                     await this._chatService.markMessageRead(data.conversationId, activeUserId);
                 } catch{
-
+                    throw new AppError('Message reading failed')
                 }
             })
 
