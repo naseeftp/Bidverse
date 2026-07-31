@@ -4,10 +4,13 @@ import { Request, Response, NextFunction } from "express";
 import { SuccessResponse } from "../../utils/response.utility";
 import { HttpStatus, MESSAGES } from "../../constants/constants";
 import { Role } from "../../dtos/Common.dto";
+import { ICloudinaryService } from "../../services/interface/ICloudinary.service";
+
 
 export class ChatController implements IChatController {
     constructor(
-        private _ChatService: IChatService
+        private _ChatService: IChatService,
+        private _cloudinaryService:ICloudinaryService
     ) { }
 
     async getOrCreateConversation(req: Request, res: Response, next: NextFunction): Promise<void> {
@@ -104,5 +107,21 @@ export class ChatController implements IChatController {
         } catch (error) {
             next(error)
         }
+    }
+    async getUploadAudioSignature(req: Request, res: Response, next: NextFunction): Promise<void> {
+      try {
+        console.log('call raeched the controllewr 11111111111111')
+        const file = (req as Request & { file?: { buffer: Buffer } }).file;
+        console.log('file that sended-------------------->',file)
+
+        if(!file){
+            return
+        }
+        const audioData=await this._cloudinaryService.getUploadAudioSignature(file.buffer)
+        console.log('audio data          --------',audioData)
+        SuccessResponse(res, MESSAGES.ACTION_SUCCESS, audioData, HttpStatus.OK);
+      } catch (error) {
+        next(error)
+      }  
     }
 }

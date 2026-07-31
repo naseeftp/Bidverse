@@ -5,6 +5,7 @@ import chatService from "../../services/chat.service";
 import toast from "react-hot-toast";
 import { useAppSelector } from "../../hooks/redux.hooks";
 import { getSocket } from "../../services/socket.service";
+import { useAudioRecorder } from "../../hooks/useAudioRecorder";
 
 
 interface ChatWorkspaceProps {
@@ -69,6 +70,9 @@ export const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ roleTheme }) => {
   const activeChatPartner = activeConversation?.participants.find((p) => p.userId !== currentUserId);
   const activePartnerName = activeChatPartner?.name || "Anonymous Operator";
 
+  const { isRecording, recordingTime, startRecording, stopRecording, cancelRecording } = useAudioRecorder();
+ const [isUploadingAudio, setIsUploadingAudio] = useState(false);
+
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
@@ -100,7 +104,7 @@ export const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ roleTheme }) => {
         })
       );
     } catch {
-       toast.error('failed to markas read')
+      toast.error('failed to markas read')
     }
   }, [currentUserId]);
 
@@ -334,6 +338,7 @@ export const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ roleTheme }) => {
     };
   }, [activeConversationId, conversations]);
 
+
   const handleInptChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setTypedMessage(e.target.value);
     if (!currentUserId || !activeConversationId) return;
@@ -480,6 +485,57 @@ export const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ roleTheme }) => {
     if (e.key === 'Enter') {
       handleSendMessage();
     }
+  };
+
+  const handleStartRecord = async () => {
+    try {
+      await startRecording();
+    } catch {
+      toast.error('Permission denied to access microphone');
+    }
+  };
+
+  const handleSendVoiceNote = async () => {
+    if (!activeConversationId) return;
+    try {
+      setIsUploadingAudio(true);
+      const audioBlob = await stopRecording();
+
+
+      const uploadRes = await chatService.uploadAudio(audioBlob);
+      if (!uploadRes.success || !uploadRes.data?.url) {
+        toast.error('Failed to upload audio');
+        return;
+      }
+
+      const response = await chatService.sendMessage({
+        conversationId: activeConversationId,
+        content: uploadRes.data.url,
+        messageType: 'audio',
+      });
+
+      if (response.success && response.data) {
+        setConversation((prevConv) =>
+          prevConv.map((c) =>
+            c._id === activeConversationId
+              ? { ...c, lastMessageSnippet: '🎙️ Voice message' }
+              : c
+          )
+        );
+      } else {
+        toast.error(response.message);
+      }
+    } catch {
+      toast.error('Failed to send voice note');
+    } finally {
+      setIsUploadingAudio(false);
+    }
+  };
+
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
   };
 
   const handleSelectConversation = (id: string) => {
@@ -667,7 +723,14 @@ export const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ roleTheme }) => {
                       )}
 
                       <p className="leading-relaxed pr-5">
-                        {msg.content}
+                        {msg.messageType === 'audio' || (msg.content.includes('cloudinary.com') && msg.content.endsWith('.mp3')) ? (
+                          <audio controls className="w-full max-w-[220px] h-8 mt-1 rounded-md">
+                            <source src={msg.content} type="audio/mpeg" />
+                            Your browser does not support the audio element.
+                          </audio>
+                        ) : (
+                          msg.content
+                        )}
                       </p>
 
                       <span className="text-[9px] mt-1 block text-right font-mono opacity-60">
@@ -705,20 +768,58 @@ export const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ roleTheme }) => {
 
 
             <div className="p-4 bg-white border-t border-[#E6E0DA] flex items-center gap-2">
-              <input
-                type="text"
-                value={typedMessage}
-                onChange={handleInptChange}
-                onKeyDown={handleKeyDown}
-                placeholder="Type a message..."
-                className="flex-1 bg-[#FFF9F4] border border-[#E6E0DA] rounded-xl px-4 py-3 text-xs text-[#1F1F1F] focus:outline-none focus:border-[#C9653B]/60 transition-all"
-              />
-              <button
-                onClick={handleSendMessage}
-                className={`px-5 py-3 text-xs font-bold uppercase tracking-wider text-white rounded-xl transition-all active:scale-95 cursor-pointer ${currentStyle.accent}`}
-              >
-                Send
-              </button>
+              {isRecording ? (
+                <div className="flex-1 bg-red-50 border border-red-200 rounded-xl px-4 py-2.5 flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="w-2.5 h-2.5 rounded-full bg-red-500 animate-ping" />
+                    <span className="text-xs font-mono font-bold text-red-600">
+                      Recording... {formatTime(recordingTime)}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={cancelRecording}
+                      className="text-xs font-semibold text-gray-500 hover:text-gray-700 px-2 py-1 cursor-pointer"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      onClick={handleSendVoiceNote}
+                      disabled={isUploadingAudio}
+                      className="px-3 py-1 bg-red-600 text-white text-xs font-bold uppercase rounded-lg transition-all hover:bg-red-700 disabled:opacity-50 cursor-pointer"
+                    >
+                      {isUploadingAudio ? 'Sending...' : 'Send Voice'}
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <>
+                  <button
+                    onClick={handleStartRecord}
+                    className="p-3 bg-[#FFF9F4] border border-[#E6E0DA] text-gray-700 hover:text-[#C9653B] rounded-xl transition-all cursor-pointer flex items-center justify-center"
+                    title="Record Voice Message"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+                    </svg>
+                  </button>
+
+                  <input
+                    type="text"
+                    value={typedMessage}
+                    onChange={handleInptChange}
+                    onKeyDown={handleKeyDown}
+                    placeholder="Type a message..."
+                    className="flex-1 bg-[#FFF9F4] border border-[#E6E0DA] rounded-xl px-4 py-3 text-xs text-[#1F1F1F] focus:outline-none focus:border-[#C9653B]/60 transition-all"
+                  />
+                  <button
+                    onClick={handleSendMessage}
+                    className={`px-5 py-3 text-xs font-bold uppercase tracking-wider text-white rounded-xl transition-all active:scale-95 cursor-pointer ${currentStyle.accent}`}
+                  >
+                    Send
+                  </button>
+                </>
+              )}
             </div>
           </div>
         ) : (

@@ -56,3 +56,8 @@ export interface MarkReadResponseDTO
     readerId:string;
     updatedMessageIds:string[]
 }
+
+export interface UploadAudioResultDTO {
+  url: string;
+  duration?: number;
+}

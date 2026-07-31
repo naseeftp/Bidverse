@@ -4,8 +4,11 @@ import { protect, allowedTo } from "../middlewares/auth.middleware";
 import { CHAT_ROUTES } from "../constants/route.constant";
 import { Role } from "../dtos/Common.dto";
 import { chatController } from "../di/chat.container";
+import multer from "multer";
+
 
 const router = Router()
+const upload = multer({ storage: multer.memoryStorage() })
 router.use(protect);
 router.use(CheckUserBlocked)
 
@@ -55,5 +58,11 @@ router.get(
    allowedTo(Role.USER, Role.TENANT, Role.ADMIN),
    (req, res, next) => chatController.getUnreadCountForUser(req, res, next)
 
+)
+router.post(
+   CHAT_ROUTES.UPLOAD_AUDIO,
+   allowedTo(Role.USER, Role.TENANT, Role.ADMIN),
+    upload.single('audio'),
+   (req, res, next) => chatController.getUploadAudioSignature(req, res, next)
 )
 export default router;

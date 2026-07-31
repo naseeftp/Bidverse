@@ -4,6 +4,7 @@ import type { ApiResponse } from "../types/auth.type";
 import type { ConversationDTO, MarkReadResponseDTO, MessageDto } from "../types/chat.dto";
 import { apiErrorHandler } from "../utils/error.handle";
 import type { SendMessageInputDTO } from "../types/chat.dto";
+import type { UploadAudioResultDTO } from "../types/chat.dto";
 
 class ChatService {
     async getOrCreateConversation(data: { receiverId: string, receiverRole: string }) {
@@ -125,6 +126,22 @@ class ChatService {
             }
         } catch (error) {
             return apiErrorHandler(error, 'Failed to get Unread Count')
+        }
+    }
+
+    async uploadAudio(audioBlob: Blob){
+        try {
+            const url=`${BASE_ROUTES.CHAT}${CHAT_ROUTES.UPLOAD_AUDIO}`
+            const formData=new FormData();
+            formData.append('audio', audioBlob, 'voice_note.mp3');
+            const response=await axiosInstance.post<UploadAudioResultDTO,ApiResponse<UploadAudioResultDTO>>(url,formData,{headers: { 'Content-Type': 'multipart/form-data' }},)
+            return {
+                success:true,
+                message:response.message,
+                data:response.data
+            }
+        } catch (error) {
+            return apiErrorHandler(error, 'Failed to upload audio');
         }
     }
 }
