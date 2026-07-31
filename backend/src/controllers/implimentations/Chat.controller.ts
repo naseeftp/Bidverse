@@ -110,15 +110,11 @@ export class ChatController implements IChatController {
     }
     async getUploadAudioSignature(req: Request, res: Response, next: NextFunction): Promise<void> {
       try {
-        console.log('call raeched the controllewr 11111111111111')
         const file = (req as Request & { file?: { buffer: Buffer } }).file;
-        console.log('file that sended-------------------->',file)
-
         if(!file){
             return
         }
         const audioData=await this._cloudinaryService.getUploadAudioSignature(file.buffer)
-        console.log('audio data          --------',audioData)
         SuccessResponse(res, MESSAGES.ACTION_SUCCESS, audioData, HttpStatus.OK);
       } catch (error) {
         next(error)

@@ -10,7 +10,7 @@ import { IMessageRepository } from "../../repositories/interfaces/IMessage.repos
 import { Role } from "../../dtos/Common.dto";
 import { socketService } from "./socket.service";
 import { MESSAGE_TIME_CONFIG } from "../../constants/constants";
-
+import { MessageType } from "../../constants/constants";
 export class ChatService implements IChatService {
   constructor(
     private _conversationRepo: IConversationRepository,
@@ -53,7 +53,7 @@ export class ChatService implements IChatService {
   }
 
   async sendMessage(senderId: string, senderRole: Role, payload: SendMessageInputDTO): Promise<MessageDto> {
-    const { conversationId, content } = payload
+    const { conversationId, content, messageType } = payload
     const conversation = await this._conversationRepo.findById(conversationId);
     if (!conversation) {
       throw new NotFoundError(MESSAGES.CONV_NOT_FOUND)
@@ -66,11 +66,20 @@ export class ChatService implements IChatService {
       conversationId: new Types.ObjectId(conversationId),
       senderId: new Types.ObjectId(senderId),
       senderRole,
-      content: content?.trim()
+      content: content?.trim(),
+      messageType: messageType
 
     });
     const now = new Date()
     const mappedMessage = ChatMapper.toMessageDocumentToDTO(newMessage)
+    let snippet = content?.trim();
+    if (messageType === MessageType.AUDIO || (content && content.includes('cloudinary.com') && content.endsWith('.mp3'))) {
+      snippet = '🎙️ Voice message';
+    } else if (messageType === MessageType.IMAGE) {
+      snippet = '📷 Photo';
+    } else if (messageType === MessageType.FILE) {
+      snippet = '📁 Document';
+    }
     const recipientIds = conversation.participants
       .map(p => p.userId.toString())
       .filter(id => id !== senderId);
@@ -80,7 +89,7 @@ export class ChatService implements IChatService {
       conversation.unreadCount.set(recipientId, currentCount + 1);
     })
 
-    conversation.lastMessageSnippet = content?.trim();
+    conversation.lastMessageSnippet = snippet;
     conversation.lastMessage = new Types.ObjectId(newMessage._id.toString());
     conversation.lastMessageAt = now;
 
@@ -95,7 +104,7 @@ export class ChatService implements IChatService {
     socketService.emitToRoom(conversationId, 'message:receive', mappedMessage)
     socketService.emitToRoom(conversationId, 'conversation:updated', {
       conversationId,
-      lastMessageSnippet: mappedMessage.content,
+      lastMessageSnippet: snippet ?? '',
       lastMessageAt: now.toISOString(),
       unreadCountMap: unreadMapObject
     })
@@ -147,9 +156,13 @@ export class ChatService implements IChatService {
     const secondLastMessageId = secondLastMessage._id;
     const secondLastMessageContent = secondLastMessage.content;
     if (isLastMessage) {
+      let snippet = secondLastMessageContent
+      if (secondLastMessage.messageType === MessageType.AUDIO|| (secondLastMessageContent?.includes('cloudinary.com') && secondLastMessageContent?.endsWith('.mp3'))) {
+        snippet = '🎙️ Voice message';
+      }
       await this._conversationRepo.updateById(
         conversationId,
-        { lastMessageSnippet: secondLastMessageContent, lastMessage: secondLastMessageId }
+        { lastMessageSnippet: snippet, lastMessage: secondLastMessageId }
       )
     }
     socketService.emitToRoom(

@@ -6,7 +6,7 @@ import toast from "react-hot-toast";
 import { useAppSelector } from "../../hooks/redux.hooks";
 import { getSocket } from "../../services/socket.service";
 import { useAudioRecorder } from "../../hooks/useAudioRecorder";
-
+import { AudioPlayer } from "../common/audioPlayer";
 
 interface ChatWorkspaceProps {
   roleTheme: 'user' | 'tenant' | 'admin';
@@ -71,7 +71,7 @@ export const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ roleTheme }) => {
   const activePartnerName = activeChatPartner?.name || "Anonymous Operator";
 
   const { isRecording, recordingTime, startRecording, stopRecording, cancelRecording } = useAudioRecorder();
- const [isUploadingAudio, setIsUploadingAudio] = useState(false);
+  const [isUploadingAudio, setIsUploadingAudio] = useState(false);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -655,8 +655,9 @@ export const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ roleTheme }) => {
                 messages.map((msg) => {
                   const isSelf = msg.senderId === currentUserId;
                   const messageAge = Date.now() - new Date(msg.createdAt!).getTime();
-                  const canModify = isSelf && messageAge <= EDIT_DELETE_TIME_WINDOW && !msg.isDeletedForEveryone;
-
+                  const isAudioMessage = msg.messageType === 'audio' || (msg.content.includes('cloudinary.com') && msg.content.endsWith('.mp3'));
+                  const canEdit = isSelf && messageAge <= EDIT_DELETE_TIME_WINDOW && !isAudioMessage;
+                  const canDelete = isSelf && messageAge <= EDIT_DELETE_TIME_WINDOW && !msg.isDeletedForEveryone
                   return (
                     <div
                       key={msg._id}
@@ -682,7 +683,7 @@ export const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ roleTheme }) => {
                           {openMenuId === msg._id && (
                             <div className="absolute right-0 top-6 bg-white text-[#1F1F1F] shadow-lg rounded-lg py-1 border border-[#E6E0DA] z-20 w-40">
 
-                              {canModify && (
+                              {canEdit && (
                                 <button
                                   onClick={(e) => {
                                     e.stopPropagation();
@@ -706,7 +707,7 @@ export const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ roleTheme }) => {
                               </button>
 
 
-                              {canModify && (
+                              {canDelete && (
                                 <button
                                   onClick={(e) => {
                                     e.stopPropagation();
@@ -723,13 +724,15 @@ export const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ roleTheme }) => {
                       )}
 
                       <p className="leading-relaxed pr-5">
-                        {msg.messageType === 'audio' || (msg.content.includes('cloudinary.com') && msg.content.endsWith('.mp3')) ? (
-                          <audio controls className="w-full max-w-[220px] h-8 mt-1 rounded-md">
-                            <source src={msg.content} type="audio/mpeg" />
-                            Your browser does not support the audio element.
-                          </audio>
+                        {msg.isDeletedForEveryone ? (
+                          <p className="italic text-gray-400 text-sm flex items-center gap-1.5 py-1">
+                            <span className="text-xs"></span> This message was deleted
+                          </p>
+                        ) : msg.messageType === 'audio' || (msg.content?.includes('cloudinary.com') && msg.content?.endsWith('.mp3')) ? (
+                          <AudioPlayer src={msg.content} isSelf={isSelf} />
                         ) : (
-                          msg.content
+                       
+                          <span>{msg.content}</span>
                         )}
                       </p>
 
