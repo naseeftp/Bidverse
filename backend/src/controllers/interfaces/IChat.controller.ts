@@ -11,5 +11,6 @@ export interface IChatController {
     deleteForMe(req: Request, res: Response, next: NextFunction): Promise<void>;
     markMessageRead(req: Request, res: Response, next: NextFunction): Promise<void>;
     getUnreadCountForUser(req: Request, res: Response, next: NextFunction): Promise<void>
-    getUploadAudioSignature(req: Request, res: Response, next: NextFunction): Promise<void>
+    UploadAudio(req: Request, res: Response, next: NextFunction): Promise<void>
+    uploadImage(req:Request,res:Response,next:NextFunction):Promise<void>
 }

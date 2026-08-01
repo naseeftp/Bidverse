@@ -7,11 +7,15 @@ import { useAppSelector } from "../../hooks/redux.hooks";
 import { getSocket } from "../../services/socket.service";
 import { useAudioRecorder } from "../../hooks/useAudioRecorder";
 import { AudioPlayer } from "../common/audioPlayer";
+import { ImagePreviewModal } from "../common/imagePreview.modal";
 
 interface ChatWorkspaceProps {
   roleTheme: 'user' | 'tenant' | 'admin';
 }
-
+interface ImagePreviewState {
+  file: File;
+  previewUrl: string;
+}
 const THEME_STYLES = {
   user: {
     accent: "bg-[#1F1F1F]",
@@ -72,6 +76,11 @@ export const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ roleTheme }) => {
 
   const { isRecording, recordingTime, startRecording, stopRecording, cancelRecording } = useAudioRecorder();
   const [isUploadingAudio, setIsUploadingAudio] = useState(false);
+
+  const [selectedImage, setSelectedImage] = useState<ImagePreviewState | null>(null);
+  const [isUploadingImage, setIsUploadingImage] = useState<boolean>(false);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const [previewImageUrl, setPreviewImageUrl] = useState<string | null>(null);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -162,6 +171,60 @@ export const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ roleTheme }) => {
       });
     };
   }, [activeConversationId, user?.userId, user?.role, markConversationAsRead]);
+  const handleImageFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      toast.error("Please select a valid image file");
+      return;
+    }
+
+    const previewUrl = URL.createObjectURL(file);
+    setSelectedImage({ file, previewUrl });
+    e.target.value = '';
+  };
+  const handleCancelImage = () => {
+    if (selectedImage?.previewUrl) {
+      URL.revokeObjectURL(selectedImage.previewUrl);
+    }
+    setSelectedImage(null);
+  };
+
+  const handleSendImage = async () => {
+    if (!selectedImage || !activeConversationId) return;
+
+    try {
+      setIsUploadingImage(true);
+      const uploadRes = await chatService.uploadImage(selectedImage.file);
+      if (!uploadRes.success || !uploadRes.data?.url) {
+        toast.error('Failed to upload image');
+        return;
+      }
+      const response = await chatService.sendMessage({
+        conversationId: activeConversationId,
+        content: uploadRes.data.url,
+        messageType: 'image',
+      });
+      if (response.success && response.data) {
+        setConversation((prevConv) =>
+          prevConv.map((c) =>
+            c._id === activeConversationId
+              ? { ...c, lastMessageSnippet: '📷 Photo' }
+              : c
+          )
+        );
+        handleCancelImage();
+      } else {
+        toast.error(response.message);
+      }
+    } catch {
+      toast.error('Failed to send image');
+    } finally {
+      setIsUploadingImage(false);
+    }
+  }
+
 
   useEffect(() => {
     const socket = getSocket();
@@ -656,7 +719,8 @@ export const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ roleTheme }) => {
                   const isSelf = msg.senderId === currentUserId;
                   const messageAge = Date.now() - new Date(msg.createdAt!).getTime();
                   const isAudioMessage = msg.messageType === 'audio' || (msg.content.includes('cloudinary.com') && msg.content.endsWith('.mp3'));
-                  const canEdit = isSelf && messageAge <= EDIT_DELETE_TIME_WINDOW && !isAudioMessage;
+                  const isImageMessage = msg.messageType === 'image' || (msg.content.includes('cloudinary.com') && /\.(png|jpe?g|webp|gif)$/i.test(msg.content));
+                  const canEdit = isSelf && messageAge <= EDIT_DELETE_TIME_WINDOW && !isAudioMessage && !isImageMessage;
                   const canDelete = isSelf && messageAge <= EDIT_DELETE_TIME_WINDOW && !msg.isDeletedForEveryone
                   return (
                     <div
@@ -728,12 +792,24 @@ export const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ roleTheme }) => {
                           <p className="italic text-gray-400 text-sm flex items-center gap-1.5 py-1">
                             <span className="text-xs"></span> This message was deleted
                           </p>
-                        ) : msg.messageType === 'audio' || (msg.content?.includes('cloudinary.com') && msg.content?.endsWith('.mp3')) ? (
+                        ) : isAudioMessage ? (
                           <AudioPlayer src={msg.content} isSelf={isSelf} />
-                        ) : (
-                       
-                          <span>{msg.content}</span>
-                        )}
+                        ) : isImageMessage ?
+                          <div className="block my-1 overflow-hidden rounded-xl border border-black/10">
+                            <button type="button" onClick={() => setPreviewImageUrl(msg.content)}
+                              className="block my-1 overflow-hidden rounded-xl border border-black/10 transition-transform hover:opacity-95 active:scale-98 cursor-pointer focus:outline-none"
+                            >
+                              <img
+                                src={msg.content}
+                                alt="Transmitted content"
+                                className="max-w-xs max-h-60 rounded-xl object-cover"
+                                loading="lazy"
+                              />
+                            </button>
+                          </div>
+                          : (
+                            <span>{msg.content}</span>
+                          )}
                       </p>
 
                       <span className="text-[9px] mt-1 block text-right font-mono opacity-60">
@@ -796,7 +872,25 @@ export const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ roleTheme }) => {
                   </div>
                 </div>
               ) : (
+
                 <>
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    onChange={handleImageFileSelect}
+                    accept="image/*"
+                    className="hidden"
+                  />
+                  <button
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={isUploadingImage}
+                    className="p-3 bg-[#FFF9F4] border border-[#E6E0DA] text-gray-700 hover:text-[#C9653B] rounded-xl transition-all cursor-pointer flex items-center justify-center disabled:opacity-50"
+                    title="Attach Image"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 002-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                  </button>
                   <button
                     onClick={handleStartRecord}
                     className="p-3 bg-[#FFF9F4] border border-[#E6E0DA] text-gray-700 hover:text-[#C9653B] rounded-xl transition-all cursor-pointer flex items-center justify-center"
@@ -834,6 +928,10 @@ export const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ roleTheme }) => {
           </div>
         )}
       </div>
+      <ImagePreviewModal
+        imageUrl={previewImageUrl}
+        onClose={() => setPreviewImageUrl(null)}
+      />
       {editingMessage && (
         <div className="fixed inset-0 bg-black/40 backdrop-blur-xs flex items-center justify-center z-50 p-4">
           <div className="bg-white border border-[#E6E0DA] rounded-2xl w-full max-w-md shadow-2xl p-6 space-y-4">
@@ -880,6 +978,53 @@ export const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ roleTheme }) => {
                   {isSubmittingEdit ? 'Saving...' : 'Submit'}
                 </button>
               )}
+            </div>
+          </div>
+        </div>
+      )}
+      {/* image preview modal */}
+      {selectedImage && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-xs flex items-center justify-center z-50 p-4">
+          <div className="bg-white border border-[#E6E0DA] rounded-2xl w-full max-w-sm shadow-2xl p-4 flex flex-col items-center gap-4">
+            <div className="flex items-center justify-between w-full border-b border-[#E6E0DA] pb-2">
+              <h3 className="text-xs font-bold uppercase tracking-wider text-[#1F1F1F]">
+                Image Preview
+              </h3>
+              <button
+                onClick={handleCancelImage}
+                disabled={isUploadingImage}
+                className="text-gray-400 hover:text-gray-600 text-sm font-bold cursor-pointer"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="relative w-full max-h-64 rounded-xl overflow-hidden bg-gray-100 flex items-center justify-center border border-[#E6E0DA]">
+              <img
+                src={selectedImage.previewUrl}
+                alt="Preview"
+                className="max-h-64 w-auto object-contain"
+              />
+            </div>
+
+            <div className="flex justify-end gap-2 w-full pt-2 border-t border-[#E6E0DA]">
+              <button
+                type="button"
+                onClick={handleCancelImage}
+                disabled={isUploadingImage}
+                className="px-4 py-2 text-xs font-semibold text-gray-600 hover:bg-gray-100 rounded-xl cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleSendImage}
+                disabled={isUploadingImage}
+                className={`px-5 py-2 text-xs font-bold uppercase tracking-wider text-white rounded-xl transition-all cursor-pointer ${currentStyle.accent} ${isUploadingImage ? 'opacity-50 cursor-not-allowed' : ''
+                  }`}
+              >
+                {isUploadingImage ? 'Sending...' : 'Send Photo'}
+              </button>
             </div>
           </div>
         </div>

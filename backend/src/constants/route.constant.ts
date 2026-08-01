@@ -89,5 +89,6 @@ export const CHAT_ROUTES = {
     EDIT_MESSAGE: '/edit-message/:id',
     MARK_AS_READED: '/mark-readed/:id',
     UNREAD_COUNT: '/unread-conv-count',
-    UPLOAD_AUDIO:'/upload-audio'
+    UPLOAD_AUDIO:'/upload-audio',
+    UPLOAD_IMAGE:'/upload-image'
 }

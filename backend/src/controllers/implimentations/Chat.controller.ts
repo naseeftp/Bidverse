@@ -5,6 +5,7 @@ import { SuccessResponse } from "../../utils/response.utility";
 import { HttpStatus, MESSAGES } from "../../constants/constants";
 import { Role } from "../../dtos/Common.dto";
 import { ICloudinaryService } from "../../services/interface/ICloudinary.service";
+import { BadRequestError } from "../../errors/AppError";
 
 
 export class ChatController implements IChatController {
@@ -108,14 +109,27 @@ export class ChatController implements IChatController {
             next(error)
         }
     }
-    async getUploadAudioSignature(req: Request, res: Response, next: NextFunction): Promise<void> {
+    async UploadAudio(req: Request, res: Response, next: NextFunction): Promise<void> {
       try {
         const file = (req as Request & { file?: { buffer: Buffer } }).file;
         if(!file){
             return
         }
-        const audioData=await this._cloudinaryService.getUploadAudioSignature(file.buffer)
+        const audioData=await this._cloudinaryService.UploadAudio(file.buffer)
         SuccessResponse(res, MESSAGES.ACTION_SUCCESS, audioData, HttpStatus.OK);
+      } catch (error) {
+        next(error)
+      }  
+    }
+    async uploadImage(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+        const file = (req as Request & { file?: { buffer: Buffer } }).file;
+        if (!file) {
+            throw new BadRequestError('No image file provided')
+        }
+
+        const imageData = await this._cloudinaryService.UploadImage(file.buffer);
+        SuccessResponse(res, MESSAGES.ACTION_SUCCESS, imageData, HttpStatus.OK);
       } catch (error) {
         next(error)
       }  

@@ -63,6 +63,12 @@ router.post(
    CHAT_ROUTES.UPLOAD_AUDIO,
    allowedTo(Role.USER, Role.TENANT, Role.ADMIN),
     upload.single('audio'),
-   (req, res, next) => chatController.getUploadAudioSignature(req, res, next)
+   (req, res, next) => chatController.UploadAudio(req, res, next)
+)
+router.post(
+   CHAT_ROUTES.UPLOAD_IMAGE,
+   allowedTo(Role.USER, Role.TENANT, Role.ADMIN),
+   upload.single('image'),
+   (req,res,next)=>chatController.uploadImage(req,res,next)
 )
 export default router;

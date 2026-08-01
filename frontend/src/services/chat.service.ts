@@ -144,6 +144,21 @@ class ChatService {
             return apiErrorHandler(error, 'Failed to upload audio');
         }
     }
+    async uploadImage(file:File){
+        try {
+            const url=`${BASE_ROUTES.CHAT}${CHAT_ROUTES.UPLOAD_IMAGE}`;
+            const formData=new FormData();
+            formData.append('image',file);
+            const response=await axiosInstance.post<{url:string},ApiResponse<{url:string}>>(url,formData,{headers: { 'Content-Type': 'multipart/form-data' }})
+            return{
+                success:true,
+                message:response.message,
+                data:response.data
+            }
+        } catch (error) {
+           return apiErrorHandler(error, 'Failed to upload image'); 
+        }
+    }
 }
 
 export default new ChatService()
