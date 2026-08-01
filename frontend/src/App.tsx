@@ -95,7 +95,7 @@ useSocketSync()
                   <Route path="/change-email" element={<ChangeEmailPage />} />
                   <Route path="/change-email-verify" element={<ChangeEmailVerifyPage />} />
                   <Route path="/watch-list" element={<WatchlistPage />} />
-                  <Route path="/chat" element={<ChatPage />} />
+                  
 
                </Route>
             </Route>
@@ -107,6 +107,7 @@ useSocketSync()
 
                </Route>
             </Route>
+            <Route path="/chat" element={<ChatPage />} />
 
             <Route path="/tenant/chat" element={<TenantChatPage />} />
             <Route element={<TenantLayout />}>

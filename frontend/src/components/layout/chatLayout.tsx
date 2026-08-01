@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import type { ConversationDTO, MessageDto } from "../../types/chat.dto";
 import chatService from "../../services/chat.service";
 import toast from "react-hot-toast";
@@ -17,29 +17,52 @@ interface ImagePreviewState {
   previewUrl: string;
 }
 const THEME_STYLES = {
+
   user: {
-    accent: "bg-[#1F1F1F]",
-    text: "text-[#1F1F1F]",
-    bgLight: "bg-[#FFF9F4]",
-    activeBubble: "bg-[#1F1F1F] text-white",
-    peerBubble: "bg-[#F5F5F5] text-[#1F1F1F] border border-[#E6E0DA]",
-    sidebarActive: "bg-[#F5F5F5] border-l-4 border-l-[#1F1F1F]",
-  },
-  tenant: {
     accent: "bg-[#C9653B]",
     text: "text-[#C9653B]",
     bgLight: "bg-[#FFF9F4]",
+    cardBg: "bg-[#FFFFFF]",
+    primaryText: "text-[#1F1F1F]",
+    secondaryText: "text-[#6B6B6B]",
+    border: "border-[#E6E0DA]",
     activeBubble: "bg-[#C9653B] text-white",
-    peerBubble: "bg-[#F5F5F5] text-[#1F1F1F] border border-[#E6E0DA]",
-    sidebarActive: "bg-[#C9653B]/5 border-l-4 border-l-[#C9653B]",
+    peerBubble: "bg-[#FFFFFF] text-[#1F1F1F] border border-[#E6E0DA]",
+    sidebarActive: "bg-[#C9653B]/10 border-l-4 border-l-[#C9653B]",
+    success: "text-[#15803D] bg-[#F0FDF4]",
+    warning: "text-[#B45309] bg-[#FFFBEB]",
+    danger: "text-[#B91C1C] bg-[#FEF2F2]",
+  },
+  tenant: {
+    accent: "bg-[#2F6FED]",
+    text: "text-[#2F6FED]",
+    bgLight: "bg-[#F5F7FB]",
+    cardBg: "bg-[#FFFFFF]",
+    primaryText: "text-[#0F172A]",
+    secondaryText: "text-[#475569]",
+    border: "border-[#E2E8F0]",
+    activeBubble: "bg-[#2F6FED] text-white",
+    peerBubble: "bg-[#FFFFFF] text-[#0F172A] border border-[#E2E8F0]",
+    sidebarActive: "bg-[#2F6FED]/10 border-l-4 border-l-[#2F6FED]",
+    success: "text-[#16A34A] bg-[#DCFCE7]",
+    warning: "text-[#D97706] bg-[#FEF3C7]",
+    danger: "text-[#EF4444] bg-[#FEE2E2]",
   },
   admin: {
-    accent: "bg-[#000000]",
-    text: "text-[#000000]",
-    bgLight: "bg-[#FAFAFA]",
-    activeBubble: "bg-[#000000] text-white",
-    peerBubble: "bg-[#EAEAEA] text-[#000000] border border-[#D1D1D1]",
-    sidebarActive: "bg-[#EAEAEA] border-l-4 border-l-[#000000]",
+    accent: "bg-[#111827]",
+    text: "text-[#111827]",
+    goldAccent: "bg-[#D4AF37]",
+    bgLight: "bg-[#F3F4F6]",
+    cardBg: "bg-[#FFFFFF]",
+    primaryText: "text-[#0F172A]",
+    secondaryText: "text-[#6B6280]",
+    border: "border-[#E5E7EB]",
+    activeBubble: "bg-[#111827] text-white",
+    peerBubble: "bg-[#FFFFFF] text-[#0F172A] border border-[#E5E7EB]",
+    sidebarActive: "bg-[#111827]/5 border-l-4 border-l-[#D4AF37]",
+    success: "text-[#16A34A] bg-[#DCFCE7]",
+    warning: "text-[#D97706] bg-[#FEF3C7]",
+    danger: "text-[#DC2626] bg-[#FEE2E2]",
   },
 };
 
@@ -50,6 +73,7 @@ export const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ roleTheme }) => {
   const [searchParams, setSearchParams] = useSearchParams();
   const activeConversationId = searchParams.get('conversationId');
   const [loading, setLoading] = useState<boolean>(true);
+  const navigate = useNavigate()
 
   const [typedMessage, setTypedMessage] = useState<string>('');
   const [messages, setMessages] = useState<MessageDto[]>([]);
@@ -616,13 +640,31 @@ export const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ roleTheme }) => {
   return (
     <div className="flex h-[calc(100vh-64px)] w-full bg-white border border-[#E6E0DA] rounded-3xl overflow-hidden shadow-sm">
       <div className="w-80 md:w-96 border-r border-[#E6E0DA] flex flex-col bg-white">
-        <div className="p-4 border-b border-[#E6E0DA] flex items-center justify-between">
+        <div className="p-4 border-b border-[#E6E0DA] flex items-center gap-3">
+
+          <button
+            onClick={() => navigate(-1)}
+            className="p-1 rounded-md text-[#1F1F1F] hover:bg-black/5 transition-colors focus:outline-none"
+            aria-label="Go back"
+          >
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M10 19l-7-7m0 0l7-7m-7 7h18"
+              />
+            </svg>
+          </button>
           <h2 className="text-sm font-black font-serif tracking-wider uppercase text-[#1F1F1F]">
             Conversations
           </h2>
-          <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-widest text-white ${currentStyle.accent}`}>
-            {roleTheme} Node
-          </span>
         </div>
 
         <div className="flex-1 overflow-y-auto divide-y divide-[#E6E0DA]/60">
@@ -701,9 +743,9 @@ export const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ roleTheme }) => {
                 </span>
                 <p className="text-xs font-bold uppercase tracking-wider text-[#1F1F1F]">
                   {activePartnerName}
-                  <span className="text-[10px] lowercase font-normal text-[#6B6B6B] ml-2 font-mono">
+                  {/* <span className="text-[10px] lowercase font-normal text-[#6B6B6B] ml-2 font-mono">
                     ({activeChatPartner?.userId && onlineUsers.has(activeChatPartner.userId) ? 'online' : 'offline'})
-                  </span>
+                  </span> */}
                 </p>
               </div>
             </div>
