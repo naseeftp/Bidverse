@@ -161,8 +161,8 @@ const PlaceBidModal: React.FC<PlaceBidProps> = ({
                                 onChange={handleInputChange}
                                 placeholder={`Enter amount >= ${requireMinBid}`}
                                 className={`w-full pl-7 pr-3 py-2 bg-white border ${errorMessage
-                                        ? "border-red-500 focus:ring-2 focus:ring-red-200"
-                                        : "border-[#E6E0DA] focus:border-[#C9653B] focus:ring-2 focus:ring-[#C9653B]/20"
+                                    ? "border-red-500 focus:ring-2 focus:ring-red-200"
+                                    : "border-[#E6E0DA] focus:border-[#C9653B] focus:ring-2 focus:ring-[#C9653B]/20"
                                     } rounded-xl text-sm font-bold text-[#1F1F1F] outline-none transition-all shadow-sm`}
                             />
                         </div>

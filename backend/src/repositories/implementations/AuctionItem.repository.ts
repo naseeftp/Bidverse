@@ -83,7 +83,7 @@ export class AuctionItemRepository extends BaseRepository<IAuctionItemDocument> 
                             images: { $ifNull: ['$images', []] },
                             startingPrice: '$startingPrice',
                             currentHighestBid: '$currentHighestBid',
-                            minimumIncrement:'$minimumIncrement'
+                            minimumIncrement: '$minimumIncrement'
 
                         }
                     }
@@ -124,6 +124,20 @@ export class AuctionItemRepository extends BaseRepository<IAuctionItemDocument> 
                 }
             },
             {
+                $lookup: {
+                    from: 'users',
+                    localField: 'currentHighestBidder',
+                    foreignField: '_id',
+                    as: 'highestBidder'
+                }
+            },
+            {
+                $unwind: {
+                    path: "$highestBidder",
+                    preserveNullAndEmptyArrays: true
+                }
+            },
+            {
                 $project: {
                     _id: 0,
                     auctionItemId: { $toString: '$_id' },
@@ -136,7 +150,8 @@ export class AuctionItemRepository extends BaseRepository<IAuctionItemDocument> 
                     startingPrice: 1,
                     reservePrice: 1,
                     minimumIncrement: 1,
-                    currentHighestBid:1,
+                    currentHighestBid: 1,
+                    bidCount: 1,
                     buyerPremiumPercent: 1,
                     shippingCost: 1,
                     shippingTerms: 1,
@@ -164,6 +179,13 @@ export class AuctionItemRepository extends BaseRepository<IAuctionItemDocument> 
                         businessEmail: '$auction.contact.businessEmail',
                         phone: '$auction.contact.phone',
                         isVerified: { $ifNull: ['$auction.isVerified', false] }
+                    },
+                    highestBidder: {
+                        name: '$highestBidder.name',
+                        userId: { $toString: '$highestBidder._id' },
+                        profileImage: {
+                            $ifNull: ["$highestBidder.profileImage", null]
+                        }
                     }
                 }
             }

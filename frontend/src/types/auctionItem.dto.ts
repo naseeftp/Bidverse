@@ -196,6 +196,7 @@ export interface AuctionItemDetailDTO {
     reservePrice: number;
     minimumIncrement: number;
     currentHighestBid: number;
+    bidCount: number;
     buyerPremiumPercent: number;
     shippingCost: number;
     shippingTerms: string;
@@ -225,6 +226,11 @@ export interface AuctionItemDetailDTO {
         phone: string;
         isVerified: boolean;
     };
+    highestBidder: {
+        name: string;
+        userId: string;
+        profileImage: string | null
+    }
 }
 
 export const updateAuctionStatusSchema = yup.object({

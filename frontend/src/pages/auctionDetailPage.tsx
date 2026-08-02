@@ -25,7 +25,7 @@ import PlaceBidModal from "../components/user/placeBid.modal";
 import bidService from "../services/bid.service";
 
 
-const PublicAuctionDetailPage: React.FC = (onBidSuccess) => {
+const PublicAuctionDetailPage: React.FC = () => {
     const { itemId } = useParams<{ itemId: string }>();
     const navigate = useNavigate();
     const dispatch = useAppDispatch()
@@ -42,7 +42,7 @@ const PublicAuctionDetailPage: React.FC = (onBidSuccess) => {
     const [isWatchlistLoading, setIsWatchlistLoading] = useState<boolean>(false)
     const [isChatLoading, setIsChatLoading] = useState<boolean>(false)
 
-    const [isBidModalOpen,setBidModalOpen]=useState<boolean>(false)
+    const [isBidModalOpen, setBidModalOpen] = useState<boolean>(false)
 
     const fetchAuctionDetail = useCallback(async () => {
         if (!itemId) return;
@@ -68,42 +68,42 @@ const PublicAuctionDetailPage: React.FC = (onBidSuccess) => {
         }
     }, [itemId, navigate]);
 
-    const handleInitiateChat=async ()=>{
+    const handleInitiateChat = async () => {
         setIsChatLoading(true)
         try {
-            const payload={
-               receiverId: auction?.auctionHouse.ownerId??'',
-               receiverRole: 'tenant'
+            const payload = {
+                receiverId: auction?.auctionHouse.ownerId ?? '',
+                receiverRole: 'tenant'
             }
-            const response=await chatService.getOrCreateConversation(payload)
-            if(response.success&&response.data){
+            const response = await chatService.getOrCreateConversation(payload)
+            if (response.success && response.data) {
                 navigate('/chat')
             }
-            else{
+            else {
                 toast.error(response.message)
             }
         } catch {
-           toast.error('failed to start conversation') 
-        }finally{
+            toast.error('failed to start conversation')
+        } finally {
             setIsChatLoading(false)
         }
     }
-    
-    const handleBidSubmit=async (bidAmount:number)=>{
-         if(!auction?.auctionItemId||!auction.auctionHouse.id){
+
+    const handleBidSubmit = async (bidAmount: number) => {
+        if (!auction?.auctionItemId || !auction.auctionHouse.id) {
             return
-         }
-         try {
-            const response=await bidService.placeBid({
-                tenantId:auction?.auctionHouse.id,
-                auctionId:auction?.auctionItemId,
-                amount:bidAmount.toString()
+        }
+        try {
+            const response = await bidService.placeBid({
+                tenantId: auction?.auctionHouse.id,
+                auctionId: auction?.auctionItemId,
+                amount: bidAmount.toString()
             })
-            if(response?.success&&response.data){
-                 toast.success(response.message)
-                 window.location.reload()
-             }
-            else{
+            if (response?.success && response.data) {
+                toast.success(response.message)
+                fetchAuctionDetail()
+            }
+            else {
                 toast.error(response?.message!)
             }
         } catch {
@@ -263,6 +263,56 @@ const PublicAuctionDetailPage: React.FC = (onBidSuccess) => {
                             {auction.description || "No customized descriptive logs written by the auction house for this lot asset position."}
                         </p>
                     </div>
+
+                    {auction.auctionHouse && (
+                        <div className="bg-white rounded-xl border border-[#E6E0DA] p-6 shadow-sm space-y-4">
+                            <div className="flex items-center justify-between border-b border-[#E6E0DA] pb-3">
+                                <div className="flex items-center gap-2">
+                                    <FaStore className="text-[#C9653B]" size={14} />
+                                    <h2 className="text-xs font-bold uppercase tracking-widest text-[#1F1F1F]">
+                                        Broker House Profile
+                                    </h2>
+                                </div>
+                                {auction.auctionHouse.isVerified && (
+                                    <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-emerald-50 text-emerald-700 text-[9px] font-black uppercase tracking-wider rounded border border-emerald-200">
+                                        <FaShieldAlt size={8} /> Verified Entity
+                                    </span>
+                                )}
+                            </div>
+
+                            <div className="space-y-1.5">
+                                <h3 className="text-sm font-black text-[#1F1F1F]">
+                                    {auction.auctionHouse.name}
+                                </h3>
+                                <p className="text-xs text-[#6B6B6B] leading-relaxed">
+                                    {auction.auctionHouse.briefDescription}
+                                </p>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-3 pt-2 text-[11px] border-t border-[#FFF9F4]">
+                                <div>
+                                    <span className="text-[9px] font-bold text-[#6B6B6B] uppercase tracking-wider block">Established</span>
+                                    <span className="font-bold text-[#1F1F1F] inline-flex items-center gap-1 mt-0.5">
+                                        <FaRegBuilding size={10} className="text-[#6B6B6B]/60" /> Class of {auction.auctionHouse.yearEstablished || "N/A"}
+                                    </span>
+                                </div>
+                                <div>
+                                    <span className="text-[9px] font-bold text-[#6B6B6B] uppercase tracking-wider block">Origin Jurisdiction</span>
+                                    <span className="font-bold text-[#1F1F1F] inline-flex items-center gap-1 mt-0.5 truncate max-w-full">
+                                        <FaMapMarkerAlt size={10} className="text-[#C9653B]" /> {auction.auctionHouse.country || "India"}
+                                    </span>
+                                </div>
+                            </div>
+
+                            {auction.auctionHouse.fullAddress && (
+                                <div className="p-2.5 bg-[#FFF9F4] rounded-lg border border-[#E6E0DA]/50 text-[11px] font-medium text-[#6B6B6B]">
+                                    <span className="font-bold text-[#1F1F1F] uppercase text-[8px] tracking-wider block mb-0.5">Corporate Headquarters Address:</span>
+                                    {auction.auctionHouse.fullAddress}
+                                </div>
+                            )}
+                        </div>
+                    )}
+                    
                 </div>
 
                 <div className="lg:col-span-5 space-y-6">
@@ -326,39 +376,52 @@ const PublicAuctionDetailPage: React.FC = (onBidSuccess) => {
                             )}
                         </div>
 
-                        <div className="border border-[#E6E0DA] rounded-xl p-4 grid grid-cols-2 gap-4 bg-white shadow-sm">
-                            <div>
-                                <span className="text-[9px] uppercase font-bold text-[#6B6B6B] tracking-widest flex items-center gap-1">
-                                    <FaCoins className="text-[#C9653B]" /> Starting Price
-                                </span>
-                                <p className="text-base font-black text-[#1F1F1F] mt-1">
-                                    {auction.currency || "INR"} {auction.startingPrice?.toLocaleString()}
+                        <div className="border border-[#E6E0DA] rounded-xl p-4 bg-white shadow-sm space-y-4">
+                            {/* Highest Bid Section */}
+                            <div className="p-3 bg-[#FFF9F4] rounded-lg border border-[#E6E0DA]">
+                                <div className="flex justify-between items-center mb-1">
+                                    <span className="text-[9px] uppercase font-bold text-[#6B6B6B] tracking-widest flex items-center gap-1">
+                                        <FaCoins className="text-[#C9653B]" /> Current Highest Bid
+                                    </span>
+                                    <span className="text-[10px] font-bold text-[#6B6B6B] bg-white px-2 py-0.5 rounded border border-[#E6E0DA]">
+                                        {auction.bidCount || 0} {auction.bidCount === 1 ? 'Bid' : 'Bids'}
+                                    </span>
+                                </div>
+
+                                <p className="text-2xl font-black text-[#1F1F1F]">
+                                    {auction.currency || "INR"} {(auction.currentHighestBid || auction.startingPrice)?.toLocaleString()}
                                 </p>
-                                 <span className="text-[9px] uppercase font-bold text-[#6B6B6B] tracking-widest flex items-center gap-1">
-                                    <FaCoins className="text-[#C9653B]" />currentHighestBid
-                                </span>
-                                <p className="text-base font-black text-[#1F1F1F] mt-1">
-                                    {auction.currency || "INR"} {auction.currentHighestBid?.toLocaleString()}
-                                </p>
+
+                                <div className="mt-2 pt-2 border-t border-[#E6E0DA]/60 flex items-center justify-between text-xs">
+                                    <span className="text-[#6B6B6B] text-[10px] uppercase font-semibold">Leading Bidder</span>
+                                    {auction.highestBidder?.name ? (
+                                        <div className="flex items-center gap-1.5">
+                                            <div className="w-5 h-5 rounded-full bg-[#1F1F1F] text-white flex items-center justify-center text-[10px] font-bold uppercase">
+                                                {auction.highestBidder.name.charAt(0)}
+                                            </div>
+                                            <span className="font-bold text-[#1F1F1F] capitalize">
+                                                {auction.highestBidder.name}
+                                            </span>
+                                        </div>
+                                    ) : (
+                                        <span className="text-[#6B6B6B] italic text-[11px]">No bids placed yet</span>
+                                    )}
+                                </div>
                             </div>
 
-                            <div className="flex flex-col justify-end">
-                                <button
-                                    disabled={isChatLoading}
-                                    onClick={handleInitiateChat}
-                                    className="w-full h-10 px-3 bg-[#1F1F1F] hover:bg-[#C9653B] text-white text-xs font-bold uppercase tracking-wider rounded-lg transition-colors duration-200 flex items-center justify-center gap-2 cursor-pointer shadow-sm"
-                                >
-                                    <FaCoins className="text-amber-400 text-xs" />
-                                    Enquire Now
-                                </button>
+                            <div className="flex justify-between items-center px-1 text-xs">
+                                <span className="text-[#6B6B6B] uppercase text-[10px] font-bold tracking-wider">Starting Price:</span>
+                                <span className="text-[#1F1F1F] font-bold">
+                                    {auction.currency || "INR"} {auction.startingPrice?.toLocaleString()}
+                                </span>
                             </div>
                         </div>
-
-                        <div className="flex flex-col gap-3 pt-2">
+                        <div className="flex flex-col gap-2.5 pt-1">
+                            {/* Primary Bidding Action */}
                             {auction.type === 'TIMED' ? (
                                 <button
                                     disabled={timerLabel === "CONCLUDED" || timerLabel === 'STARTS IN'}
-                                    onClick={()=>setBidModalOpen(true)}
+                                    onClick={() => setBidModalOpen(true)}
                                     className="w-full bg-[#C9653B] hover:bg-[#C9653B]/90 text-white font-bold text-xs uppercase tracking-wider py-3 rounded-lg transition-all shadow-sm focus:outline-none disabled:bg-[#E6E0DA] disabled:text-[#6B6B6B] disabled:cursor-not-allowed transform active:scale-[0.99]"
                                 >
                                     {timerLabel === 'ENDS IN' ? 'Place Bid' : 'Awaiting Bidding Window'}
@@ -372,24 +435,35 @@ const PublicAuctionDetailPage: React.FC = (onBidSuccess) => {
                                 </button>
                             )}
 
-                            <button
-                                onClick={handleWatchlistAction}
-                                disabled={isWatchlistLoading || isWatched}
-                                className={`w-full py-2.5 rounded-lg font-bold text-xs uppercase tracking-wider transition-all focus:outline-none flex items-center justify-center gap-2 border border-[#E6E0DA] disabled:cursor-not-allowed ${isWatched
-                                    ? "bg-[#1F1F1F] text-white border-[#1F1F1F]"
-                                    : "bg-white text-[#1F1F1F] hover:bg-[#FFF9F4]"
-                                    }`}
-                            >
-                                {isWatched ? (
-                                    <>
-                                        <FaHeart size={12} className="text-[#C9653B]" /> Saved to Watchlist
-                                    </>
-                                ) : (
-                                    <>
-                                        <FaRegHeart size={12} className="text-[#6B6B6B]" /> Add to Watchlist
-                                    </>
-                                )}
-                            </button>
+                            {/* Secondary Actions Row: Watchlist & Enquiry */}
+                            <div className="grid grid-cols-2 gap-2">
+                                <button
+                                    onClick={handleWatchlistAction}
+                                    disabled={isWatchlistLoading || isWatched}
+                                    className={`w-full py-2.5 rounded-lg font-bold text-xs uppercase tracking-wider transition-all focus:outline-none flex items-center justify-center gap-1.5 border border-[#E6E0DA] disabled:cursor-not-allowed ${isWatched
+                                            ? "bg-[#1F1F1F] text-white border-[#1F1F1F]"
+                                            : "bg-white text-[#1F1F1F] hover:bg-[#FFF9F4]"
+                                        }`}
+                                >
+                                    {isWatched ? (
+                                        <>
+                                            <FaHeart size={11} className="text-[#C9653B]" /> Saved
+                                        </>
+                                    ) : (
+                                        <>
+                                            <FaRegHeart size={11} className="text-[#6B6B6B]" /> Watchlist
+                                        </>
+                                    )}
+                                </button>
+
+                                <button
+                                    disabled={isChatLoading}
+                                    onClick={handleInitiateChat}
+                                    className="w-full py-2.5 bg-[#1F1F1F] hover:bg-[#C9653B] text-white text-xs font-bold uppercase tracking-wider rounded-lg transition-colors duration-200 flex items-center justify-center gap-1.5 cursor-pointer shadow-sm disabled:opacity-50"
+                                >
+                                    <FaCoins className="text-amber-400 text-xs" /> Enquire
+                                </button>
+                            </div>
                         </div>
 
                         <div className="space-y-3 text-xs font-medium border-t border-[#E6E0DA] pt-4">
@@ -410,54 +484,7 @@ const PublicAuctionDetailPage: React.FC = (onBidSuccess) => {
                         </div>
                     </div>
 
-                    {auction.auctionHouse && (
-                        <div className="bg-white rounded-xl border border-[#E6E0DA] p-6 shadow-sm space-y-4">
-                            <div className="flex items-center justify-between border-b border-[#E6E0DA] pb-3">
-                                <div className="flex items-center gap-2">
-                                    <FaStore className="text-[#C9653B]" size={14} />
-                                    <h2 className="text-xs font-bold uppercase tracking-widest text-[#1F1F1F]">
-                                        Broker House Profile
-                                    </h2>
-                                </div>
-                                {auction.auctionHouse.isVerified && (
-                                    <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-emerald-50 text-emerald-700 text-[9px] font-black uppercase tracking-wider rounded border border-emerald-200">
-                                        <FaShieldAlt size={8} /> Verified Entity
-                                    </span>
-                                )}
-                            </div>
-
-                            <div className="space-y-1.5">
-                                <h3 className="text-sm font-black text-[#1F1F1F]">
-                                    {auction.auctionHouse.name}
-                                </h3>
-                                <p className="text-xs text-[#6B6B6B] leading-relaxed">
-                                    {auction.auctionHouse.briefDescription}
-                                </p>
-                            </div>
-
-                            <div className="grid grid-cols-2 gap-3 pt-2 text-[11px] border-t border-[#FFF9F4]">
-                                <div>
-                                    <span className="text-[9px] font-bold text-[#6B6B6B] uppercase tracking-wider block">Established</span>
-                                    <span className="font-bold text-[#1F1F1F] inline-flex items-center gap-1 mt-0.5">
-                                        <FaRegBuilding size={10} className="text-[#6B6B6B]/60" /> Class of {auction.auctionHouse.yearEstablished || "N/A"}
-                                    </span>
-                                </div>
-                                <div>
-                                    <span className="text-[9px] font-bold text-[#6B6B6B] uppercase tracking-wider block">Origin Jurisdiction</span>
-                                    <span className="font-bold text-[#1F1F1F] inline-flex items-center gap-1 mt-0.5 truncate max-w-full">
-                                        <FaMapMarkerAlt size={10} className="text-[#C9653B]" /> {auction.auctionHouse.country || "India"}
-                                    </span>
-                                </div>
-                            </div>
-
-                            {auction.auctionHouse.fullAddress && (
-                                <div className="p-2.5 bg-[#FFF9F4] rounded-lg border border-[#E6E0DA]/50 text-[11px] font-medium text-[#6B6B6B]">
-                                    <span className="font-bold text-[#1F1F1F] uppercase text-[8px] tracking-wider block mb-0.5">Corporate Headquarters Address:</span>
-                                    {auction.auctionHouse.fullAddress}
-                                </div>
-                            )}
-                        </div>
-                    )}
+                    
 
                     <div className="bg-white rounded-xl border border-[#E6E0DA] p-6 shadow-sm space-y-3">
                         <div className="flex items-center gap-2 border-b border-[#E6E0DA] pb-2">
@@ -487,13 +514,13 @@ const PublicAuctionDetailPage: React.FC = (onBidSuccess) => {
                 </div>
             </div>
             <PlaceBidModal
-            isOpen={isBidModalOpen}
-            onClose={()=>setBidModalOpen(false)}
-            auctionName={auction.title}
-            currentHighestBid={auction.currentHighestBid}
-            minimumBidIncrement={auction.minimumIncrement}
-            startingPrice={auction.startingPrice}
-            onSubmitBid={handleBidSubmit}
+                isOpen={isBidModalOpen}
+                onClose={() => setBidModalOpen(false)}
+                auctionName={auction.title}
+                currentHighestBid={auction.currentHighestBid}
+                minimumBidIncrement={auction.minimumIncrement}
+                startingPrice={auction.startingPrice}
+                onSubmitBid={handleBidSubmit}
             />
         </div>
     );

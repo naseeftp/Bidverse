@@ -20,7 +20,7 @@ interface TimeLeft {
     seconds: number;
 }
 
-const AuctionCard: React.FC<AuctionCardProps> = ({ item,onBidSuccess}) => {
+const AuctionCard: React.FC<AuctionCardProps> = ({ item, onBidSuccess }) => {
     const primaryImage = item.images?.find(img => img.isPrimary) || item.images?.[0];
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
@@ -34,7 +34,7 @@ const AuctionCard: React.FC<AuctionCardProps> = ({ item,onBidSuccess}) => {
     const [isWatched, setIsWatched] = useState<boolean>(false);
     const [isLoading, setIsLoading] = useState<boolean>(false);
 
-    const [isBidModalOpen,setBidModalOpen]=useState(false);
+    const [isBidModalOpen, setBidModalOpen] = useState(false);
 
     const handleWatchlistAction = async (e: React.MouseEvent<HTMLButtonElement>) => {
         e.stopPropagation();
@@ -55,19 +55,19 @@ const AuctionCard: React.FC<AuctionCardProps> = ({ item,onBidSuccess}) => {
             setIsLoading(false);
         }
     };
-    const handleBidSubmit=async(bidAmount:number)=>{
+    const handleBidSubmit = async (bidAmount: number) => {
         try {
-            const response=await bidService.placeBid({
-                tenantId:item.auctionHouseId,
-                auctionId:item.auctionItemId,
-                amount:bidAmount.toString()
+            const response = await bidService.placeBid({
+                tenantId: item.auctionHouseId,
+                auctionId: item.auctionItemId,
+                amount: bidAmount.toString()
             })
-            if(response?.success&&response.data){
+            if (response?.success && response.data) {
                 toast.success(response.message)
                 onBidSuccess?.()  // Trigger re-fetch in parent component
             }
-            else{
-                toast.error(response?.message??'')
+            else {
+                toast.error(response?.message ?? '')
             }
         } catch {
             toast.error('failed to place bid')
@@ -132,7 +132,7 @@ const AuctionCard: React.FC<AuctionCardProps> = ({ item,onBidSuccess}) => {
 
     return (
         <div className="bg-white border border-[#E6E0DA] rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-200 flex flex-col w-full max-w-[360px] mx-auto group">
-        <div className="relative aspect-[21/9] bg-[#FFF9F4] overflow-hidden border-b border-[#E6E0DA]/40">
+            <div className="relative aspect-[21/9] bg-[#FFF9F4] overflow-hidden border-b border-[#E6E0DA]/40">
                 {primaryImage?.url ? (
                     <img
                         src={primaryImage.url}
@@ -180,7 +180,7 @@ const AuctionCard: React.FC<AuctionCardProps> = ({ item,onBidSuccess}) => {
                                             Current Highest Bid
                                         </span>
                                         <span className="text-xs font-black text-[#C9653B] truncate">
-                                            {item.currentHighestBid >0 ? `${item.currentHighestBid.toLocaleString()}` : "No Bids"}
+                                            {item.currentHighestBid > 0 ? `${item.currentHighestBid.toLocaleString()}` : "No Bids"}
                                         </span>
                                     </div>
 
@@ -236,7 +236,7 @@ const AuctionCard: React.FC<AuctionCardProps> = ({ item,onBidSuccess}) => {
                 <div className="flex flex-col gap-1.5 pt-2 border-t border-[#E6E0DA]/50">
                     {item.type === 'TIMED' ? (
                         <button
-                            onClick={()=>setBidModalOpen(true)}
+                            onClick={() => setBidModalOpen(true)}
                             disabled={timerLabel === "CONCLUDED" || timerLabel === 'STARTS IN'}
                             className="w-full bg-[#C9653B] hover:bg-[#C9653B]/90 text-white font-bold text-[11px] py-1.5 rounded-md transition-colors shadow-sm focus:outline-none disabled:bg-[#E6E0DA] disabled:text-[#6B6B6B] disabled:cursor-not-allowed"
                         >
@@ -274,13 +274,13 @@ const AuctionCard: React.FC<AuctionCardProps> = ({ item,onBidSuccess}) => {
 
             </div>
             <PlaceBidModal
-             isOpen={isBidModalOpen}
-             onClose={()=>setBidModalOpen(false)}
-             auctionName={item.auctionName}
-             currentHighestBid={item.currentHighestBid||0}
-             minimumBidIncrement={item.minimumIncrement}
-             startingPrice={item.startingPrice}
-             onSubmitBid={handleBidSubmit}
+                isOpen={isBidModalOpen}
+                onClose={() => setBidModalOpen(false)}
+                auctionName={item.auctionName}
+                currentHighestBid={item.currentHighestBid || 0}
+                minimumBidIncrement={item.minimumIncrement}
+                startingPrice={item.startingPrice}
+                onSubmitBid={handleBidSubmit}
             />
         </div>
     );
