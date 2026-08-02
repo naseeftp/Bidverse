@@ -21,8 +21,11 @@ import watchListService from "../services/watchList.service";
 import { useAppDispatch } from "../hooks/redux.hooks";
 import { incrementWatchlistCount } from "../redux/user/auth.slice";
 import chatService from "../services/chat.service";
+import PlaceBidModal from "../components/user/placeBid.modal";
+import bidService from "../services/bid.service";
 
-const PublicAuctionDetailPage: React.FC = () => {
+
+const PublicAuctionDetailPage: React.FC = (onBidSuccess) => {
     const { itemId } = useParams<{ itemId: string }>();
     const navigate = useNavigate();
     const dispatch = useAppDispatch()
@@ -38,6 +41,8 @@ const PublicAuctionDetailPage: React.FC = () => {
     const [isWatched, setIsWathed] = useState<boolean>(false);
     const [isWatchlistLoading, setIsWatchlistLoading] = useState<boolean>(false)
     const [isChatLoading, setIsChatLoading] = useState<boolean>(false)
+
+    const [isBidModalOpen,setBidModalOpen]=useState<boolean>(false)
 
     const fetchAuctionDetail = useCallback(async () => {
         if (!itemId) return;
@@ -83,7 +88,29 @@ const PublicAuctionDetailPage: React.FC = () => {
             setIsChatLoading(false)
         }
     }
+    
+    const handleBidSubmit=async (bidAmount:number)=>{
+         if(!auction?.auctionItemId||!auction.auctionHouse.id){
+            return
+         }
+         try {
+            const response=await bidService.placeBid({
+                tenantId:auction?.auctionHouse.id,
+                auctionId:auction?.auctionItemId,
+                amount:bidAmount.toString()
+            })
+            if(response?.success&&response.data){
+                 toast.success(response.message)
+                 window.location.reload()
+             }
+            else{
+                toast.error(response?.message!)
+            }
+        } catch {
+            toast.error('failed to place Bid')
+        }
 
+    }
     const handleWatchlistAction = async (e: React.MouseEvent<HTMLButtonElement>) => {
         e.stopPropagation();
         if (isWatchlistLoading) return;
@@ -307,7 +334,14 @@ const PublicAuctionDetailPage: React.FC = () => {
                                 <p className="text-base font-black text-[#1F1F1F] mt-1">
                                     {auction.currency || "INR"} {auction.startingPrice?.toLocaleString()}
                                 </p>
+                                 <span className="text-[9px] uppercase font-bold text-[#6B6B6B] tracking-widest flex items-center gap-1">
+                                    <FaCoins className="text-[#C9653B]" />currentHighestBid
+                                </span>
+                                <p className="text-base font-black text-[#1F1F1F] mt-1">
+                                    {auction.currency || "INR"} {auction.currentHighestBid?.toLocaleString()}
+                                </p>
                             </div>
+
                             <div className="flex flex-col justify-end">
                                 <button
                                     disabled={isChatLoading}
@@ -324,6 +358,7 @@ const PublicAuctionDetailPage: React.FC = () => {
                             {auction.type === 'TIMED' ? (
                                 <button
                                     disabled={timerLabel === "CONCLUDED" || timerLabel === 'STARTS IN'}
+                                    onClick={()=>setBidModalOpen(true)}
                                     className="w-full bg-[#C9653B] hover:bg-[#C9653B]/90 text-white font-bold text-xs uppercase tracking-wider py-3 rounded-lg transition-all shadow-sm focus:outline-none disabled:bg-[#E6E0DA] disabled:text-[#6B6B6B] disabled:cursor-not-allowed transform active:scale-[0.99]"
                                 >
                                     {timerLabel === 'ENDS IN' ? 'Place Bid' : 'Awaiting Bidding Window'}
@@ -451,6 +486,15 @@ const PublicAuctionDetailPage: React.FC = () => {
 
                 </div>
             </div>
+            <PlaceBidModal
+            isOpen={isBidModalOpen}
+            onClose={()=>setBidModalOpen(false)}
+            auctionName={auction.title}
+            currentHighestBid={auction.currentHighestBid}
+            minimumBidIncrement={auction.minimumIncrement}
+            startingPrice={auction.startingPrice}
+            onSubmitBid={handleBidSubmit}
+            />
         </div>
     );
 };

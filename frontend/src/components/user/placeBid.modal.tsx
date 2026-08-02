@@ -8,7 +8,7 @@ interface PlaceBidProps {
     currentHighestBid: number;
     minimumBidIncrement: number;
     startingPrice?: number;
-    onSubmitBid: (amount: number) => Promise<void>
+    onSubmitBid?: (amount: number) => Promise<void>
 }
 
 const PlaceBidModal: React.FC<PlaceBidProps> = ({
@@ -61,7 +61,7 @@ const PlaceBidModal: React.FC<PlaceBidProps> = ({
         }
         try {
             setIsSubmitting(true);
-            await onSubmitBid(bidAmount);
+            await onSubmitBid?.(bidAmount);
             onClose()
         } catch {
             toast.error("Failed to place bid. Please try again.");

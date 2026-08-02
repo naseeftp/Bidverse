@@ -65,8 +65,7 @@ const AuctionCard: React.FC<AuctionCardProps> = ({ item,onBidSuccess}) => {
             if(response?.success&&response.data){
                 toast.success(response.message)
                 onBidSuccess?.()  // Trigger re-fetch in parent component
-                
-             }
+            }
             else{
                 toast.error(response?.message??'')
             }

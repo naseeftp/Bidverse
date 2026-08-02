@@ -136,6 +136,7 @@ export class AuctionItemRepository extends BaseRepository<IAuctionItemDocument> 
                     startingPrice: 1,
                     reservePrice: 1,
                     minimumIncrement: 1,
+                    currentHighestBid:1,
                     buyerPremiumPercent: 1,
                     shippingCost: 1,
                     shippingTerms: 1,

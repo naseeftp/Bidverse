@@ -195,6 +195,7 @@ export interface AuctionItemDetailDTO {
     startingPrice: number;
     reservePrice: number;
     minimumIncrement: number;
+    currentHighestBid: number;
     buyerPremiumPercent: number;
     shippingCost: number;
     shippingTerms: string;
