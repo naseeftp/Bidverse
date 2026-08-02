@@ -1,82 +1,80 @@
-import React, { useState,useEffect} from "react";
+import React, { useState, useEffect } from "react";
 import toast from "react-hot-toast";
 
-interface PlaceBidProps{
-    isOpen:boolean;
-    onClose:()=>void;
-    auctionName:string;
-    currentHighestBid:number;
-    minimumBidIncrement:number;
-    startingPrice?:number;
-    onSubmitBid:(amount:number)=>Promise<void>
+interface PlaceBidProps {
+    isOpen: boolean;
+    onClose: () => void;
+    auctionName: string;
+    currentHighestBid: number;
+    minimumBidIncrement: number;
+    startingPrice?: number;
+    onSubmitBid: (amount: number) => Promise<void>
 }
 
-const PlaceBidModal:React.FC<PlaceBidProps>=({
-isOpen,
-onClose,
-auctionName,
-currentHighestBid,
-minimumBidIncrement,
-startingPrice,
-onSubmitBid
-})=>{
+const PlaceBidModal: React.FC<PlaceBidProps> = ({
+    isOpen,
+    onClose,
+    auctionName,
+    currentHighestBid,
+    minimumBidIncrement,
+    startingPrice,
+    onSubmitBid
+}) => {
 
-const hasbids=currentHighestBid>0;
-const basePrice=hasbids?currentHighestBid:startingPrice;
-const requireMinBid=basePrice!+minimumBidIncrement;
+    const hasbids = currentHighestBid > 0;
+    const basePrice = hasbids ? currentHighestBid : startingPrice;
+    const requireMinBid = basePrice! + minimumBidIncrement;
 
-const [bidAmount,setBidAmount]=useState<number>(requireMinBid);
-const [isSubmitting,setIsSubmitting]=useState<boolean>(false);
-const [errorMessage,setErrorMessage]=useState<string>('')
+    const [bidAmount, setBidAmount] = useState<number>(requireMinBid);
+    const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+    const [errorMessage, setErrorMessage] = useState<string>('')
 
-useEffect(()=>{
-  if(isOpen){
-    setBidAmount(requireMinBid);
-    setErrorMessage('')
-  }
-},[isOpen,requireMinBid])
-if(!isOpen) return null;
+    useEffect(() => {
+        if (isOpen) {
+            setBidAmount(requireMinBid);
+            setErrorMessage('')
+        }
+    }, [isOpen, requireMinBid])
+    if (!isOpen) return null;
 
-const handleInputChange=(e:React.ChangeEvent<HTMLInputElement>)=>{
-    const value=parseFloat(e.target.value);
-    setBidAmount(value);
-    if(isNaN(value)||value<requireMinBid){
-        setErrorMessage(`Minimum Require bid is ${requireMinBid.toLocaleString()}`)
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const value = parseFloat(e.target.value);
+        setBidAmount(value);
+        if (isNaN(value) || value < requireMinBid) {
+            setErrorMessage(`Minimum Require bid is ${requireMinBid.toLocaleString()}`)
+        }
+        else {
+            setErrorMessage('');
+        }
     }
-    else{
-        setErrorMessage('');
+    const handlePresetAdd = (multiplier: number) => {
+        const newBid = requireMinBid + minimumBidIncrement * (multiplier - 1);
+        setBidAmount(newBid);
+        setErrorMessage('')
     }
-}
-const handlePresetAdd=(multiplier:number)=>{
-    const newBid=requireMinBid+minimumBidIncrement*(multiplier-1);
-    setBidAmount(newBid);
-    setErrorMessage('')
-}
-const handleSubmit=async (e:React.FormEvent)=>{
-    e.preventDefault();
-    if(isNaN(bidAmount)||bidAmount<requireMinBid){
-      setErrorMessage(`Your bid must be at least $${requireMinBid.toLocaleString()}`); 
-      toast.error("Bid amount is below the required minimum!");
-      return 
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (isNaN(bidAmount) || bidAmount < requireMinBid) {
+            setErrorMessage(`Your bid must be at least $${requireMinBid.toLocaleString()}`);
+            toast.error("Bid amount is below the required minimum!");
+            return
+        }
+        try {
+            setIsSubmitting(true);
+            await onSubmitBid(bidAmount);
+            onClose()
+        } catch {
+            toast.error("Failed to place bid. Please try again.");
+        } finally {
+            setIsSubmitting(false)
+        }
     }
-    try {
-        setIsSubmitting(true);
-        await onSubmitBid(bidAmount);
-        toast.success('Bid placed successfully');
-        onClose()
-    } catch{
-       toast.error("Failed to place bid. Please try again."); 
-    }finally{
-        setIsSubmitting(false)
-    }
-}
-return (
+    return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
-            <div 
+            <div
                 className="bg-white border border-[#E6E0DA] rounded-2xl w-full max-w-md overflow-hidden shadow-2xl transition-all"
                 onClick={(e) => e.stopPropagation()}
             >
-                {/* Header */}
                 <div className="bg-[#FFF9F4] px-5 py-4 border-b border-[#E6E0DA]/60 flex items-center justify-between">
                     <div>
                         <span className="text-[9px] uppercase font-bold tracking-wider text-[#C9653B]">
@@ -150,7 +148,7 @@ return (
                             <span>Your Bid Amount ($)</span>
                             <span className="text-[#C9653B]">Min: ${requireMinBid.toLocaleString()}</span>
                         </label>
-                        
+
                         <div className="relative flex items-center">
                             <span className="absolute left-3 text-sm font-bold text-[#6B6B6B]">
                                 $
@@ -162,11 +160,10 @@ return (
                                 value={isNaN(bidAmount) ? "" : bidAmount}
                                 onChange={handleInputChange}
                                 placeholder={`Enter amount >= ${requireMinBid}`}
-                                className={`w-full pl-7 pr-3 py-2 bg-white border ${
-                                    errorMessage 
-                                        ? "border-red-500 focus:ring-2 focus:ring-red-200" 
+                                className={`w-full pl-7 pr-3 py-2 bg-white border ${errorMessage
+                                        ? "border-red-500 focus:ring-2 focus:ring-red-200"
                                         : "border-[#E6E0DA] focus:border-[#C9653B] focus:ring-2 focus:ring-[#C9653B]/20"
-                                } rounded-xl text-sm font-bold text-[#1F1F1F] outline-none transition-all shadow-sm`}
+                                    } rounded-xl text-sm font-bold text-[#1F1F1F] outline-none transition-all shadow-sm`}
                             />
                         </div>
 

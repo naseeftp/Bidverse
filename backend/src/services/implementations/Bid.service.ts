@@ -23,12 +23,17 @@ export class BidService implements IBidService {
         if(!auctionExist){
             throw new NotFoundError(MESSAGES.AUCTION_NOT_FOUND)
         };
+        
         const result=await this._bidRepo.create({
             tenantId:new Types.ObjectId(data.tenantId),
             bidAmount:Number(data.amount),
             auctionId:new Types.ObjectId(data.auctionId),
             bidderId:new Types.ObjectId(userId)
         })
+        auctionExist.currentHighestBid=Number(data.amount);
+        auctionExist.currentHighestBidder=new Types.ObjectId(data.auctionId)
+        await auctionExist.save()
+
         return BidMapper.toBidResponseDTO(result)
     }
 }   

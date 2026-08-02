@@ -10,6 +10,7 @@ import bidService from "../../services/bid.service";
 
 interface AuctionCardProps {
     item: AuctionItemListDTO;
+    onBidSuccess?: () => void; //call back prop
 }
 
 interface TimeLeft {
@@ -19,7 +20,7 @@ interface TimeLeft {
     seconds: number;
 }
 
-const AuctionCard: React.FC<AuctionCardProps> = ({ item }) => {
+const AuctionCard: React.FC<AuctionCardProps> = ({ item,onBidSuccess}) => {
     const primaryImage = item.images?.find(img => img.isPrimary) || item.images?.[0];
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
@@ -63,7 +64,9 @@ const AuctionCard: React.FC<AuctionCardProps> = ({ item }) => {
             })
             if(response?.success&&response.data){
                 toast.success(response.message)
-            }
+                onBidSuccess?.()  // Trigger re-fetch in parent component
+                
+             }
             else{
                 toast.error(response?.message??'')
             }
