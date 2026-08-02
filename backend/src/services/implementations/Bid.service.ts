@@ -34,6 +34,9 @@ export class BidService implements IBidService {
         auctionExist.currentHighestBidder=new Types.ObjectId(data.auctionId)
         await auctionExist.save()
 
-        return BidMapper.toBidResponseDTO(result)
+        await this._bidRepo.makeOutBid(result._id,data.auctionId)
+        
+        const mappedResutl= BidMapper.toBidResponseDTO(result)
+        return mappedResutl
     }
 }   
