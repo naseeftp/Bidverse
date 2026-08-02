@@ -6,7 +6,9 @@ export const BASE_ROUTES = {
     PUBLIC: '/public',
     AUCTION_ITEM: '/auction-item',
     WATCH_LIST: '/watch-list',
-    CHAT: '/chat'
+    CHAT: '/chat',
+    BID: '/bid'
+
 
 }
 export const AUTH_ROUTES = {
@@ -85,5 +87,9 @@ export const CHAT_ROUTES = {
     MARK_AS_READED: '/mark-readed',
     UNREAD_COUNT: '/unread-conv-count',
     UPLOAD_AUDIO: '/upload-audio',
-    UPLOAD_IMAGE:'/upload-image'
+    UPLOAD_IMAGE: '/upload-image'
+}
+
+export const BID_ROUTES = {
+    PLACE_BID: '/place-bid',
 }

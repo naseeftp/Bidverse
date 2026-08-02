@@ -86,6 +86,14 @@ const AuctionItemSchema = new Schema<IAuctionItemDocument>({
         type: Types.ObjectId,
         ref: 'User'
     },
+    reserveMet: {
+    type: Boolean,
+    default: false
+    },
+    bidCount:{
+        type:Number,
+        default:0
+    },
     startTime: {
         type: Date,
         required: true,

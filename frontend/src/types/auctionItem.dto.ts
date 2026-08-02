@@ -167,7 +167,9 @@ export interface AuctionItemListDTO {
     type: AuctionType;
     startTime: string;
     endTime: string;
-    startingPrice: number
+    startingPrice: number;
+    currentHighestBid: number;
+    minimumIncrement: number;
     images: {
         id: string;
         url: string;
@@ -209,7 +211,7 @@ export interface AuctionItemDetailDTO {
     auctionHouse: {
         id: string;
         name: string;
-        ownerId:string,
+        ownerId: string,
         yearEstablished: number;
         briefDescription: string;
         categories: string[];

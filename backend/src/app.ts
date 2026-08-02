@@ -19,6 +19,7 @@ import publicAuctionRoutes from './routes/public.routes'
 import auctionItemRoutes from './routes/auctionItem.routes'
 import WatchlistRoutes from './routes/watchlist.routes'
 import ChatRoutes from './routes/chat.routes'
+import BidRoutes from './routes/bid.routes'
 
 import { LoggerService } from "./services/implementations/Logger.service";
 
@@ -49,6 +50,7 @@ app.use(BASE_ROUTES.PUBLIC, publicAuctionRoutes)
 app.use(BASE_ROUTES.AUCTION_ITEM, auctionItemRoutes)
 app.use(BASE_ROUTES.WATCH_LIST, WatchlistRoutes)
 app.use(BASE_ROUTES.CHAT, ChatRoutes)
+app.use(BASE_ROUTES.BID, BidRoutes)
 
 app.use(errorHandler);
 const startServer = async () => {

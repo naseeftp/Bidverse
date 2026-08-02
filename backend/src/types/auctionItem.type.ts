@@ -33,6 +33,8 @@ export interface IAuctionItem {
 
   currentHighestBidder?: Types.ObjectId;
   winningBidder?: Types.ObjectId;
+  bidCount:number;
+  reserveMet:boolean,
 
   startTime: Date;
   endTime: Date;

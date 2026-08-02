@@ -164,6 +164,8 @@ export const MESSAGES = {
     MESSAGE_READED:'Message readed',
     ACTION_SUCCESS:'Action currently doing is success',
 
+    BID_PLACED:'Bid placed Successfully',
+
     LOGOUT_SUCCESS: "Logout success",
     LOGOUT_FAILED: "Logout failed",
 
@@ -194,6 +196,15 @@ export enum MessageType {
     AUDIO = 'audio',
     FILE = 'file'
 }
+
+export enum BidStatus{
+    ACTIVE='active',
+    OUTBID='outbid',
+    WINNING='winning',
+    WON='won',
+    CANCELLED='cancelled',
+}
+export const BidStatusValues=Object.values(BidStatus)
 
 export const MESSAGE_TIME_CONFIG = {
     MAX_DELETE_WINDOW: 15 * 60 * 1000,
