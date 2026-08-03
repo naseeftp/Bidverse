@@ -1,4 +1,3 @@
-import { data } from "react-router-dom";
 import axiosInstance from "../api/axios.instance";
 import { BASE_ROUTES, BID_ROUTES } from "../constants/api.constant";
 import type { ApiResponse, IPaginationMeta } from "../types/auth.type";

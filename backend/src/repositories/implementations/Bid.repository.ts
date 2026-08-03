@@ -31,13 +31,7 @@ export class BidRepository extends BaseRepository<IBidDocument> implements IBidR
                 bidderId: new Types.ObjectId(userId)
             }
         })
-        if (status) {
-            pipeline.push({
-                $match: {
-                    status: status
-                }
-            })
-        }
+      
         pipeline.push({
             $sort: { createdAt: -1 }
         })
@@ -56,9 +50,9 @@ export class BidRepository extends BaseRepository<IBidDocument> implements IBidR
         pipeline.push({
             $lookup: {
                 from: 'auctionitems',
-                localField: 'auctionid',
+                localField: 'auctionId',
                 foreignField: '_id',
-                as: 'auctio'
+                as: 'auction'
             }
         },
             {
@@ -71,7 +65,7 @@ export class BidRepository extends BaseRepository<IBidDocument> implements IBidR
         pipeline.push(
             {
                 $lookup: {
-                    from: "auctionhouses", 
+                    from: "auctionhouses",
                     localField: "tenantId",
                     foreignField: "_id",
                     as: "house"
@@ -84,6 +78,24 @@ export class BidRepository extends BaseRepository<IBidDocument> implements IBidR
                 }
             }
         );
+        if (search && search.trim() !== "") {
+            const searchRegex = { $regex: search.trim(), $options: "i" };
+            pipeline.push({
+                $match: {
+                    $or: [
+                        { "auction.title": searchRegex },
+                        { "house.name": searchRegex }
+                    ]
+                }
+            });
+        }
+        if (status) {
+            pipeline.push({
+                $match: {
+                    status: status
+                }
+            })
+        }
         pipeline.push({
             $facet: {
                 data: [
@@ -114,9 +126,9 @@ export class BidRepository extends BaseRepository<IBidDocument> implements IBidR
             }
         });
 
-        const results=await mongoose.model('Bid').aggregate(pipeline)
+        const results = await mongoose.model('Bid').aggregate(pipeline)
         return {
-            docs:(results[0]?.data||[]) as myBidListDTO[],
+            docs: (results[0]?.data || []) as myBidListDTO[],
             total: results[0]?.totalCount[0]?.count || 0
         }
     }

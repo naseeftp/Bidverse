@@ -30,6 +30,7 @@ import Dashboard from "./pages/users/Dashboard";
 import AddressPage from "./pages/users/AddressPage";
 import WatchlistPage from "./pages/users/WatchlistPage";
 import ChatPage from "./pages/users/chatPage";
+import MyBidsPage from "./pages/users/myBids.page";
 
 import TenantRegisterPage from "./pages/tenant/RegiterPage";
 import TenantVerifyOtpPage from "./pages/tenant/VerifyotpPage";
@@ -63,7 +64,7 @@ import AdminChatPage from "./pages/admin/chatPage";
 import { useSocketSync } from "./hooks/useSocketSync";
 
 function App() {
-useSocketSync()
+   useSocketSync()
 
    return (
       <Router>
@@ -95,7 +96,7 @@ useSocketSync()
                   <Route path="/change-email" element={<ChangeEmailPage />} />
                   <Route path="/change-email-verify" element={<ChangeEmailVerifyPage />} />
                   <Route path="/watch-list" element={<WatchlistPage />} />
-                  
+
 
                </Route>
             </Route>
@@ -104,7 +105,7 @@ useSocketSync()
                <Route element={<ProtectedRoute allowedRoles={['user']} />}>
                   <Route path="/dashboard" element={<Dashboard />} />
                   <Route path="/addresses" element={<AddressPage />} />
-
+                  <Route path="/my-bids" element={<MyBidsPage />} />
                </Route>
             </Route>
             <Route path="/chat" element={<ChatPage />} />
@@ -138,7 +139,7 @@ useSocketSync()
                </Route>
 
             </Route>
-            <Route path="/admin/chat" element={<AdminChatPage/>} />
+            <Route path="/admin/chat" element={<AdminChatPage />} />
             <Route element={<AdminLayout />}>
                <Route element={<PublicRoute />}>
                   <Route path="/admin" element={<AdminLoginPage />} />

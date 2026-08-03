@@ -21,7 +21,7 @@ export class BidController implements IBidController {
     try {
       const userId = req.user.id;
       const page = Number(req.query.page);
-      const limit = Number(req.query.number);
+      const limit = Number(req.query.limit);
       const status = req.query.status as string;
       const search = req.query.search as string;
       const result = await this._bidService.getUserBids(userId, page, limit, status, search)

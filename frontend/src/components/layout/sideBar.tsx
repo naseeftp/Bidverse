@@ -3,7 +3,7 @@ import React from 'react';
 
 const Sidebar: React.FC = () => {
   const menuItems = [
-    { name: 'My Bids', icon: Hammer, path: '/bids' },
+    { name: 'My Bids', icon: Hammer, path: '/my-bids' },
     { name: 'Orders', icon: ShoppingBag, path: '/orders' },
     { name: 'Addresses', icon: MapPin, path: '/addresses' },
     { name: 'Profile', icon: User, path: '/profile' },
