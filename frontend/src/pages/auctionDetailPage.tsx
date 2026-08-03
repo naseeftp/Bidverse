@@ -377,7 +377,6 @@ const PublicAuctionDetailPage: React.FC = () => {
                         </div>
 
                         <div className="border border-[#E6E0DA] rounded-xl p-4 bg-white shadow-sm space-y-4">
-                            {/* Highest Bid Section */}
                             <div className="p-3 bg-[#FFF9F4] rounded-lg border border-[#E6E0DA]">
                                 <div className="flex justify-between items-center mb-1">
                                     <span className="text-[9px] uppercase font-bold text-[#6B6B6B] tracking-widest flex items-center gap-1">
@@ -417,7 +416,6 @@ const PublicAuctionDetailPage: React.FC = () => {
                             </div>
                         </div>
                         <div className="flex flex-col gap-2.5 pt-1">
-                            {/* Primary Bidding Action */}
                             {auction.type === 'TIMED' ? (
                                 <button
                                     disabled={timerLabel === "CONCLUDED" || timerLabel === 'STARTS IN'}
@@ -435,7 +433,6 @@ const PublicAuctionDetailPage: React.FC = () => {
                                 </button>
                             )}
 
-                            {/* Secondary Actions Row: Watchlist & Enquiry */}
                             <div className="grid grid-cols-2 gap-2">
                                 <button
                                     onClick={handleWatchlistAction}

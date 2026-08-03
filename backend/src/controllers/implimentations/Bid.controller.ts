@@ -11,9 +11,21 @@ export class BidController implements IBidController {
   async placdBid(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const userId = req.user.id;
-      // const { data } = req.body;
       const result = await this._bidService.placceBid(userId, req.body)
       SuccessResponse(res, MESSAGES.BID_PLACED, result, HttpStatus.OK)
+    } catch (error) {
+      next(error)
+    }
+  }
+  async getUserBids(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const userId = req.user.id;
+      const page = Number(req.query.page);
+      const limit = Number(req.query.number);
+      const status = req.query.status as string;
+      const search = req.query.search as string;
+      const result = await this._bidService.getUserBids(userId, page, limit, status, search)
+      SuccessResponse(res, MESSAGES.ACTION_SUCCESS, result, HttpStatus.OK)
     } catch (error) {
       next(error)
     }

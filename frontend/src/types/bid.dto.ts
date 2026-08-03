@@ -9,3 +9,13 @@ export interface bidResponseDTO{
     bidAmount:string,
     placedAt:Date
 }
+
+export interface myBidListDTO {
+    auctionImage: string;
+    auctionTitle: string;
+    auctionHouseName: string;
+    myLastBidAmount: number;
+    currentHighestBid: number;
+    myBidStatus: string;
+    endTime?: Date;
+}

@@ -13,4 +13,9 @@ router.post(
     allowedTo(Role.USER),
     (req, res, next) => bidController.placdBid(req, res, next)
 )
-export default router;
+router.get(
+    BID_ROUTES.MY_BIDS,
+    allowedTo(Role.USER),
+    (req, res, next) => bidController.getUserBids(req, res, next)
+)
+export default router; 
