@@ -11,6 +11,7 @@ export interface bidResponseDTO{
 }
 
 export interface myBidListDTO {
+    auctionId:string;
     auctionImage: string;
     auctionTitle: string;
     auctionHouseName: string;
@@ -19,3 +20,13 @@ export interface myBidListDTO {
     myBidStatus: string;
     endTime?: Date;
 }
+
+export const BidStatus = {
+    ACTIVE: "active",
+    OUTBID: "outbid",
+    WINNING: "winning",
+    WON: "won",
+    CANCELLED: "cancelled"
+} as const;
+
+export type BidStatus = typeof BidStatus[keyof typeof BidStatus];

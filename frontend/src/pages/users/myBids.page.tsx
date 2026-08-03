@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 import type { myBidListDTO } from "../../types/bid.dto";
 import type { IPaginationMeta } from "../../types/auth.type";
 import toast from "react-hot-toast";
 import bidService from "../../services/bid.service";
-import Pagination from "../../components/user/pagination"; // Adjust path to your Pagination component
+import Pagination from "../../components/user/pagination";
 import {
     FaSearch,
     FaTrophy,
@@ -11,29 +12,39 @@ import {
     FaCheckCircle,
     FaTimesCircle,
     FaStore,
-    FaGavel
+    FaGavel,
+    FaExternalLinkAlt,
+    FaFilter
 } from "react-icons/fa";
-
-export enum BidStatus {
-    ACTIVE = "active",
-    OUTBID = "outbid",
-    WINNING = "winning",
-    WON = "won",
-    CANCELLED = "cancelled"
-}
+import { BidStatus } from "../../types/bid.dto";
+import CountdownTimer from "../../components/user/countDownTimer";
 
 const MyBidsPage: React.FC = () => {
+    const navigate = useNavigate();
     const [bids, setBids] = useState<myBidListDTO[]>([]);
     const [pagination, setPagination] = useState<IPaginationMeta | null>(null);
     const [page, setPage] = useState<number>(1);
+
     const [search, setSearch] = useState<string>("");
+    const [debouncedSearch, setDebouncedSearch] = useState<string>("");
+
     const [statusFilter, setStatusFilter] = useState<string>("");
     const [loading, setLoading] = useState<boolean>(false);
+
+
+    useEffect(() => {
+        const handler = setTimeout(() => {
+            setDebouncedSearch(search);
+            setPage(1);
+        }, 300);
+
+        return () => clearTimeout(handler);
+    }, [search]);
 
     const fetchBids = useCallback(async () => {
         setLoading(true);
         try {
-            const response = await bidService.getUserBids(page, 6, statusFilter, search);
+            const response = await bidService.getUserBids(page, 6, statusFilter, debouncedSearch);
             if (response.success && response.data) {
                 setBids(response.data ?? []);
                 setPagination(response.pagination ?? null);
@@ -43,7 +54,7 @@ const MyBidsPage: React.FC = () => {
         } finally {
             setLoading(false);
         }
-    }, [page, statusFilter, search]);
+    }, [page, statusFilter, debouncedSearch]);
 
     useEffect(() => {
         fetchBids();
@@ -52,33 +63,40 @@ const MyBidsPage: React.FC = () => {
     const renderStatusBadge = (status: string) => {
         const normalized = status?.toLowerCase();
         switch (normalized) {
+            case BidStatus.ACTIVE:
+            case "active":
+                return (
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-[#FFF9F4] text-[#6B6B6B] border border-[#E6E0DA] text-[10px] font-bold uppercase tracking-wider shadow-sm">
+                        Active
+                    </span>
+                );
             case BidStatus.WINNING:
                 return (
-                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-bold uppercase tracking-wider">
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-bold uppercase tracking-wider shadow-sm">
                         <FaCheckCircle size={10} /> Winning
                     </span>
                 );
             case BidStatus.OUTBID:
                 return (
-                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-amber-50 text-amber-700 border border-amber-200 text-[10px] font-bold uppercase tracking-wider">
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-amber-50 text-amber-700 border border-amber-200 text-[10px] font-bold uppercase tracking-wider shadow-sm">
                         <FaExclamationTriangle size={10} /> Outbid
                     </span>
                 );
             case BidStatus.WON:
                 return (
-                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-[#1F1F1F] text-white border border-[#1F1F1F] text-[10px] font-bold uppercase tracking-wider">
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-[#1F1F1F] text-white border border-[#1F1F1F] text-[10px] font-bold uppercase tracking-wider shadow-sm">
                         <FaTrophy size={10} className="text-amber-400" /> Lot Won
                     </span>
                 );
             case BidStatus.CANCELLED:
                 return (
-                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-rose-50 text-rose-700 border border-rose-200 text-[10px] font-bold uppercase tracking-wider">
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-rose-50 text-rose-700 border border-rose-200 text-[10px] font-bold uppercase tracking-wider shadow-sm">
                         <FaTimesCircle size={10} /> Cancelled
                     </span>
                 );
             default:
                 return (
-                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-[#FFF9F4] text-[#6B6B6B] border border-[#E6E0DA] text-[10px] font-bold uppercase tracking-wider">
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-[#FFF9F4] text-[#6B6B6B] border border-[#E6E0DA] text-[10px] font-bold uppercase tracking-wider shadow-sm">
                         Active
                     </span>
                 );
@@ -89,7 +107,6 @@ const MyBidsPage: React.FC = () => {
         <div className="min-h-screen bg-[#FFF9F4] px-4 py-8 md:px-8 text-[#1F1F1F] font-sans antialiased">
             <div className="max-w-6xl mx-auto space-y-6">
 
-                {/* Header */}
                 <div className="border-b border-[#E6E0DA] pb-5">
                     <h1 className="text-2xl font-black uppercase tracking-tight text-[#1F1F1F]">
                         My Bids
@@ -99,52 +116,42 @@ const MyBidsPage: React.FC = () => {
                     </p>
                 </div>
 
-                {/* Search & Status Filters */}
                 <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-                    
-                    {/* Status Tabs */}
-                    <div className="bg-white border border-[#E6E0DA] p-1 rounded-xl flex flex-wrap gap-1 w-full sm:w-auto shadow-sm">
-                        {[
-                            { label: "All Bids", value: "" },
-                            { label: "Winning", value: BidStatus.WINNING },
-                            { label: "Outbid", value: BidStatus.OUTBID },
-                            { label: "Won", value: BidStatus.WON },
-                            { label: "Cancelled", value: BidStatus.CANCELLED }
-                        ].map((tab) => (
-                            <button
-                                key={tab.value}
-                                onClick={() => {
-                                    setStatusFilter(tab.value);
-                                    setPage(1); // Reset to page 1 on filter switch
-                                }}
-                                className={`px-3 py-1.5 rounded-lg text-[11px] font-bold uppercase tracking-wider transition-all ${
-                                    statusFilter === tab.value
-                                        ? "bg-[#C9653B] text-white shadow-sm"
-                                        : "text-[#6B6B6B] hover:text-[#1F1F1F]"
-                                }`}
-                            >
-                                {tab.label}
-                            </button>
-                        ))}
+
+                    <div className="relative w-full sm:w-56">
+                        <FaFilter size={10} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#6B6B6B] pointer-events-none" />
+                        <select
+                            value={statusFilter}
+                            onChange={(e) => {
+                                setStatusFilter(e.target.value);
+                                setPage(1);
+                            }}
+                            className="w-full bg-white border border-[#E6E0DA] rounded-xl pl-9 pr-8 py-2 text-xs font-bold uppercase tracking-wider text-[#1F1F1F] focus:outline-none focus:border-[#C9653B] shadow-sm appearance-none cursor-pointer transition-all"
+                        >
+                            <option value="">All Statuses</option>
+                            <option value={BidStatus.ACTIVE}>Active</option>
+                            <option value={BidStatus.WINNING}>Winning</option>
+                            <option value={BidStatus.OUTBID}>Outbid</option>
+                            <option value={BidStatus.WON}>Won</option>
+                            <option value={BidStatus.CANCELLED}>Cancelled</option>
+                        </select>
+                        <div className="absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none text-[#6B6B6B] text-[10px]">
+                            ▼
+                        </div>
                     </div>
 
-                    {/* Search Input */}
                     <div className="relative w-full sm:w-72">
                         <FaSearch size={12} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#6B6B6B]" />
                         <input
                             type="text"
                             placeholder="Search by lot title..."
                             value={search}
-                            onChange={(e) => {
-                                setSearch(e.target.value);
-                                setPage(1); // Reset page on query change
-                            }}
+                            onChange={(e) => setSearch(e.target.value)}
                             className="w-full bg-white border border-[#E6E0DA] rounded-xl pl-9 pr-4 py-2 text-xs text-[#1F1F1F] placeholder-[#6B6B6B] focus:outline-none focus:border-[#C9653B] shadow-sm transition-all"
                         />
                     </div>
                 </div>
 
-                {/* Dynamic Content Grid */}
                 {loading ? (
                     <div className="flex justify-center items-center h-64">
                         <div className="w-8 h-8 border-4 border-[#C9653B] border-t-transparent rounded-full animate-spin"></div>
@@ -166,7 +173,6 @@ const MyBidsPage: React.FC = () => {
                                     className="bg-white border border-[#E6E0DA] rounded-xl overflow-hidden shadow-sm hover:border-[#C9653B]/50 transition-all flex flex-col justify-between"
                                 >
                                     <div>
-                                        {/* Image Header */}
                                         <div className="relative h-44 bg-[#FFF9F4] border-b border-[#E6E0DA] overflow-hidden">
                                             <img
                                                 src={item.auctionImage || "/placeholder.png"}
@@ -178,7 +184,6 @@ const MyBidsPage: React.FC = () => {
                                             </div>
                                         </div>
 
-                                        {/* Lot Details */}
                                         <div className="p-4 space-y-3">
                                             <div className="space-y-1">
                                                 <h2 className="text-sm font-bold text-[#1F1F1F] line-clamp-1">
@@ -190,7 +195,6 @@ const MyBidsPage: React.FC = () => {
                                                 </p>
                                             </div>
 
-                                            {/* Bid Amount Metrics */}
                                             <div className="grid grid-cols-2 gap-2 bg-[#FFF9F4] p-3 rounded-lg border border-[#E6E0DA]">
                                                 <div>
                                                     <span className="block text-[9px] uppercase tracking-wider font-bold text-[#6B6B6B]">
@@ -205,9 +209,8 @@ const MyBidsPage: React.FC = () => {
                                                     <span className="block text-[9px] uppercase tracking-wider font-bold text-[#6B6B6B]">
                                                         Current Highest
                                                     </span>
-                                                    <span className={`text-sm font-black font-mono ${
-                                                        item.myBidStatus === BidStatus.OUTBID ? "text-amber-600" : "text-emerald-700"
-                                                    }`}>
+                                                    <span className={`text-sm font-black font-mono ${item.myBidStatus === BidStatus.OUTBID ? "text-amber-600" : "text-emerald-700"
+                                                        }`}>
                                                         ₹{item.currentHighestBid?.toLocaleString()}
                                                     </span>
                                                 </div>
@@ -215,20 +218,28 @@ const MyBidsPage: React.FC = () => {
                                         </div>
                                     </div>
 
-                                    {/* Footer End Time info */}
-                                    {item.endTime && (
-                                        <div className="px-4 py-2.5 bg-[#FFF9F4] border-t border-[#E6E0DA] flex justify-between items-center text-[10px] text-[#6B6B6B] font-medium">
-                                            <span>Ends:</span>
-                                            <span className="font-bold text-[#1F1F1F]">
-                                                {new Date(item.endTime).toLocaleDateString()} at {new Date(item.endTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                            </span>
-                                        </div>
-                                    )}
+                                    <div className="border-t border-[#E6E0DA] bg-[#FFF9F4] p-3 space-y-2">
+                                        {item.endTime && (
+                                            <div className="flex justify-between items-center text-[11px]">
+                                                <span className="text-[#6B6B6B] font-semibold text-[10px] uppercase tracking-wider">
+                                                    Time Remaining:
+                                                </span>
+                                                <CountdownTimer endTime={new Date(item.endTime).toISOString()} />
+                                            </div>
+                                        )}
+
+                                        <button
+                                            onClick={() => navigate(`/auctions/${(item as any).auctionId || item.auctionTitle}`)}
+                                            className="w-full py-2 px-3 bg-white hover:bg-[#C9653B] hover:text-white border border-[#E6E0DA] hover:border-[#C9653B] text-[#1F1F1F] text-[11px] font-bold uppercase tracking-wider rounded-lg transition-all duration-200 flex items-center justify-center gap-1.5 shadow-sm group"
+                                        >
+                                            View Auction Details
+                                            <FaExternalLinkAlt size={10} className="text-[#6B6B6B] group-hover:text-white transition-colors" />
+                                        </button>
+                                    </div>
                                 </div>
                             ))}
                         </div>
 
-                        {/* Pagination Component */}
                         <div className="mt-10">
                             <Pagination
                                 pagination={pagination}

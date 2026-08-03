@@ -12,6 +12,7 @@ export interface bidResponseDTO {
 }
 
 export interface myBidListDTO {
+    auctionId:string;
     auctionImage: string;
     auctionTitle: string;
     auctionHouseName: string;

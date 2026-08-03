@@ -89,7 +89,7 @@ export class BidRepository extends BaseRepository<IBidDocument> implements IBidR
                 }
             });
         }
-        if (status) {
+          if (status) {
             pipeline.push({
                 $match: {
                     status: status
@@ -105,6 +105,7 @@ export class BidRepository extends BaseRepository<IBidDocument> implements IBidR
                     {
                         $project: {
                             _id: 0,
+                            auctionId:'$auction._id',
                             auctionTitle: "$auction.title",
                             auctionImage: {
                                 $ifNull: [
