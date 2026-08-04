@@ -317,16 +317,23 @@ const TenantAuctionDetailPage: React.FC = () => {
                                     </div>
                                 </div>
                                 <div className="flex justify-between items-center px-1 text-xs">
+                                    <span className="text-[#6B6B6B] uppercase text-[10px] font-bold tracking-wider">Reserve Price:</span>
+                                    <span className="text-[#1F1F1F] font-bold">
+                                        {auction.currency || "INR"} {auction.reservePrice?.toLocaleString()}
+                                    </span>
+                                </div>
+                                <div className="flex justify-between items-center px-1 text-xs">
                                     <span className="text-[#6B6B6B] uppercase text-[10px] font-bold tracking-wider">Starting Price:</span>
                                     <span className="text-[#1F1F1F] font-bold">
                                         {auction.currency || "INR"} {auction.startingPrice?.toLocaleString()}
                                     </span>
                                 </div>
+
                                 {auction.bidCount > 0 ?
                                     (
                                         <button
                                             type="button"
-                                            onClick={()=>navigate(`/tenant/bid-history/${auction.auctionItemId}`)}
+                                            onClick={() => navigate(`/tenant/bid-history/${auction.auctionItemId}`)}
                                             className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-lg border border-[#E2E8F0] bg-white hover:bg-[#F5F7FB] text-[#0F172A] text-xs font-bold transition-colors shadow-sm"
                                         >
                                             <FaHistory size={12} className="text-[#2F6FED]" />

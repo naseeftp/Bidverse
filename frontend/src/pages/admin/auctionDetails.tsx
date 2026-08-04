@@ -13,7 +13,8 @@ import {
     FaTimesCircle,
     FaBan,
     FaSearchPlus,
-    FaExclamationTriangle
+    FaExclamationTriangle,
+    FaHistory
 } from "react-icons/fa";
 
 import { ValidationError } from "yup";
@@ -147,8 +148,7 @@ const AdminAuctionDetailPage: React.FC = () => {
                 `}</style>
             )}
 
-            {/* ✅ Top Scrolled Infraction Marquee Banner Row */}
-            {isHalted && (
+            -            {isHalted && (
                 <div className="max-w-7xl mx-auto mb-6 bg-[#DC2626] border border-[#B91C1C] rounded-xl shadow-md overflow-hidden relative group">
                     <div className="flex items-center">
                         <div className="bg-[#B91C1C] text-white px-4 py-2.5 flex items-center gap-2 text-[10px] font-black uppercase tracking-widest border-r border-[#991B1B] z-10 shadow-lg shrink-0 select-none">
@@ -226,6 +226,28 @@ const AdminAuctionDetailPage: React.FC = () => {
                             {auction.description}
                         </p>
                     </div>
+                    <div className="bg-white rounded-xl border border-[#E5E7EB] p-6 shadow-sm space-y-3">
+                        <div className="flex items-center gap-2 border-b border-[#E5E7EB] pb-2">
+                            <FaTruck className="text-[#6B7280]" size={13} />
+                            <h2 className="text-[11px] font-black uppercase tracking-widest text-[#0F172A]">
+                                Shipping Rules & Margins
+                            </h2>
+                        </div>
+                        <div className="grid grid-cols-2 gap-2 text-xs font-bold">
+                            <div>
+                                <span className="block text-[9px] uppercase tracking-wider text-[#6B7280]/50">Premium Surcharge</span>
+                                <span className="text-[#0F172A]">{auction.buyerPremiumPercent}% Flat Rate</span>
+                            </div>
+                            <div>
+                                <span className="block text-[9px] uppercase tracking-wider text-[#6B7280]/50">Dispatch Fee</span>
+                                <span className="text-[#0F172A]">{auction.currency} {auction.shippingCost}</span>
+                            </div>
+                        </div>
+                        <div className="p-3 bg-slate-50 border border-[#E5E7EB] rounded-lg text-[11px] font-medium text-[#6B7280] leading-normal">
+                            <span className="font-black text-[#0F172A] block text-[9px] uppercase tracking-wider mb-0.5">Shipping Strategy:</span>
+                            {auction.shippingTerms}
+                        </div>
+                    </div>
                 </div>
 
                 <div className="lg:col-span-5 space-y-6">
@@ -256,23 +278,66 @@ const AdminAuctionDetailPage: React.FC = () => {
                         </div>
 
 
-                        <div className="bg-[#F3F4F6] border border-[#E5E7EB] rounded-xl p-4 grid grid-cols-2 gap-4">
-                            <div>
-                                <span className="text-[9px] uppercase font-black text-[#6B7280] tracking-widest flex items-center gap-1">
-                                    <FaCoins className="text-[#D4AF37]" /> Starting Price
-                                </span>
-                                <p className="text-base font-black text-[#0F172A] mt-1">
-                                    {auction.currency} {auction.startingPrice?.toLocaleString()}
-                                </p>
+                        <div className="border border-[#E5E7EB] rounded-xl p-4 bg-white shadow-sm space-y-4">
+                            <div className="bg-[#F9FAFB] border border-[#E5E7EB] rounded-xl p-3 grid grid-cols-2 gap-4">
+                                <div>
+                                    <span className="text-[9px] uppercase font-black text-[#6B7280] tracking-widest flex items-center gap-1">
+                                        <FaCoins className="text-[#D4AF37]" /> Starting Price
+                                    </span>
+                                    <p className="text-base font-black text-[#0F172A] mt-1">
+                                        {auction.currency || "INR"} {auction.startingPrice?.toLocaleString()}
+                                    </p>
+                                </div>
+                                <div>
+                                    <span className="text-[9px] uppercase font-black text-[#6B7280] tracking-widest flex items-center gap-1">
+                                        <FaCoins className="text-[#111827]" /> Reserve Price
+                                    </span>
+                                    <p className="text-base font-black text-[#0F172A] mt-1">
+                                        {auction.currency || "INR"} {auction.reservePrice?.toLocaleString()}
+                                    </p>
+                                </div>
                             </div>
-                            <div>
-                                <span className="text-[9px] uppercase font-black text-[#6B7280] tracking-widest flex items-center gap-1">
-                                    <FaCoins className="text-[#111827]" /> Reserve Price
-                                </span>
-                                <p className="text-base font-black text-[#0F172A] mt-1">
-                                    {auction.currency} {auction.reservePrice?.toLocaleString()}
+                            <div className="p-3 bg-[#F9FAFB] rounded-lg border border-[#E5E7EB]">
+                                <div className="flex justify-between items-center mb-1">
+                                    <span className="text-[9px] uppercase font-black text-[#6B7280] tracking-widest flex items-center gap-1">
+                                        <FaCoins className="text-[#111827]" /> Current Highest Bid
+                                    </span>
+                                    <span className="text-[10px] font-bold text-[#111827] bg-white px-2 py-0.5 rounded border border-[#E5E7EB]">
+                                        {auction.bidCount || 0} {auction.bidCount === 1 ? 'Bid' : 'Bids'}
+                                    </span>
+                                </div>
+
+                                <p className="text-2xl font-black text-[#0F172A]">
+                                    {auction.currency || "INR"} {(auction.currentHighestBid || auction.startingPrice)?.toLocaleString()}
                                 </p>
+
+                                <div className="mt-2 pt-2 border-t border-[#E5E7EB] flex items-center justify-between text-xs">
+                                    <span className="text-[#6B7280] text-[10px] uppercase font-semibold">Leading Bidder</span>
+                                    {auction.highestBidder?.name ? (
+                                        <div className="flex items-center gap-1.5">
+                                            <div className="w-5 h-5 rounded-full bg-[#111827] text-white flex items-center justify-center text-[10px] font-bold uppercase">
+                                                {auction.highestBidder.name.charAt(0)}
+                                            </div>
+                                            <span className="font-bold text-[#0F172A] capitalize">
+                                                {auction.highestBidder.name}
+                                            </span>
+                                        </div>
+                                    ) : (
+                                        <span className="text-[#6B7280] italic text-[11px]">No bids placed yet</span>
+                                    )}
+                                </div>
                             </div>
+
+                            {auction.bidCount > 0 && (
+                                <button
+                                    type="button"
+                                    onClick={() => navigate(`/admin/bid-history/${auction.auctionItemId}`)}
+                                    className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-lg border border-[#E5E7EB] bg-white hover:bg-[#F9FAFB] text-[#0F172A] text-xs font-bold transition-colors shadow-sm"
+                                >
+                                    <FaHistory size={12} className="text-[#111827]" />
+                                    View Bidding History
+                                </button>
+                            )}
                         </div>
 
 
@@ -365,28 +430,7 @@ const AdminAuctionDetailPage: React.FC = () => {
                         </div>
                     )}
 
-                    <div className="bg-white rounded-xl border border-[#E5E7EB] p-6 shadow-sm space-y-3">
-                        <div className="flex items-center gap-2 border-b border-[#E5E7EB] pb-2">
-                            <FaTruck className="text-[#6B7280]" size={13} />
-                            <h2 className="text-[11px] font-black uppercase tracking-widest text-[#0F172A]">
-                                Shipping Rules & Margins
-                            </h2>
-                        </div>
-                        <div className="grid grid-cols-2 gap-2 text-xs font-bold">
-                            <div>
-                                <span className="block text-[9px] uppercase tracking-wider text-[#6B7280]/50">Premium Surcharge</span>
-                                <span className="text-[#0F172A]">{auction.buyerPremiumPercent}% Flat Rate</span>
-                            </div>
-                            <div>
-                                <span className="block text-[9px] uppercase tracking-wider text-[#6B7280]/50">Dispatch Fee</span>
-                                <span className="text-[#0F172A]">{auction.currency} {auction.shippingCost}</span>
-                            </div>
-                        </div>
-                        <div className="p-3 bg-slate-50 border border-[#E5E7EB] rounded-lg text-[11px] font-medium text-[#6B7280] leading-normal">
-                            <span className="font-black text-[#0F172A] block text-[9px] uppercase tracking-wider mb-0.5">Shipping Strategy:</span>
-                            {auction.shippingTerms}
-                        </div>
-                    </div>
+
 
                 </div>
             </div>
@@ -394,7 +438,6 @@ const AdminAuctionDetailPage: React.FC = () => {
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn">
                     <div className="bg-white w-full max-w-md rounded-2xl border border-[#E5E7EB] shadow-2xl p-6 relative overflow-hidden animate-scaleIn">
 
-                        {/* Header Area */}
                         <div className="flex items-center gap-3 mb-4">
                             <div className={`p-2.5 rounded-xl ${modalType === 'APPROVE' ? 'bg-emerald-50 text-[#16A34A]' : 'bg-red-50 text-[#DC2626]'}`}>
                                 {modalType === 'APPROVE' ? <FaCheckCircle size={20} /> : <FaExclamationTriangle size={20} />}

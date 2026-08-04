@@ -19,7 +19,7 @@ const TenantBidHistoryPage: React.FC = () => {
         if (!id) return;
         setLoading(true);
         try {
-            const result = await bidService.getBidHistory(id, page, 10);
+            const result = await bidService.getBidHistory(id, page, 6);
             if (result && result.success && result.data) {
                 setBids(result.data ?? []);
                 setPagination(result.pagination ?? null);
