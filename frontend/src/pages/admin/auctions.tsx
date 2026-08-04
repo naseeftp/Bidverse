@@ -23,7 +23,8 @@ const AdminAuctionsListPage: React.FC = () => {
         setLoading(true)
         try {
             const result = await auctionItemMangementService.listAdminAuctions(
-                1, 5, undefined,
+                page, 5,
+                search.trim() ? search : undefined,
                 statusFilter == 'all' ? undefined : statusFilter,
                 typeFilter == 'all' ? undefined : typeFilter
 
@@ -40,7 +41,7 @@ const AdminAuctionsListPage: React.FC = () => {
         } finally {
             setLoading(false)
         }
-    }, [statusFilter, typeFilter])
+    }, [statusFilter, typeFilter,page,search])
 
     useEffect(() => {
         fetchAuctions()

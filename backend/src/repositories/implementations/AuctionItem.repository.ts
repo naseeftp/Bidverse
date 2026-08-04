@@ -67,8 +67,10 @@ export class AuctionItemRepository extends BaseRepository<IAuctionItemDocument> 
         pipeline.push({
             $facet: {
                 data: [
+                    {$sort:{createdAt:-1}},
                     { $skip: skip },
                     { $limit: limit },
+                    
                     {
                         $project: {
                             _id: 0,

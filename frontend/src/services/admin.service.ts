@@ -7,7 +7,7 @@ import type { IPaginationMeta, UserResponseDTO } from "../types/auth.type";
 import type { AdminAuctionHouseDetailDTO } from '../types/auctionHouse.type'
 
 class AdminService {
-    async listAllAuctionHouses(page: number = 1, limit: number = 10, search?: string, status?: string) {
+    async listAllAuctionHouses(page: number =1, limit: number = 10, search?: string, status?: string) {
         try {
             let url = `${ADMIN_ROUTES.GET_AUCTION_HOUSES}?page=${page}&limit=${limit}`;
             if (search) {
