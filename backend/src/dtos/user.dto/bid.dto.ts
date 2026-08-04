@@ -12,7 +12,7 @@ export interface bidResponseDTO {
 }
 
 export interface myBidListDTO {
-    auctionId:string;
+    auctionId: string;
     auctionImage: string;
     auctionTitle: string;
     auctionHouseName: string;
@@ -20,4 +20,12 @@ export interface myBidListDTO {
     currentHighestBid: number;
     myBidStatus: BidStatus;
     endTime?: Date;
+}
+
+export interface bidHistoryDTO {
+    bidId: string;
+    bidderName: string;
+    bidAmount: number;
+    bidPlacedAt: Date;
+    bidStatus: BidStatus
 }

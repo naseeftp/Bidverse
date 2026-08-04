@@ -18,4 +18,9 @@ router.get(
     allowedTo(Role.USER),
     (req, res, next) => bidController.getUserBids(req, res, next)
 )
+router.get(
+    BID_ROUTES.BID_HISTORY,
+    allowedTo(Role.TENANT,Role.ADMIN),
+    (req,res,next)=>bidController.getBidHistory(req,res,next)
+)
 export default router; 

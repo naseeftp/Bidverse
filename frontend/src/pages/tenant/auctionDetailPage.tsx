@@ -326,6 +326,7 @@ const TenantAuctionDetailPage: React.FC = () => {
                                     (
                                         <button
                                             type="button"
+                                            onClick={()=>navigate(`/tenant/bid-history/${auction.auctionItemId}`)}
                                             className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-lg border border-[#E2E8F0] bg-white hover:bg-[#F5F7FB] text-[#0F172A] text-xs font-bold transition-colors shadow-sm"
                                         >
                                             <FaHistory size={12} className="text-[#2F6FED]" />

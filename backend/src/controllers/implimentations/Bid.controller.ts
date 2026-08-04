@@ -30,4 +30,15 @@ export class BidController implements IBidController {
       next(error)
     }
   }
+  async getBidHistory(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const auctionId = req.params.id as string;
+      const page = Number(req.query.page);
+      const limit = Number(req.query.limit);
+      const result = await this._bidService.getBidHistory(auctionId, page, limit)
+      SuccessResponse(res, MESSAGES.ACTION_SUCCESS, result, HttpStatus.OK)
+    } catch (error) {
+      next(error)
+    }
+  }
 }

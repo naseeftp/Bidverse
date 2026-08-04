@@ -9,11 +9,10 @@ import {
     FaFilter,
     FaLayerGroup,
     FaEye,
-    FaChevronLeft,
-    FaChevronRight,
     FaEdit,
     FaCloudUploadAlt,
 } from "react-icons/fa";
+import Pagination from "../../components/tenant/pagination";
 
 const TenantAuctions: React.FC = () => {
     const [auctions, setAuction] = useState<AuctionItemListDTO[]>([]);
@@ -246,31 +245,13 @@ const TenantAuctions: React.FC = () => {
                     </div>
                 )}
             </div>
-
-            {pagination && pagination.totalPages > 1 && (
-                <div className="max-w-7xl mx-auto mt-10 flex items-center justify-between bg-white px-6 py-4 rounded-xl border border-[#E2E8F0] shadow-sm">
-                    <p className="text-xs font-semibold text-[#475569] tracking-wide">
-                        Showing page <span className="text-[#0F172A] font-bold underline">{page}</span> of {pagination.totalPages}
-                    </p>
-
-                    <div className="flex gap-3">
-                        <button
-                            onClick={() => setPage((prev) => Math.max(1, prev - 1))}
-                            disabled={page === 1 || loading}
-                            className="inline-flex items-center gap-1.5 px-3 py-2 border border-[#E2E8F0] rounded-lg text-xs font-bold text-[#475569] hover:bg-[#F5F7FB] hover:text-[#0F172A] disabled:opacity-40 disabled:cursor-not-allowed transition-all shadow-sm"
-                        >
-                            <FaChevronLeft size={10} /> PREV
-                        </button>
-                        <button
-                            onClick={() => setPage((prev) => Math.min(pagination.totalPages, prev + 1))}
-                            disabled={page === pagination.totalPages || loading}
-                            className="inline-flex items-center gap-1.5 px-3 py-2 border border-[#E2E8F0] rounded-lg text-xs font-bold text-[#475569] hover:bg-[#F5F7FB] hover:text-[#0F172A] disabled:opacity-40 disabled:cursor-not-allowed transition-all shadow-sm"
-                        >
-                            NEXT <FaChevronRight size={10} />
-                        </button>
-                    </div>
-                </div>
-            )}
+             <Pagination
+                pagination={pagination}
+                currentPage={page}
+                onPageChange={setPage}
+                loading={loading}
+            />
+            
         </div>
     );
 };

@@ -1,9 +1,8 @@
 import axiosInstance from "../api/axios.instance";
 import { BASE_ROUTES, BID_ROUTES } from "../constants/api.constant";
 import type { ApiResponse, IPaginationMeta } from "../types/auth.type";
-import type { bidResponseDTO,myBidListDTO,placeBidDTO } from "../types/bid.dto";
+import type { bidHistoryDTO, bidResponseDTO,myBidListDTO,placeBidDTO } from "../types/bid.dto";
 import { apiErrorHandler } from "../utils/error.handle";
-
 
 export class BidService{
     async placeBid(data:placeBidDTO){
@@ -34,6 +33,22 @@ export class BidService{
         }
         } catch (error) {
         return apiErrorHandler(error,'Failed to get User Bids')
+      }
+    }
+    async getBidHistory(auctionId:string,page:number,limit:number){
+      try {
+        let url=`${BASE_ROUTES.BID}${BID_ROUTES.BID_HISTORY}/${auctionId}?page=${page}&limit=${limit}`;
+        const response=await axiosInstance.get<bidHistoryDTO,ApiResponse<{data:bidHistoryDTO[],pagination:IPaginationMeta}>>(url)
+        const paginatedResult=response.data;
+        return{
+          success:true,
+          message:response.message,
+          data:paginatedResult?.data,
+          pagination:paginatedResult?.pagination
+        }
+
+      } catch (error) {
+       return apiErrorHandler(error,'Failed to get BidHistory')
       }
     }
 

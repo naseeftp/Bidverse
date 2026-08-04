@@ -3,7 +3,7 @@ import { IBidRepository } from "../interfaces/IBid.repository";
 import { IBidDocument } from "../../types/bid.type";
 import { Bid } from '../../models/bid.model'
 import mongoose, { Types, UpdateResult, PipelineStage } from "mongoose";
-import { myBidListDTO } from "../../dtos/user.dto/bid.dto";
+import { myBidListDTO, bidHistoryDTO } from "../../dtos/user.dto/bid.dto";
 
 export class BidRepository extends BaseRepository<IBidDocument> implements IBidRepository {
     constructor() {
@@ -31,7 +31,7 @@ export class BidRepository extends BaseRepository<IBidDocument> implements IBidR
                 bidderId: new Types.ObjectId(userId)
             }
         })
-      
+
         pipeline.push({
             $sort: { createdAt: -1 }
         })
@@ -89,7 +89,7 @@ export class BidRepository extends BaseRepository<IBidDocument> implements IBidR
                 }
             });
         }
-          if (status) {
+        if (status) {
             pipeline.push({
                 $match: {
                     status: status
@@ -105,7 +105,7 @@ export class BidRepository extends BaseRepository<IBidDocument> implements IBidR
                     {
                         $project: {
                             _id: 0,
-                            auctionId:'$auction._id',
+                            auctionId: '$auction._id',
                             auctionTitle: "$auction.title",
                             auctionImage: {
                                 $ifNull: [
@@ -132,6 +132,27 @@ export class BidRepository extends BaseRepository<IBidDocument> implements IBidR
             docs: (results[0]?.data || []) as myBidListDTO[],
             total: results[0]?.totalCount[0]?.count || 0
         }
+    }
+    async getBidHistory(auctionId: string, page: number, limit: number): Promise<{ docs: bidHistoryDTO[], total: number }> {
+        const skip = (page - 1) * limit;
+        const targateAuctionId = new Types.ObjectId(auctionId)
+        const [bids, total] = await Promise.all([
+            this.model.find({ auctionId: targateAuctionId })
+                .sort({ createdAt: -1 })
+                .skip(skip)
+                .limit(limit)
+                .populate<{ bidderId: { name: string } }>('bidderId', 'name')
+                .lean(),
+            this.model.countDocuments({ auctionId: targateAuctionId })
+        ])
+        const docs: bidHistoryDTO[] = bids.map((bid) => ({
+            bidId: bid._id.toString(),
+            bidderName: bid.bidderId.name,
+            bidAmount: bid.bidAmount,
+            bidPlacedAt: bid.createdAt,
+            bidStatus: bid.status
+        }));
+        return { docs, total }
     }
 
 }

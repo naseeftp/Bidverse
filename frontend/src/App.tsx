@@ -50,6 +50,7 @@ import TenantAuctions from "./pages/tenant/myAuctions";
 import TenantAuctionDetailPage from "./pages/tenant/auctionDetailPage";
 import TenantEditAuctionPage from "./pages/tenant/updateAuctionPage";
 import TenantChatPage from "./pages/tenant/chatPage";
+import TenantBidHistoryPage from "./pages/tenant/bidHistoryPage";
 
 import AdminLoginPage from "./pages/admin/LoginPage";
 import AdminDashboard from "./pages/admin/Dashboard";
@@ -134,9 +135,9 @@ function App() {
                   <Route path="/tenant/auctions" element={<TenantAuctions />} />
                   <Route path="/tenant/auctions/:id" element={<TenantAuctionDetailPage />} />
                   <Route path="/tenant/update-auctions/:id" element={<TenantEditAuctionPage />} />
-
-
-               </Route>
+                  <Route path="/tenant/bid-history/:id" element={<TenantBidHistoryPage />} />
+                  
+              </Route>
 
             </Route>
             <Route path="/admin/chat" element={<AdminChatPage />} />

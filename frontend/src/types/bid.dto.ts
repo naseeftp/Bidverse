@@ -30,3 +30,11 @@ export const BidStatus = {
 } as const;
 
 export type BidStatus = typeof BidStatus[keyof typeof BidStatus];
+
+export interface bidHistoryDTO {
+    bidId: string;
+    bidderName: string;
+    bidAmount: number;
+    bidPlacedAt: Date;
+    bidStatus: BidStatus
+}

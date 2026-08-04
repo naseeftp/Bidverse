@@ -1,6 +1,6 @@
 import { IBidService } from "../interface/IBid.service";
 import { IBidRepository } from "../../repositories/interfaces/IBid.repository";
-import { bidResponseDTO, myBidListDTO, placeBidDTO } from "../../dtos/user.dto/bid.dto";
+import { bidResponseDTO, myBidListDTO, placeBidDTO, bidHistoryDTO } from "../../dtos/user.dto/bid.dto";
 import { IUserRepository } from "../../repositories/interfaces/iUser.repository";
 import { BadRequestError, NotFoundError } from "../../errors/AppError";
 import { AuctionItemStatus, BidStatus, MESSAGES } from "../../constants/constants";
@@ -77,20 +77,38 @@ export class BidService implements IBidService {
 
     }
     async getUserBids(userId: string, page: number, limit: number, status?: string, search?: string): Promise<IGenericPaginatedResposnse<myBidListDTO>> {
-        const userExist=await this._userRepo.findById(userId)
-        if(!userExist){
+        const userExist = await this._userRepo.findById(userId)
+        if (!userExist) {
             throw new NotFoundError(MESSAGES.USER_NOT_FOUND)
         }
-        const {docs,total}=await this._bidRepo.getUserBids(userId,page,limit,status,search)
-        return{
-            data:docs,
-            pagination:{
-                totalItems:total,
-                itemsPerPage:limit,
-                currentPage:page,
-                totalPages:Math.ceil(total/limit),
-                hasNextPage:page*limit<total,
-                hasPrevPage:page>1
+        const { docs, total } = await this._bidRepo.getUserBids(userId, page, limit, status, search)
+        return {
+            data: docs,
+            pagination: {
+                totalItems: total,
+                itemsPerPage: limit,
+                currentPage: page,
+                totalPages: Math.ceil(total / limit),
+                hasNextPage: page * limit < total,
+                hasPrevPage: page > 1
+            }
+        }
+    }
+    async getBidHistory(auctionId: string, page: number, limit: number): Promise<IGenericPaginatedResposnse<bidHistoryDTO>> {
+        const auctionExist = await this._auctionRepo.findById(auctionId);
+        if (!auctionExist) {
+            throw new NotFoundError(MESSAGES.AUCTION_NOT_FOUND)
+        }
+        const { docs, total } = await this._bidRepo.getBidHistory(auctionId, page, limit);
+        return {
+            data: docs,
+            pagination: {
+                totalItems: total,
+                itemsPerPage: limit,
+                currentPage: page,
+                totalPages: Math.ceil(total / limit),
+                hasNextPage: page * limit < total,
+                hasPrevPage: page > 1
             }
         }
     }

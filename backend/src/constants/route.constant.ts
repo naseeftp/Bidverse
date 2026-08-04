@@ -95,5 +95,6 @@ export const CHAT_ROUTES = {
 }
 export const BID_ROUTES = {
     PLACE_BID: '/place-bid',
-    MY_BIDS:'/my-bids'
+    MY_BIDS: '/my-bids',
+    BID_HISTORY: '/bid-history/:id'
 }
