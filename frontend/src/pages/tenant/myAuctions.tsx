@@ -16,51 +16,50 @@ import {
 } from "react-icons/fa";
 
 const TenantAuctions: React.FC = () => {
-    const [auctions, setAuction] = useState<AuctionItemListDTO[]>([])
-    const [pagination, setPagination] = useState<IPaginationMeta | null>(null)
+    const [auctions, setAuction] = useState<AuctionItemListDTO[]>([]);
+    const [pagination, setPagination] = useState<IPaginationMeta | null>(null);
     const [loading, setLoading] = useState(false);
-    const [page, setPage] = useState<number>(1)
+    const [page, setPage] = useState<number>(1);
     const [search, setSearch] = useState<string>("");
-    const [debouncedSearch, setDebouncedSearch] = useState<string>('')
+    const [debouncedSearch, setDebouncedSearch] = useState<string>("");
     const [statusFilter, setStatusFilter] = useState<string>("all");
-    const [typeFilter, setTypeFilter] = useState<string>('all')
-    const navigate = useNavigate()
+    const [typeFilter, setTypeFilter] = useState<string>("all");
+    const navigate = useNavigate();
 
     useEffect(() => {
         const delayHandler = setTimeout(() => {
             setDebouncedSearch(search);
-            setPage(1)
-        }, 400)
-        return () => clearTimeout(delayHandler)
-    }, [search])
+            setPage(1);
+        }, 400);
+        return () => clearTimeout(delayHandler);
+    }, [search]);
+
     const fetchAuctions = useCallback(async () => {
-        setLoading(true)
+        setLoading(true);
         try {
             const result = await auctionItemMangementService.listTenantAuctions(
                 page,
                 6,
-                debouncedSearch.trim() === '' ? undefined : debouncedSearch,
-                statusFilter == 'all' ? undefined : statusFilter,
-                typeFilter == 'all' ? undefined : typeFilter
-
-            )
+                debouncedSearch.trim() === "" ? undefined : debouncedSearch,
+                statusFilter === "all" ? undefined : statusFilter,
+                typeFilter === "all" ? undefined : typeFilter
+            );
             if (result.success && result.data) {
-                setAuction(result.data)
-                setPagination(result.pagination ?? null)
-            }
-            else {
-                toast.error(result.message)
+                setAuction(result.data);
+                setPagination(result.pagination ?? null);
+            } else {
+                toast.error(result.message);
             }
         } catch {
-            toast.error('Error while listing auctions')
+            toast.error("Error while listing auctions");
         } finally {
-            setLoading(false)
+            setLoading(false);
         }
-    }, [page, debouncedSearch, statusFilter, typeFilter])
+    }, [page, debouncedSearch, statusFilter, typeFilter]);
 
     useEffect(() => {
-        fetchAuctions()
-    }, [fetchAuctions])
+        fetchAuctions();
+    }, [fetchAuctions]);
 
     return (
         <div className="min-h-screen bg-[#F5F7FB] px-4 py-8 md:px-8 text-[#0F172A] font-sans">
@@ -135,8 +134,8 @@ const TenantAuctions: React.FC = () => {
                 ) : auctions.length > 0 ? (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                         {auctions.map((item) => {
-                            const thumbnailImage = item.images?.find((img) => img.isPrimary)?.url
-
+                            const thumbnailImage = item.images?.find((img) => img.isPrimary)?.url;
+                            const currentHighestBid = item.currentHighestBid ?? 0;
 
                             return (
                                 <div key={item.auctionItemId} className="bg-white rounded-xl border border-[#E2E8F0] shadow-sm overflow-hidden flex flex-col hover:shadow-md transition-shadow duration-300 group">
@@ -148,44 +147,64 @@ const TenantAuctions: React.FC = () => {
                                             onError={(e) => { (e.target as HTMLImageElement).src = "https://via.placeholder.com/400x250?text=No+Image+Available"; }}
                                         />
 
-
                                         <div className="absolute top-3 left-3 flex flex-col gap-1.5 items-start">
-
-                                            <span className={`px-2.5 py-1 text-[9px] font-black tracking-wider uppercase rounded-md shadow-sm border ${item.type === "LIVE"
-                                                ? "bg-[#0F172A] text-white border-[#0F172A]"
-                                                : "bg-white text-[#0F172A] border-[#E2E8F0]"
-                                                }`}>
+                                            <span className={`px-2.5 py-1 text-[9px] font-black tracking-wider uppercase rounded-md shadow-sm border ${
+                                                item.type === "LIVE"
+                                                    ? "bg-[#0F172A] text-white border-[#0F172A]"
+                                                    : "bg-white text-[#0F172A] border-[#E2E8F0]"
+                                            }`}>
                                                 {item.type}
                                             </span>
                                         </div>
                                     </div>
 
-
                                     <div className="p-5 flex-1 flex flex-col justify-between">
-                                        <div className="space-y-2">
+                                        <div className="space-y-3">
+                                      
                                             <div className="flex justify-between items-start gap-2">
                                                 <span className="text-[10px] font-mono uppercase tracking-wider text-[#475569]/60">
                                                     #{item.auctionItemId?.slice(-8).toUpperCase()}
                                                 </span>
-                                                <span className={`px-2 py-0.5 text-[9px] font-bold tracking-wide uppercase rounded-md border ${item.auctionStatus === "SCHEDULED" || item.auctionStatus === "SOLD"
-                                                    ? "bg-emerald-50 border-emerald-200 text-emerald-700"
-                                                    : item.auctionStatus === "PENDING_APPROVAL"
-                                                        ? "bg-amber-50 border-amber-200 text-amber-700"
-                                                        : item.auctionStatus === "DRAFT"
-                                                            ? "bg-slate-50 border-slate-200 text-slate-600"
-                                                            : "bg-rose-50 border-rose-200 text-rose-700"
-                                                    }`}>
+                                                <span className={`px-2 py-0.5 text-[9px] font-bold tracking-wide uppercase rounded-md border ${
+                                                    item.auctionStatus === "SCHEDULED" || item.auctionStatus === "SOLD"
+                                                        ? "bg-emerald-50 border-emerald-200 text-emerald-700"
+                                                        : item.auctionStatus === "PENDING_APPROVAL"
+                                                            ? "bg-amber-50 border-amber-200 text-amber-700"
+                                                            : item.auctionStatus === "DRAFT"
+                                                                ? "bg-slate-50 border-slate-200 text-slate-600"
+                                                                : "bg-rose-50 border-rose-200 text-rose-700"
+                                                }`}>
                                                     {item.auctionStatus?.replace(/_/g, " ")}
                                                 </span>
                                             </div>
 
-                                            <h3 className="font-bold text-base text-[#0F172A] line-clamp-1 group-hover:text-[#2F6FED] transition-colors">
-                                                {item.auctionName}
-                                            </h3>
-                                            <p className="text-xs text-[#475569] font-medium flex items-center gap-1.5">
-                                                <span className="inline-block w-1.5 h-1.5 bg-[#2F6FED] rounded-full"></span>
-                                                {item.auctionHouseName}
-                                            </p>
+                                      
+                                            <div className="flex justify-between items-start gap-3">
+                                                <div className="min-w-0 flex-1">
+                                                    <h3 className="font-bold text-base text-[#0F172A] line-clamp-1 group-hover:text-[#2F6FED] transition-colors" title={item.auctionName}>
+                                                        {item.auctionName}
+                                                    </h3>
+                                                    <p className="text-xs text-[#475569] font-medium flex items-center gap-1.5 mt-1">
+                                                        <span className="inline-block w-1.5 h-1.5 bg-[#2F6FED] rounded-full flex-shrink-0"></span>
+                                                        <span className="truncate">{item.auctionHouseName}</span>
+                                                    </p>
+                                                </div>
+
+                                                <div className="text-right flex-shrink-0">
+                                                    <div className="text-xs font-semibold text-[#0F172A]">
+                                                       <span className="text-[9px] text-[#475569]/70 block font-bold uppercase tracking-wider">Starting Price</span>
+                                                       ${item.startingPrice?.toLocaleString() ?? "0"}
+                                                    </div>
+                                                    <div className="text-xs font-bold text-[#2F6FED] mt-1">
+                                                     <span className="text-[9px] text-[#475569]/70 block font-bold uppercase tracking-wider">Highest Bid</span>
+                                                          {currentHighestBid <= 0 ? (
+                                                            <span className="text-[#475569]/70 text-[11px] font-medium italic">No bids</span>
+                                                        ) : (
+                                                            `$${currentHighestBid.toLocaleString()}`
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
 
                                         <div className="pt-4 mt-4 border-t border-[#E2E8F0] grid grid-cols-2 gap-2">
@@ -196,7 +215,6 @@ const TenantAuctions: React.FC = () => {
                                                 Details <FaEye size={12} />
                                             </button>
 
-
                                             {item.auctionStatus === "REJECTED" && (
                                                 <button
                                                     onClick={() => navigate(`/tenant/update-auctions/${item.auctionItemId}`)}
@@ -205,7 +223,6 @@ const TenantAuctions: React.FC = () => {
                                                     Resubmit <FaCloudUploadAlt size={13} />
                                                 </button>
                                             )}
-
 
                                             {(item.auctionStatus === "PENDING_APPROVAL" || item.auctionStatus === "DRAFT") && (
                                                 <button
@@ -256,6 +273,6 @@ const TenantAuctions: React.FC = () => {
             )}
         </div>
     );
+};
 
-}
-export default TenantAuctions
+export default TenantAuctions;

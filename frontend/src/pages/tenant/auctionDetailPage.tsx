@@ -12,7 +12,8 @@ import {
     FaCalendarAlt,
     FaEdit,
     FaRedo,
-    FaExclamationTriangle
+    FaExclamationTriangle,
+    FaHistory
 } from "react-icons/fa";
 
 const TenantAuctionDetailPage: React.FC = () => {
@@ -283,23 +284,59 @@ const TenantAuctionDetailPage: React.FC = () => {
                                 )}
                             </div>
 
-                            <div className="border border-[#E2E8F0] rounded-xl p-4 grid grid-cols-2 gap-4">
-                                <div>
-                                    <span className="text-[9px] uppercase font-bold text-[#475569] tracking-widest flex items-center gap-1">
-                                        <FaCoins className="text-[#2F6FED]" /> Starting Price
-                                    </span>
-                                    <p className="text-base font-bold text-[#0F172A] mt-1">
-                                        {auction.currency} {auction.startingPrice?.toLocaleString()}
+                            <div className="border border-[#E6E0DA] rounded-xl p-4 bg-white shadow-sm space-y-4">
+                                <div className="p-3 bg-[#F5F7FB] rounded-lg border border-[#E2E8F0]">
+                                    <div className="flex justify-between items-center mb-1">
+                                        <span className="text-[9px] uppercase font-bold text-[#475569] tracking-widest flex items-center gap-1">
+                                            <FaCoins className="text-[#2F6FED]" /> Current Highest Bid
+                                        </span>
+                                        <span className="text-[10px] font-bold text-[#2F6FED] bg-white px-2 py-0.5 rounded border border-[#E2E8F0]">
+                                            {auction.bidCount || 0} {auction.bidCount === 1 ? 'Bid' : 'Bids'}
+                                        </span>
+                                    </div>
+
+                                    <p className="text-2xl font-black text-[#0F172A]">
+                                        {auction.currency || "INR"} {(auction.currentHighestBid || auction.startingPrice)?.toLocaleString()}
                                     </p>
+
+
+                                    <div className="mt-2 pt-2 border-t border-[#E2E8F0] flex items-center justify-between text-xs">
+                                        <span className="text-[#475569] text-[10px] uppercase font-semibold">Leading Bidder</span>
+                                        {auction.highestBidder?.name ? (
+                                            <div className="flex items-center gap-1.5">
+                                                <div className="w-5 h-5 rounded-full bg-[#2F6FED] text-white flex items-center justify-center text-[10px] font-bold uppercase">
+                                                    {auction.highestBidder.name.charAt(0)}
+                                                </div>
+                                                <span className="font-bold text-[#0F172A] capitalize">
+                                                    {auction.highestBidder.name}
+                                                </span>
+                                            </div>
+                                        ) : (
+                                            <span className="text-[#475569] italic text-[11px]">No bids placed yet</span>
+                                        )}
+                                    </div>
                                 </div>
-                                <div>
-                                    <span className="text-[9px] uppercase font-bold text-[#475569] tracking-widest flex items-center gap-1">
-                                        <FaCoins className="text-[#475569]" /> Reserve Price
+                                <div className="flex justify-between items-center px-1 text-xs">
+                                    <span className="text-[#6B6B6B] uppercase text-[10px] font-bold tracking-wider">Starting Price:</span>
+                                    <span className="text-[#1F1F1F] font-bold">
+                                        {auction.currency || "INR"} {auction.startingPrice?.toLocaleString()}
                                     </span>
-                                    <p className="text-base font-bold text-[#0F172A] mt-1">
-                                        {auction.currency} {auction.reservePrice?.toLocaleString()}
-                                    </p>
                                 </div>
+                                {auction.bidCount > 0 ?
+                                    (
+                                        <button
+                                            type="button"
+                                            className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-lg border border-[#E2E8F0] bg-white hover:bg-[#F5F7FB] text-[#0F172A] text-xs font-bold transition-colors shadow-sm"
+                                        >
+                                            <FaHistory size={12} className="text-[#2F6FED]" />
+                                            View Bidding History
+                                        </button>
+
+                                    ) : (
+                                        <></>
+                                    )
+                                }
+
                             </div>
 
                             <div className="space-y-3 text-xs font-medium border-t border-[#E2E8F0] pt-4">
