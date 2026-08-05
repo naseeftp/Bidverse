@@ -3,6 +3,7 @@ import { IConversationRepository } from "../interfaces/IConversation.repository"
 import { BaseRepository } from "./Base.repository";
 import { Conversation } from '../../models/conversation.model'
 import { Types } from "mongoose";
+import { roles } from "../../types/user.type";
 
 export class ConversationRepository extends BaseRepository<IConversation> implements IConversationRepository {
     constructor() {
@@ -17,7 +18,7 @@ export class ConversationRepository extends BaseRepository<IConversation> implem
         if (!conversation) {
             const preparedParticipants = participants.map(p => ({
                 userId: new Types.ObjectId(p.userId),
-                role: p.role
+                role: p.role as roles
             }))
             const initialUnreadCount = new Map<string, number>()
             participants.forEach(p => initialUnreadCount.set(p.userId, 0));

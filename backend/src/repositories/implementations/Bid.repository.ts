@@ -4,6 +4,7 @@ import { IBidDocument } from "../../types/bid.type";
 import { Bid } from '../../models/bid.model'
 import mongoose, { Types, UpdateResult, PipelineStage } from "mongoose";
 import { myBidListDTO, bidHistoryDTO } from "../../dtos/user.dto/bid.dto";
+import { BidStatus } from "../../constants/constants";
 
 export class BidRepository extends BaseRepository<IBidDocument> implements IBidRepository {
     constructor() {
@@ -14,10 +15,10 @@ export class BidRepository extends BaseRepository<IBidDocument> implements IBidR
             {
                 auctionId: { $eq: new Types.ObjectId(auctionId) },
                 _id: { $ne: exceptedBidId },
-                status: { $ne: 'outbid' }
+                status: { $ne: BidStatus.OUTBID }
             }, {
             $set: {
-                status: 'outbid'
+                status: BidStatus.OUTBID
             }
         }
         )

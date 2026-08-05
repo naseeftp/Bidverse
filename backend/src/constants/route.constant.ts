@@ -10,7 +10,8 @@ export const BASE_ROUTES = {
     AUCTION_ITEM: '/auction-item',
     WATCH_LIST: '/watch-list',
     CHAT: '/chat',
-    BID: '/bid'
+    BID: '/bid',
+  
 } as const
 
 export const AUTH_ROUTES = {
@@ -98,3 +99,10 @@ export const BID_ROUTES = {
     MY_BIDS: '/my-bids',
     BID_HISTORY: '/bid-history/:id'
 }
+
+export const STRIPE = {
+    PLACE_BID: '/place-bid',
+    MY_BIDS: '/my-bids',
+    BID_HISTORY: '/bid-history/:id'
+}
+
