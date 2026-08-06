@@ -26,8 +26,7 @@ export const useAudioRecorder = () => {
       timerRef.current = setInterval(() => {
         setRecordingTime((prev) => prev + 1);
       }, 1000);
-    } catch (err) {
-      console.error('Microphone access denied:', err);
+    } catch  {
       throw new Error('Microphone access denied');
     }
   }, []);

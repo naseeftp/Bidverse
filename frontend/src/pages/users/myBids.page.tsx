@@ -161,7 +161,7 @@ const MyBidsPage: React.FC = () => {
                         <FaGavel size={24} className="mx-auto text-[#6B6B6B]/40" />
                         <p className="text-[#1F1F1F] text-sm font-bold uppercase tracking-wide">No Bids Found</p>
                         <p className="text-[#6B6B6B] text-xs max-w-sm mx-auto">
-                            You haven't placed any bids matching your current filter criteria.
+                           You haven&rsquo;t placed any bids matching your current filter criteria.
                         </p>
                     </div>
                 ) : (
@@ -229,7 +229,7 @@ const MyBidsPage: React.FC = () => {
                                         )}
 
                                         <button
-                                            onClick={() => navigate(`/auctions/${(item as any).auctionId || item.auctionTitle}`)}
+                                            onClick={() => navigate(`/auctions/${item.auctionId || item.auctionTitle}`)}
                                             className="w-full py-2 px-3 bg-white hover:bg-[#C9653B] hover:text-white border border-[#E6E0DA] hover:border-[#C9653B] text-[#1F1F1F] text-[11px] font-bold uppercase tracking-wider rounded-lg transition-all duration-200 flex items-center justify-center gap-1.5 shadow-sm group"
                                         >
                                             View Auction Details

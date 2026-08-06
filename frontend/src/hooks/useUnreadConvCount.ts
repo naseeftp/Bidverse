@@ -14,8 +14,9 @@ export const useUnreadCount = () => {
             if (response.success && typeof response.data === "number") {
                 dispatch(setUnreadConversationCount(response.data));
             }
-        } catch {
-
+        } catch(error) {
+         // eslint-disable-next-line no-console
+         console.error("Failed to fetch unread count:", error);
         }
     }, [isAuthenticated, dispatch]);
 

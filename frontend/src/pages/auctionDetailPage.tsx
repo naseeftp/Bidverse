@@ -104,7 +104,7 @@ const PublicAuctionDetailPage: React.FC = () => {
                 fetchAuctionDetail()
             }
             else {
-                toast.error(response?.message!)
+                toast.error(response!.message)
             }
         } catch {
             toast.error('failed to place Bid')

@@ -37,7 +37,7 @@ export class BidService{
     }
     async getBidHistory(auctionId:string,page:number,limit:number){
       try {
-        let url=`${BASE_ROUTES.BID}${BID_ROUTES.BID_HISTORY}/${auctionId}?page=${page}&limit=${limit}`;
+        const url=`${BASE_ROUTES.BID}${BID_ROUTES.BID_HISTORY}/${auctionId}?page=${page}&limit=${limit}`;
         const response=await axiosInstance.get<bidHistoryDTO,ApiResponse<{data:bidHistoryDTO[],pagination:IPaginationMeta}>>(url)
         const paginatedResult=response.data;
         return{

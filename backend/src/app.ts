@@ -23,8 +23,6 @@ import BidRoutes from './routes/bid.routes'
 
 import { LoggerService } from "./services/implementations/Logger.service";
 
-
-
 dotenv.config()
 const app: Application = express()
 const appLogger = new LoggerService("App")
@@ -36,6 +34,7 @@ app.use(cors({
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
     allowedHeaders: ['Content-Type', 'Authorization']
 }))
+
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 app.use(cookieParser())

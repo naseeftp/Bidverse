@@ -8,6 +8,7 @@ interface PlaceBidProps {
     currentHighestBid: number;
     minimumBidIncrement: number;
     startingPrice?: number;
+     // eslint-disable-next-line no-unused-vars
     onSubmitBid?: (amount: number) => Promise<void>
 }
 

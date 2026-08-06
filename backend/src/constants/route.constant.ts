@@ -11,6 +11,7 @@ export const BASE_ROUTES = {
     WATCH_LIST: '/watch-list',
     CHAT: '/chat',
     BID: '/bid',
+    WEB_HOOK:'/webhooks'
   
 } as const
 
@@ -106,3 +107,6 @@ export const STRIPE = {
     BID_HISTORY: '/bid-history/:id'
 }
 
+export const WEBHOOK_ROUTES={
+    STRIPE:'/stripe'
+}

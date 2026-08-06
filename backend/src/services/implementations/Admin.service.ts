@@ -16,6 +16,8 @@ import { Role } from "../../dtos/Common.dto";
 import { IUserRepository } from "../../repositories/interfaces/iUser.repository";
 import { UserMapper } from "../../mappers/user.mapper";
 import { isValidObjectId } from "mongoose";
+import { generatePaymentAccountId } from "../../utils/paymentAccount";
+
 export class AdminService implements IAdminService {
     constructor(
         private _auctionHouseRepo: IAuctionHouseRepository,
@@ -66,6 +68,11 @@ export class AdminService implements IAdminService {
         const updatedHouse = await this._auctionHouseRepo.updateById(id, uodateData)
         if (!updatedHouse) {
             throw new NotFoundError(MESSAGES.AUCTION_HOUSE_NOT_FOUND)
+        }
+        if (status === VerificationStatus.APPROVED) {
+            await this._userRepo.updateById(updatedHouse.userId.toString(), {
+                paymentAccountId: generatePaymentAccountId()
+            })
         }
         await this._emailService.sendVerificationStatusUpdationEmail(updatedHouse.contact.businessEmail, updatedHouse.name, status, reason)
         return AuctionHouseMapper.toResponseDTO(updatedHouse)

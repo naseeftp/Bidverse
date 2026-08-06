@@ -35,6 +35,10 @@ const UserSchema = new Schema<IUserDocument>({
         required: false,
         default: null
     },
+    paymentAccountId:{
+        type:String,
+        default:null
+    },
     isActive: {
         type: Boolean,
         default: true,

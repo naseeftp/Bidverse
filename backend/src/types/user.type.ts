@@ -12,6 +12,7 @@ export interface IUser {
     role: roles;
     profileImage?: string;
     googleId?: string;
+    paymentAccountId?:string;
     isActive: boolean;
     BlockingReson?: string
     passwordResetToken?: string;

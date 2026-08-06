@@ -423,7 +423,7 @@ export const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ roleTheme }) => {
         });
       }
     };
-  }, [activeConversationId, conversations]);
+  }, [activeConversationId, conversations,currentUserId,markConversationAsRead]);
 
 
   const handleInptChange = (e: React.ChangeEvent<HTMLInputElement>) => {
