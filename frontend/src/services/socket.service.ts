@@ -4,14 +4,13 @@ import { API_BASE_URL } from '../constants/api.constant';
 
 const socketUrl=API_BASE_URL;
 let socket:Socket|null=null;
-      
+
 export const getSocket=(userId?:string,role?:string):Socket=>{
     if(!socket){
        socket=io(socketUrl,{
         path:'/socket',
         autoConnect:false,
-        withCredentials:true,
-      
+        withCredentials:true
        })
     }
     return socket

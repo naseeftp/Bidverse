@@ -17,6 +17,8 @@ export interface IAuctionItem {
   description: string;
   status: AuctionItemStatus;
   type: AuctionType;
+  totalSlots?: number; 
+  slotFee?: number;
   images: {
     id: string;
     url: string;

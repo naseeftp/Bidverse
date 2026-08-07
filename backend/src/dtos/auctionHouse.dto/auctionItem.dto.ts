@@ -15,6 +15,14 @@ export const baseAuctionItemObjectSchema = z.object({
     type: z.nativeEnum(AuctionType, {
         message: "Invalid auction type selected"
     }),
+    totalSlots: z.coerce.number()
+    .int("Total slots must be a whole number")
+    .positive("Total slots must be at least 1")
+    .optional(),
+
+    slotFee: z.coerce.number()
+    .nonnegative("Slot fee cannot be negative")
+    .optional(),
 
     images: z.array(
         z.object({
@@ -71,7 +79,25 @@ export const createAuctionItemSchema = baseAuctionItemObjectSchema
     .refine((data) => data.reservePrice >= data.startingPrice, {
         message: "Reserve price cannot be lower than the starting opening price",
         path: ["reservePrice"],
-    });
+    })
+    .superRefine((data, ctx) => {
+    if (data.type === AuctionType.LIVE) {
+      if (data.totalSlots === undefined || isNaN(data.totalSlots)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Total slots configuration is required for Live auctions",
+          path: ["totalSlots"],
+        });
+      }
+      if (data.slotFee === undefined || isNaN(data.slotFee)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Slot fee is required for Live auctions",
+          path: ["slotFee"],
+        });
+      }
+    }
+  });
 
 
 export interface AuctionItemResponseDTO {
@@ -81,6 +107,8 @@ export interface AuctionItemResponseDTO {
     description: string;
     status: AuctionItemStatus;
     type: AuctionType;
+    totalSlots?: number;
+     slotFee?: number;
     images: {
         id: string;
         url: string;

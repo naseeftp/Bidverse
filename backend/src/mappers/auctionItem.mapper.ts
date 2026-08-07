@@ -10,6 +10,8 @@ export class AuctionItemMapper {
             description: doc.description,
             status: doc.status,
             type: doc.type,
+            totalSlots: doc.totalSlots??0,
+            slotFee: doc.slotFee??0,
             images: doc.images.map(img => ({
                 id: img.id,
                 url: img.url,

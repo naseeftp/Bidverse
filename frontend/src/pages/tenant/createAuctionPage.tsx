@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from "react";
-import { useForm, useFieldArray } from "react-hook-form";
+import { useForm, useFieldArray, type Resolver } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 
 import toast from "react-hot-toast";
@@ -30,7 +30,7 @@ const CreateAuctionPage: React.FC = () => {
   const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null);//hold the exact pixel cordinates and diamensions of the image area you want to cut out
   const navigate = useNavigate();
   const { register, handleSubmit, control, setValue, watch, formState: { errors } } = useForm<CreateAuctionItemDTO>({
-    resolver: yupResolver(createAuctionItemSchema),
+    resolver: yupResolver(createAuctionItemSchema) as unknown as Resolver<CreateAuctionItemDTO>,
     defaultValues: { images: [] }
   });
 
@@ -40,7 +40,7 @@ const CreateAuctionPage: React.FC = () => {
   });
 
   const watchedImages = watch("images") || [];
-
+  const watchedType = watch("type");
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files) return;
@@ -224,7 +224,38 @@ const CreateAuctionPage: React.FC = () => {
           </div>
         </div>
 
+        {watchedType === AuctionType.LIVE && (
+          <div className="bg-white rounded-2xl p-8 border border-[#2F6FED]/30 bg-[#2F6FED]/5 shadow-sm space-y-4 animate-in fade-in slide-in-from-top-2 duration-200">
+            <div className="flex items-center gap-3 pb-2 border-b border-[#E2E8F0]">
+              <Gavel size={17} className="text-[#2F6FED]" />
+              <h2 className="text-[11px] font-bold uppercase tracking-widest text-[#0F172A]">Live Auction Slot Parameters</h2>
+            </div>
 
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-1">
+                <label className={labelStyle}>Total Available Slots</label>
+                <input
+                  type="number"
+                  {...register("totalSlots")}
+                  className={inputStyle}
+                  placeholder="Ex: 50 Bidding Slots"
+                />
+                {errors.totalSlots && <p className={errorStyle}>{errors.totalSlots.message}</p>}
+              </div>
+
+              <div className="space-y-1">
+                <label className={labelStyle}>Entry Slot Fee (₹)</label>
+                <input
+                  type="number"
+                  {...register("slotFee")}
+                  className={inputStyle}
+                  placeholder="₹ Fee per seat"
+                />
+                {errors.slotFee && <p className={errorStyle}>{errors.slotFee.message}</p>}
+              </div>
+            </div>
+          </div>
+        )}
         <div className="bg-white rounded-2xl p-8 border border-[#E2E8F0] shadow-sm space-y-6">
           <div className="flex items-center gap-3 pb-4 border-b border-[#F5F7FB]">
             <ImageIcon size={18} className="text-[#2F6FED]" />

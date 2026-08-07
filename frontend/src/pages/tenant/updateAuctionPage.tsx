@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { useForm, useFieldArray, type FieldArrayPath } from "react-hook-form";
+import { useForm, useFieldArray, type Resolver } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import toast from "react-hot-toast";
 import Cropper, { type Point, type Area } from "react-easy-crop";
@@ -41,13 +41,14 @@ const TenantEditAuctionPage: React.FC = () => {
   const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null);
 
   const { register, handleSubmit, control, setValue, watch, reset, formState: { errors } } = useForm<UpdateAuctionItemDTO>({
-    resolver: yupResolver(updateAuctionItemSchema),
+    resolver: yupResolver(updateAuctionItemSchema) as unknown as Resolver<UpdateAuctionItemDTO>,
     defaultValues: { images: [] }
   });
 
-  const { fields: attachedImages, append: appendImageField, remove: removeImageField } = useFieldArray<UpdateAuctionItemDTO, FieldArrayPath<UpdateAuctionItemDTO>>({
+  // Type inference fix for useFieldArray
+  const { fields: attachedImages, append: appendImageField, remove: removeImageField } = useFieldArray({
     control,
-    name: "images" as FieldArrayPath<UpdateAuctionItemDTO>
+    name: "images"
   });
 
   const watchedImages = (watch("images") || []) as IFormImage[];
@@ -155,6 +156,19 @@ const TenantEditAuctionPage: React.FC = () => {
     });
   };
 
+  const advanceOrCloseCropModal = () => {
+    if (activeCropIndex === null) return;
+    URL.revokeObjectURL(cropQueue[activeCropIndex].rawUrl);
+
+    if (activeCropIndex < cropQueue.length - 1) {
+      setActiveCropIndex(activeCropIndex + 1);
+      setZoom(1);
+    } else {
+      setCropQueue([]);
+      setActiveCropIndex(null);
+    }
+  };
+
   const saveActiveCropSelection = async () => {
     if (activeCropIndex === null || !croppedAreaPixels) return;
     const activeItem = cropQueue[activeCropIndex];
@@ -176,23 +190,9 @@ const TenantEditAuctionPage: React.FC = () => {
     }
   };
 
-  const advanceOrCloseCropModal = () => {
-    if (activeCropIndex === null) return;
-    URL.revokeObjectURL(cropQueue[activeCropIndex].rawUrl);
-
-    if (activeCropIndex < cropQueue.length - 1) {
-      setActiveCropIndex(activeCropIndex + 1);
-      setZoom(1);
-    } else {
-      setCropQueue([]);
-      setActiveCropIndex(null);
-    }
-  };
-
   const setPrimaryImageIndex = (targetIndex: number) => {
     watchedImages.forEach((_, index: number) => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      setValue(`images.${index}.isPrimary` as any, index === targetIndex);
+      setValue(`images.${index}.isPrimary`, index === targetIndex);
     });
   };
 
@@ -212,7 +212,7 @@ const TenantEditAuctionPage: React.FC = () => {
             id: img.id || activeFields[idx]?.id || crypto.randomUUID(),
             url: img.url,
             isPrimary: img.isPrimary || false,
-            altText: img.altText || `${data.title} asset viewport ${idx}`
+            altText: img.altText || `${data.title || "Asset"} viewport ${idx}`
           };
         }
 
@@ -225,7 +225,7 @@ const TenantEditAuctionPage: React.FC = () => {
           id: img.id || activeFields[idx]?.id || crypto.randomUUID(),
           url: secureCdnUrl,
           isPrimary: img.isPrimary || false,
-          altText: img.altText || `${data.title} asset viewport ${idx}`
+          altText: img.altText || `${data.title || "Asset"} viewport ${idx}`
         };
       });
 
@@ -250,7 +250,7 @@ const TenantEditAuctionPage: React.FC = () => {
 
         navigate(-1);
       } else {
-        toast.error(result.message);
+        toast.error(result.message || "Failed to update auction");
       }
     } catch {
       toast.error("Failed to update auction configuration parameters.");
@@ -262,6 +262,15 @@ const TenantEditAuctionPage: React.FC = () => {
   const inputStyle = "w-full bg-[#FFFFFF] border border-[#E2E8F0] px-4 py-3 rounded-xl text-[#0F172A] text-sm focus:outline-none focus:ring-2 focus:ring-[#2F6FED]/20 focus:border-[#2F6FED] transition-all placeholder:text-[#94A3B8]";
   const labelStyle = "block text-[10px] font-bold uppercase tracking-widest text-[#475569] mb-1";
   const errorStyle = "text-[#EF4444] text-[9px] font-bold uppercase mt-1";
+
+  // Safe helper function for rendering RHF field errors without ReactNode compiler errors
+  const renderError = (error: unknown) => {
+    if (!error) return null;
+    if (typeof error === "object" && "message" in error && typeof error.message === "string") {
+      return <p className={errorStyle}>{error.message}</p>;
+    }
+    return null;
+  };
 
   if (isDataLoading) {
     return (
@@ -299,7 +308,7 @@ const TenantEditAuctionPage: React.FC = () => {
         </p>
       </div>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
+      <form onSubmit={handleSubmit(onSubmit, (err) => console.log("Form Validation Errors:", err))} className="space-y-8">
 
         <div className="bg-white rounded-2xl p-8 border border-[#E2E8F0] shadow-sm space-y-6">
           <div className="flex items-center gap-3 pb-4 border-b border-[#F5F7FB]">
@@ -310,7 +319,7 @@ const TenantEditAuctionPage: React.FC = () => {
           <div className="space-y-1">
             <label className={labelStyle}>Auction Lot Title</label>
             <input {...register("title")} placeholder="Ex: Vintage Leather Chronograph Watch" className={inputStyle} />
-            {errors.title && <p className={errorStyle}>{errors.title.message}</p>}
+            {renderError(errors.title)}
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -322,14 +331,14 @@ const TenantEditAuctionPage: React.FC = () => {
                   <option key={typeVal} value={typeVal}>{typeVal}</option>
                 ))}
               </select>
-              {errors.type && <p className={errorStyle}>{errors.type.message}</p>}
+              {renderError(errors.type)}
             </div>
           </div>
 
           <div className="space-y-1">
             <label className={labelStyle}>Item Specifications & Overview</label>
             <textarea rows={4} {...register("description")} className={`${inputStyle} resize-none`} />
-            {errors.description && <p className={errorStyle}>{errors.description.message}</p>}
+            {renderError(errors.description)}
           </div>
         </div>
 
@@ -344,7 +353,7 @@ const TenantEditAuctionPage: React.FC = () => {
             <p className="text-[11px] font-bold text-[#475569] uppercase tracking-widest">Add Alternative Demonstration Assets</p>
             <p className="text-[9px] text-[#94A3B8] uppercase mt-1">New selections enter optimization nodes before mounting payload arrays.</p>
           </div>
-          {errors.images && <p className={errorStyle}>{errors.images.message}</p>}
+          {renderError(errors.images)}
 
           {watchedImages.length > 0 && (
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-4">
@@ -384,18 +393,18 @@ const TenantEditAuctionPage: React.FC = () => {
               <div>
                 <label className={labelStyle}>Opening Starting Bid</label>
                 <input type="number" {...register("startingPrice")} className={inputStyle} />
-                {errors.startingPrice && <p className={errorStyle}>{errors.startingPrice.message}</p>}
+                {renderError(errors.startingPrice)}
               </div>
               <div>
                 <label className={labelStyle}>Reserve Floor Margin</label>
                 <input type="number" {...register("reservePrice")} className={inputStyle} />
-                {errors.reservePrice && <p className={errorStyle}>{errors.reservePrice.message}</p>}
+                {renderError(errors.reservePrice)}
               </div>
             </div>
             <div>
               <label className={labelStyle}>Minimum Scale Increment Step</label>
               <input type="number" {...register("minimumIncrement")} className={inputStyle} />
-              {errors.minimumIncrement && <p className={errorStyle}>{errors.minimumIncrement.message}</p>}
+              {renderError(errors.minimumIncrement)}
             </div>
           </div>
 
@@ -407,12 +416,12 @@ const TenantEditAuctionPage: React.FC = () => {
             <div>
               <label className={labelStyle}>Buyer Premium Scale Percentage</label>
               <input type="number" step="0.01" {...register("buyerPremiumPercent")} className={inputStyle} />
-              {errors.buyerPremiumPercent && <p className={errorStyle}>{errors.buyerPremiumPercent.message}</p>}
+              {renderError(errors.buyerPremiumPercent)}
             </div>
             <div>
               <label className={labelStyle}>Sniping Protection Extension Windows</label>
               <input type="number" {...register("snipingProtectionMinutes")} className={inputStyle} />
-              {errors.snipingProtectionMinutes && <p className={errorStyle}>{errors.snipingProtectionMinutes.message}</p>}
+              {renderError(errors.snipingProtectionMinutes)}
             </div>
           </div>
         </div>
@@ -426,12 +435,12 @@ const TenantEditAuctionPage: React.FC = () => {
             <div>
               <label className={labelStyle}>Opening Window Execution Start</label>
               <input type="datetime-local" {...register("startTime")} className={inputStyle} />
-              {errors.startTime && <p className={errorStyle}>{errors.startTime.message}</p>}
+              {renderError(errors.startTime)}
             </div>
             <div>
               <label className={labelStyle}>Closing Window Termination End</label>
               <input type="datetime-local" {...register("endTime")} className={inputStyle} />
-              {errors.endTime && <p className={errorStyle}>{errors.endTime.message}</p>}
+              {renderError(errors.endTime)}
             </div>
           </div>
         </div>
@@ -444,12 +453,12 @@ const TenantEditAuctionPage: React.FC = () => {
           <div>
             <label className={labelStyle}>Flat Parcel Shipping Cost</label>
             <input type="number" {...register("shippingCost")} className={inputStyle} />
-            {errors.shippingCost && <p className={errorStyle}>{errors.shippingCost.message}</p>}
+            {renderError(errors.shippingCost)}
           </div>
           <div>
             <label className={labelStyle}>Shipping Terms Conditions Specifications</label>
             <textarea rows={2} {...register("shippingTerms")} className={`${inputStyle} resize-none`} />
-            {errors.shippingTerms && <p className={errorStyle}>{errors.shippingTerms.message}</p>}
+            {renderError(errors.shippingTerms)}
           </div>
         </div>
 

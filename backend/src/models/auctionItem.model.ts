@@ -31,6 +31,15 @@ const AuctionItemSchema = new Schema<IAuctionItemDocument>({
         enum: AuctionTypeValues,
         required: true
     },
+    totalSlots: {
+        type: Number,
+        min: 1,
+    },
+    slotFee: {
+        type: Number,
+        min: 0,
+      
+    },
     images: [
         {
             id: {
