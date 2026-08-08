@@ -147,6 +147,8 @@ export class AuctionItemRepository extends BaseRepository<IAuctionItemDocument> 
                     description: 1,
                     status: 1,
                     type: 1,
+                     totalSlots:1,
+                     slotFee: 1,
                     images: { $ifNull: ['$images', []] },
                     currency: 1,
                     startingPrice: 1,

@@ -107,8 +107,8 @@ export interface AuctionItemResponseDTO {
     description: string;
     status: AuctionItemStatus;
     type: AuctionType;
-    totalSlots?: number;
-     slotFee?: number;
+    totalSlots: number;
+    slotFee: number;
     images: {
         id: string;
         url: string;
@@ -165,6 +165,8 @@ export interface AuctionItemDetailDTO {
     description: string;
     status: string;
     type: string;
+     totalSlots: number|null;
+    slotFee: number|null;
     images: Array<{
         id: string;
         url: string;
