@@ -7,9 +7,8 @@ export const BASE_ROUTES = {
     AUCTION_ITEM: '/auction-item',
     WATCH_LIST: '/watch-list',
     CHAT: '/chat',
-    BID: '/bid'
-
-
+    BID: '/bid',
+    SLOT: '/slot'
 }
 export const AUTH_ROUTES = {
     REGISTER: "/auth/register",
@@ -94,5 +93,8 @@ export const BID_ROUTES = {
     PLACE_BID: '/place-bid',
     MY_BIDS: '/my-bids',
     BID_HISTORY: '/bid-history'
-
+  
+}
+export const SLOT_ROUTES={
+    BOOK_SLOT:'/book-slot'
 }

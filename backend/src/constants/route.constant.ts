@@ -11,8 +11,7 @@ export const BASE_ROUTES = {
     WATCH_LIST: '/watch-list',
     CHAT: '/chat',
     BID: '/bid',
-    WEB_HOOK:'/webhooks'
-  
+    SLOT:'/slot'  
 } as const
 
 export const AUTH_ROUTES = {
@@ -100,13 +99,9 @@ export const BID_ROUTES = {
     MY_BIDS: '/my-bids',
     BID_HISTORY: '/bid-history/:id'
 }
-
-export const STRIPE = {
-    PLACE_BID: '/place-bid',
-    MY_BIDS: '/my-bids',
-    BID_HISTORY: '/bid-history/:id'
+export const SLOT_ROUTES={
+    BOOK_SLOT:'/book-slot'
 }
 
-export const WEBHOOK_ROUTES={
-    STRIPE:'/stripe'
-}
+
+

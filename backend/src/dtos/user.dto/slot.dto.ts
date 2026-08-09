@@ -1,4 +1,4 @@
-import { SlotBookingStatus,SlotBookingStatusValues } from "../../constants/slot.constant";
+import { SlotBookingStatus} from "../../constants/slot.constant";
 
 export interface bookSlotDTO{
     auctionId:string;

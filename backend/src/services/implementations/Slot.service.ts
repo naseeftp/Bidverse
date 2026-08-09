@@ -23,6 +23,7 @@ export class SlotService implements ISlotService {
         const bookedSlot = await this._slotRepo.create({
         userId:new Types.ObjectId(userId),
         auctionId:new Types.ObjectId(data.auctionId),
+        tenantId:new Types.ObjectId(data.tenantId),
         status:SlotBookingStatus.CONFIRMED,
         startTime:auctionExist.startTime,
         endTime:auctionExist.endTime,

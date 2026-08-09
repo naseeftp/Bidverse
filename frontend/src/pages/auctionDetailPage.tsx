@@ -23,7 +23,8 @@ import { incrementWatchlistCount } from "../redux/user/auth.slice";
 import chatService from "../services/chat.service";
 import PlaceBidModal from "../components/user/placeBid.modal";
 import bidService from "../services/bid.service";
-
+import BookSlotModal from "../components/user/slotBook.modal";
+import slotService from "../services/slot.service";
 
 const PublicAuctionDetailPage: React.FC = () => {
     const { itemId } = useParams<{ itemId: string }>();
@@ -43,6 +44,7 @@ const PublicAuctionDetailPage: React.FC = () => {
     const [isChatLoading, setIsChatLoading] = useState<boolean>(false)
 
     const [isBidModalOpen, setBidModalOpen] = useState<boolean>(false)
+    const [isSlotModalOpen,setIsSlotModalOpen]=useState<boolean>(false)
 
     const fetchAuctionDetail = useCallback(async () => {
         if (!itemId) return;
@@ -111,6 +113,31 @@ const PublicAuctionDetailPage: React.FC = () => {
         }
 
     }
+   const handleBookSlotSubmit = async () => {
+    if (!auction?.auctionItemId || !auction.auctionHouse.id) {
+        toast.error("Auction details are missing.");
+        return;
+    }
+
+    try {
+        const payload = {
+            auctionId: auction.auctionItemId,
+            tenantId:auction.auctionHouse.id,
+        };
+
+        const response = await slotService.bookSlot(payload);
+
+        if (response?.success) {
+            toast.success(response.message || "Slot reserved successfully!");
+            fetchAuctionDetail(); 
+        } else {
+            toast.error(response?.message || "Failed to book slot");
+        }
+    } catch {
+        toast.error("An error occurred while booking slot");
+    }
+};
+
     const handleWatchlistAction = async (e: React.MouseEvent<HTMLButtonElement>) => {
         e.stopPropagation();
         if (isWatchlistLoading) return;
@@ -426,6 +453,7 @@ const PublicAuctionDetailPage: React.FC = () => {
                                 </button>
                             ) : (
                                 <button
+                                    onClick={()=>setIsSlotModalOpen(true)}
                                     disabled={timerLabel === "CONCLUDED" || timerLabel === 'ENDS IN'}
                                     className="w-full bg-[#C9653B] hover:bg-[#C9653B]/90 text-white font-bold text-xs uppercase tracking-wider py-3 rounded-lg transition-all shadow-sm focus:outline-none disabled:bg-[#E6E0DA] disabled:text-[#6B6B6B] disabled:cursor-not-allowed transform active:scale-[0.99]"
                                 >
@@ -519,6 +547,16 @@ const PublicAuctionDetailPage: React.FC = () => {
                 startingPrice={auction.startingPrice}
                 onSubmitBid={handleBidSubmit}
             />
+            <BookSlotModal
+            isOpen={isSlotModalOpen}
+            onClose={() => setIsSlotModalOpen(false)}
+            auctionName={auction.title}
+            slotAmount={auction.slotFee || 0} 
+             currency={auction.currency}
+             onConfirm={handleBookSlotSubmit}
+            
+            />
+
         </div>
     );
 };
