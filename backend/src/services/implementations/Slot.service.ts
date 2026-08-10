@@ -7,13 +7,16 @@ import { NotFoundError } from "../../errors/AppError";
 import { MESSAGES } from "../../constants/constants";
 import { Types } from "mongoose";
 import { SlotBookingStatus } from "../../constants/slot.constant";
-import { SlotMapper } from "../../mappers/slot..mapper";
+// import { SlotMapper } from "../../mappers/slot..mapper";
+import { IPaymentService } from "../interface/IPayment.service";
+import { createSlotPaymentDTO } from "../../dtos/user.dto/payment.dto";
 
 export class SlotService implements ISlotService {
     constructor(
         private _slotRepo: ISlotRepository,
         private _auctionHouse: IAuctionHouseRepository,
-        private _auctionItemRepo: IAuctionItemRepository
+        private _auctionItemRepo: IAuctionItemRepository,
+        private _paymentService:IPaymentService,
     ) { }
     async bookSlot(userId: string, data: bookSlotDTO): Promise<bookSlotResponseDTO> {
         const auctionExist = await this._auctionItemRepo.findById(data.auctionId)
@@ -24,10 +27,31 @@ export class SlotService implements ISlotService {
         userId:new Types.ObjectId(userId),
         auctionId:new Types.ObjectId(data.auctionId),
         tenantId:new Types.ObjectId(data.tenantId),
-        status:SlotBookingStatus.CONFIRMED,
+        status:SlotBookingStatus.PENDING,
         startTime:auctionExist.startTime,
         endTime:auctionExist.endTime,
         })
-        return SlotMapper.toBookSloTResponseDTO(bookedSlot)
+        auctionExist.slotCount+=1;
+        await auctionExist.save();
+        const paymentData:createSlotPaymentDTO={
+            userId:userId,
+            auctionId:data.auctionId,
+            slotBookingId:bookedSlot._id.toString(),
+            amount:auctionExist.slotFee!
+        }
+        const payment= await this._paymentService.createSlotPayment(paymentData)
+        // return SlotMapper.toBookSloTResponseDTO(bookedSlot)
+        return {
+            slotId:bookedSlot._id.toString(),
+            slotStatus:bookedSlot.status,
+            slotOwnerId:bookedSlot.userId.toString(),
+            payment:{
+                paymentId:payment.paymentId.toString(),
+                orderId:payment.orderId.toString(),
+                amount:payment.amount,
+                currency:payment.currency,
+                keyId:process.env.RAZORPAY_KEY_ID!
+            }
+        }
     }
 }

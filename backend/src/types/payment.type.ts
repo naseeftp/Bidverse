@@ -1,0 +1,21 @@
+import { Types,Document} from "mongoose";
+import { PaymentType, PaymentStatus } from "../constants/payment.constants";
+export interface IPayment {
+    userId: Types.ObjectId;
+    auctionItemId?: Types.ObjectId;
+    auctionHouseId?: Types.ObjectId;
+    slotBookingId?: Types.ObjectId;
+    type: PaymentType;
+    amount: number;
+    currency: string;
+    status: PaymentStatus;
+    razorpayOrderId: string;
+    razorpayPaymentId?: string;
+    razorpaySignature?: string;
+    paidAt?: Date;
+    refundedAt?: Date;
+    platformCommission?: number;
+    netAmount?: number;
+    releasedAt?: Date;
+}
+export type IPaymentDocument= IPayment&Document;

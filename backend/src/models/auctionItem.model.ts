@@ -103,6 +103,10 @@ const AuctionItemSchema = new Schema<IAuctionItemDocument>({
         type:Number,
         default:0
     },
+    slotCount:{
+    type:Number,
+    default:0
+    },
     startTime: {
         type: Date,
         required: true,

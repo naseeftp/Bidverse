@@ -8,5 +8,12 @@ export interface bookSlotDTO{
 export interface bookSlotResponseDTO{
  slotId:string;
  slotStatus:SlotBookingStatus;
- sloteOwnerId:string
+ slotOwnerId:string
+ payment: {
+        paymentId: string;
+        orderId: string;
+        amount: number;
+        currency: string;
+        keyId: string;
+ }
 }
