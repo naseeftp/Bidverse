@@ -25,6 +25,8 @@ import PlaceBidModal from "../components/user/placeBid.modal";
 import bidService from "../services/bid.service";
 import BookSlotModal from "../components/user/slotBook.modal";
 import slotService from "../services/slot.service";
+import { openRazorpayCheckout } from "../utils/razorpay";
+import paymentService from "../services/payment.service";
 
 const PublicAuctionDetailPage: React.FC = () => {
     const { itemId } = useParams<{ itemId: string }>();
@@ -126,9 +128,44 @@ const PublicAuctionDetailPage: React.FC = () => {
         };
 
         const response = await slotService.bookSlot(payload);
+       
 
         if (response?.success) {
             toast.success(response.message || "Slot reserved successfully!");
+             openRazorpayCheckout({
+             orderId:response.data?.payment.orderId??'',
+             amount:response.data?.payment.amount??0,
+             currency:response.data?.payment.currency??'',
+             keyId:response.data?.payment.keyId??''
+             },
+             async (paymentResponse) => {
+
+                    console.log("Razorpay response:", paymentResponse);
+
+                    try {
+
+                        await paymentService.verifyPayment({
+                            razorpayOrderId:
+                                paymentResponse.razorpay_order_id,
+
+                            razorpayPaymentId:
+                                paymentResponse.razorpay_payment_id,
+
+                            razorpaySignature:
+                                paymentResponse.razorpay_signature,
+                        });
+
+                        toast.success("Payment successful! Slot confirmed.");
+
+                        fetchAuctionDetail();
+
+                    } catch {
+                        toast.error(
+                            "Payment verification failed."
+                        );
+                    }
+                },
+            )
             fetchAuctionDetail(); 
         } else {
             toast.error(response?.message || "Failed to book slot");

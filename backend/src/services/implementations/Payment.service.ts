@@ -37,7 +37,8 @@ export class PaymentService implements IPaymentService {
     }
 
     async verifyPayment(data: verifyPaymentDTO): Promise<void> {
-        const payment = await this._paymentRepo.findById(data.razorpayOrderId)
+        //find payment by razorpay orderId
+        const payment = await this._paymentRepo.findOne({razorpayOrderId:data.razorpayOrderId})
         if (!payment) {
             throw new NotFoundError("Payment not found");
         }

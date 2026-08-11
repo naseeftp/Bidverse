@@ -164,10 +164,10 @@ export const MESSAGES = {
     MESSAGE_READED:'Message readed',
     ACTION_SUCCESS:'Action currently doing is success',
 
-    SLOT_BOOKED:'Slot booking completed',
-
     BID_PLACED:'Bid placed Successfully',
-
+    SLOT_BOOKED:'Slot booking completed',
+    PAYMENT_SUCCESS:'Payment Success',
+    
     LOGOUT_SUCCESS: "Logout success",
     LOGOUT_FAILED: "Logout failed",
 

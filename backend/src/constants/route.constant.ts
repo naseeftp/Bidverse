@@ -11,7 +11,8 @@ export const BASE_ROUTES = {
     WATCH_LIST: '/watch-list',
     CHAT: '/chat',
     BID: '/bid',
-    SLOT:'/slot'  
+    SLOT:'/slot',
+    PAYMENT:'/payment'
 } as const
 
 export const AUTH_ROUTES = {
@@ -102,6 +103,10 @@ export const BID_ROUTES = {
 export const SLOT_ROUTES={
     BOOK_SLOT:'/book-slot'
 }
+export const PAYMENT_ROUTES={
+    VERIFY_PAYMENT:'/verify-payment'
+}
+
 
 
 
