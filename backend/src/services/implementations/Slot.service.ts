@@ -3,7 +3,7 @@ import { ISlotRepository } from "../../repositories/interfaces/ISlot.repository"
 import { bookSlotDTO, bookSlotResponseDTO } from "../../dtos/user.dto/slot.dto";
 import { IAuctionHouseRepository } from "../../repositories/interfaces/IAuctionHouse.repository";
 import { IAuctionItemRepository } from "../../repositories/interfaces/IAuctionItem.repository";
-import { NotFoundError } from "../../errors/AppError";
+import { BadRequestError, NotFoundError } from "../../errors/AppError";
 import { MESSAGES } from "../../constants/constants";
 import { Types } from "mongoose";
 import { SlotBookingStatus } from "../../constants/slot.constant";
@@ -23,6 +23,13 @@ export class SlotService implements ISlotService {
         if (!auctionExist) {
             throw new NotFoundError(MESSAGES.AUCTION_NOT_FOUND)
         }
+        if(auctionExist.totalSlots&&auctionExist.slotCount>=auctionExist.totalSlots){
+            throw new BadRequestError(MESSAGES.HOUSE_FULL)
+        }
+        const isAllReadyBooked=await this._slotRepo.findAllReadyBooked(userId,data.auctionId)
+        if(isAllReadyBooked){
+            throw new BadRequestError(MESSAGES.ALLREADY_BOOKED)
+        }
         const bookedSlot = await this._slotRepo.create({
         userId:new Types.ObjectId(userId),
         auctionId:new Types.ObjectId(data.auctionId),
@@ -31,8 +38,7 @@ export class SlotService implements ISlotService {
         startTime:auctionExist.startTime,
         endTime:auctionExist.endTime,
         })
-        auctionExist.slotCount+=1;
-        await auctionExist.save();
+       
         const paymentData:createSlotPaymentDTO={
             userId:userId,
             auctionId:data.auctionId,

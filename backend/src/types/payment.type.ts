@@ -1,5 +1,5 @@
 import { Types,Document} from "mongoose";
-import { PaymentType, PaymentStatus } from "../constants/payment.constants";
+import { PaymentType, PaymentStatus,EscrowStatus} from "../constants/payment.constants";
 export interface IPayment {
     userId: Types.ObjectId;
     auctionItemId?: Types.ObjectId;
@@ -9,6 +9,7 @@ export interface IPayment {
     amount: number;
     currency: string;
     status: PaymentStatus;
+    escrowStatus?:EscrowStatus
     razorpayOrderId: string;
     razorpayPaymentId?: string;
     razorpaySignature?: string;

@@ -3,13 +3,18 @@ import { IPaymentRepository } from "../../repositories/interfaces/IPayment.repos
 import { createSlotPaymentDTO, slotPaymentResponseDTO, verifyPaymentDTO } from "../../dtos/user.dto/payment.dto";
 import Razorpay from "razorpay";
 import { Types } from "mongoose";
-import { PaymentStatus, PaymentType } from "../../constants/payment.constants";
+import { EscrowStatus, PaymentStatus, PaymentType } from "../../constants/payment.constants";
 import crypto from "crypto";
 import { BadRequestError, NotFoundError } from "../../errors/AppError";
+import { ISlotRepository } from "../../repositories/interfaces/ISlot.repository";
+import { SlotBookingStatus } from "../../constants/slot.constant";
+import { IAuctionItemRepository } from "../../repositories/interfaces/IAuctionItem.repository";
 
 export class PaymentService implements IPaymentService {
     constructor(
         private _paymentRepo: IPaymentRepository,
+        private _slotRepo:ISlotRepository,
+        private _auctionRepo:IAuctionItemRepository,
         private _razorpay: Razorpay
     ) { }
     async createSlotPayment(data: createSlotPaymentDTO): Promise<slotPaymentResponseDTO> {
@@ -23,9 +28,11 @@ export class PaymentService implements IPaymentService {
             userId: new Types.ObjectId(data.userId),
             auctionItemId: new Types.ObjectId(data.auctionId),
             type: PaymentType.SLOT_BOOKING,
+            slotBookingId:new Types.ObjectId(data.slotBookingId),
             amount: data.amount,
             currency: 'INR',
             status: PaymentStatus.PENDING,
+            escrowStatus:EscrowStatus.NOT_APPLICABLE,
             razorpayOrderId: razorPayOrder.id
         })
         return {
@@ -64,17 +71,31 @@ export class PaymentService implements IPaymentService {
                 "Invalid Razorpay payment signature"
             );
         }
-
-
         await this._paymentRepo.updateById(
             payment._id.toString(),
             {
                 razorpayPaymentId: data.razorpayPaymentId,
                 razorpaySignature: data.razorpaySignature,
                 status: PaymentStatus.PAID,
+                escrowStatus:EscrowStatus.HELD,
                 paidAt: new Date()
             }
         );
+        if(payment.type===PaymentType.SLOT_BOOKING&&payment.slotBookingId){
+            await this._slotRepo.updateById(
+                payment.slotBookingId.toString(),
+                {
+                    status:SlotBookingStatus.CONFIRMED,
+                    paymentId:payment._id,
+                }
+            )
+            const auctionItem=await this._auctionRepo.findById(payment.auctionItemId!.toString())
+            if(auctionItem){
+                auctionItem.slotCount+=1
+                await auctionItem.save()
+            }
+
+        }
 
     }
 }

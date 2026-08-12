@@ -11,6 +11,6 @@ const slotRepo=new SlotRepository()
 const auctionRepo=new AuctionItemRepository();
 const auctionHouseRepo=new AuctionHouseRepository();
 const paymentRepo=new PaymentRepository();
-const paymentService=new PaymentService(paymentRepo,razorpay)
+const paymentService=new PaymentService(paymentRepo,slotRepo,auctionRepo,razorpay)
 const slotService=new SlotService(slotRepo,auctionHouseRepo,auctionRepo,paymentService)
 export const slotController=new SlotController(slotService)

@@ -128,10 +128,8 @@ const PublicAuctionDetailPage: React.FC = () => {
         };
 
         const response = await slotService.bookSlot(payload);
-       
-
         if (response?.success) {
-            toast.success(response.message || "Slot reserved successfully!");
+            // toast.success(response.message || "Slot reserved successfully!");
              openRazorpayCheckout({
              orderId:response.data?.payment.orderId??'',
              amount:response.data?.payment.amount??0,
@@ -140,9 +138,7 @@ const PublicAuctionDetailPage: React.FC = () => {
              },
              async (paymentResponse) => {
 
-                    console.log("Razorpay response:", paymentResponse);
-
-                    try {
+                      try {
 
                         await paymentService.verifyPayment({
                             razorpayOrderId:

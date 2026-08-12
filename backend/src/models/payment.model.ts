@@ -1,5 +1,4 @@
-import { number } from "zod";
-import { PaymentStatusValues, PaymentTypeValues } from "../constants/payment.constants";
+import { EscrowStatusValues, PaymentStatusValues, PaymentTypeValues } from "../constants/payment.constants";
 import { IPaymentDocument } from "../types/payment.type";
 import mongoose, { Schema, Types } from "mongoose";
 
@@ -39,6 +38,11 @@ const PaymentSchema = new Schema<IPaymentDocument>({
         type: String,
         enum: PaymentStatusValues,
         required: true
+    },
+    escrowStatus:{
+    type:String,
+    enum:EscrowStatusValues,
+    required:true
     },
     razorpayOrderId: {
         type: String,

@@ -16,7 +16,7 @@ export class SlotService{
                 data:response.data
             }
         } catch (error) {
-            apiErrorHandler(error,'Failed to book slot')
+           return apiErrorHandler(error,'Failed to book slot')
         }
     }
 }

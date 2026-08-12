@@ -166,6 +166,8 @@ export const MESSAGES = {
 
     BID_PLACED:'Bid placed Successfully',
     SLOT_BOOKED:'Slot booking completed',
+    HOUSE_FULL:'All slots are already booked',
+    ALLREADY_BOOKED:'You are allready own a slot for this auction',
     PAYMENT_SUCCESS:'Payment Success',
     
     LOGOUT_SUCCESS: "Logout success",
