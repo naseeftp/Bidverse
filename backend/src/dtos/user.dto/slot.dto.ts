@@ -17,3 +17,14 @@ export interface bookSlotResponseDTO{
         keyId: string;
  }
 }
+
+export interface bookedSlotListDTO{
+    slotId:string;
+    auctionId:string;
+    auctionTitle:string;
+    auctionImage?:string;
+    startTime:Date,
+    endTime:Date;
+    status:SlotBookingStatus;
+    bookedAt:Date;
+}

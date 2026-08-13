@@ -1,6 +1,5 @@
 import { Document,Types } from "mongoose";
 import { SlotBookingStatus } from "../constants/slot.constant";
-SlotBookingStatus
 
 export interface ISlot{
 userId:Types.ObjectId;
