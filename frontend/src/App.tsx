@@ -31,6 +31,7 @@ import AddressPage from "./pages/users/AddressPage";
 import WatchlistPage from "./pages/users/WatchlistPage";
 import ChatPage from "./pages/users/chatPage";
 import MyBidsPage from "./pages/users/myBids.page";
+import MySlotsPage from "./pages/users/mySlots";
 
 import TenantRegisterPage from "./pages/tenant/RegiterPage";
 import TenantVerifyOtpPage from "./pages/tenant/VerifyotpPage";
@@ -108,6 +109,8 @@ function App() {
                   <Route path="/dashboard" element={<Dashboard />} />
                   <Route path="/addresses" element={<AddressPage />} />
                   <Route path="/my-bids" element={<MyBidsPage />} />
+                  <Route path="/my-slots" element={<MySlotsPage/>} />
+
                </Route>
             </Route>
             <Route path="/chat" element={<ChatPage />} />

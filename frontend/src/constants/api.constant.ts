@@ -9,7 +9,7 @@ export const BASE_ROUTES = {
     CHAT: '/chat',
     BID: '/bid',
     SLOT: '/slot',
-    PAYMENT:'/payment'
+    PAYMENT: '/payment'
 }
 export const AUTH_ROUTES = {
     REGISTER: "/auth/register",
@@ -94,11 +94,12 @@ export const BID_ROUTES = {
     PLACE_BID: '/place-bid',
     MY_BIDS: '/my-bids',
     BID_HISTORY: '/bid-history'
-  
+
 }
-export const SLOT_ROUTES={
-    BOOK_SLOT:'/book-slot'
+export const SLOT_ROUTES = {
+    BOOK_SLOT: '/book-slot',
+    MY_SLOTS: '/my-slots'
 }
-export const PAYMENT_ROUTES={
-    VERIFY_PAYMENT:'/verify-payment'
+export const PAYMENT_ROUTES = {
+    VERIFY_PAYMENT: '/verify-payment'
 }

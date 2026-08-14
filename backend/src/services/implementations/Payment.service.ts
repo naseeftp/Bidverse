@@ -9,12 +9,15 @@ import { BadRequestError, NotFoundError } from "../../errors/AppError";
 import { ISlotRepository } from "../../repositories/interfaces/ISlot.repository";
 import { SlotBookingStatus } from "../../constants/slot.constant";
 import { IAuctionItemRepository } from "../../repositories/interfaces/IAuctionItem.repository";
+import { ITransactionService } from "../interface/ITransaction.service";
+import { TransactionDirection, TransactionPartyType, TransactionPurpose, TransactionStatus } from "../../constants/transaction.constant";
 
 export class PaymentService implements IPaymentService {
     constructor(
         private _paymentRepo: IPaymentRepository,
         private _slotRepo:ISlotRepository,
         private _auctionRepo:IAuctionItemRepository,
+        private _transactionService:ITransactionService,
         private _razorpay: Razorpay
     ) { }
     async createSlotPayment(data: createSlotPaymentDTO): Promise<slotPaymentResponseDTO> {
@@ -94,6 +97,21 @@ export class PaymentService implements IPaymentService {
                 auctionItem.slotCount+=1
                 await auctionItem.save()
             }
+            await this._transactionService.createTransaction({
+                partyType:TransactionPartyType.USER,
+                userId:payment.userId.toString(),
+                paymentId:payment._id.toString(),
+                auctionItemId:payment.auctionItemId?.toString(),
+                           slotBookingId: payment.slotBookingId.toString(),
+                 purpose:TransactionPurpose.SLOT_BOOKING,
+                 direction:TransactionDirection.DEBIT,
+                 amount:payment.amount,
+                 currency:payment.currency,
+                 status:TransactionStatus.COMPLETED,
+                 description:'Auction slot booking payment',
+                 razorpayOrderId:data.razorpayOrderId,
+                 razorpayPaymentId:data.razorpayPaymentId
+            })
 
         }
 
