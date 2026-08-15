@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import slotService from "../../services/slot.service";
-import type { bookedSlotListDTO } from "../../types/slot.dto";
+import type { bookedSlotListDTO, slotCancelDTO } from "../../types/slot.dto";
 import type { IPaginationMeta } from "../../types/auth.type";
 import toast from "react-hot-toast";
 import Pagination from "../../components/user/pagination";
@@ -57,7 +57,11 @@ const MySlotsPage: React.FC = () => {
 
     setCancelling(true);
     try {
-      const response = await slotService.cancelSlot(selectedSlotForCancel.slotId);
+      const cancelData:slotCancelDTO={
+      slotId:selectedSlotForCancel.slotId,
+      auctionId:selectedSlotForCancel.auctionId
+      }
+      const response = await slotService.cancellSlot(cancelData);
       if (response.success) {
         toast.success(response.message || "Slot cancelled successfully");
         setSelectedSlotForCancel(null);

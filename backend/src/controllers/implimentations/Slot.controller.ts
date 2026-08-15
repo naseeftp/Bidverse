@@ -29,4 +29,14 @@ export class SlotController implements ISlotController {
             next(error)
         }
     }
+   async cancellSlot(req: Request, res: Response, next: NextFunction): Promise<void> {
+       try {
+        const userId=req.user.id;
+        const {slotId,auctionId}=req.body;
+        const result=await this._slotService.cancellSlot({userId,slotId,auctionId});
+        SuccessResponse(res,MESSAGES.SLOT_CANCELLED,result,HttpStatus.OK)
+       } catch (error) {
+        next(error)
+       }
+   }
 }

@@ -20,5 +20,10 @@ router.get(
     allowedTo(Role.USER),
     (req, res, next) => slotController.listAllSlotForUser(req, res, next)
 )
+router.patch(
+    SLOT_ROUTES.CANCEL_SLOT,
+    allowedTo(Role.USER),
+    (req,res,next)=>slotController.cancellSlot(req,res,next)
+)
 
 export default router;

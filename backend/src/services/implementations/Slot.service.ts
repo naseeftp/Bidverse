@@ -1,9 +1,9 @@
 import { ISlotService } from "../interface/ISlot.service";
 import { ISlotRepository } from "../../repositories/interfaces/ISlot.repository";
-import { bookedSlotListDTO, bookSlotDTO, bookSlotResponseDTO } from "../../dtos/user.dto/slot.dto";
+import { bookedSlotListDTO, bookSlotDTO, bookSlotResponseDTO, slotCancelDTO, slotCancelResponseDTO } from "../../dtos/user.dto/slot.dto";
 import { IAuctionHouseRepository } from "../../repositories/interfaces/IAuctionHouse.repository";
 import { IAuctionItemRepository } from "../../repositories/interfaces/IAuctionItem.repository";
-import { BadRequestError, NotFoundError } from "../../errors/AppError";
+import { BadRequestError, NotFoundError, UnauthorizedError } from "../../errors/AppError";
 import { MESSAGES } from "../../constants/constants";
 import { Types } from "mongoose";
 import { SlotBookingStatus } from "../../constants/slot.constant";
@@ -11,6 +11,7 @@ import { SlotBookingStatus } from "../../constants/slot.constant";
 import { IPaymentService } from "../interface/IPayment.service";
 import { createSlotPaymentDTO } from "../../dtos/user.dto/payment.dto";
 import { IGenericPaginatedResposnse } from "../../types/response.type";
+import { SlotMapper } from "../../mappers/slot..mapper";
 
 export class SlotService implements ISlotService {
     constructor(
@@ -74,5 +75,24 @@ export class SlotService implements ISlotService {
                 hasPrevPage: page > 1
             }
         }
+    }
+    async cancellSlot(data: slotCancelDTO): Promise<slotCancelResponseDTO> {
+        const slotExist=await this._slotRepo.findById(data.slotId)
+        if(!slotExist){
+            throw new NotFoundError(MESSAGES.SLOT_NOT_FOUND)
+        }
+        if(slotExist.userId.toString()!==data.userId){
+            throw new UnauthorizedError(MESSAGES.NOT_PERMITTED)
+        };
+        const cancelledSlot=await this._slotRepo.updateById(data.slotId,
+
+            {
+                status:SlotBookingStatus.CANCELLED
+            }
+        )
+        if(!cancelledSlot){
+            throw new NotFoundError(MESSAGES.SLOT_NOT_FOUND)
+        }
+        return SlotMapper.toCancelSloTResponseDTO(cancelledSlot)
     }
 }

@@ -28,3 +28,14 @@ export interface bookedSlotListDTO{
     status:SlotBookingStatus;
     bookedAt:Date;
 }
+
+ export interface slotCancelDTO{
+    userId:string;
+    auctionId:string;
+    slotId:string;
+ }
+ export interface slotCancelResponseDTO{
+    slotStatus:SlotBookingStatus,
+    slotId:string;
+    auctionId:string
+ }

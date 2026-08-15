@@ -6,7 +6,7 @@ export const Roles = {
     TENANT: 'tenant',
     USER: 'user'
 } as const;
-
+export const PLATFORM_COMMISSION = 10
 
 export const OtpPurpose = {
     REGISTRATION: 'registration',
@@ -161,15 +161,18 @@ export const MESSAGES = {
     MESSAGE_NOT_FOUND: 'Message Not Foud',
     MESSAGE_DELETED: 'Message deleted',
     MESSAGE_EDITED: 'Message edited',
-    MESSAGE_READED:'Message readed',
-    ACTION_SUCCESS:'Action currently doing is success',
+    MESSAGE_READED: 'Message readed',
+    ACTION_SUCCESS: 'Action currently doing is success',
 
-    BID_PLACED:'Bid placed Successfully',
-    SLOT_BOOKED:'Slot booking completed',
-    HOUSE_FULL:'All slots are already booked',
-    ALLREADY_BOOKED:'You are allready own a slot for this auction',
-    PAYMENT_SUCCESS:'Payment Success',
-    
+    BID_PLACED: 'Bid placed Successfully',
+    SLOT_BOOKED: 'Slot booking completed',
+    SLOT_NOT_FOUND: 'Slot Not found',
+    SLOT_CANCELLED: 'Slot cancelled sucessfully',
+
+    HOUSE_FULL: 'All slots are already booked',
+    ALLREADY_BOOKED: 'You are allready own a slot for this auction',
+    PAYMENT_SUCCESS: 'Payment Success',
+
     LOGOUT_SUCCESS: "Logout success",
     LOGOUT_FAILED: "Logout failed",
 
@@ -201,14 +204,14 @@ export enum MessageType {
     FILE = 'file'
 }
 
-export enum BidStatus{
-    ACTIVE='active',
-    OUTBID='outbid',
-    WINNING='winning',
-    WON='won',
-    CANCELLED='cancelled',
+export enum BidStatus {
+    ACTIVE = 'active',
+    OUTBID = 'outbid',
+    WINNING = 'winning',
+    WON = 'won',
+    CANCELLED = 'cancelled',
 }
-export const BidStatusValues=Object.values(BidStatus)
+export const BidStatusValues = Object.values(BidStatus)
 
 export const MESSAGE_TIME_CONFIG = {
     MAX_DELETE_WINDOW: 15 * 60 * 1000,

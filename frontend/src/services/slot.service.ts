@@ -1,6 +1,6 @@
 import axiosInstance from "../api/axios.instance";
 import { BASE_ROUTES, SLOT_ROUTES } from "../constants/api.constant";
-import type { bookedSlotListDTO, bookSlotDTO, bookSlotResponseDTO } from "../types/slot.dto";
+import type { bookedSlotListDTO, bookSlotDTO, bookSlotResponseDTO, slotCancelDTO, slotCancelResponseDTO } from "../types/slot.dto";
 import { apiErrorHandler } from "../utils/error.handle";
 import type { ApiResponse, IPaginationMeta } from "../types/auth.type";
 
@@ -32,6 +32,19 @@ export class SlotService {
             }
         } catch (error) {
             return apiErrorHandler(error, 'Failed to slot list')
+        }
+    }
+    async cancellSlot(data:slotCancelDTO){
+        try {
+           const url=`${BASE_ROUTES.SLOT}${SLOT_ROUTES.CANCEL_SLOT}` 
+           const response=await axiosInstance.patch<slotCancelResponseDTO,ApiResponse<slotCancelResponseDTO>>(url,data)
+           return {
+            success:true,
+            message:response.message,
+            data:response.data
+           }
+        } catch (error) {
+        return apiErrorHandler(error, 'Failed to Cancel slot')
         }
     }
 }

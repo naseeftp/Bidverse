@@ -17,6 +17,7 @@ export interface IPayment {
     refundedAt?: Date;
     platformCommission?: number;
     netAmount?: number;
+    platformCommision?:number;
     releasedAt?: Date;
 }
 export type IPaymentDocument= IPayment&Document;

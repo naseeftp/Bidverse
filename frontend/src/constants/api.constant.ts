@@ -98,7 +98,9 @@ export const BID_ROUTES = {
 }
 export const SLOT_ROUTES = {
     BOOK_SLOT: '/book-slot',
-    MY_SLOTS: '/my-slots'
+    MY_SLOTS: '/my-slots',
+    CANCEL_SLOT: '/cancel-slot'
+
 }
 export const PAYMENT_ROUTES = {
     VERIFY_PAYMENT: '/verify-payment'
