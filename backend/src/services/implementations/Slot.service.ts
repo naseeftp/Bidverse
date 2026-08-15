@@ -7,11 +7,10 @@ import { BadRequestError, NotFoundError, UnauthorizedError } from "../../errors/
 import { MESSAGES } from "../../constants/constants";
 import { Types } from "mongoose";
 import { SlotBookingStatus } from "../../constants/slot.constant";
-// import { SlotMapper } from "../../mappers/slot..mapper";
+import { SlotMapper } from "../../mappers/slot..mapper";
 import { IPaymentService } from "../interface/IPayment.service";
 import { createSlotPaymentDTO } from "../../dtos/user.dto/payment.dto";
 import { IGenericPaginatedResposnse } from "../../types/response.type";
-import { SlotMapper } from "../../mappers/slot..mapper";
 
 export class SlotService implements ISlotService {
     constructor(
@@ -84,6 +83,10 @@ export class SlotService implements ISlotService {
         if(slotExist.userId.toString()!==data.userId){
             throw new UnauthorizedError(MESSAGES.NOT_PERMITTED)
         };
+        if(slotExist.status===SlotBookingStatus.CANCELLED){
+            throw new BadRequestError(MESSAGES.SLOT_ALLREADY_CANCELLED)
+        }
+        await this._paymentService.refundSlotPayment(data.slotId)
         const cancelledSlot=await this._slotRepo.updateById(data.slotId,
 
             {
@@ -93,6 +96,12 @@ export class SlotService implements ISlotService {
         if(!cancelledSlot){
             throw new NotFoundError(MESSAGES.SLOT_NOT_FOUND)
         }
+        const auctionExist=await this._auctionItemRepo.findById(data.auctionId);
+        if(!auctionExist){
+            throw new NotFoundError(MESSAGES.AUCTION_NOT_FOUND)
+        }
+        auctionExist.slotCount-=1;
+        auctionExist.save()
         return SlotMapper.toCancelSloTResponseDTO(cancelledSlot)
     }
 }

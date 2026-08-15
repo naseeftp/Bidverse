@@ -168,10 +168,12 @@ export const MESSAGES = {
     SLOT_BOOKED: 'Slot booking completed',
     SLOT_NOT_FOUND: 'Slot Not found',
     SLOT_CANCELLED: 'Slot cancelled sucessfully',
+    SLOT_ALLREADY_CANCELLED:'Slot is already cancelled',
 
     HOUSE_FULL: 'All slots are already booked',
     ALLREADY_BOOKED: 'You are allready own a slot for this auction',
     PAYMENT_SUCCESS: 'Payment Success',
+    PAYMENT_NOT_FOUND:'Payment not Found',
 
     LOGOUT_SUCCESS: "Logout success",
     LOGOUT_FAILED: "Logout failed",

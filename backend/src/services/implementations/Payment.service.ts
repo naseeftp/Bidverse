@@ -11,7 +11,7 @@ import { SlotBookingStatus } from "../../constants/slot.constant";
 import { IAuctionItemRepository } from "../../repositories/interfaces/IAuctionItem.repository";
 import { ITransactionService } from "../interface/ITransaction.service";
 import { TransactionDirection, TransactionPartyType, TransactionPurpose, TransactionStatus } from "../../constants/transaction.constant";
-import { PLATFORM_COMMISSION } from "../../constants/constants";
+import { MESSAGES, PLATFORM_COMMISSION } from "../../constants/constants";
 
 export class PaymentService implements IPaymentService {
     constructor(
@@ -28,16 +28,16 @@ export class PaymentService implements IPaymentService {
             currency: 'INR',
             receipt: `slot_${data.slotBookingId}`
         })
-        const netAmount=data.amount-(PLATFORM_COMMISSION/100)*data.amount;
-        const platformCommision=(PLATFORM_COMMISSION/100)*data.amount;
+        const netAmount = data.amount - (PLATFORM_COMMISSION / 100) * data.amount;
+        const platformCommision = (PLATFORM_COMMISSION / 100) * data.amount;
         const payment = await this._paymentRepo.create({
             userId: new Types.ObjectId(data.userId),
             auctionItemId: new Types.ObjectId(data.auctionId),
             type: PaymentType.SLOT_BOOKING,
             slotBookingId: new Types.ObjectId(data.slotBookingId),
             amount: data.amount,
-            netAmount:netAmount,
-            platformCommision:platformCommision,
+            netAmount: netAmount,
+            platformCommision: platformCommision,
             currency: 'INR',
             status: PaymentStatus.PENDING,
             escrowStatus: EscrowStatus.NOT_APPLICABLE,
@@ -120,5 +120,54 @@ export class PaymentService implements IPaymentService {
 
         }
 
+    }
+    async refundSlotPayment(slotId: string): Promise<void> {
+        const payment = await this._paymentRepo.findOne({
+            slotBookingId: new Types.ObjectId(slotId)
+        });
+        if (!payment) {
+            throw new NotFoundError(MESSAGES.PAYMENT_NOT_FOUND)
+        }
+        if (payment.status !== PaymentStatus.PAID) {
+            return
+        };
+        if (payment.escrowStatus !== EscrowStatus.HELD) {
+            return
+        }
+        if (!payment.razorpayPaymentId) {
+            throw new BadRequestError('Razorpay payment ID is missing')
+        };
+
+        await this._razorpay.payments.refund(
+            payment.razorpayPaymentId,
+            {
+                amount: Math.round(payment.amount * 100)
+            }
+        )
+
+        await this._paymentRepo.updateById(
+            payment._id.toString(),
+            {
+                status: PaymentStatus.REFUNDED,
+                escrowStatus: EscrowStatus.REFUNDED,
+                refundedAt: new Date()
+            }
+        )
+
+        await this._transactionService.createTransaction({
+            partyType: TransactionPartyType.USER,
+            userId: payment.userId.toString(),
+            paymentId: payment._id.toString(),
+            auctionItemId: payment.auctionItemId?.toString(),
+            slotBookingId: payment.slotBookingId?.toString(),
+            purpose: TransactionPurpose.REFUND,
+            direction: TransactionDirection.CREDIT,
+            amount: payment.amount,
+            currency: payment.currency,
+            status: TransactionStatus.COMPLETED,
+            description: 'Slot booking refund',
+            razorpayPaymentId: payment.razorpayPaymentId,
+            razorpayOrderId: payment.razorpayOrderId,
+        })
     }
 }
