@@ -76,31 +76,31 @@ export class SlotService implements ISlotService {
         }
     }
     async cancellSlot(data: slotCancelDTO): Promise<slotCancelResponseDTO> {
-        const slotExist=await this._slotRepo.findById(data.slotId)
-        if(!slotExist){
+        const slotExist = await this._slotRepo.findById(data.slotId)
+        if (!slotExist) {
             throw new NotFoundError(MESSAGES.SLOT_NOT_FOUND)
         }
-        if(slotExist.userId.toString()!==data.userId){
+        if (slotExist.userId.toString() !== data.userId) {
             throw new UnauthorizedError(MESSAGES.NOT_PERMITTED)
         };
-        if(slotExist.status===SlotBookingStatus.CANCELLED){
+        if (slotExist.status === SlotBookingStatus.CANCELLED) {
             throw new BadRequestError(MESSAGES.SLOT_ALLREADY_CANCELLED)
         }
         await this._paymentService.refundSlotPayment(data.slotId)
-        const cancelledSlot=await this._slotRepo.updateById(data.slotId,
+        const cancelledSlot = await this._slotRepo.updateById(data.slotId,
 
             {
-                status:SlotBookingStatus.CANCELLED
+                status: SlotBookingStatus.CANCELLED
             }
         )
-        if(!cancelledSlot){
+        if (!cancelledSlot) {
             throw new NotFoundError(MESSAGES.SLOT_NOT_FOUND)
         }
-        const auctionExist=await this._auctionItemRepo.findById(data.auctionId);
-        if(!auctionExist){
+        const auctionExist = await this._auctionItemRepo.findById(data.auctionId);
+        if (!auctionExist) {
             throw new NotFoundError(MESSAGES.AUCTION_NOT_FOUND)
         }
-        auctionExist.slotCount-=1;
+        auctionExist.slotCount -= 1;
         auctionExist.save()
         return SlotMapper.toCancelSloTResponseDTO(cancelledSlot)
     }

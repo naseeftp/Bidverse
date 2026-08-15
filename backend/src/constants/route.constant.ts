@@ -12,7 +12,8 @@ export const BASE_ROUTES = {
     CHAT: '/chat',
     BID: '/bid',
     SLOT: '/slot',
-    PAYMENT: '/payment'
+    PAYMENT: '/payment',
+    TRANSACTION: '/transaction',
 } as const
 
 export const AUTH_ROUTES = {
@@ -103,12 +104,15 @@ export const BID_ROUTES = {
 export const SLOT_ROUTES = {
     BOOK_SLOT: '/book-slot',
     MY_SLOTS: '/my-slots',
-    CANCEL_SLOT:'/cancel-slot'
+    CANCEL_SLOT: '/cancel-slot'
 }
 export const PAYMENT_ROUTES = {
     VERIFY_PAYMENT: '/verify-payment'
 }
 
+export const TRANSACTION_ROUTES = {
+    LIST_TRANSACTIONS: '/list-transactions'
+}
 
 
 

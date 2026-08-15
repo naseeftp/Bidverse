@@ -33,11 +33,9 @@ const MySlotsPage: React.FC = () => {
     setLoading(true);
     try {
       const response = await slotService.listAllSlotForUser(page, 6);
-
-
       if (response.success && response.data) {
         setSlots(response.data);
-        setPagination(response.pagination?? null);
+        setPagination(response.pagination ?? null);
       } else {
         toast.error(response.message || "Failed to retrieve slots");
       }
@@ -57,9 +55,9 @@ const MySlotsPage: React.FC = () => {
 
     setCancelling(true);
     try {
-      const cancelData:slotCancelDTO={
-      slotId:selectedSlotForCancel.slotId,
-      auctionId:selectedSlotForCancel.auctionId
+      const cancelData: slotCancelDTO = {
+        slotId: selectedSlotForCancel.slotId,
+        auctionId: selectedSlotForCancel.auctionId
       }
       const response = await slotService.cancellSlot(cancelData);
       if (response.success) {
@@ -142,7 +140,7 @@ const MySlotsPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-[#FFF9F4] px-4 py-8 md:px-8 text-[#1F1F1F] font-sans antialiased">
       <div className="max-w-6xl mx-auto space-y-6">
-        
+
         <div className="border-b border-[#E6E0DA] pb-5">
           <h1 className="text-2xl font-black uppercase tracking-tight text-[#1F1F1F]">
             My Reserved Slots
@@ -315,7 +313,7 @@ const MySlotsPage: React.FC = () => {
 
             <p className="text-xs text-[#6B6B6B] leading-relaxed">
               Are you sure you want to cancel your slot for{" "}
-              <span className="font-bold text-[#1F1F1F]">{selectedSlotForCancel.auctionTitle}</span>? 
+              <span className="font-bold text-[#1F1F1F]">{selectedSlotForCancel.auctionTitle}</span>?
               This action cannot be undone, and your bidding window access will be released.
             </p>
 

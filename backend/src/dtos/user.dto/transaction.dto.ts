@@ -38,3 +38,16 @@ export interface TransactionResponseDTO {
     description?: string;
     createdAt: Date;
 }
+
+export interface transactionListDTO {
+    transactionId: string;
+    purpose: TransactionPurpose;
+    direction: TransactionDirection;
+    amount: number;
+    currency: string;
+    status: TransactionStatus;
+    description?: string;
+    auctionId?: string;
+    slotBookingId?: string;
+    createdAt: Date;
+}

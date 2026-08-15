@@ -9,7 +9,8 @@ export const BASE_ROUTES = {
     CHAT: '/chat',
     BID: '/bid',
     SLOT: '/slot',
-    PAYMENT: '/payment'
+    PAYMENT: '/payment',
+    TRANSACTION: '/transaction',
 }
 export const AUTH_ROUTES = {
     REGISTER: "/auth/register",
@@ -104,4 +105,7 @@ export const SLOT_ROUTES = {
 }
 export const PAYMENT_ROUTES = {
     VERIFY_PAYMENT: '/verify-payment'
+}
+export const TRANSACTION_ROUTES = {
+    LIST_TRANSACTIONS: '/list-transactions'
 }

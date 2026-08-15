@@ -32,6 +32,7 @@ import WatchlistPage from "./pages/users/WatchlistPage";
 import ChatPage from "./pages/users/chatPage";
 import MyBidsPage from "./pages/users/myBids.page";
 import MySlotsPage from "./pages/users/mySlots";
+import MyTransactions from "./pages/users/myTransactions";
 
 import TenantRegisterPage from "./pages/tenant/RegiterPage";
 import TenantVerifyOtpPage from "./pages/tenant/VerifyotpPage";
@@ -110,6 +111,7 @@ function App() {
                   <Route path="/addresses" element={<AddressPage />} />
                   <Route path="/my-bids" element={<MyBidsPage />} />
                   <Route path="/my-slots" element={<MySlotsPage/>} />
+                  <Route path="/my-transactions" element={<MyTransactions/>} />
 
                </Route>
             </Route>

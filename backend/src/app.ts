@@ -22,6 +22,7 @@ import ChatRoutes from './routes/chat.routes'
 import BidRoutes from './routes/bid.routes'
 import SlotRoutes from './routes/slot.routes'
 import PaymentRoutes from './routes/payment.routes'
+import TransactionRoutes from './routes/transaction.routes'
 
 import { LoggerService } from "./services/implementations/Logger.service";
 
@@ -52,8 +53,9 @@ app.use(BASE_ROUTES.AUCTION_ITEM, auctionItemRoutes)
 app.use(BASE_ROUTES.WATCH_LIST, WatchlistRoutes)
 app.use(BASE_ROUTES.CHAT, ChatRoutes)
 app.use(BASE_ROUTES.BID, BidRoutes)
-app.use(BASE_ROUTES.SLOT,SlotRoutes)
-app.use(BASE_ROUTES.PAYMENT,PaymentRoutes)
+app.use(BASE_ROUTES.SLOT, SlotRoutes)
+app.use(BASE_ROUTES.PAYMENT, PaymentRoutes)
+app.use(BASE_ROUTES.TRANSACTION, TransactionRoutes)
 
 app.use(errorHandler);
 const startServer = async () => {

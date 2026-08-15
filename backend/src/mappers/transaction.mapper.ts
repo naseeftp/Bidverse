@@ -1,5 +1,5 @@
 import { ITransactionDocument } from "../types/transaction.type";
-import { TransactionResponseDTO } from "../dtos/user.dto/transaction.dto";
+import { transactionListDTO, TransactionResponseDTO } from "../dtos/user.dto/transaction.dto";
 
 export class TransactionMapper {
 
@@ -22,5 +22,19 @@ export class TransactionMapper {
             description: transaction.description,
             createdAt: transaction.createdAt
         };
+    };
+    static toTransactionListResponse(transaction: ITransactionDocument): transactionListDTO {
+        return {
+            transactionId: transaction._id.toString(),
+            purpose: transaction.purpose,
+            direction: transaction.direction,
+            amount: transaction.amount,
+            currency: transaction.currency,
+            status: transaction.status,
+            description: transaction.description,
+            auctionId: transaction.auctionItemId?.toString(),
+            slotBookingId: transaction.slotBookingId?.toString(),
+            createdAt: transaction.createdAt
+        }
     }
 }
