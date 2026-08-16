@@ -23,7 +23,7 @@ const MyTransactions: React.FC = () => {
     const fetchTransactions = useCallback(async () => {
         setLoading(true);
         try {
-            const response = await transactionService.listTransaction(page, 2);
+            const response = await transactionService.listTransaction(page, 6);
             if (response.success && response.data) {
                 setTransactions(response.data);
                 setPagination(response.pagination ?? null);
@@ -212,7 +212,6 @@ const MyTransactions: React.FC = () => {
                             </div>
                         </div>
 
-                        {/* Pagination */}
                         <div className="mt-8">
                             <Pagination
                                 pagination={pagination}

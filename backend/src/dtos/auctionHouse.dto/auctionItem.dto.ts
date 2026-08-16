@@ -189,6 +189,7 @@ export interface AuctionItemDetailDTO {
     isApproved: boolean;
     approvedAt?: string;
     rejectionReason?: string;
+    cancellationReason?:string;
     createdAt: string;
     updatedAt: string;
 

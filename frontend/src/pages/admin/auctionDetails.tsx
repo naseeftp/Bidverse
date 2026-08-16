@@ -168,7 +168,7 @@ const AdminAuctionDetailPage: React.FC = () => {
     if (!auction) return null
     const isPendingReview = auction?.status == 'PENDING_APPROVAL' && !auction?.isApproved
     const isHalted = auction.status === 'REJECTED' || auction.status === 'CANCELLED_BY_ADMIN';
-    const haltNotice = auction.rejectionReason // later add auction cancellation reason
+    const haltNotice = auction.rejectionReason||auction.cancellationReason // later add auction cancellation reason
     return (
 
         <div className="min-h-screen bg-[#F3F4F6] px-4 py-8 md:px-8 text-[#0F172A] font-sans">

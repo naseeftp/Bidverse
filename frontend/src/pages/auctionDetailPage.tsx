@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import type { AuctionItemDetailDTO } from "../types/auctionItem.dto";
+import { AuctionItemStatus, type AuctionItemDetailDTO } from "../types/auctionItem.dto";
 import toast from "react-hot-toast";
 import publicAuctionService from "../services/publicAuction.service";
 import {
@@ -15,7 +15,9 @@ import {
     FaShieldAlt,
     FaRegBuilding,
     FaRegHeart,
-    FaHeart
+    FaHeart,
+    FaBan,
+    FaExclamationTriangle
 } from "react-icons/fa";
 import watchListService from "../services/watchList.service";
 import { useAppDispatch } from "../hooks/redux.hooks";
@@ -31,7 +33,7 @@ import paymentService from "../services/payment.service";
 const PublicAuctionDetailPage: React.FC = () => {
     const { itemId } = useParams<{ itemId: string }>();
     const navigate = useNavigate();
-    const dispatch = useAppDispatch()
+    const dispatch = useAppDispatch();
 
     const [loading, setLoading] = useState(false);
     const [auction, setAuction] = useState<AuctionItemDetailDTO | null>(null);
@@ -42,11 +44,11 @@ const PublicAuctionDetailPage: React.FC = () => {
     const [timerLabel, setTimerLabel] = useState<'STARTS IN' | 'ENDS IN' | 'CONCLUDED'>('STARTS IN');
 
     const [isWatched, setIsWathed] = useState<boolean>(false);
-    const [isWatchlistLoading, setIsWatchlistLoading] = useState<boolean>(false)
-    const [isChatLoading, setIsChatLoading] = useState<boolean>(false)
+    const [isWatchlistLoading, setIsWatchlistLoading] = useState<boolean>(false);
+    const [isChatLoading, setIsChatLoading] = useState<boolean>(false);
 
-    const [isBidModalOpen, setBidModalOpen] = useState<boolean>(false)
-    const [isSlotModalOpen,setIsSlotModalOpen]=useState<boolean>(false)
+    const [isBidModalOpen, setBidModalOpen] = useState<boolean>(false);
+    const [isSlotModalOpen, setIsSlotModalOpen] = useState<boolean>(false);
 
     const fetchAuctionDetail = useCallback(async () => {
         if (!itemId) return;
@@ -73,126 +75,109 @@ const PublicAuctionDetailPage: React.FC = () => {
     }, [itemId, navigate]);
 
     const handleInitiateChat = async () => {
-        setIsChatLoading(true)
+        setIsChatLoading(true);
         try {
             const payload = {
                 receiverId: auction?.auctionHouse.ownerId ?? '',
                 receiverRole: 'tenant'
-            }
-            const response = await chatService.getOrCreateConversation(payload)
+            };
+            const response = await chatService.getOrCreateConversation(payload);
             if (response.success && response.data) {
-                navigate('/chat')
-            }
-            else {
-                toast.error(response.message)
+                navigate('/chat');
+            } else {
+                toast.error(response.message);
             }
         } catch {
-            toast.error('failed to start conversation')
+            toast.error('failed to start conversation');
         } finally {
-            setIsChatLoading(false)
+            setIsChatLoading(false);
         }
-    }
+    };
 
     const handleBidSubmit = async (bidAmount: number) => {
         if (!auction?.auctionItemId || !auction.auctionHouse.id) {
-            return
+            return;
         }
         try {
             const response = await bidService.placeBid({
                 tenantId: auction?.auctionHouse.id,
                 auctionId: auction?.auctionItemId,
                 amount: bidAmount.toString()
-            })
+            });
             if (response?.success && response.data) {
-                toast.success(response.message)
-                fetchAuctionDetail()
-            }
-            else {
-                toast.error(response!.message)
+                toast.success(response.message);
+                fetchAuctionDetail();
+            } else {
+                toast.error(response!.message);
             }
         } catch {
-            toast.error('failed to place Bid')
+            toast.error('failed to place Bid');
+        }
+    };
+
+    const handleBookSlotSubmit = async () => {
+        if (!auction?.auctionItemId || !auction.auctionHouse.id) {
+            toast.error("Auction details are missing.");
+            return;
         }
 
-    }
-   const handleBookSlotSubmit = async () => {
-    if (!auction?.auctionItemId || !auction.auctionHouse.id) {
-        toast.error("Auction details are missing.");
-        return;
-    }
+        try {
+            const payload = {
+                auctionId: auction.auctionItemId,
+                tenantId: auction.auctionHouse.id,
+            };
 
-    try {
-        const payload = {
-            auctionId: auction.auctionItemId,
-            tenantId:auction.auctionHouse.id,
-        };
-
-        const response = await slotService.bookSlot(payload);
-        if (response?.success) {
-            // toast.success(response.message || "Slot reserved successfully!");
-             openRazorpayCheckout({
-             orderId:response.data?.payment.orderId??'',
-             amount:response.data?.payment.amount??0,
-             currency:response.data?.payment.currency??'',
-             keyId:response.data?.payment.keyId??''
-             },
-             async (paymentResponse) => {
-
-                      try {
-
-                        await paymentService.verifyPayment({
-                            razorpayOrderId:
-                                paymentResponse.razorpay_order_id,
-
-                            razorpayPaymentId:
-                                paymentResponse.razorpay_payment_id,
-
-                            razorpaySignature:
-                                paymentResponse.razorpay_signature,
-                        });
-
-                        toast.success("Payment successful! Slot confirmed.");
-
-                        fetchAuctionDetail();
-
-                    } catch {
-                        toast.error(
-                            "Payment verification failed."
-                        );
-                    }
-                },
-            )
-            fetchAuctionDetail(); 
-        } else {
-            toast.error(response?.message || "Failed to book slot");
+            const response = await slotService.bookSlot(payload);
+            if (response?.success) {
+                openRazorpayCheckout(
+                    {
+                        orderId: response.data?.payment.orderId ?? '',
+                        amount: response.data?.payment.amount ?? 0,
+                        currency: response.data?.payment.currency ?? '',
+                        keyId: response.data?.payment.keyId ?? ''
+                    },
+                    async (paymentResponse) => {
+                        try {
+                            await paymentService.verifyPayment({
+                                razorpayOrderId: paymentResponse.razorpay_order_id,
+                                razorpayPaymentId: paymentResponse.razorpay_payment_id,
+                                razorpaySignature: paymentResponse.razorpay_signature,
+                            });
+                            toast.success("Payment successful! Slot confirmed.");
+                            fetchAuctionDetail();
+                        } catch {
+                            toast.error("Payment verification failed.");
+                        }
+                    },
+                );
+                fetchAuctionDetail();
+            } else {
+                toast.error(response?.message || "Failed to book slot");
+            }
+        } catch {
+            toast.error("An error occurred while booking slot");
         }
-    } catch {
-        toast.error("An error occurred while booking slot");
-    }
-};
+    };
 
     const handleWatchlistAction = async (e: React.MouseEvent<HTMLButtonElement>) => {
         e.stopPropagation();
         if (isWatchlistLoading) return;
         try {
             setIsWatchlistLoading(true);
-            const response = await watchListService.addToWatchList(auction?.auctionItemId as string)
+            const response = await watchListService.addToWatchList(auction?.auctionItemId as string);
             if (response.success) {
-                toast.success(response.message)
-                setIsWathed(true)
-                dispatch(incrementWatchlistCount())
-            }
-            else {
-                toast.error(response.message)
+                toast.success(response.message);
+                setIsWathed(true);
+                dispatch(incrementWatchlistCount());
+            } else {
+                toast.error(response.message);
             }
         } catch {
-            toast.error('failed to add Watchlist')
-        }
-        finally {
+            toast.error('failed to add Watchlist');
+        } finally {
             setIsWatchlistLoading(false);
         }
     };
-
 
     useEffect(() => {
         fetchAuctionDetail();
@@ -200,6 +185,16 @@ const PublicAuctionDetailPage: React.FC = () => {
 
     useEffect(() => {
         if (!auction || !auction.startTime || !auction.endTime) return;
+
+        const cancelled =
+            auction.status === AuctionItemStatus.CANCELLED_BY_ADMIN ||
+            auction.status === AuctionItemStatus.CANCELLED_BY_HOUSE ;
+
+        if (cancelled) {
+            setTimerLabel('CONCLUDED');
+            setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+            return;
+        }
 
         const interval = setInterval(() => {
             const now = new Date().getTime();
@@ -250,6 +245,12 @@ const PublicAuctionDetailPage: React.FC = () => {
 
     if (!auction) return null;
 
+    const isCancelled = auction.status === 'CANCELLED_BY_ADMIN' || auction.status === 'CANCELLED_BY_HOUSE' 
+    const cancellationReason =auction.cancellationReason
+    const canPlaceBid = !isCancelled && timerLabel === 'ENDS IN';
+    const canBookSlot = !isCancelled && timerLabel === 'STARTS IN';
+    const canAddToWatchlist = !isCancelled && !isWatched;
+
     return (
         <div className="min-h-screen bg-[#FFF9F4] px-4 py-8 md:px-8 text-[#1F1F1F] font-sans antialiased">
 
@@ -268,7 +269,6 @@ const PublicAuctionDetailPage: React.FC = () => {
             <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
 
                 <div className="lg:col-span-7 space-y-6">
-
                     <div className="bg-white rounded-xl border border-[#E6E0DA] shadow-sm p-4">
                         <div
                             className="h-[450px] w-full rounded-lg overflow-hidden bg-[#FFF9F4] relative cursor-zoom-in border border-[#E6E0DA]/60"
@@ -280,8 +280,7 @@ const PublicAuctionDetailPage: React.FC = () => {
                                 <img
                                     src={activeImage}
                                     alt={auction.title}
-                                    className={`w-full h-full object-cover transition-transform duration-75 origin-center ${isZoomed ? "scale-[2.2]" : "scale-100"
-                                        }`}
+                                    className={`w-full h-full object-cover transition-transform duration-75 origin-center ${isZoomed ? "scale-[2.2]" : "scale-100"}`}
                                     style={isZoomed ? { transformOrigin: `${zoomPos.x}% ${zoomPos.y}%` } : undefined}
                                 />
                             ) : (
@@ -319,7 +318,7 @@ const PublicAuctionDetailPage: React.FC = () => {
                         <h2 className="text-xs font-bold uppercase tracking-widest text-[#1F1F1F] border-b border-[#E6E0DA] pb-3 mb-4">
                             Auction Item Description
                         </h2>
-                        <p className="text-sm text-[#6B6B6B] Aquarium leading-relaxed whitespace-pre-line font-medium">
+                        <p className="text-sm text-[#6B6B6B] leading-relaxed whitespace-pre-line font-medium">
                             {auction.description || "No customized descriptive logs written by the auction house for this lot asset position."}
                         </p>
                     </div>
@@ -372,7 +371,6 @@ const PublicAuctionDetailPage: React.FC = () => {
                             )}
                         </div>
                     )}
-                    
                 </div>
 
                 <div className="lg:col-span-5 space-y-6">
@@ -384,14 +382,15 @@ const PublicAuctionDetailPage: React.FC = () => {
                                 {auction.type} Format
                             </span>
 
-                            <span className={`px-2.5 py-1 text-[10px] font-bold tracking-wider uppercase rounded border ${auction.status === "PENDING_APPROVAL" || auction.status === "SCHEDULED"
-                                ? "bg-amber-50 border-amber-200 text-amber-700"
-                                : auction.status === "DRAFT"
-                                    ? "bg-stone-100 border-stone-200 text-stone-600"
-                                    : auction.status === "REJECTED" || auction.status?.startsWith('CANCELLED')
-                                        ? "bg-red-50 border-red-200 text-red-600"
-                                        : "bg-emerald-50 border-emerald-200 text-emerald-700"
-                                }`}>
+                            <span className={`px-2.5 py-1 text-[10px] font-bold tracking-wider uppercase rounded border ${
+                                auction.status === "PENDING_APPROVAL" || auction.status === "SCHEDULED"
+                                    ? "bg-amber-50 border-amber-200 text-amber-700"
+                                    : auction.status === "DRAFT"
+                                        ? "bg-stone-100 border-stone-200 text-stone-600"
+                                        : isCancelled || auction.status === "REJECTED"
+                                            ? "bg-red-50 border-red-200 text-red-600"
+                                            : "bg-emerald-50 border-emerald-200 text-emerald-700"
+                            }`}>
                                 {auction.status?.replace(/_/g, " ")}
                             </span>
                         </div>
@@ -402,39 +401,66 @@ const PublicAuctionDetailPage: React.FC = () => {
                             </h1>
                         </div>
 
-                        <div className="border border-[#E6E0DA]/80 bg-[#FFF9F4] rounded-xl p-4 shadow-sm">
-                            <div className="flex items-center gap-2 mb-3">
-                                <FaHourglassHalf className={`text-xs ${timerLabel === 'ENDS IN' ? 'text-[#C9653B] animate-spin' : 'text-[#6B6B6B]'}`} />
-                                <span className="text-[10px] uppercase font-bold text-[#6B6B6B] tracking-widest">
-                                    {timerLabel}
-                                </span>
+                        {isCancelled ? (
+                            <div className="border border-red-200 bg-red-50 rounded-xl p-4 shadow-sm">
+                                <div className="flex items-center gap-2 mb-3">
+                                    <FaBan className="text-red-600" size={14} />
+                                    <span className="text-[10px] uppercase font-bold text-red-700 tracking-widest">
+                                        Auction Cancelled
+                                    </span>
+                                </div>
+                                <div className="bg-white border border-red-100 rounded-lg p-3">
+                                    <div className="flex items-start gap-2">
+                                        <FaExclamationTriangle className="text-amber-500 mt-0.5 shrink-0" size={12} />
+                                        <div>
+                                            <p className="text-[9px] uppercase font-bold text-[#6B6B6B] tracking-wider mb-1">
+                                                Cancellation Reason
+                                            </p>
+                                            <p className="text-sm font-medium text-[#1F1F1F] leading-relaxed">
+                                                {cancellationReason}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <p className="mt-3 text-[10px] text-red-600/80 font-medium text-center uppercase tracking-wide">
+                                    This lot is no longer available for bidding
+                                </p>
                             </div>
+                        ) : (
+                            <div className="border border-[#E6E0DA]/80 bg-[#FFF9F4] rounded-xl p-4 shadow-sm">
+                                <div className="flex items-center gap-2 mb-3">
+                                    <FaHourglassHalf className={`text-xs ${timerLabel === 'ENDS IN' ? 'text-[#C9653B] animate-spin' : 'text-[#6B6B6B]'}`} />
+                                    <span className="text-[10px] uppercase font-bold text-[#6B6B6B] tracking-widest">
+                                        {timerLabel}
+                                    </span>
+                                </div>
 
-                            {timerLabel !== "CONCLUDED" ? (
-                                <div className="grid grid-cols-4 gap-2 text-center">
-                                    <div className="bg-white border border-[#E6E0DA] p-2 rounded-lg">
-                                        <p className="text-lg font-black text-[#1F1F1F] font-mono">{String(timeLeft.days).padStart(2, '0')}</p>
-                                        <p className="text-[9px] uppercase font-bold text-[#6B6B6B] tracking-tight">Days</p>
+                                {timerLabel !== "CONCLUDED" ? (
+                                    <div className="grid grid-cols-4 gap-2 text-center">
+                                        <div className="bg-white border border-[#E6E0DA] p-2 rounded-lg">
+                                            <p className="text-lg font-black text-[#1F1F1F] font-mono">{String(timeLeft.days).padStart(2, '0')}</p>
+                                            <p className="text-[9px] uppercase font-bold text-[#6B6B6B] tracking-tight">Days</p>
+                                        </div>
+                                        <div className="bg-white border border-[#E6E0DA] p-2 rounded-lg">
+                                            <p className="text-lg font-black text-[#1F1F1F] font-mono">{String(timeLeft.hours).padStart(2, '0')}</p>
+                                            <p className="text-[9px] uppercase font-bold text-[#6B6B6B] tracking-tight">Hours</p>
+                                        </div>
+                                        <div className="bg-white border border-[#E6E0DA] p-2 rounded-lg">
+                                            <p className="text-lg font-black text-[#1F1F1F] font-mono">{String(timeLeft.minutes).padStart(2, '0')}</p>
+                                            <p className="text-[9px] uppercase font-bold text-[#6B6B6B] tracking-tight">Mins</p>
+                                        </div>
+                                        <div className="bg-white border border-[#E6E0DA] p-2 rounded-lg">
+                                            <p className="text-lg font-black text-[#C9653B] font-mono">{String(timeLeft.seconds).padStart(2, '0')}</p>
+                                            <p className="text-[9px] uppercase font-bold text-[#6B6B6B] tracking-tight">Secs</p>
+                                        </div>
                                     </div>
-                                    <div className="bg-white border border-[#E6E0DA] p-2 rounded-lg">
-                                        <p className="text-lg font-black text-[#1F1F1F] font-mono">{String(timeLeft.hours).padStart(2, '0')}</p>
-                                        <p className="text-[9px] uppercase font-bold text-[#6B6B6B] tracking-tight">Hours</p>
+                                ) : (
+                                    <div className="bg-white border border-red-100 p-2.5 rounded-lg text-center text-xs font-bold text-red-600 uppercase tracking-widest shadow-sm">
+                                        Bidding Window Has Closed
                                     </div>
-                                    <div className="bg-white border border-[#E6E0DA] p-2 rounded-lg">
-                                        <p className="text-lg font-black text-[#1F1F1F] font-mono">{String(timeLeft.minutes).padStart(2, '0')}</p>
-                                        <p className="text-[9px] uppercase font-bold text-[#6B6B6B] tracking-tight">Mins</p>
-                                    </div>
-                                    <div className="bg-white border border-[#E6E0DA] p-2 rounded-lg">
-                                        <p className="text-lg font-black text-[#C9653B] font-mono">{String(timeLeft.seconds).padStart(2, '0')}</p>
-                                        <p className="text-[9px] uppercase font-bold text-[#6B6B6B] tracking-tight">Secs</p>
-                                    </div>
-                                </div>
-                            ) : (
-                                <div className="bg-white border border-red-100 p-2.5 rounded-lg text-center text-xs font-bold text-red-600 uppercase tracking-widest shadow-sm">
-                                    Bidding Window Has Closed
-                                </div>
-                            )}
-                        </div>
+                                )}
+                            </div>
+                        )}
 
                         <div className="border border-[#E6E0DA] rounded-xl p-4 bg-white shadow-sm space-y-4">
                             <div className="p-3 bg-[#FFF9F4] rounded-lg border border-[#E6E0DA]">
@@ -475,33 +501,45 @@ const PublicAuctionDetailPage: React.FC = () => {
                                 </span>
                             </div>
                         </div>
+
                         <div className="flex flex-col gap-2.5 pt-1">
                             {auction.type === 'TIMED' ? (
                                 <button
-                                    disabled={timerLabel === "CONCLUDED" || timerLabel === 'STARTS IN'}
+                                    disabled={!canPlaceBid}
                                     onClick={() => setBidModalOpen(true)}
                                     className="w-full bg-[#C9653B] hover:bg-[#C9653B]/90 text-white font-bold text-xs uppercase tracking-wider py-3 rounded-lg transition-all shadow-sm focus:outline-none disabled:bg-[#E6E0DA] disabled:text-[#6B6B6B] disabled:cursor-not-allowed transform active:scale-[0.99]"
                                 >
-                                    {timerLabel === 'ENDS IN' ? 'Place Bid' : 'Awaiting Bidding Window'}
+                                    {isCancelled
+                                        ? 'Auction Cancelled'
+                                        : timerLabel === 'ENDS IN'
+                                            ? 'Place Bid'
+                                            : timerLabel === 'CONCLUDED'
+                                                ? 'Bidding Window Closed'
+                                                : 'Awaiting Bidding Window'}
                                 </button>
                             ) : (
                                 <button
-                                    onClick={()=>setIsSlotModalOpen(true)}
-                                    disabled={timerLabel === "CONCLUDED" || timerLabel === 'ENDS IN'}
+                                    onClick={() => setIsSlotModalOpen(true)}
+                                    disabled={!canBookSlot}
                                     className="w-full bg-[#C9653B] hover:bg-[#C9653B]/90 text-white font-bold text-xs uppercase tracking-wider py-3 rounded-lg transition-all shadow-sm focus:outline-none disabled:bg-[#E6E0DA] disabled:text-[#6B6B6B] disabled:cursor-not-allowed transform active:scale-[0.99]"
                                 >
-                                    {timerLabel === 'STARTS IN' ? 'Register & Reserve Live Bidding Slot' : 'Live Show Concluded'}
+                                    {isCancelled
+                                        ? 'Auction Cancelled'
+                                        : timerLabel === 'STARTS IN'
+                                            ? 'Register & Reserve Live Bidding Slot'
+                                            : 'Live Show Concluded'}
                                 </button>
                             )}
 
                             <div className="grid grid-cols-2 gap-2">
                                 <button
                                     onClick={handleWatchlistAction}
-                                    disabled={isWatchlistLoading || isWatched}
-                                    className={`w-full py-2.5 rounded-lg font-bold text-xs uppercase tracking-wider transition-all focus:outline-none flex items-center justify-center gap-1.5 border border-[#E6E0DA] disabled:cursor-not-allowed ${isWatched
+                                    disabled={isWatchlistLoading || !canAddToWatchlist}
+                                    className={`w-full py-2.5 rounded-lg font-bold text-xs uppercase tracking-wider transition-all focus:outline-none flex items-center justify-center gap-1.5 border border-[#E6E0DA] disabled:cursor-not-allowed disabled:opacity-60 ${
+                                        isWatched
                                             ? "bg-[#1F1F1F] text-white border-[#1F1F1F]"
                                             : "bg-white text-[#1F1F1F] hover:bg-[#FFF9F4]"
-                                        }`}
+                                    }`}
                                 >
                                     {isWatched ? (
                                         <>
@@ -542,8 +580,6 @@ const PublicAuctionDetailPage: React.FC = () => {
                         </div>
                     </div>
 
-                    
-
                     <div className="bg-white rounded-xl border border-[#E6E0DA] p-6 shadow-sm space-y-3">
                         <div className="flex items-center gap-2 border-b border-[#E6E0DA] pb-2">
                             <FaTruck className="text-[#6B6B6B]" size={13} />
@@ -568,9 +604,9 @@ const PublicAuctionDetailPage: React.FC = () => {
                             </div>
                         )}
                     </div>
-
                 </div>
             </div>
+
             <PlaceBidModal
                 isOpen={isBidModalOpen}
                 onClose={() => setBidModalOpen(false)}
@@ -581,15 +617,13 @@ const PublicAuctionDetailPage: React.FC = () => {
                 onSubmitBid={handleBidSubmit}
             />
             <BookSlotModal
-            isOpen={isSlotModalOpen}
-            onClose={() => setIsSlotModalOpen(false)}
-            auctionName={auction.title}
-            slotAmount={auction.slotFee || 0} 
-             currency={auction.currency}
-             onConfirm={handleBookSlotSubmit}
-            
+                isOpen={isSlotModalOpen}
+                onClose={() => setIsSlotModalOpen(false)}
+                auctionName={auction.title}
+                slotAmount={auction.slotFee || 0}
+                currency={auction.currency}
+                onConfirm={handleBookSlotSubmit}
             />
-
         </div>
     );
 };

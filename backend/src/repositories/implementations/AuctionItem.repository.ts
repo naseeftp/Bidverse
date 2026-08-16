@@ -67,10 +67,10 @@ export class AuctionItemRepository extends BaseRepository<IAuctionItemDocument> 
         pipeline.push({
             $facet: {
                 data: [
-                    {$sort:{createdAt:-1}},
+                    { $sort: { createdAt: -1 } },
                     { $skip: skip },
                     { $limit: limit },
-                    
+
                     {
                         $project: {
                             _id: 0,
@@ -147,8 +147,8 @@ export class AuctionItemRepository extends BaseRepository<IAuctionItemDocument> 
                     description: 1,
                     status: 1,
                     type: 1,
-                     totalSlots:1,
-                     slotFee: 1,
+                    totalSlots: 1,
+                    slotFee: 1,
                     images: { $ifNull: ['$images', []] },
                     currency: 1,
                     startingPrice: 1,
@@ -167,7 +167,7 @@ export class AuctionItemRepository extends BaseRepository<IAuctionItemDocument> 
                     rejectionReason: 1,
                     createdAt: { $dateToString: { date: '$createdAt' } },
                     updatedAt: { $dateToString: { date: '$updatedAt' } },
-
+                    cancellationReason: '$cancellation.reason',
                     auctionHouse: {
                         id: { $toString: '$auction._id' },
                         name: { $ifNull: ['$auction.name', 'Unknown Organization'] },

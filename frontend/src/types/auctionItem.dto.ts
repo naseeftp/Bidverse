@@ -251,25 +251,25 @@ export const updateAuctionItemSchema = yup.object({
     shippingCost: yup.number().transform((v, o) => (o === '' ? undefined : v)).min(0).optional(),
     shippingTerms: yup.string().trim().min(5).max(500).optional(),
 })
-.test(
-    'reserve-price-validation-on-edit',
-    'Reserve price cannot be lower than the starting opening price',
-    function (value) {
-        if (!value || value.startingPrice === undefined || value.reservePrice === undefined) return true;
-        return value.reservePrice >= value.startingPrice;
-    }
-)
-.test(
-    'end-time-validation-on-edit',
-    'The auction end time must occur after the start timeline has opened',
-    function (value) {
-        if (!value || !value.startTime || !value.endTime) return true;
-        const start = new Date(value.startTime);
-        const end = new Date(value.endTime);
-        if (isNaN(start.getTime()) || isNaN(end.getTime())) return false;
-        return end > start;
-    }
-);
+    .test(
+        'reserve-price-validation-on-edit',
+        'Reserve price cannot be lower than the starting opening price',
+        function (value) {
+            if (!value || value.startingPrice === undefined || value.reservePrice === undefined) return true;
+            return value.reservePrice >= value.startingPrice;
+        }
+    )
+    .test(
+        'end-time-validation-on-edit',
+        'The auction end time must occur after the start timeline has opened',
+        function (value) {
+            if (!value || !value.startTime || !value.endTime) return true;
+            const start = new Date(value.startTime);
+            const end = new Date(value.endTime);
+            if (isNaN(start.getTime()) || isNaN(end.getTime())) return false;
+            return end > start;
+        }
+    );
 
 export interface AuctionItemListDTO {
     auctionItemId: string;
@@ -297,8 +297,8 @@ export interface AuctionItemDetailDTO {
     description: string;
     status: string;
     type: string;
-    totalSlots: number|null;
-    slotFee: number|null;
+    totalSlots: number | null;
+    slotFee: number | null;
     images: Array<{
         id: string;
         url: string;
@@ -320,6 +320,7 @@ export interface AuctionItemDetailDTO {
     isApproved: boolean;
     approvedAt?: string;
     rejectionReason?: string;
+    cancellationReason?: string;
     createdAt: string;
     updatedAt: string;
 
@@ -350,8 +351,8 @@ export type CreateAuctionItemDTO = yup.InferType<typeof createAuctionItemSchema>
 export type UpdateAuctionItemDTO = yup.InferType<typeof updateAuctionItemSchema>;
 export type UpdateAuctionStatusDTO = yup.InferType<typeof updateAuctionStatusSchema>;
 
-export interface cancelAuctionItemDTO{
-    auctionId:string;
-    cancelledRole:string,
-    cencelingReason:string
+export interface cancelAuctionItemDTO {
+    auctionId: string;
+    cancelledRole: string,
+    cencelingReason: string
 }
