@@ -1,4 +1,4 @@
-import { CreateAuctionItemDTO, AuctionItemResponseDTO, AuctionItemDetailDTO, updateAuctionStatusDTO, UpdateAuctionDTO } from '../../dtos/auctionHouse.dto/auctionItem.dto'
+import { CreateAuctionItemDTO, AuctionItemResponseDTO, AuctionItemDetailDTO, updateAuctionStatusDTO, UpdateAuctionDTO, cancelAuctionItemDTO } from '../../dtos/auctionHouse.dto/auctionItem.dto'
 import { IGenericPaginatedResposnse } from '../../types/response.type'
 import { AuctionItemListDTO } from '../../dtos/auctionHouse.dto/auctionItem.dto'
 export interface IAuctionItemMangementSevice {
@@ -8,4 +8,5 @@ export interface IAuctionItemMangementSevice {
     getAuctionDetails(itemId: string): Promise<AuctionItemDetailDTO | null>
     updateAuctionStatus(data: updateAuctionStatusDTO): Promise<AuctionItemResponseDTO>
     editAuction(userId: string, itemId: string, data: UpdateAuctionDTO): Promise<AuctionItemResponseDTO>
+    cancellAuction(userId:string,data:cancelAuctionItemDTO):Promise<AuctionItemResponseDTO>
 }

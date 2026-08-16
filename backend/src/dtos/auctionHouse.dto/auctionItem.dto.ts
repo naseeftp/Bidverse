@@ -1,5 +1,6 @@
 import { AuctionItemStatus, AuctionItemStatusValues, AuctionType } from "../../constants/constants";
 import { z } from 'zod'
+import { Role } from "../Common.dto";
 
 export const baseAuctionItemObjectSchema = z.object({
     title: z.string()
@@ -236,3 +237,10 @@ export type CreateAuctionItemDTO = z.infer<typeof createAuctionItemSchema>
 export type UpdateAuctionDTO = Partial<CreateAuctionItemDTO>
 export const updateAuctionSchema = baseAuctionItemObjectSchema.partial();
 export type updateAuctionStatusDTO = z.infer<typeof updateAuctionStatusSchema>
+
+
+export interface cancelAuctionItemDTO{
+    auctionId:string;
+    cancelledRole:Role,
+    cencelingReason:string
+}

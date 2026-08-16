@@ -98,4 +98,14 @@ export class AuctionItemMangementController implements IAuctionItemMangementCont
             next(error)
         }
     }
+    async cancellAuction(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const userId=req.user.id;
+            const {auctionId,cancelledRole,cencelingReason}=req.body;
+            const result=await this._auctionItemService.cancellAuction(userId,{auctionId,cancelledRole,cencelingReason});
+            SuccessResponse(res,MESSAGES.AUCTION_CANCELLED,result,HttpStatus.OK)
+        } catch (error) {
+            next(error)
+        }
+    }
 }

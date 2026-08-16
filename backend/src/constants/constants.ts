@@ -148,6 +148,7 @@ export const MESSAGES = {
     AUCTION_RETRIEVED: 'Auction Retrieved successfully',
     AUCTION_STATUS_UPDATED: 'Auction status updated',
     AUCTION_UPDATED: 'Auction Details updated Successfully',
+    AUCTION_CANCELLED:'Auction Cancelled Successfully',
     WATCHLIST_ADDED: 'Item Added To WatchList Successfully',
     WATCHLIST_DELETED: 'Item Removed From WatchList Successfully',
     WATCHLIST_EXISTED: 'Item Allredy existed on watchlist',

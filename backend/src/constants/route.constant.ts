@@ -75,7 +75,8 @@ export const AUCTION_ITEM_ROUTES = {
     TENANT_AUCTIONS: '/tenant/auctions',
     GET_AUCTION: '/get-auction/:id',
     UPDATE_STATUS: '/update-status',
-    UPDATE_AUCTION: '/update-auction/:id'
+    UPDATE_AUCTION: '/update-auction/:id',
+    CANCEL_AUCTION:'/cancel-auction'
 }
 
 export const WATCH_LIST_ROUTES = {

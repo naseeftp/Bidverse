@@ -1,13 +1,15 @@
 import { IAuctionItemMangementSevice } from "../interface/IAuctionItemMangement.service";
 import { ILoggerService } from "../interface/ILogger.service";
 import { IAuctionItemRepository } from "../../repositories/interfaces/IAuctionItem.repository";
-import { CreateAuctionItemDTO, AuctionItemResponseDTO, AuctionItemListDTO, AuctionItemDetailDTO, updateAuctionStatusDTO, UpdateAuctionDTO } from "../../dtos/auctionHouse.dto/auctionItem.dto";
+import { CreateAuctionItemDTO, AuctionItemResponseDTO, AuctionItemListDTO, AuctionItemDetailDTO, updateAuctionStatusDTO, UpdateAuctionDTO, cancelAuctionItemDTO } from "../../dtos/auctionHouse.dto/auctionItem.dto";
 import { IAuctionHouseRepository } from "../../repositories/interfaces/IAuctionHouse.repository";
-import { AppError, ForbiddenError, NotFoundError } from "../../errors/AppError";
+import { AppError, BadRequestError, ForbiddenError, NotFoundError, UnauthorizedError } from "../../errors/AppError";
 import { AuctionItemStatus, MESSAGES } from "../../constants/constants";
 import { IAuctionItem } from "../../types/auctionItem.type";
 import { AuctionItemMapper } from "../../mappers/auctionItem.mapper";
 import { IGenericPaginatedResposnse } from "../../types/response.type";
+import { Role } from "../../dtos/Common.dto";
+import { Types } from "mongoose";
 
 export class AuctionItemMangementSevice implements IAuctionItemMangementSevice {
     constructor(
@@ -143,5 +145,34 @@ export class AuctionItemMangementSevice implements IAuctionItemMangementSevice {
         if (!updatedItem) throw new AppError('Failed to execute auction modification updates');
         const hydratedObject = updatedItem.toObject ? updatedItem.toObject() : updatedItem;
         return AuctionItemMapper.toResponseDTO(hydratedObject);
+    }
+    async cancellAuction(userId: string, data: cancelAuctionItemDTO): Promise<AuctionItemResponseDTO> {
+        const auctionExist = await this._auctionItemRepo.findById(data.auctionId);
+        if (!auctionExist) {
+            throw new NotFoundError(MESSAGES.AUCTION_NOT_FOUND)
+        }
+        if (data.cancelledRole === Role.TENANT) {
+            const house = await this._auctionHouseRepo.findById(auctionExist.houseId);
+            if (house?.userId.toString() !== userId) {
+                throw new UnauthorizedError(MESSAGES.NOT_PERMITTED)
+            }
+        }
+        if (auctionExist.status == AuctionItemStatus.PASSED || auctionExist.status == AuctionItemStatus.SOLD) {
+            throw new BadRequestError('Completed auction cannot be cancelled')
+        }
+        if (auctionExist.status == AuctionItemStatus.CANCELLED_BY_HOUSE || auctionExist.status === AuctionItemStatus.CANCELLED_BY_ADMIN) {
+            throw new BadRequestError('Auction is already cancelled')
+        }
+        const newStatus = data.cancelledRole == Role.TENANT ? AuctionItemStatus.CANCELLED_BY_HOUSE : AuctionItemStatus.CANCELLED_BY_ADMIN;
+        auctionExist.status = newStatus;
+        auctionExist.cancellation = {
+            cancelledBy: data.cancelledRole === Role.TENANT ? 'HOUSE' : 'ADMIN',
+            userId: new Types.ObjectId(userId),
+            reason: data.cencelingReason,
+            cancelledAt: new Date()
+        }
+        const cancelledAuction = await auctionExist.save();
+        //handle slot /refund logic here
+        return AuctionItemMapper.toResponseDTO(cancelledAuction)
     }
 }

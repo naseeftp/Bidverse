@@ -349,3 +349,9 @@ export interface AuctionItemDetailDTO {
 export type CreateAuctionItemDTO = yup.InferType<typeof createAuctionItemSchema>;
 export type UpdateAuctionItemDTO = yup.InferType<typeof updateAuctionItemSchema>;
 export type UpdateAuctionStatusDTO = yup.InferType<typeof updateAuctionStatusSchema>;
+
+export interface cancelAuctionItemDTO{
+    auctionId:string;
+    cancelledRole:string,
+    cencelingReason:string
+}

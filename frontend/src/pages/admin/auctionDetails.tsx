@@ -32,6 +32,12 @@ const AdminAuctionDetailPage: React.FC = () => {
     const [rejectionReason, setRejectionReason] = useState("");
     const [validationError, setValidationError] = useState("");
     const [actionLoading, setActionLoading] = useState(false);
+    
+    const [cancelModalOpen, setCancelModalOpen] = useState(false);
+    const [cancelReason, setCancelReason] = useState("");
+    const [cancelValidationError, setCancelValidationError] = useState("");
+    const [cancelLoading, setCancelLoading] = useState(false);
+
     const fetchAuction = useCallback(async () => {
         setLoading(true);
 
@@ -111,9 +117,45 @@ const AdminAuctionDetailPage: React.FC = () => {
             setActionLoading(false)
         }
     }
+   const openCancelModal = () => {
+        setCancelReason('');
+        setCancelValidationError('');
+        setCancelModalOpen(true);
+    };
 
-    const handleCancelAuction = () => {
-
+    const handleCancelAuction = async () => {
+        if(!auction) return
+        const trimmed=cancelReason.trim();
+        if(!trimmed){
+           setCancelValidationError("Cancellation reason is required");
+           return; 
+        }
+        if (trimmed.length < 5) {
+            setCancelValidationError("Cancellation reason must be at least 5 characters");
+            return;
+        }
+        setCancelValidationError("");
+        setCancelLoading(true);
+        try {
+            const response = await auctionItemMangementService.cancellAuction({
+                auctionId: auction?.auctionItemId ?? '',
+                cancelledRole: 'admin',
+                cencelingReason:trimmed
+            })
+            if (response.success && response.data) {
+                toast.success(response.message)
+                setCancelModalOpen(false);
+                setCancelReason('')
+                fetchAuction()
+            }
+            else {
+                toast.error(response.message)
+            }
+        } catch {
+            toast.error('Failed to cancell Auction')
+        }finally{
+            setCancelLoading(false)
+        }
     }
     if (loading) {
         return (
@@ -148,7 +190,7 @@ const AdminAuctionDetailPage: React.FC = () => {
                 `}</style>
             )}
 
-            -            {isHalted && (
+                {isHalted && (
                 <div className="max-w-7xl mx-auto mb-6 bg-[#DC2626] border border-[#B91C1C] rounded-xl shadow-md overflow-hidden relative group">
                     <div className="flex items-center">
                         <div className="bg-[#B91C1C] text-white px-4 py-2.5 flex items-center gap-2 text-[10px] font-black uppercase tracking-widest border-r border-[#991B1B] z-10 shadow-lg shrink-0 select-none">
@@ -379,7 +421,7 @@ const AdminAuctionDetailPage: React.FC = () => {
                                 </div>
                             ) : (
                                 auction.status == 'SCHEDULED' && <button
-                                    onClick={handleCancelAuction}
+                                    onClick={openCancelModal}
                                     className="w-full bg-[#111827] hover:bg-black text-[#D4AF37] text-xs font-black uppercase tracking-widest py-3.5 rounded-xl transition-all flex items-center justify-center gap-2 shadow-md"
                                 >
                                     <FaBan /> Terminate Auction
@@ -429,9 +471,6 @@ const AdminAuctionDetailPage: React.FC = () => {
                             </div>
                         </div>
                     )}
-
-
-
                 </div>
             </div>
             {modalOpen && (
@@ -509,6 +548,84 @@ const AdminAuctionDetailPage: React.FC = () => {
                             </button>
                         </div>
 
+                    </div>
+                </div>
+            )}
+            {cancelModalOpen && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn">
+                    <div className="bg-white w-full max-w-md rounded-2xl border border-[#E5E7EB] shadow-2xl p-6 relative overflow-hidden animate-scaleIn">
+                        <div className="flex items-center gap-3 mb-4">
+                            <div className="p-2.5 rounded-xl bg-red-50 text-[#DC2626]">
+                                <FaBan size={20} />
+                            </div>
+                            <div>
+                                <h3 className="text-sm font-black uppercase tracking-widest text-[#0F172A]">
+                                    Terminate Auction
+                                </h3>
+                                <p className="text-[11px] font-medium text-[#6B7280] mt-0.5">
+                                    Item Ref: #{auction.auctionItemId?.toUpperCase()}
+                                </p>
+                            </div>
+                        </div>
+
+                        <div className="space-y-4">
+                            <p className="text-xs font-medium text-[#6B7280] leading-relaxed">
+                                You are about to permanently terminate <span className="font-bold text-[#0F172A]">&quot;{auction.title}&quot;</span>. Please provide a clear reason for this administrative action.
+                            </p>
+
+                            <div className="space-y-1.5">
+                                <label className="block text-[10px] font-black uppercase tracking-widest text-[#6B7280]">
+                                    Cancellation Reason <span className="text-red-500">*</span>
+                                </label>
+                                <textarea
+                                    rows={4}
+                                    value={cancelReason}
+                                    onChange={(e) => {
+                                        setCancelReason(e.target.value);
+                                        if (cancelValidationError) setCancelValidationError("");
+                                    }}
+                                    placeholder="Enter the reason for terminating this auction (minimum 5 characters)..."
+                                    className={`w-full text-xs font-medium bg-[#F3F4F6] border rounded-xl p-3 text-[#0F172A] placeholder-[#9CA3AF] focus:outline-none focus:ring-1 transition-all ${cancelValidationError
+                                            ? 'border-[#DC2626] focus:ring-[#DC2626]'
+                                            : 'border-[#E5E7EB] focus:ring-[#111827]'
+                                        }`}
+                                />
+                                {cancelValidationError && (
+                                    <span className="text-[10px] font-bold tracking-wide text-[#DC2626] block mt-1">
+                                        ⚠️ {cancelValidationError}
+                                    </span>
+                                )}
+                            </div>
+                        </div>
+
+                        <div className="flex items-center gap-3 mt-6 pt-4 border-t border-[#E5E7EB]">
+                            <button
+                                type="button"
+                                disabled={cancelLoading}
+                                onClick={() => {
+                                    setCancelModalOpen(false);
+                                    setCancelReason('');
+                                    setCancelValidationError('');
+                                }}
+                                className="w-1/2 bg-[#F3F4F6] hover:bg-[#E5E7EB] text-[#6B7280] hover:text-[#0F172A] text-xs font-black uppercase tracking-widest py-3 rounded-xl transition-colors disabled:opacity-50"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                type="button"
+                                disabled={cancelLoading}
+                                onClick={handleCancelAuction}
+                                className="w-1/2 bg-[#111827] hover:bg-black text-[#D4AF37] text-xs font-black uppercase tracking-widest py-3 rounded-xl transition-colors shadow-sm flex items-center justify-center gap-2 disabled:opacity-50"
+                            >
+                                {cancelLoading ? (
+                                    <div className="w-4 h-4 border-2 border-[#D4AF37] border-t-transparent rounded-full animate-spin"></div>
+                                ) : (
+                                    <>
+                                        <FaBan size={12} /> Confirm Termination
+                                    </>
+                                )}
+                            </button>
+                        </div>
                     </div>
                 </div>
             )}

@@ -45,4 +45,9 @@ router.patch(
     validator(AuctionItemValidators.validateUpdateAuctionInput),
     (req, res, next) => auctionItemMangementController.editAuction(req, res, next)
 )
+router.patch(
+    AUCTION_ITEM_ROUTES.CANCEL_AUCTION,
+    allowedTo(Role.TENANT,Role.ADMIN),
+    (req,res,next)=>auctionItemMangementController.cancellAuction(req,res,next)
+)
 export default router
