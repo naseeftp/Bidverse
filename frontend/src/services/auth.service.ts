@@ -33,13 +33,13 @@ class AuthService {
         localStorage.setItem("accessToken", token)
     }
 
-    private decodeToken(token: string): JwtPayload | null {
-        try {
-            return JSON.parse(atob(token.split('.')[1]))
-        } catch {
-            return null
-        }
-    }
+    // private decodeToken(token: string): JwtPayload | null {
+    //     try {
+    //         return JSON.parse(atob(token.split('.')[1]))
+    //     } catch {
+    //         return null
+    //     }
+    // }
 
     async register(userData: RegisterDTO) {
         try {

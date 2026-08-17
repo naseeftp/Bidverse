@@ -11,7 +11,7 @@ export interface RazorpayOptions {
     name: string;
     description?: string;
     order_id: string;
-
+    // eslint-disable-next-line no-unused-vars
     handler: (response: RazorpayPaymentResponse) => void;
 
     theme?: {
@@ -29,6 +29,7 @@ export interface RazorpayInstance {
 }
 
 export interface RazorpayConstructor {
+    // eslint-disable-next-line no-unused-vars
     new(options: RazorpayOptions): RazorpayInstance;
 }
 

@@ -7,6 +7,7 @@ export const openRazorpayCheckout = (
         currency: string;
         keyId: string;
     },
+    // eslint-disable-next-line no-unused-vars
     onSuccess: (response: RazorpayPaymentResponse) => void,
     onDismiss?: () => void
 ) => {

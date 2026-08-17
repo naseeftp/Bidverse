@@ -28,7 +28,6 @@ const TenantAuctionDetailPage: React.FC = () => {
     const [timerLabel, setTimerLabel] = useState<'STARTS IN' | 'ENDS IN' | 'CONCLUDED'>('STARTS IN');
     const navigate = useNavigate();
 
-    // --- Cancel / Terminate modal state ---
     const [cancelModalOpen, setCancelModalOpen] = useState(false);
     const [cancelReason, setCancelReason] = useState("");
     const [cancelValidationError, setCancelValidationError] = useState("");
@@ -118,14 +117,12 @@ const TenantAuctionDetailPage: React.FC = () => {
         setZoomPos({ x, y });
     };
 
-    // --- Open cancel modal ---
     const openCancelModal = () => {
         setCancelReason('');
         setCancelValidationError('');
         setCancelModalOpen(true);
     };
 
-    // --- Submit cancellation with validation ---
     const handleCancelAuction = async () => {
         if (!auction) return;
 
@@ -144,7 +141,7 @@ const TenantAuctionDetailPage: React.FC = () => {
         try {
             const response = await auctionItemMangementService.cancellAuction({
                 auctionId: auction.auctionItemId ?? '',
-                cancelledRole: 'tenant', // change to 'house' if your backend expects that
+                cancelledRole: 'tenant', 
                 cencelingReason: trimmed
             });
             if (response.success) {

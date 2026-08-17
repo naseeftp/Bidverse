@@ -308,7 +308,7 @@ const TenantEditAuctionPage: React.FC = () => {
         </p>
       </div>
 
-      <form onSubmit={handleSubmit(onSubmit, (err) => console.log("Form Validation Errors:", err))} className="space-y-8">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
 
         <div className="bg-white rounded-2xl p-8 border border-[#E2E8F0] shadow-sm space-y-6">
           <div className="flex items-center gap-3 pb-4 border-b border-[#F5F7FB]">

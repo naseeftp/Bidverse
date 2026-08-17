@@ -11,8 +11,8 @@ export interface JWTPayload {
 
 }
 
-export interface AuthenticatedRequest extends Request {
-    user?: JWTPayload
-}
+// export interface AuthenticatedRequest extends Request {
+//     user?: JWTPayload
+// }
 
 

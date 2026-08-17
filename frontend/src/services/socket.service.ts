@@ -4,8 +4,7 @@ import { API_BASE_URL } from '../constants/api.constant';
 
 const socketUrl=API_BASE_URL;
 let socket:Socket|null=null;
-
-export const getSocket=(userId?:string,role?:string):Socket=>{
+export const getSocket=():Socket=>{
     if(!socket){
        socket=io(socketUrl,{
         path:'/socket',
@@ -17,7 +16,7 @@ export const getSocket=(userId?:string,role?:string):Socket=>{
 }
 
 export const connectSocket=(userId:string,role:string)=>{
-    const s=getSocket(userId,role);
+    const s=getSocket();
     if(s.connected) return;
     s.auth={userId,role}
     s.off('connect');
