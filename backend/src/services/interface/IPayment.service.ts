@@ -4,5 +4,6 @@ import { createSlotPaymentDTO,slotPaymentResponseDTO, verifyPaymentDTO } from ".
 export interface IPaymentService{
     createSlotPayment(data:createSlotPaymentDTO):Promise<slotPaymentResponseDTO>
     verifyPayment(data:verifyPaymentDTO):Promise<void>
-    refundSlotPayment(slotId:string):Promise<void>
+    refundSlotPayment(slotId:string):Promise<void>;
+    refundForCancelAuction(auctionId:string):Promise<void>
 }

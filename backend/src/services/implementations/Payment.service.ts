@@ -170,4 +170,53 @@ export class PaymentService implements IPaymentService {
             razorpayOrderId: payment.razorpayOrderId,
         })
     }
+    async refundForCancelAuction(auctionId: string): Promise<void> {
+        const payments = await this._paymentRepo.findHeldPaymentByAuction(auctionId);
+        for (const payment of payments) {
+            if (!payment.razorpayPaymentId) {
+                continue;
+            }
+            await this._razorpay.payments.refund(
+                payment.razorpayPaymentId,
+                {
+                    amount: Math.round(
+                        payment.amount * 100
+                    )
+                }
+            )
+            await this._paymentRepo.updateById(
+                payment._id.toString(),
+                {
+                    status: PaymentStatus.REFUNDED,
+                    escrowStatus: EscrowStatus.REFUNDED,
+                    refundedAt: new Date(),
+
+                }
+            )
+            if (payment.slotBookingId) {
+                await this._slotRepo.updateById(
+                    payment.slotBookingId.toString(),
+                    {
+                        status: SlotBookingStatus.CANCELLED
+                    }
+                )
+            }
+            await this._transactionService.createTransaction({
+                partyType: TransactionPartyType.USER,
+                userId: payment.userId.toString(),
+                paymentId: payment._id.toString(),
+                auctionItemId: payment.auctionItemId?.toString(),
+                slotBookingId: payment.slotBookingId?.toString(),
+                purpose: TransactionPurpose.REFUND,
+                direction: TransactionDirection.CREDIT,
+                amount: payment.amount,
+                currency: payment.currency,
+                status: TransactionStatus.COMPLETED,
+                description: "Slot booking refund due to auction cancellation",
+                razorpayPaymentId: payment.razorpayPaymentId,
+                razorpayOrderId: payment.razorpayOrderId
+            })
+
+        }
+    }
 }

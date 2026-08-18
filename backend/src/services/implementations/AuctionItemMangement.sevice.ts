@@ -10,11 +10,13 @@ import { AuctionItemMapper } from "../../mappers/auctionItem.mapper";
 import { IGenericPaginatedResposnse } from "../../types/response.type";
 import { Role } from "../../dtos/Common.dto";
 import { Types } from "mongoose";
+import { IPaymentService } from "../interface/IPayment.service";
 
 export class AuctionItemMangementSevice implements IAuctionItemMangementSevice {
     constructor(
         private _auctionItemRepo: IAuctionItemRepository,
         private _auctionHouseRepo: IAuctionHouseRepository,
+        private _paymentService:IPaymentService,
         private _logger: ILoggerService
     ) { }
 
@@ -172,7 +174,7 @@ export class AuctionItemMangementSevice implements IAuctionItemMangementSevice {
             cancelledAt: new Date()
         }
         const cancelledAuction = await auctionExist.save();
-        //handle slot /refund logic here
+        await this._paymentService.refundForCancelAuction(auctionExist._id.toString())
         return AuctionItemMapper.toResponseDTO(cancelledAuction)
     }
 }
