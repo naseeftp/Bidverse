@@ -32,6 +32,7 @@ const PublicAuctions: React.FC = () => {
         }
 
     }, [page, search, typeFilter])
+    
 
     useEffect(() => {
         const delayDebounceFn = setTimeout(() => {
