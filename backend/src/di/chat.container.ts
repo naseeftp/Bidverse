@@ -10,5 +10,5 @@ const convRepo = new ConversationRepository();
 const userRepo = new UserRepository();
 const messageRepo = new MessageRepository()
 export const chatService = new ChatService(convRepo, userRepo, messageRepo);
-const cloudinaryService=new CloudinaryService()
-export const chatController = new ChatController(chatService,cloudinaryService)
+const cloudinaryService = new CloudinaryService()
+export const chatController = new ChatController(chatService, cloudinaryService)

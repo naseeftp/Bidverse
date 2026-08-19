@@ -13,12 +13,12 @@ import { razorpay } from "../config/razorpay.config";
 const auctionHouseRepo = new AuctionHouseRepository();
 const auctionItemRepo = new AuctionItemRepository();
 const aucionItemServiceLogger = new LoggerService('auctionItemManagementService');
-const paymentRepo=new PaymentRepository()
-const slotRepo=new SlotRepository()
-const transactionRepo=new TransactionRepository()
-const transactionService=new TransactionService(transactionRepo);
+const paymentRepo = new PaymentRepository()
+const slotRepo = new SlotRepository()
+const transactionRepo = new TransactionRepository()
+const transactionService = new TransactionService(transactionRepo);
 
-const paymentService=new PaymentService(paymentRepo,slotRepo,auctionItemRepo,transactionService,razorpay)
-const auctioItemMangementService = new AuctionItemMangementSevice(auctionItemRepo, auctionHouseRepo,paymentService, aucionItemServiceLogger)
+const paymentService = new PaymentService(paymentRepo, slotRepo, auctionItemRepo, transactionService, razorpay)
+const auctioItemMangementService = new AuctionItemMangementSevice(auctionItemRepo, auctionHouseRepo, paymentService, aucionItemServiceLogger)
 const auctionItemControllerLogger = new LoggerService('auctionItemMangemenController')
 export const auctionItemMangementController = new AuctionItemMangementController(auctionItemControllerLogger, auctioItemMangementService)

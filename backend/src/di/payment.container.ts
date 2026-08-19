@@ -7,11 +7,11 @@ import { AuctionItemRepository } from "../repositories/implementations/AuctionIt
 import { TransactionService } from "../services/implementations/Transaction.service";
 import { TransactionRepository } from "../repositories/implementations/Transaction.respository";
 
-const paymentRepo=new PaymentRepository();
-const slotrepo=new SlotRepository()
-const auctionItemRepo=new AuctionItemRepository()
-const transactionRepo=new TransactionRepository()
-const transactionService=new TransactionService(transactionRepo)
-const paymentService=new PaymentService(paymentRepo,slotrepo,auctionItemRepo,transactionService,razorpay)
-export const paymentController=new PaymentController(paymentService)
+const paymentRepo = new PaymentRepository();
+const slotrepo = new SlotRepository()
+const auctionItemRepo = new AuctionItemRepository()
+const transactionRepo = new TransactionRepository()
+const transactionService = new TransactionService(transactionRepo)
+const paymentService = new PaymentService(paymentRepo, slotrepo, auctionItemRepo, transactionService, razorpay)
+export const paymentController = new PaymentController(paymentService)
 
