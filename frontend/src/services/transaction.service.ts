@@ -5,9 +5,12 @@ import type { transactionListDTO } from "../types/transaction.dto";
 import { apiErrorHandler } from "../utils/error.handle"
 
 export class TransactionService{
-async listTransaction(page:number,limit:number){
+async listTransaction(page:number,limit:number,direction?:string){
     try {
-        const url=`${BASE_ROUTES.TRANSACTION}${TRANSACTION_ROUTES.LIST_TRANSACTIONS}?page=${page}&limit=${limit}`;
+        let url=`${BASE_ROUTES.TRANSACTION}${TRANSACTION_ROUTES.LIST_TRANSACTIONS}?page=${page}&limit=${limit}`;
+        if(direction&&direction!=='all'){
+         url+=`&direction=${direction}`
+        }
         const response=await axiosInstance.get<transactionListDTO,ApiResponse<{data:transactionListDTO[],pagination:IPaginationMeta}>>(url);
         const paginatedResult=response.data;
         return{

@@ -11,7 +11,8 @@ import {
     FaTimesCircle,
     FaHourglassHalf,
     FaReceipt,
-    FaExchangeAlt
+    FaExchangeAlt,
+    FaFilter
 } from "react-icons/fa";
 
 const MyTransactions: React.FC = () => {
@@ -19,11 +20,12 @@ const MyTransactions: React.FC = () => {
     const [pagination, setPagination] = useState<IPaginationMeta | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
     const [page, setPage] = useState<number>(1);
+    const [direction, setDirection] = useState('all');
 
     const fetchTransactions = useCallback(async () => {
         setLoading(true);
         try {
-            const response = await transactionService.listTransaction(page, 6);
+            const response = await transactionService.listTransaction(page, 6, direction);
             if (response.success && response.data) {
                 setTransactions(response.data);
                 setPagination(response.pagination ?? null);
@@ -35,11 +37,12 @@ const MyTransactions: React.FC = () => {
         } finally {
             setLoading(false);
         }
-    }, [page]);
+    }, [page, direction]);
 
     useEffect(() => {
         fetchTransactions();
     }, [fetchTransactions]);
+
     const formatDate = (date: string | Date): string => {
         const d = typeof date === "string" ? new Date(date) : date;
         return d.toLocaleDateString("en-IN", {
@@ -90,8 +93,8 @@ const MyTransactions: React.FC = () => {
         }
     };
 
-    const renderDirectionBadge = (direction: string) => {
-        const isCredit = direction?.toLowerCase() === "credit";
+    const renderDirectionBadge = (dir: string) => {
+        const isCredit = dir?.toLowerCase() === "credit";
         return (
             <span
                 className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${isCredit
@@ -100,7 +103,7 @@ const MyTransactions: React.FC = () => {
                     }`}
             >
                 {isCredit ? <FaArrowDown size={9} /> : <FaArrowUp size={9} />}
-                {direction}
+                {dir}
             </span>
         );
     };
@@ -112,13 +115,44 @@ const MyTransactions: React.FC = () => {
     return (
         <div className="min-h-screen bg-[#FFF9F4] px-4 py-8 md:px-8 text-[#1F1F1F] font-sans antialiased">
             <div className="max-w-6xl mx-auto space-y-6">
-                <div className="border-b border-[#E6E0DA] pb-5">
-                    <h1 className="text-2xl font-black uppercase tracking-tight text-[#1F1F1F]">
-                        Transaction History
-                    </h1>
-                    <p className="text-xs text-[#6B6B6B] font-medium mt-1">
-                        Track all your payments,and refunds.
-                    </p>
+                
+                {/* Header Container */}
+                <div className="border-b border-[#E6E0DA] pb-5 flex flex-col md:flex-row md:items-end justify-between gap-4">
+                    <div>
+                        <h1 className="text-2xl font-black uppercase tracking-tight text-[#1F1F1F]">
+                            Transaction History
+                        </h1>
+                        <p className="text-xs text-[#6B6B6B] font-medium mt-1">
+                            Track all your payments, and refunds.
+                        </p>
+                    </div>
+
+                    {/* Styled Direction Filter */}
+                    <div className="w-full md:w-auto min-w-[200px] relative group">
+                        <label className="text-[9px] font-black uppercase tracking-[0.2em] text-[#6B6B6B] mb-1.5 block">
+                            Direction Filter
+                        </label>
+                        <div className="relative">
+                            <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#6B6B6B] group-focus-within:text-[#C9653B] transition-colors pointer-events-none">
+                                <FaFilter size={10} />
+                            </div>
+                            <select
+                                value={direction}
+                                onChange={(e) => {
+                                    setDirection(e.target.value);
+                                    setPage(1);
+                                }}
+                                className="w-full bg-white border border-[#E6E0DA] rounded-lg pl-9 pr-8 py-2.5 text-[11px] text-[#1F1F1F] font-bold uppercase tracking-wider focus:outline-none focus:border-[#C9653B] appearance-none cursor-pointer shadow-sm transition-all"
+                            >
+                                <option value="all">ALL TRANSACTIONS</option>
+                                <option value="credit">CREDITED</option>
+                                <option value="debit">DEBITED</option>
+                            </select>
+                            <div className="absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none text-[#6B6B6B] text-[8px]">
+                                ▼
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 {loading ? (
@@ -132,7 +166,7 @@ const MyTransactions: React.FC = () => {
                             No Transactions Found
                         </p>
                         <p className="text-[#6B6B6B] text-xs max-w-sm mx-auto">
-                            You haven&rsquo;t made any transactions yet. Your payment logs and refunds will appear here.
+                            You haven&rsquo;t made any transactions matching this criteria yet.
                         </p>
                     </div>
                 ) : (

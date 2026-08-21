@@ -3,7 +3,7 @@ import { CreateTransactionDTO, transactionListDTO, TransactionResponseDTO } from
 import { BadRequestError } from "../../errors/AppError";
 import { ITransactionRepository } from "../../repositories/interfaces/ITransaction.repository";
 import { ITransactionService } from "../interface/ITransaction.service";
-import { TransactionStatus } from "../../constants/transaction.constant";
+import { TransactionDirection, TransactionStatus } from "../../constants/transaction.constant";
 import { TransactionMapper } from "../../mappers/transaction.mapper";
 import { IGenericPaginatedResposnse } from "../../types/response.type";
 
@@ -35,8 +35,8 @@ export class TransactionService implements ITransactionService {
 
         return TransactionMapper.toResponseDTO(transaction)
     }
-    async listTransactons(userId: string, page: number, limit: number): Promise<IGenericPaginatedResposnse<transactionListDTO>> {
-        const { data, total } = await this._transactionRepo.listTransactions(userId, page, limit);
+    async listTransactons(userId: string, page: number, limit: number,direction?:TransactionDirection): Promise<IGenericPaginatedResposnse<transactionListDTO>> {
+        const { data, total } = await this._transactionRepo.listTransactions(userId, page, limit,direction);
         return {
             data: data,
             pagination: {

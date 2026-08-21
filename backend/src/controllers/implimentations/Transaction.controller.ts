@@ -3,6 +3,7 @@ import { ITransactionService } from "../../services/interface/ITransaction.servi
 import { Request, Response, NextFunction } from "express";
 import { SuccessResponse } from "../../utils/response.utility";
 import { HttpStatus, MESSAGES } from "../../constants/constants";
+import { TransactionDirection } from "../../constants/transaction.constant";
 
 export class TransactionController implements ITransactionController {
     constructor(
@@ -13,7 +14,8 @@ export class TransactionController implements ITransactionController {
             const userId = req.user.id;
             const page = Number(req.query.page);
             const limit = Number(req.query.limit);
-            const result = await this._transactionService.listTransactons(userId, page, limit);
+            const direction=req.query.direction as TransactionDirection
+            const result = await this._transactionService.listTransactons(userId, page, limit,direction);
             SuccessResponse(res, MESSAGES.LIST_RETRIEVED, result, HttpStatus.OK)
         } catch (error) {
             next(error)
