@@ -116,7 +116,6 @@ const MyTransactions: React.FC = () => {
         <div className="min-h-screen bg-[#FFF9F4] px-4 py-8 md:px-8 text-[#1F1F1F] font-sans antialiased">
             <div className="max-w-6xl mx-auto space-y-6">
                 
-                {/* Header Container */}
                 <div className="border-b border-[#E6E0DA] pb-5 flex flex-col md:flex-row md:items-end justify-between gap-4">
                     <div>
                         <h1 className="text-2xl font-black uppercase tracking-tight text-[#1F1F1F]">
@@ -127,7 +126,6 @@ const MyTransactions: React.FC = () => {
                         </p>
                     </div>
 
-                    {/* Styled Direction Filter */}
                     <div className="w-full md:w-auto min-w-[200px] relative group">
                         <label className="text-[9px] font-black uppercase tracking-[0.2em] text-[#6B6B6B] mb-1.5 block">
                             Direction Filter
