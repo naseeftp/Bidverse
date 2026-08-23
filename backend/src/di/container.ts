@@ -6,6 +6,8 @@ import { OtpService } from "../services/implementations/Otp.service";
 import { EmailService } from "../services/implementations/Email.service";
 import { LoggerService } from "../services/implementations/Logger.service";
 import { RedisOtpRepository } from "../repositories/implementations/RedisOtp.repository";
+import { NotificationService } from "../services/implementations/Notification.service";
+import { NotificationRepository } from "../repositories/implementations/NotificationRepository";
 
 const userRepository = new UserRepository();
 // const otpRepository = new OtpRepository();
@@ -24,7 +26,9 @@ import { AuctionHouseController } from "../controllers/implimentations/AuctionHo
 
 const Logger = new LoggerService();
 const repo = new AuctionHouseRepository();
-const service = new AuctionHouseService(repo, Logger)
+const notificationRepo=new NotificationRepository()
+const notificationService=new NotificationService(notificationRepo)
+const service = new AuctionHouseService(repo, Logger,notificationService,userRepository)
 export const auctionHouseController = new AuctionHouseController(service, Logger)
 
 import { AdminService } from "../services/implementations/Admin.service";
