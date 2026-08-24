@@ -14,6 +14,7 @@ export const BASE_ROUTES = {
     SLOT: '/slot',
     PAYMENT: '/payment',
     TRANSACTION: '/transaction',
+    NOTIFICATION: '/notification'
 } as const
 
 export const AUTH_ROUTES = {
@@ -76,7 +77,7 @@ export const AUCTION_ITEM_ROUTES = {
     GET_AUCTION: '/get-auction/:id',
     UPDATE_STATUS: '/update-status',
     UPDATE_AUCTION: '/update-auction/:id',
-    CANCEL_AUCTION:'/cancel-auction'
+    CANCEL_AUCTION: '/cancel-auction'
 }
 
 export const WATCH_LIST_ROUTES = {
@@ -114,6 +115,8 @@ export const PAYMENT_ROUTES = {
 export const TRANSACTION_ROUTES = {
     LIST_TRANSACTIONS: '/list-transactions'
 }
-
+export const NOTIFICATION_ROUTES = {
+    GET_NOTIFICATION: '/get-notifications'
+}
 
 

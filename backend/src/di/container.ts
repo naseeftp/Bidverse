@@ -11,7 +11,7 @@ import { NotificationRepository } from "../repositories/implementations/Notifica
 
 const userRepository = new UserRepository();
 // const otpRepository = new OtpRepository();
-const otpRedisRepo=new RedisOtpRepository()
+const otpRedisRepo = new RedisOtpRepository()
 const emailLogger = new LoggerService("EmailService")
 const emailService = new EmailService(emailLogger)
 const otpLogger = new LoggerService('OtpService')
@@ -26,9 +26,9 @@ import { AuctionHouseController } from "../controllers/implimentations/AuctionHo
 
 const Logger = new LoggerService();
 const repo = new AuctionHouseRepository();
-const notificationRepo=new NotificationRepository()
-const notificationService=new NotificationService(notificationRepo)
-const service = new AuctionHouseService(repo, Logger,notificationService,userRepository)
+const notificationRepo = new NotificationRepository()
+const notificationService = new NotificationService(notificationRepo)
+const service = new AuctionHouseService(repo, Logger, notificationService, userRepository)
 export const auctionHouseController = new AuctionHouseController(service, Logger)
 
 import { AdminService } from "../services/implementations/Admin.service";

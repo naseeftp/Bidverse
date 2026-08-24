@@ -10,3 +10,13 @@ export interface createNotificationDTO{
     title:string;
     message:string
 }
+export interface NotificationResponseDTO{
+    notificationId:string;
+    recipientRole:Role,
+    type:NotificationType,
+    event:NotificationEvent,
+    title:string,
+    message:string,
+    createdAt:Date,
+    updatedAt:Date,
+}

@@ -8,12 +8,17 @@ import { IAuctionItemRepository } from "../../repositories/interfaces/IAuctionIt
 import { Types } from "mongoose";
 import { BidMapper } from "../../mappers/bid.mapper";
 import { IGenericPaginatedResposnse } from "../../types/response.type";
+import { NotificationService } from "./Notification.service";
+import { INotificationService } from "../interface/INotification.service";
+import { Role } from "../../dtos/Common.dto";
+import { NotificationEvent, NotificationType } from "../../constants/notification.constant";
 
 export class BidService implements IBidService {
     constructor(
         private _bidRepo: IBidRepository,
         private _userRepo: IUserRepository,
-        private _auctionRepo: IAuctionItemRepository
+        private _auctionRepo: IAuctionItemRepository,
+        private _notificationService: INotificationService
     ) { }
     async placceBid(userId: string, data: placeBidDTO): Promise<bidResponseDTO> {
         const userExist = await this._userRepo.findById(userId);
@@ -41,6 +46,17 @@ export class BidService implements IBidService {
 
         if (Number(data.amount) < minimumRequiredBid) {
             throw new BadRequestError(`Bid amount must be at least ${minimumRequiredBid}`)
+        };
+        if (auctionExist.bidCount > 0) {
+            const currentHighestBidderId = auctionExist.currentHighestBidder;
+            await this._notificationService.createAndSendNotification({
+                recipientId: currentHighestBidderId!,
+                recipientRole: Role.USER,
+                type: NotificationType.WARNING,
+                event: NotificationEvent.OUTBID,
+                title: 'Outbid for an auction',
+                message: `You are out bided for ${auctionExist.title}`
+            })
         }
 
 

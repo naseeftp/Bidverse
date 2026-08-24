@@ -23,6 +23,7 @@ import BidRoutes from './routes/bid.routes'
 import SlotRoutes from './routes/slot.routes'
 import PaymentRoutes from './routes/payment.routes'
 import TransactionRoutes from './routes/transaction.routes'
+import NotificationRoutes from './routes/notification.routes'
 
 import { LoggerService } from "./services/implementations/Logger.service";
 
@@ -32,7 +33,7 @@ const appLogger = new LoggerService("App")
 const httpServer = createServer(app)//WRAP THE EXPRESS INSTANCE IN AN HTTP SERVER
 
 app.use(cors({
-    origin:  [
+    origin: [
         "http://localhost:5173",
         "http://localhost"
     ],
@@ -59,6 +60,7 @@ app.use(BASE_ROUTES.BID, BidRoutes)
 app.use(BASE_ROUTES.SLOT, SlotRoutes)
 app.use(BASE_ROUTES.PAYMENT, PaymentRoutes)
 app.use(BASE_ROUTES.TRANSACTION, TransactionRoutes)
+app.use(BASE_ROUTES.NOTIFICATION, NotificationRoutes)
 
 app.use(errorHandler);
 const startServer = async () => {

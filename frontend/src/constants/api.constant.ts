@@ -12,6 +12,7 @@ export const BASE_ROUTES = {
     SLOT: '/slot',
     PAYMENT: '/payment',
     TRANSACTION: '/transaction',
+    NOTIFICATION: '/notification'
 }
 export const AUTH_ROUTES = {
     REGISTER: "/auth/register",
@@ -111,4 +112,8 @@ export const PAYMENT_ROUTES = {
 }
 export const TRANSACTION_ROUTES = {
     LIST_TRANSACTIONS: '/list-transactions'
+}
+
+export const NOTIFICATION_ROUTES = {
+    GET_NOTIFICATION: '/get-notifications'
 }
