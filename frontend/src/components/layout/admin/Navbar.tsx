@@ -25,8 +25,10 @@ const AdminNavbar: React.FC = () => {
             </div>
             <div className="flex items-center gap-6">
                 <div className="flex items-center gap-4 pr-6 border-r border-[#E5E7EB]">
-                    <button className="text-[#6B7280] hover:text-[#D4AF37] transition-colors relative">
-                        <Bell size={18} />
+                    <button 
+                    onClick={() => navigate("/admin/notifications")}
+                    className="text-[#6B7280] hover:text-[#D4AF37] transition-colors relative">
+                    <Bell size={18} />
                         <span className="absolute -top-1 -right-1 w-2 h-2 bg-[#DC2626] rounded-full border-2 border-white"></span>
                     </button>
                     <button
