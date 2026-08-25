@@ -116,6 +116,7 @@ export const TRANSACTION_ROUTES = {
 
 export const NOTIFICATION_ROUTES = {
     GET_NOTIFICATION: '/get-notifications',
-    MARK_AS_READ: '/mark-read'
+    MARK_AS_READ: '/mark-read',
+    READ_ALL: '/read-all'
 
 }

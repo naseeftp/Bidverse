@@ -28,4 +28,13 @@ export class NotificationController implements INotificationController {
             next(error)
         }
     }
+    async markAllRead(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const userId=req.user.id;
+            const result=await this._notificationService.markAllRead(userId);
+            SuccessResponse(res,MESSAGES.ACTION_SUCCESS,result,HttpStatus.OK)
+        } catch (error) {
+            next(error)
+        }
+    }
 }

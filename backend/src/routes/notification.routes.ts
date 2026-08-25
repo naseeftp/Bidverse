@@ -19,5 +19,10 @@ router.patch(
     allowedTo(Role.USER, Role.ADMIN, Role.TENANT),
     (req,res,next)=>notificationController.markAsRead(req,res,next)
 )
+router.patch(
+    NOTIFICATION_ROUTES.READ_ALL,
+    allowedTo(Role.USER,Role.ADMIN,Role.TENANT),
+    (req,res,next)=>notificationController.markAllRead(req,res,next)
+)
 
 export default router;

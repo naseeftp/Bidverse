@@ -14,4 +14,18 @@ export class NotificationRepository extends BaseRepository<INotificationDocument
             recipientId:targetedObjectId
         })
     }
+    async markAllRead(userId:string):Promise<INotificationDocument[]>{
+        const targetedObjectId=new Types.ObjectId(userId)
+        await this.model.updateMany(
+            {recipientId:targetedObjectId,isRead:false},
+            {
+                $set:{
+                    isRead:true,
+                    readAt:new Date
+                }
+            }
+        )
+        return this.model.find({recipientId:targetedObjectId})
+    }
+    
 }

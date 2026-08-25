@@ -45,6 +45,7 @@ export const NotificationWorkSpace: React.FC<NotificationWorkspaceProps> = ({ ro
   const [notifications, setNotifications] = useState<NotificationResponseDTO[]>([]);
   const [loading, setLoading] = useState(false);
   const [markingId,setMarkingId]=useState<string|null>(null)
+  const [markingAll,SetMarkingAll]=useState(false)
   const [filter, setFilter] = useState<'all' | 'unread'>('all');
 
   useEffect(() => {
@@ -90,6 +91,23 @@ export const NotificationWorkSpace: React.FC<NotificationWorkspaceProps> = ({ ro
     setMarkingId(null)
    }
   }
+ const handleMarkAllAsRead=async()=>{
+   const unreadCount=notifications.filter((n)=>!n.isRead).length;
+   if(unreadCount==0) return;
+   SetMarkingAll(true);
+   try {
+    const response=await notificationService.readAll();
+    if(response?.success){
+      setNotifications((prev) => prev.map((item) => ({ ...item, isRead: true })));
+    }else{
+      toast.error(response?.message)
+    }
+   } catch (error) {
+    toast.error('Error updating notifications');
+   }finally{
+    SetMarkingAll(false)
+   }
+ }
 
   const getNotificationIcon = (type: string) => {
     switch (type) {
@@ -151,7 +169,6 @@ const formatDate = (dateInput: string | Date) => {
           </button>
         </div>
 
-        {/* Filter Tabs */}
         <div className="flex border-b border-slate-200 dark:border-slate-800 px-4 pt-2 bg-slate-50 dark:bg-slate-900/50">
           {(['all', 'unread'] as const).map((tab) => (
             <button
@@ -168,7 +185,6 @@ const formatDate = (dateInput: string | Date) => {
           ))}
         </div>
 
-        {/* List Body */}
         <div className="overflow-y-auto p-4 space-y-3 flex-1 min-h-[250px]">
           {loading ? (
             <div className="h-full py-16 flex flex-col items-center justify-center text-slate-400 gap-2">
@@ -236,7 +252,7 @@ const formatDate = (dateInput: string | Date) => {
         
         <div className="p-3 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50 flex justify-between items-center text-xs">
           
-          {/* <button
+          <button
             onClick={handleMarkAllAsRead}
             disabled={!hasUnread || markingAll}
             className={`flex items-center gap-1.5 font-medium transition-colors ${
@@ -251,7 +267,7 @@ const formatDate = (dateInput: string | Date) => {
               <CheckCheck className="w-3.5 h-3.5" />
             )}
             Mark all as read
-          </button> */}
+          </button>
 
           <button 
             onClick={onClose}
