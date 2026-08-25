@@ -10,6 +10,7 @@ export class NotificationMapper {
             event: doc.event,
             title: doc.title,
             message: doc.message,
+            isRead: doc.isRead,
             createdAt: doc.createdAt,
             updatedAt: doc.updatedAt
         }

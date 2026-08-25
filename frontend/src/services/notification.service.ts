@@ -19,6 +19,19 @@ async getAllNotifications(){
         return apiErrorHandler(error,'Failed to get Notifications')
     }
 }
+async markAsRead(notificationId:string){
+try {
+    const url=`${BASE_ROUTES.NOTIFICATION}${NOTIFICATION_ROUTES.MARK_AS_READ}`;
+    const response=await axiosInstance.patch<NotificationResponseDTO,ApiResponse<NotificationResponseDTO>>(url,{notificationId:notificationId});
+    return{
+        success:true,
+        message:response.message,
+        data:response.data
+    }
+} catch (error) {
+    return apiErrorHandler(error,'Failed to mark as read')
+}
+}
 }
 
 export default new NotificationService()

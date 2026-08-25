@@ -176,6 +176,8 @@ export const MESSAGES = {
     PAYMENT_SUCCESS: 'Payment Success',
     PAYMENT_NOT_FOUND:'Payment not Found',
 
+    NOTIFICATION_NOT_FOUND:'Notification Notfound',
+
     LOGOUT_SUCCESS: "Logout success",
     LOGOUT_FAILED: "Logout failed",
 

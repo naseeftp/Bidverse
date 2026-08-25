@@ -42,6 +42,7 @@ export interface NotificationResponseDTO {
     event: NotificationEventValues,
     title: string,
     message: string,
+    isRead: boolean,
     createdAt: Date,
     updatedAt: Date,
 }

@@ -18,4 +18,14 @@ export class NotificationController implements INotificationController {
             next(error)
         }
     }
+    async markAsRead(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const userId = req.user.id;
+            const { notificationId } = req.body;
+            const result = await this._notificationService.markAsRead(userId, notificationId);
+            SuccessResponse(res, MESSAGES.ACTION_SUCCESS, result, HttpStatus.OK)
+        } catch (error) {
+            next(error)
+        }
+    }
 }

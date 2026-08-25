@@ -116,7 +116,8 @@ export const TRANSACTION_ROUTES = {
     LIST_TRANSACTIONS: '/list-transactions'
 }
 export const NOTIFICATION_ROUTES = {
-    GET_NOTIFICATION: '/get-notifications'
+    GET_NOTIFICATION: '/get-notifications',
+    MARK_AS_READ:'/mark-read'
 }
 
 
