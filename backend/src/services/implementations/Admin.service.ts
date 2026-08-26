@@ -17,13 +17,16 @@ import { IUserRepository } from "../../repositories/interfaces/iUser.repository"
 import { UserMapper } from "../../mappers/user.mapper";
 import { isValidObjectId } from "mongoose";
 import { generatePaymentAccountId } from "../../utils/paymentAccount";
+import { INotificationService } from "../interface/INotification.service";
+import { NotificationEvent, NotificationType } from "../../constants/notification.constant";
 
 export class AdminService implements IAdminService {
     constructor(
         private _auctionHouseRepo: IAuctionHouseRepository,
         private _userRepo: IUserRepository,
         private _logger: ILoggerService,
-        private _emailService: IEmailService
+        private _emailService: IEmailService,
+        private _notificationService:INotificationService
     ) { }
     async listAllAuctionHouses(page: number, limit: number, search?: string, status?: string): Promise<IGenericPaginatedResposnse<AdminAuctionHouseDetailDTO>> {
 
@@ -74,6 +77,21 @@ export class AdminService implements IAdminService {
                 paymentAccountId: generatePaymentAccountId()
             })
         }
+        const isApproved=status===VerificationStatus.APPROVED
+        const notificationType=isApproved?NotificationType.SUCCESS:NotificationType.WARNING;
+        const notificationEvent=isApproved?NotificationEvent.HOUSE_VERIFICATION_APPROVED:NotificationEvent.HOUSE_VERIFICATION_REJECTED;
+        const message=isApproved?
+        'You are Kyc verification completed':
+        `You are kyc verification Rejected due to ${reason}`;
+        const title=status==VerificationStatus.APPROVED?'KYC completed':'KYC rejected';
+        await this._notificationService.createAndSendNotification({
+            recipientId:updatedHouse.userId,
+            recipientRole:Role.TENANT,
+            type:notificationType,
+            event:notificationEvent,
+            title:title,
+            message:message
+        })
         await this._emailService.sendVerificationStatusUpdationEmail(updatedHouse.contact.businessEmail, updatedHouse.name, status, reason)
         return AuctionHouseMapper.toResponseDTO(updatedHouse)
 

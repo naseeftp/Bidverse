@@ -39,5 +39,5 @@ const adminRepo = new AuctionHouseRepository();
 const userRepo = new UserRepository()
 const AdminemailLogger = new LoggerService('EmailLogger')
 const adminEmailService = new EmailService(AdminemailLogger)
-const adminService = new AdminService(adminRepo, userRepo, adminLogger, adminEmailService);
+const adminService = new AdminService(adminRepo, userRepo, adminLogger, adminEmailService,notificationService);
 export const adminController = new AdminController(adminService, adminLogger)
