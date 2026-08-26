@@ -34,11 +34,6 @@ const TenantNavbar: React.FC = () => {
         <>
 
           <div className="flex items-center gap-8">
-            <button className="text-[#64748B] hover:text-[#2F6FED] transition-colors relative">
-              <Bell size={20} strokeWidth={2} />
-              <span className="absolute top-0 right-0 w-2 h-2 bg-[#EF4444] rounded-full border-2 border-white"></span>
-            </button>
-
             <button
               onClick={() => navigate("/tenant/chat")}
               title="View Watchlist"
@@ -51,6 +46,12 @@ const TenantNavbar: React.FC = () => {
                   {unreadCount > 99 ? '99+' : unreadCount}
                 </span>
               )}
+            </button>
+            <button
+              onClick={() => navigate('/tenant/notifications')}
+              className="text-[#64748B] hover:text-[#2F6FED] transition-colors relative">
+              <Bell size={20} strokeWidth={2} />
+              <span className="absolute top-0 right-0 w-2 h-2 bg-[#EF4444] rounded-full border-2 border-white"></span>
             </button>
 
             <div className="h-8 w-[1px] bg-[#E2E8F0]"></div>

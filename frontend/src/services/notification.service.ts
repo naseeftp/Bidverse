@@ -32,18 +32,18 @@ class NotificationService {
             return apiErrorHandler(error, 'Failed to mark as read')
         }
     }
-    async readAll(){
+    async readAll() {
         try {
-            const url=`${BASE_ROUTES.NOTIFICATION}${NOTIFICATION_ROUTES.READ_ALL}`;
-            const response=await axiosInstance.patch<NotificationResponseDTO,ApiResponse<NotificationResponseDTO[]>>(url)
-            return{
-                success:true,
-                message:response.message,
-                data:response.data
+            const url = `${BASE_ROUTES.NOTIFICATION}${NOTIFICATION_ROUTES.READ_ALL}`;
+            const response = await axiosInstance.patch<NotificationResponseDTO, ApiResponse<NotificationResponseDTO[]>>(url)
+            return {
+                success: true,
+                message: response.message,
+                data: response.data
             }
             return
         } catch (error) {
-            return apiErrorHandler(error,'Failed to Read All')
+            return apiErrorHandler(error, 'Failed to Read All')
         }
     }
 

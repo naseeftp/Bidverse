@@ -148,7 +148,7 @@ export const MESSAGES = {
     AUCTION_RETRIEVED: 'Auction Retrieved successfully',
     AUCTION_STATUS_UPDATED: 'Auction status updated',
     AUCTION_UPDATED: 'Auction Details updated Successfully',
-    AUCTION_CANCELLED:'Auction Cancelled Successfully',
+    AUCTION_CANCELLED: 'Auction Cancelled Successfully',
     WATCHLIST_ADDED: 'Item Added To WatchList Successfully',
     WATCHLIST_DELETED: 'Item Removed From WatchList Successfully',
     WATCHLIST_EXISTED: 'Item Allredy existed on watchlist',
@@ -169,14 +169,14 @@ export const MESSAGES = {
     SLOT_BOOKED: 'Slot booking completed',
     SLOT_NOT_FOUND: 'Slot Not found',
     SLOT_CANCELLED: 'Slot cancelled sucessfully',
-    SLOT_ALLREADY_CANCELLED:'Slot is already cancelled',
+    SLOT_ALLREADY_CANCELLED: 'Slot is already cancelled',
 
     HOUSE_FULL: 'All slots are already booked',
     ALLREADY_BOOKED: 'You are allready own a slot for this auction',
     PAYMENT_SUCCESS: 'Payment Success',
-    PAYMENT_NOT_FOUND:'Payment not Found',
+    PAYMENT_NOT_FOUND: 'Payment not Found',
 
-    NOTIFICATION_NOT_FOUND:'Notification Notfound',
+    NOTIFICATION_NOT_FOUND: 'Notification Notfound',
 
     LOGOUT_SUCCESS: "Logout success",
     LOGOUT_FAILED: "Logout failed",

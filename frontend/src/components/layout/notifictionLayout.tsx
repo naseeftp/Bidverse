@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
-import {Bell, X, Info, AlertTriangle, CheckCircle, XCircle, Shield, Building, User, Loader2, CheckCheck } from 'lucide-react';
+import { Bell, X, Info, AlertTriangle, CheckCircle, XCircle, Shield, Building, User, Loader2, CheckCheck } from 'lucide-react';
 import type { NotificationResponseDTO } from "../../types/notification.dto";
-import { NotificationType } from "../../types/notification.dto"; 
+import { NotificationType } from "../../types/notification.dto";
 import toast from "react-hot-toast";
 import notificationService from "../../services/notification.service";
 
@@ -44,8 +44,8 @@ interface NotificationWorkspaceProps {
 export const NotificationWorkSpace: React.FC<NotificationWorkspaceProps> = ({ roleTheme = 'user', isOpen, onClose }) => {
   const [notifications, setNotifications] = useState<NotificationResponseDTO[]>([]);
   const [loading, setLoading] = useState(false);
-  const [markingId,setMarkingId]=useState<string|null>(null)
-  const [markingAll,SetMarkingAll]=useState(false)
+  const [markingId, setMarkingId] = useState<string | null>(null)
+  const [markingAll, SetMarkingAll] = useState(false)
   const [filter, setFilter] = useState<'all' | 'unread'>('all');
 
   useEffect(() => {
@@ -73,41 +73,41 @@ export const NotificationWorkSpace: React.FC<NotificationWorkspaceProps> = ({ ro
 
   const activeTheme = THEME_CONFIG[roleTheme] || THEME_CONFIG.user;
   const RoleIcon = activeTheme.icon;
-  
-  const handleMarkAsRead=async (notificationId:string)=>{
-   setMarkingId(notificationId);
-   try {
-    const response=await notificationService.markAsRead(notificationId);
-    if(response.success&&response.data){
-      setNotifications((prev)=>
-      prev.map((item)=>
-        item.notificationId==notificationId?{...item,isRead:true}:item
-      )
-      )
+
+  const handleMarkAsRead = async (notificationId: string) => {
+    setMarkingId(notificationId);
+    try {
+      const response = await notificationService.markAsRead(notificationId);
+      if (response.success && response.data) {
+        setNotifications((prev) =>
+          prev.map((item) =>
+            item.notificationId == notificationId ? { ...item, isRead: true } : item
+          )
+        )
+      }
+    } catch {
+      toast.error('failed to mark as read')
+    } finally {
+      setMarkingId(null)
     }
-   } catch {
-    toast.error('failed to mark as read')
-   }finally{
-    setMarkingId(null)
-   }
   }
- const handleMarkAllAsRead=async()=>{
-   const unreadCount=notifications.filter((n)=>!n.isRead).length;
-   if(unreadCount==0) return;
-   SetMarkingAll(true);
-   try {
-    const response=await notificationService.readAll();
-    if(response?.success){
-      setNotifications((prev) => prev.map((item) => ({ ...item, isRead: true })));
-    }else{
-      toast.error(response?.message)
+  const handleMarkAllAsRead = async () => {
+    const unreadCount = notifications.filter((n) => !n.isRead).length;
+    if (unreadCount == 0) return;
+    SetMarkingAll(true);
+    try {
+      const response = await notificationService.readAll();
+      if (response?.success) {
+        setNotifications((prev) => prev.map((item) => ({ ...item, isRead: true })));
+      } else {
+        toast.error(response?.message)
+      }
+    } catch (error) {
+      toast.error('Error updating notifications');
+    } finally {
+      SetMarkingAll(false)
     }
-   } catch (error) {
-    toast.error('Error updating notifications');
-   }finally{
-    SetMarkingAll(false)
-   }
- }
+  }
 
   const getNotificationIcon = (type: string) => {
     switch (type) {
@@ -123,15 +123,15 @@ export const NotificationWorkSpace: React.FC<NotificationWorkspaceProps> = ({ ro
     }
   };
 
-const formatDate = (dateInput: string | Date) => {
-  const date = typeof dateInput === 'string' ? new Date(dateInput) : dateInput;
-  return date.toLocaleDateString(undefined, {
-    month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit'
-  });
-}
+  const formatDate = (dateInput: string | Date) => {
+    const date = typeof dateInput === 'string' ? new Date(dateInput) : dateInput;
+    return date.toLocaleDateString(undefined, {
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  }
 
   const filteredNotifications = notifications.filter(item => {
     if (filter === 'unread') return !item.isRead;
@@ -142,7 +142,7 @@ const formatDate = (dateInput: string | Date) => {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in">
       <div className="bg-white dark:bg-slate-900 w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden border border-slate-200 dark:border-slate-800 flex flex-col max-h-[85vh]">
-        
+
         <div className={`${activeTheme.header} p-4 text-white flex items-center justify-between`}>
           <div className="flex items-center space-x-3">
             <div className="p-2 bg-white/10 rounded-xl backdrop-blur-md">
@@ -160,7 +160,7 @@ const formatDate = (dateInput: string | Date) => {
             </div>
           </div>
 
-          <button 
+          <button
             onClick={onClose}
             className="p-1.5 rounded-lg hover:bg-white/20 transition-colors focus:outline-none"
             aria-label="Close modal"
@@ -174,11 +174,10 @@ const formatDate = (dateInput: string | Date) => {
             <button
               key={tab}
               onClick={() => setFilter(tab)}
-              className={`pb-2.5 px-3 text-xs font-semibold uppercase tracking-wider border-b-2 transition-colors ${
-                filter === tab 
-                  ? activeTheme.tabActive 
+              className={`pb-2.5 px-3 text-xs font-semibold uppercase tracking-wider border-b-2 transition-colors ${filter === tab
+                  ? activeTheme.tabActive
                   : 'border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-400'
-              }`}
+                }`}
             >
               {tab}
             </button>
@@ -200,11 +199,10 @@ const formatDate = (dateInput: string | Date) => {
             filteredNotifications.map((item) => (
               <div
                 key={item.notificationId}
-                className={`p-3.5 rounded-xl border transition-all flex gap-3 ${
-                  !item.isRead
+                className={`p-3.5 rounded-xl border transition-all flex gap-3 ${!item.isRead
                     ? 'bg-slate-50 dark:bg-slate-800/60 border-slate-200 dark:border-slate-700'
                     : 'bg-white dark:bg-slate-900 border-slate-100 dark:border-slate-800/80 opacity-75'
-                }`}
+                  }`}
               >
                 {getNotificationIcon(item.type)}
 
@@ -249,17 +247,16 @@ const formatDate = (dateInput: string | Date) => {
           )}
         </div>
 
-        
+
         <div className="p-3 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50 flex justify-between items-center text-xs">
-          
+
           <button
             onClick={handleMarkAllAsRead}
             disabled={!hasUnread || markingAll}
-            className={`flex items-center gap-1.5 font-medium transition-colors ${
-              hasUnread && !markingAll
+            className={`flex items-center gap-1.5 font-medium transition-colors ${hasUnread && !markingAll
                 ? 'text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100'
                 : 'text-slate-300 dark:text-slate-600 cursor-not-allowed'
-            }`}
+              }`}
           >
             {markingAll ? (
               <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -269,7 +266,7 @@ const formatDate = (dateInput: string | Date) => {
             Mark all as read
           </button>
 
-          <button 
+          <button
             onClick={onClose}
             className="px-4 py-1.5 bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-medium rounded-lg hover:bg-slate-300 dark:hover:bg-slate-700 transition-colors"
           >

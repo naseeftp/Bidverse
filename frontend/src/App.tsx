@@ -33,6 +33,7 @@ import ChatPage from "./pages/users/chatPage";
 import MyBidsPage from "./pages/users/myBids.page";
 import MySlotsPage from "./pages/users/mySlots";
 import MyTransactions from "./pages/users/myTransactions";
+import UserNotificationPage from "./pages/users/notificationPage";
 
 import TenantRegisterPage from "./pages/tenant/RegiterPage";
 import TenantVerifyOtpPage from "./pages/tenant/VerifyotpPage";
@@ -53,6 +54,7 @@ import TenantAuctionDetailPage from "./pages/tenant/auctionDetailPage";
 import TenantEditAuctionPage from "./pages/tenant/updateAuctionPage";
 import TenantChatPage from "./pages/tenant/chatPage";
 import TenantBidHistoryPage from "./pages/tenant/bidHistoryPage";
+import TenantNotificationPage from "./pages/tenant/notificationPage";
 
 import AdminLoginPage from "./pages/admin/LoginPage";
 import AdminDashboard from "./pages/admin/Dashboard";
@@ -101,7 +103,7 @@ function App() {
                   <Route path="/change-email" element={<ChangeEmailPage />} />
                   <Route path="/change-email-verify" element={<ChangeEmailVerifyPage />} />
                   <Route path="/watch-list" element={<WatchlistPage />} />
-
+                  <Route path="/notifications" element={<UserNotificationPage />} />
 
                </Route>
             </Route>
@@ -111,8 +113,8 @@ function App() {
                   <Route path="/dashboard" element={<Dashboard />} />
                   <Route path="/addresses" element={<AddressPage />} />
                   <Route path="/my-bids" element={<MyBidsPage />} />
-                  <Route path="/my-slots" element={<MySlotsPage/>} />
-                  <Route path="/my-transactions" element={<MyTransactions/>} />
+                  <Route path="/my-slots" element={<MySlotsPage />} />
+                  <Route path="/my-transactions" element={<MyTransactions />} />
 
                </Route>
             </Route>
@@ -143,8 +145,9 @@ function App() {
                   <Route path="/tenant/auctions/:id" element={<TenantAuctionDetailPage />} />
                   <Route path="/tenant/update-auctions/:id" element={<TenantEditAuctionPage />} />
                   <Route path="/tenant/bid-history/:id" element={<TenantBidHistoryPage />} />
-                  
-              </Route>
+                  <Route path="/tenant/notifications" element={<TenantNotificationPage />} />
+
+               </Route>
 
             </Route>
             <Route path="/admin/chat" element={<AdminChatPage />} />
@@ -161,13 +164,9 @@ function App() {
                   <Route path="/admin/auctions" element={<AdminAuctionsListPage />} />
                   <Route path="/admin/auctions/:id" element={<AdminAuctionDetailPage />} />
                   <Route path="/admin/bid-history/:id" element={<AdminBidHistoryPage />} />
-                  <Route path="/admin/notifications" element={<AdminNotificationPage/>}/>
+                  <Route path="/admin/notifications" element={<AdminNotificationPage />} />
                </Route>
             </Route>
-
-
-
-
          </Routes>
 
       </Router>

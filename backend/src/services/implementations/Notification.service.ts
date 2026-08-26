@@ -18,21 +18,21 @@ export class NotificationService implements INotificationService {
         return mappedNotifications
     }
     async markAsRead(userId: string, notificationId: string): Promise<NotificationResponseDTO> {
-        const notification=await this._notificationRepo.findById(notificationId);
-        if(!notification){
+        const notification = await this._notificationRepo.findById(notificationId);
+        if (!notification) {
             throw new NotFoundError(MESSAGES.NOTIFICATION_NOT_FOUND)
         }
-        if(notification.recipientId.toString()!==userId){
+        if (notification.recipientId.toString() !== userId) {
             throw new UnauthorizedError(MESSAGES.NOT_PERMITTED)
         };
-        const markAsReadNotification=await this._notificationRepo.updateById(notificationId,{isRead:true,readAt:new Date()});
-        if(!markAsReadNotification){
+        const markAsReadNotification = await this._notificationRepo.updateById(notificationId, { isRead: true, readAt: new Date() });
+        if (!markAsReadNotification) {
             throw new NotFoundError(MESSAGES.NOTIFICATION_NOT_FOUND)
         }
         return NotificationMapper.toNotificationResponseDTO(markAsReadNotification)
     }
     async markAllRead(userId: string): Promise<NotificationResponseDTO[]> {
-      const result=await this._notificationRepo.markAllRead(userId)
-      return result.map((notification)=>NotificationMapper.toNotificationResponseDTO(notification))
+        const result = await this._notificationRepo.markAllRead(userId)
+        return result.map((notification) => NotificationMapper.toNotificationResponseDTO(notification))
     }
 }

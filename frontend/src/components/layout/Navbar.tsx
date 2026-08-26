@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAppSelector, useAppDispatch } from "../../hooks/redux.hooks";
 import { logout, setWatchlistCount } from "../../redux/user/auth.slice";
-import { ChevronDown, Heart, Menu, X, MessageCircle } from "lucide-react";
+import { ChevronDown, Heart, Menu, X, MessageCircle,Bell} from "lucide-react";
 import authService from "../../services/auth.service";
 import watchListService from "../../services/watchList.service";
 import { apiErrorHandler } from "../../utils/error.handle";
@@ -104,6 +104,7 @@ const Navbar: React.FC = () => {
                   </span>
                 )}
               </button>
+
               <button
                 onClick={() => navigate("/chat")}
                 title="View Watchlist"
@@ -116,6 +117,15 @@ const Navbar: React.FC = () => {
                     {unreadCount > 99 ? '99+' : unreadCount}
                   </span>
                 )}
+              </button>
+
+                     <button
+                onClick={() => navigate("/notifications")}
+                title="View Watchlist"
+                className="relative p-2 text-[#6B6B6B] hover:text-[#C9653B] hover:bg-[#FFF9F4] rounded-xl transition-all duration-300 group cursor-pointer focus:outline-none"
+              >
+                <Bell size={18} className="transition-transform group-hover:scale-105" />
+
               </button>
 
               <div className="relative hidden md:block" ref={dropdownRef}>

@@ -7,7 +7,7 @@ interface NotificationPageProps {
   onClose?: () => void;
 }
 
-const AdminNotificationPage: React.FC<NotificationPageProps> = ({
+const UserNotificationPage: React.FC<NotificationPageProps> = ({
   isOpen: propsIsOpen,
   onClose: propsOnClose
 }) => {
@@ -26,11 +26,11 @@ const AdminNotificationPage: React.FC<NotificationPageProps> = ({
 
   return (
     <NotificationWorkSpace
-      roleTheme="admin"
+      roleTheme="user"
       isOpen={isOpen}
       onClose={handleClose}
     />
   );
 };
 
-export default AdminNotificationPage;
+export default UserNotificationPage;

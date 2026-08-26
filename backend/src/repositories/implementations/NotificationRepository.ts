@@ -4,28 +4,28 @@ import { INotificationDocument } from "../../types/notification.type";
 import { INotificationRepository } from "../interfaces/INotificationRepository";
 import { BaseRepository } from "./Base.repository";
 
-export class NotificationRepository extends BaseRepository<INotificationDocument> implements INotificationRepository{
-    constructor(){
+export class NotificationRepository extends BaseRepository<INotificationDocument> implements INotificationRepository {
+    constructor() {
         super(Notification)
     }
     async findAllNotificationForUser(userId: string): Promise<INotificationDocument[]> {
-        const targetedObjectId=new Types.ObjectId(userId);
+        const targetedObjectId = new Types.ObjectId(userId);
         return await this.model.find({
-            recipientId:targetedObjectId
+            recipientId: targetedObjectId
         })
     }
-    async markAllRead(userId:string):Promise<INotificationDocument[]>{
-        const targetedObjectId=new Types.ObjectId(userId)
+    async markAllRead(userId: string): Promise<INotificationDocument[]> {
+        const targetedObjectId = new Types.ObjectId(userId)
         await this.model.updateMany(
-            {recipientId:targetedObjectId,isRead:false},
+            { recipientId: targetedObjectId, isRead: false },
             {
-                $set:{
-                    isRead:true,
-                    readAt:new Date
+                $set: {
+                    isRead: true,
+                    readAt: new Date
                 }
             }
         )
-        return this.model.find({recipientId:targetedObjectId})
+        return this.model.find({ recipientId: targetedObjectId })
     }
-    
+
 }
