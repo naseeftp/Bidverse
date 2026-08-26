@@ -4,13 +4,16 @@ import { INotificationService } from "../interface/INotification.service";
 import { NotificationMapper } from "../../mappers/notification.mapper";
 import { NotFoundError, UnauthorizedError } from "../../errors/AppError";
 import { MESSAGES } from "../../constants/constants";
+import { socketService} from "./socket.service";
 
 export class NotificationService implements INotificationService {
     constructor(
         private _notificationRepo: INotificationRepository
     ) { }
     async createAndSendNotification(data: createNotificationDTO): Promise<void> {
-        await this._notificationRepo.create(data)
+        const createdNotification =await this._notificationRepo.create(data);
+        const mapped=NotificationMapper.toNotificationResponseDTO(createdNotification);
+        socketService.emitToUser(data.recipientId.toString(),'notification:new',mapped)
     }
     async findAllNotificationForUser(userId: string): Promise<NotificationResponseDTO[]> {
         const notifications = await this._notificationRepo.findAllNotificationForUser(userId);

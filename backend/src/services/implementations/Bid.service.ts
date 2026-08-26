@@ -8,7 +8,6 @@ import { IAuctionItemRepository } from "../../repositories/interfaces/IAuctionIt
 import { Types } from "mongoose";
 import { BidMapper } from "../../mappers/bid.mapper";
 import { IGenericPaginatedResposnse } from "../../types/response.type";
-import { NotificationService } from "./Notification.service";
 import { INotificationService } from "../interface/INotification.service";
 import { Role } from "../../dtos/Common.dto";
 import { NotificationEvent, NotificationType } from "../../constants/notification.constant";

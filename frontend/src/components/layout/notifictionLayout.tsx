@@ -4,6 +4,7 @@ import type { NotificationResponseDTO } from "../../types/notification.dto";
 import { NotificationType } from "../../types/notification.dto";
 import toast from "react-hot-toast";
 import notificationService from "../../services/notification.service";
+import { getSocket } from "../../services/socket.service";
 
 const THEME_CONFIG = {
   user: {
@@ -68,6 +69,16 @@ export const NotificationWorkSpace: React.FC<NotificationWorkspaceProps> = ({ ro
       fetchNotifications();
     }
   }, [isOpen, roleTheme]);
+  useEffect(()=>{
+    const socket=getSocket();
+    const handleNewNotification=(newNotification:NotificationResponseDTO)=>{
+      setNotifications((prev)=>[newNotification,...prev])
+    };
+    socket.on('notification:new', handleNewNotification)
+    return()=>{
+      socket.off('notification:new', handleNewNotification);
+    }
+  },[])
 
   if (!isOpen) return null;
 
