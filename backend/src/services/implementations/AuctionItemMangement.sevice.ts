@@ -11,13 +11,19 @@ import { IGenericPaginatedResposnse } from "../../types/response.type";
 import { Role } from "../../dtos/Common.dto";
 import { Types } from "mongoose";
 import { IPaymentService } from "../interface/IPayment.service";
+import { INotificationService } from "../interface/INotification.service";
+import { IUserRepository } from "../../repositories/interfaces/iUser.repository";
+import { NotificationEvent, NotificationType } from "../../constants/notification.constant";
 
 export class AuctionItemMangementSevice implements IAuctionItemMangementSevice {
     constructor(
         private _auctionItemRepo: IAuctionItemRepository,
         private _auctionHouseRepo: IAuctionHouseRepository,
         private _paymentService:IPaymentService,
-        private _logger: ILoggerService
+        private _logger: ILoggerService,
+        private _notificationService:INotificationService,
+        private _userRepo:IUserRepository
+
     ) { }
 
     async createAuction(userId: string, data: CreateAuctionItemDTO): Promise<AuctionItemResponseDTO> {
@@ -45,6 +51,15 @@ export class AuctionItemMangementSevice implements IAuctionItemMangementSevice {
             }))
         }
         const createdItem = await this._auctionItemRepo.create(auctionItemData)
+        const admin=await this._userRepo.findOne({role:'admin'});
+        await this._notificationService.createAndSendNotification({
+            recipientId:admin?._id!,
+            recipientRole:Role.ADMIN,
+            type:NotificationType.WARNING,
+            event:NotificationEvent.AUCTION_VERIFICATION_REQUESTED,
+            message:`a new Auction Item ${createdItem.title} submitted to verification`,
+            title:'Auction Verification'
+        })
         const hydratedObject = createdItem.toObject ? createdItem.toObject() : createdItem;
         return AuctionItemMapper.toResponseDTO(hydratedObject)
     }
@@ -108,6 +123,22 @@ export class AuctionItemMangementSevice implements IAuctionItemMangementSevice {
         if (!updatedAuction) {
             throw new AppError('Failed to update auction')
         }
+        const isApproved=status===AuctionItemStatus.SCHEDULED;
+        const notificationType=isApproved?NotificationType.SUCCESS:NotificationType.WARNING;
+        const notificationEvent=isApproved?NotificationEvent.AUCTION_APPROVED:NotificationEvent.AUCTION_REJECTED;
+        const message=isApproved?
+        `You are auction item named ${updatedAuction.title} is Approved `
+        :`You are auction item named ${updatedAuction.title} is rejected due to ${reason}`;
+        const auctionOwner=await this._auctionHouseRepo.findById(updatedAuction.houseId);
+        await this._notificationService.createAndSendNotification({
+            recipientId:auctionOwner?.userId!,
+            recipientRole:Role.TENANT,
+            type:notificationType,
+            event:notificationEvent,
+            title:'Auction Status Update',
+            message:message
+        })
+
         return AuctionItemMapper.toResponseDTO(updatedAuction)
     }
 

@@ -56,7 +56,7 @@ const PlaceBidModal: React.FC<PlaceBidProps> = ({
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (isNaN(bidAmount) || bidAmount < requireMinBid) {
-            setErrorMessage(`Your bid must be at least $${requireMinBid.toLocaleString()}`);
+            setErrorMessage(`Your bid must be at least ₹${requireMinBid.toLocaleString()}`);
             toast.error("Bid amount is below the required minimum!");
             return
         }
@@ -101,7 +101,7 @@ const PlaceBidModal: React.FC<PlaceBidProps> = ({
                                 {hasbids ? "Current Highest Bid" : "Starting Price"}
                             </span>
                             <span className="text-sm font-black text-[#1F1F1F]">
-                                ${basePrice!.toLocaleString()}
+                                ₹{basePrice!.toLocaleString()}
                             </span>
                         </div>
 
@@ -110,7 +110,7 @@ const PlaceBidModal: React.FC<PlaceBidProps> = ({
                                 Min Increment
                             </span>
                             <span className="text-sm font-bold text-[#C9653B]">
-                                +${minimumBidIncrement.toLocaleString()}
+                                +₹{minimumBidIncrement.toLocaleString()}
                             </span>
                         </div>
                     </div>
@@ -125,34 +125,34 @@ const PlaceBidModal: React.FC<PlaceBidProps> = ({
                                 onClick={() => handlePresetAdd(1)}
                                 className="py-1.5 px-2 bg-white hover:bg-[#FFF9F4] border border-[#E6E0DA] hover:border-[#C9653B] rounded-lg text-xs font-bold text-[#1F1F1F] transition-all"
                             >
-                                ${requireMinBid.toLocaleString()}
+                                ₹{requireMinBid.toLocaleString()}
                             </button>
                             <button
                                 type="button"
                                 onClick={() => handlePresetAdd(2)}
                                 className="py-1.5 px-2 bg-white hover:bg-[#FFF9F4] border border-[#E6E0DA] hover:border-[#C9653B] rounded-lg text-xs font-bold text-[#1F1F1F] transition-all"
                             >
-                                ${(requireMinBid + minimumBidIncrement).toLocaleString()}
+                                ₹{(requireMinBid + minimumBidIncrement).toLocaleString()}
                             </button>
                             <button
                                 type="button"
                                 onClick={() => handlePresetAdd(3)}
                                 className="py-1.5 px-2 bg-white hover:bg-[#FFF9F4] border border-[#E6E0DA] hover:border-[#C9653B] rounded-lg text-xs font-bold text-[#1F1F1F] transition-all"
                             >
-                                ${(requireMinBid + minimumBidIncrement * 2).toLocaleString()}
+                                ₹{(requireMinBid + minimumBidIncrement * 2).toLocaleString()}
                             </button>
                         </div>
                     </div>
 
                     <div className="flex flex-col gap-1">
                         <label className="text-[10px] font-bold uppercase tracking-wider text-[#1F1F1F] flex justify-between">
-                            <span>Your Bid Amount ($)</span>
-                            <span className="text-[#C9653B]">Min: ${requireMinBid.toLocaleString()}</span>
+                            <span>Your Bid Amount (₹)</span>
+                            <span className="text-[#C9653B]">Min: ₹{requireMinBid.toLocaleString()}</span>
                         </label>
 
                         <div className="relative flex items-center">
                             <span className="absolute left-3 text-sm font-bold text-[#6B6B6B]">
-                                $
+                                ₹
                             </span>
                             <input
                                 type="number"
@@ -174,7 +174,7 @@ const PlaceBidModal: React.FC<PlaceBidProps> = ({
                             </span>
                         ) : (
                             <span className="text-[9.5px] font-medium text-[#6B6B6B] mt-0.5">
-                                {hasbids ? "Highest Bid" : "Starting Price"} (${basePrice!.toLocaleString()}) + Increment (${minimumBidIncrement.toLocaleString()}) = Minimum Bid (${requireMinBid.toLocaleString()})
+                                {hasbids ? "Highest Bid" : "Starting Price"} (₹{basePrice!.toLocaleString()}) + Increment (₹{minimumBidIncrement.toLocaleString()}) = Minimum Bid (${requireMinBid.toLocaleString()})
                             </span>
                         )}
                     </div>
