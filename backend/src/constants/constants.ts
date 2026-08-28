@@ -223,4 +223,13 @@ export const MESSAGE_TIME_CONFIG = {
     MAX_EDIT_WINDOW: 15 * 60 * 1000
 }
 
+export enum LiveAuctionStatus {
+    WAITING = "WAITING",
+    LIVE = "LIVE",
+    PAUSED = "PAUSED",
+    ENDED = "ENDED"
+}
+
+export const LiveAuctionStatusValues = Object.values(LiveAuctionStatus);
+
 
