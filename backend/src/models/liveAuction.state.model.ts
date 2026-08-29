@@ -1,8 +1,8 @@
 import mongoose,{Schema,Types} from "mongoose";
-import { ILiveAuctionState } from "../types/liveAuction.type";
+import { ILiveAuctionStateDocument } from "../types/liveAuction.type";
 import { LiveAuctionStatus, LiveAuctionStatusValues } from "../constants/constants";
 
-const LiveAuctionSchema=new Schema<ILiveAuctionState>({
+const LiveAuctionSchema=new Schema<ILiveAuctionStateDocument>({
 auctionItemId:{
     type:Types.ObjectId,
     required:true,
@@ -37,4 +37,4 @@ totalPauseDuration:{
 }
 },{timestamps:true})
 
-export const LiveAuctionSate=mongoose.model<ILiveAuctionState>('LiveAuctionState',LiveAuctionSchema)
+export const LiveAuctionState=mongoose.model<ILiveAuctionStateDocument>('LiveAuctionState',LiveAuctionSchema)

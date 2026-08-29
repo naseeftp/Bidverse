@@ -14,7 +14,9 @@ import {
     FaRedo,
     FaExclamationTriangle,
     FaHistory,
-    FaBan
+    FaBan,
+    FaSlidersH
+    
 } from "react-icons/fa";
 
 const TenantAuctionDetailPage: React.FC = () => {
@@ -141,7 +143,7 @@ const TenantAuctionDetailPage: React.FC = () => {
         try {
             const response = await auctionItemMangementService.cancellAuction({
                 auctionId: auction.auctionItemId ?? '',
-                cancelledRole: 'tenant', 
+                cancelledRole: 'tenant',
                 cencelingReason: trimmed
             });
             if (response.success) {
@@ -171,14 +173,15 @@ const TenantAuctionDetailPage: React.FC = () => {
     if (!auction) return null;
 
     const isCancelled =
-        auction.status === AuctionItemStatus.CANCELLED_BY_ADMIN||
-        auction.status === AuctionItemStatus.CANCELLED_BY_HOUSE 
-    
+        auction.status === AuctionItemStatus.CANCELLED_BY_ADMIN ||
+        auction.status === AuctionItemStatus.CANCELLED_BY_HOUSE
+
 
     const isRejected = auction.status === "REJECTED";
     const isScheduled = auction.status === "SCHEDULED";
 
-    const cancellationReason =auction.cancellationReason
+    const cancellationReason = auction.cancellationReason
+    const isLiveHandleAvailable = auction.type == 'LIVE' && auction.status === 'SCHEDULED'
 
     return (
         <div className="min-h-screen bg-[#F5F7FB] px-4 py-8 md:px-8 text-[#0F172A] font-sans antialiased">
@@ -300,15 +303,14 @@ const TenantAuctionDetailPage: React.FC = () => {
                                     {auction.type} Format
                                 </span>
 
-                                <span className={`px-2.5 py-1 text-[10px] font-bold tracking-wider uppercase rounded border ${
-                                    auction.status === "PENDING_APPROVAL"
+                                <span className={`px-2.5 py-1 text-[10px] font-bold tracking-wider uppercase rounded border ${auction.status === "PENDING_APPROVAL"
                                         ? "bg-amber-50 border-amber-200 text-amber-700"
                                         : auction.status === "DRAFT"
                                             ? "bg-slate-100 border-slate-200 text-slate-600"
                                             : isRejected || isCancelled
                                                 ? "bg-red-50 border-red-200 text-red-600"
                                                 : "bg-emerald-50 border-emerald-200 text-emerald-700"
-                                }`}>
+                                    }`}>
                                     {auction.status?.replace(/_/g, " ")}
                                 </span>
                             </div>
@@ -447,13 +449,27 @@ const TenantAuctionDetailPage: React.FC = () => {
                             </div>
 
                             {isScheduled && (
+
                                 <button
                                     onClick={openCancelModal}
                                     className="w-full bg-[#0F172A] hover:bg-black text-white text-xs font-bold uppercase tracking-wider py-3.5 rounded-xl transition-all flex items-center justify-center gap-2 shadow-md"
                                 >
                                     <FaBan size={12} /> Terminate Auction
                                 </button>
+
+
                             )}
+                            {isLiveHandleAvailable &&
+                                (
+                                    <button
+                                        
+                                        className="w-full bg-[#0F172A] hover:bg-black text-white text-xs font-bold uppercase tracking-wider py-3.5 rounded-xl transition-all flex items-center justify-center gap-2 shadow-md"
+                                    >
+                                        <FaSlidersH size={12} /> Control Room
+                                    </button>
+                                )
+                            }
+
 
                             <div className="space-y-3 text-xs font-medium border-t border-[#E2E8F0] pt-4">
                                 <div className="flex justify-between">
@@ -536,11 +552,10 @@ const TenantAuctionDetailPage: React.FC = () => {
                                         if (cancelValidationError) setCancelValidationError("");
                                     }}
                                     placeholder="Enter the reason for terminating this auction (minimum 5 characters)..."
-                                    className={`w-full text-xs font-medium bg-[#F5F7FB] border rounded-xl p-3 text-[#0F172A] placeholder-[#94A3B8] focus:outline-none focus:ring-1 transition-all ${
-                                        cancelValidationError
+                                    className={`w-full text-xs font-medium bg-[#F5F7FB] border rounded-xl p-3 text-[#0F172A] placeholder-[#94A3B8] focus:outline-none focus:ring-1 transition-all ${cancelValidationError
                                             ? 'border-red-500 focus:ring-red-500'
                                             : 'border-[#E2E8F0] focus:ring-[#2F6FED]'
-                                    }`}
+                                        }`}
                                 />
                                 {cancelValidationError && (
                                     <span className="text-[10px] font-bold tracking-wide text-red-600 block mt-1">

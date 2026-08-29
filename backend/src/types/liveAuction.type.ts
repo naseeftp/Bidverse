@@ -1,7 +1,7 @@
 import { Document,Types } from "mongoose";
 import { LiveAuctionStatus } from "../constants/constants";
 
-export interface ILiveAuctionState extends Document{
+export interface ILiveAuctionStateDocument extends Document{
     auctionItemId:Types.ObjectId,
     status:LiveAuctionStatus,
     startBy:Types.ObjectId,

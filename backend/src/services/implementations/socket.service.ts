@@ -94,6 +94,19 @@ export class SocketService {
                 }
             })
 
+            socket.on(
+                'auction:join',
+                 async(auctionItemId:string)=>{
+                    const roomName=`auction:${auctionItemId}`
+                    socket.join(roomName)
+                 }
+            )
+            socket.on('auction:leave',
+                async(auctionItemId:string)=>{
+                    const roomName=`auction:${auctionItemId}`;
+                    socket.leave(roomName)
+                })
+
         });
     }
     //methods for backend services and controllers
