@@ -462,7 +462,7 @@ const TenantAuctionDetailPage: React.FC = () => {
                             {isLiveHandleAvailable &&
                                 (
                                     <button
-                                        
+                                     onClick={()=>navigate('/tenant/live-controll')}
                                         className="w-full bg-[#0F172A] hover:bg-black text-white text-xs font-bold uppercase tracking-wider py-3.5 rounded-xl transition-all flex items-center justify-center gap-2 shadow-md"
                                     >
                                         <FaSlidersH size={12} /> Control Room

@@ -55,6 +55,7 @@ import TenantEditAuctionPage from "./pages/tenant/updateAuctionPage";
 import TenantChatPage from "./pages/tenant/chatPage";
 import TenantBidHistoryPage from "./pages/tenant/bidHistoryPage";
 import TenantNotificationPage from "./pages/tenant/notificationPage";
+import TenantAuctionControllPage from "./pages/tenant/liveControllPage";
 
 import AdminLoginPage from "./pages/admin/LoginPage";
 import AdminDashboard from "./pages/admin/Dashboard";
@@ -67,6 +68,7 @@ import AdminAuctionDetailPage from "./pages/admin/auctionDetails";
 import AdminChatPage from "./pages/admin/chatPage";
 import AdminBidHistoryPage from "./pages/admin/bidHistory";
 import AdminNotificationPage from "./pages/admin/notification";
+
 
 import { useSocketSync } from "./hooks/useSocketSync";
 
@@ -146,6 +148,7 @@ function App() {
                   <Route path="/tenant/update-auctions/:id" element={<TenantEditAuctionPage />} />
                   <Route path="/tenant/bid-history/:id" element={<TenantBidHistoryPage />} />
                   <Route path="/tenant/notifications" element={<TenantNotificationPage />} />
+                  <Route path="/tenant/live-controll" element={<TenantAuctionControllPage/>}/>
 
                </Route>
 
