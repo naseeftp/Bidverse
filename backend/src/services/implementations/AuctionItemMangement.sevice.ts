@@ -4,7 +4,7 @@ import { IAuctionItemRepository } from "../../repositories/interfaces/IAuctionIt
 import { CreateAuctionItemDTO, AuctionItemResponseDTO, AuctionItemListDTO, AuctionItemDetailDTO, updateAuctionStatusDTO, UpdateAuctionDTO, cancelAuctionItemDTO } from "../../dtos/auctionHouse.dto/auctionItem.dto";
 import { IAuctionHouseRepository } from "../../repositories/interfaces/IAuctionHouse.repository";
 import { AppError, BadRequestError, ForbiddenError, NotFoundError, UnauthorizedError } from "../../errors/AppError";
-import { AuctionItemStatus, MESSAGES } from "../../constants/constants";
+import { AuctionItemStatus, AuctionType, LiveAuctionStatus, MESSAGES } from "../../constants/constants";
 import { IAuctionItem } from "../../types/auctionItem.type";
 import { AuctionItemMapper } from "../../mappers/auctionItem.mapper";
 import { IGenericPaginatedResposnse } from "../../types/response.type";
@@ -14,6 +14,7 @@ import { IPaymentService } from "../interface/IPayment.service";
 import { INotificationService } from "../interface/INotification.service";
 import { IUserRepository } from "../../repositories/interfaces/iUser.repository";
 import { NotificationEvent, NotificationType } from "../../constants/notification.constant";
+import { ILiveAuctionStateRepository } from "../../repositories/interfaces/ILiveAuctionStateRepository";
 
 export class AuctionItemMangementSevice implements IAuctionItemMangementSevice {
     constructor(
@@ -22,7 +23,8 @@ export class AuctionItemMangementSevice implements IAuctionItemMangementSevice {
         private _paymentService:IPaymentService,
         private _logger: ILoggerService,
         private _notificationService:INotificationService,
-        private _userRepo:IUserRepository
+        private _userRepo:IUserRepository,
+        private _liveAuction:ILiveAuctionStateRepository
 
     ) { }
 
@@ -138,6 +140,12 @@ export class AuctionItemMangementSevice implements IAuctionItemMangementSevice {
             title:'Auction Status Update',
             message:message
         })
+        if(isApproving&&updatedAuction.type==AuctionType.LIVE){
+            await this._liveAuction.createLiveState({
+                auctionItemId:updatedAuction._id.toString(),
+                status:LiveAuctionStatus.WAITING
+            })
+        }
 
         return AuctionItemMapper.toResponseDTO(updatedAuction)
     }

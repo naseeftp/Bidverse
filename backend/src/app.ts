@@ -24,6 +24,7 @@ import SlotRoutes from './routes/slot.routes'
 import PaymentRoutes from './routes/payment.routes'
 import TransactionRoutes from './routes/transaction.routes'
 import NotificationRoutes from './routes/notification.routes'
+import LiveRoutes from './routes/live.routes'
 
 import { LoggerService } from "./services/implementations/Logger.service";
 
@@ -61,6 +62,7 @@ app.use(BASE_ROUTES.SLOT, SlotRoutes)
 app.use(BASE_ROUTES.PAYMENT, PaymentRoutes)
 app.use(BASE_ROUTES.TRANSACTION, TransactionRoutes)
 app.use(BASE_ROUTES.NOTIFICATION, NotificationRoutes)
+app.use(BASE_ROUTES.LIVE,LiveRoutes)
 
 app.use(errorHandler);
 const startServer = async () => {

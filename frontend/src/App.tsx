@@ -148,7 +148,7 @@ function App() {
                   <Route path="/tenant/update-auctions/:id" element={<TenantEditAuctionPage />} />
                   <Route path="/tenant/bid-history/:id" element={<TenantBidHistoryPage />} />
                   <Route path="/tenant/notifications" element={<TenantNotificationPage />} />
-                  <Route path="/tenant/live-controll" element={<TenantAuctionControllPage/>}/>
+                  <Route path="/tenant/live-controll/:id" element={<TenantAuctionControllPage/>}/>
 
                </Route>
 

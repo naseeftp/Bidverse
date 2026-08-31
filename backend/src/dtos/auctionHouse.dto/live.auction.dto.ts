@@ -5,3 +5,10 @@ export interface CreateLiveAuctionStateDTO {
     status?: LiveAuctionStatus;
     totalPausedDuration?: number;
 }
+
+export interface LiveAuctionStateResponseDTO{
+    liveStateId:string,
+    auctionId:String,
+    status:LiveAuctionStatus,
+    totalPause:Number,
+}

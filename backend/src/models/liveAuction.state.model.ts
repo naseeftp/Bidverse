@@ -19,7 +19,7 @@ status:{
 startBy:{
     type:Types.ObjectId,
     ref:'User',
-    required:true,
+    
 },
 startedAt:{
     type:Date,

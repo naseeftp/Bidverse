@@ -12,7 +12,8 @@ export const BASE_ROUTES = {
     SLOT: '/slot',
     PAYMENT: '/payment',
     TRANSACTION: '/transaction',
-    NOTIFICATION: '/notification'
+    NOTIFICATION: '/notification',
+    LIVE:'/LIVE'
 }
 export const AUTH_ROUTES = {
     REGISTER: "/auth/register",
@@ -119,4 +120,7 @@ export const NOTIFICATION_ROUTES = {
     MARK_AS_READ: '/mark-read',
     READ_ALL: '/read-all'
 
+}
+export const LIVE_ROUTES={
+    GET_LIVE_STATE:'/get-liveState'
 }
