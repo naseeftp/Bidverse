@@ -61,7 +61,6 @@ const TenantAuctionControllPage: React.FC = () => {
           const response = await liveService.startLive(id);
           if (response.success) {
             toast.success(response.message);
-            fetchAuctionDetails();
           } else {
             toast.error(response.message);
           }
@@ -109,16 +108,36 @@ const TenantAuctionControllPage: React.FC = () => {
                 ...prev.slice(0, 19)
             ]);
         };
+        const handleAuctionStarted = (data: { auctionItemId: string; status?: string; liveStateId?: string }) => {
+        if (data.auctionItemId !== id) return;
+
+        const timeString = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+
+        setLiveState((prev) => (prev ? { ...prev, status: "LIVE" } : prev));
+        setActivityLogs((prev) => [
+            {
+                id: Math.random().toString(),
+                message: "Auction has officially started (LIVE)",
+                timestamp: timeString
+            },
+            ...prev.slice(0, 19)
+        ]);
+    };
         socket.off("auction:user_joined");
         socket.off("auction:user_left");
+        socket.off("auction:started");
+
         socket.on("auction:user_joined", handleUserJoined);
         socket.on("auction:user_left", handleUserLeft);
-         
+        socket.on("auction:started", handleAuctionStarted);
+        
+
         socket.emit('auction:join', id)
         return () => {
             socket.emit("auction:leave", id);
             socket.off("auction:user_joined", handleUserJoined);
             socket.off("auction:user_left", handleUserLeft);
+            socket.off("auction:started", handleAuctionStarted);
         };
     }, [id])
 
@@ -164,7 +183,6 @@ const TenantAuctionControllPage: React.FC = () => {
             <div className="max-w-7xl mx-auto">
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-                    {/* LEFT SIDE: Item Overview & Parameters */}
                     <div className="lg:col-span-2 space-y-6">
                         <div className="bg-white rounded-2xl border border-[#E2E8F0] p-6 shadow-sm space-y-6">
                             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[#E2E8F0]">
@@ -227,7 +245,6 @@ const TenantAuctionControllPage: React.FC = () => {
                                 </div>
                             </div>
 
-                            {/* LIVE CONTROL CONSOLE SECTION */}
                             <div className="pt-4 border-t border-[#E2E8F0] space-y-4">
                                 <div className="flex items-center justify-between">
                                     <h3 className="text-xs font-bold text-[#0F172A] uppercase tracking-wider">
@@ -320,11 +337,9 @@ const TenantAuctionControllPage: React.FC = () => {
                         </div>
                     </div>
 
-                    {/* RIGHT SIDE: Real-Time Presence & Stream Logs */}
                     <div className="lg:col-span-1 space-y-6">
                         <div className="bg-white rounded-2xl border border-[#E2E8F0] p-6 shadow-sm sticky top-6 space-y-6">
 
-                            {/* LIVE PARTICIPANT COUNTER */}
                             <div className="p-4 rounded-xl bg-[#F5F7FB] border border-[#E2E8F0] flex items-center justify-between">
                                 <div className="flex items-center gap-3">
                                     <div className="w-10 h-10 rounded-full bg-blue-50 text-[#2F6FED] flex items-center justify-center font-bold text-lg">
@@ -341,7 +356,6 @@ const TenantAuctionControllPage: React.FC = () => {
                                 </span>
                             </div>
 
-                            {/* ROOM ACTIVITY STREAM */}
                             <div className="space-y-3">
                                 <h3 className="text-xs font-bold text-[#0F172A] uppercase tracking-wider">
                                     Presence Log Stream

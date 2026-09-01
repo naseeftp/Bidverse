@@ -5,9 +5,10 @@ import { ILiveAcutionStateService } from "../interface/ILiveAuctionSate.service"
 import { LiveStateMapper } from "../../mappers/liveState.mapper";
 import { NotFoundError, UnauthorizedError } from "../../errors/AppError";
 import { LiveAuctionStatus, MESSAGES } from "../../constants/constants";
-import { AuctionItemDetailDTO, AuctionItemResponseDTO } from "../../dtos/auctionHouse.dto/auctionItem.dto";
+import { AuctionItemDetailDTO} from "../../dtos/auctionHouse.dto/auctionItem.dto";
 import { ISlotRepository } from "../../repositories/interfaces/ISlot.repository";
 import { IAuctionItemRepository } from "../../repositories/interfaces/IAuctionItem.repository";
+import { socketService } from "./socket.service";
 
 export class LiveAuctionStateService implements ILiveAcutionStateService {
     constructor(
@@ -51,6 +52,12 @@ export class LiveAuctionStateService implements ILiveAcutionStateService {
         if (!updatedLive) {
             throw new NotFoundError(MESSAGES.LIVE_STATE_NOT_FOUND)
         }
-        return LiveStateMapper.toLiveStateResponseDTO(updatedLive)
+        const responseDTO= LiveStateMapper.toLiveStateResponseDTO(updatedLive)
+        socketService.emitToAuctionRoom(auctionId,'auction:started',{
+            auctionItemId:auctionId,
+            startedAt:new Date().toISOString()
+        })
+       
+        return responseDTO
     }
 }

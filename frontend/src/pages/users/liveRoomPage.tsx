@@ -46,6 +46,14 @@ const LiveRoom: React.FC = () => {
         }
     }, [id]);
 
+    const handleAuctionStarted = (data: { auctionItemId: string; status?: string; liveStateId?: string }) => {
+        if (data.auctionItemId !== id) return;
+
+        const timeString = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+
+        setLiveState((prev) => (prev ? { ...prev, status: "LIVE" } : prev))
+    };
+    
     useEffect(() => {
         if(!id) return
         fetchAuctionDetails();
@@ -54,8 +62,12 @@ const LiveRoom: React.FC = () => {
             socket.connect()
         }
         socket.emit('auction:join',id)
+        socket.off("auction:started", handleAuctionStarted);
+
+        socket.on("auction:started", handleAuctionStarted);
         return ()=>{
             socket.emit('auction:leave',id)
+            socket.off("auction:started", handleAuctionStarted)
         }
     }, [fetchAuctionDetails,id]);
 
