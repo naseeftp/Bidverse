@@ -54,30 +54,30 @@ const TenantAuctionControllPage: React.FC = () => {
         fetchAuctionDetails();
     }, [fetchAuctionDetails]);
 
-    //   const handleStartAuction = async () => {
-    //     if (!id) return;
-    //     setStarting(true);
-    //     try {
-    //       const response = await liveService.startAuction(id);
-    //       if (response.success) {
-    //         toast.success("Auction started successfully!");
-    //         fetchAuctionDetails();
-    //       } else {
-    //         toast.error(response.message || "Failed to start auction");
-    //       }
-    //     } catch {
-    //       toast.error("An error occurred while starting the auction");
-    //     } finally {
-    //       setStarting(false);
-    //     }
-    //   };
-    useEffect(()=>{
-        if(!id) return;
-        const socket=getSocket();
-        if(!socket.connected){
+      const handleStartAuction = async () => {
+        if (!id) return;
+        setStarting(true);
+        try {
+          const response = await liveService.startLive(id);
+          if (response.success) {
+            toast.success(response.message);
+            fetchAuctionDetails();
+          } else {
+            toast.error(response.message);
+          }
+        } catch {
+          toast.error("An error occurred while starting the auction");
+        } finally {
+          setStarting(false);
+        }
+      };
+    useEffect(() => {
+        if (!id) return;
+        const socket = getSocket();
+        if (!socket.connected) {
             socket.connect()
         };
-        socket.emit('auction:join',id)
+        
         const handleUserJoined = (data: { auctionItemId: string; userId: string; userName: string; activeCount: number }) => {
             if (data.auctionItemId !== id) return;
 
@@ -109,18 +109,20 @@ const TenantAuctionControllPage: React.FC = () => {
                 ...prev.slice(0, 19)
             ]);
         };
-
+        socket.off("auction:user_joined");
+        socket.off("auction:user_left");
         socket.on("auction:user_joined", handleUserJoined);
         socket.on("auction:user_left", handleUserLeft);
-
+         
+        socket.emit('auction:join', id)
         return () => {
             socket.emit("auction:leave", id);
             socket.off("auction:user_joined", handleUserJoined);
             socket.off("auction:user_left", handleUserLeft);
         };
-    },[id])
+    }, [id])
 
-   const formatCurrency = (amount: number, currency: string = "INR") => {
+    const formatCurrency = (amount: number, currency: string = "INR") => {
         return new Intl.NumberFormat("en-IN", {
             style: "currency",
             currency: currency
@@ -237,13 +239,12 @@ const TenantAuctionControllPage: React.FC = () => {
                                                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
                                             )}
                                             <span
-                                                className={`relative inline-flex rounded-full h-2.5 w-2.5 ${
-                                                    liveState?.status === "WAITING"
+                                                className={`relative inline-flex rounded-full h-2.5 w-2.5 ${liveState?.status === "WAITING"
                                                         ? "bg-amber-500"
                                                         : liveState?.status === "LIVE"
-                                                        ? "bg-emerald-500"
-                                                        : "bg-gray-400"
-                                                }`}
+                                                            ? "bg-emerald-500"
+                                                            : "bg-gray-400"
+                                                    }`}
                                             ></span>
                                         </span>
                                         <span className="text-xs font-semibold text-[#475569]">
@@ -263,6 +264,7 @@ const TenantAuctionControllPage: React.FC = () => {
                                     <div>
                                         {liveState?.status === "WAITING" && (
                                             <button
+                                                onClick={handleStartAuction}
                                                 disabled={starting}
                                                 className="w-full bg-[#2F6FED] hover:bg-[#2458c7] text-white font-semibold py-2.5 px-4 rounded-xl transition-all shadow-sm flex items-center justify-center gap-2 disabled:opacity-50"
                                             >
@@ -321,7 +323,7 @@ const TenantAuctionControllPage: React.FC = () => {
                     {/* RIGHT SIDE: Real-Time Presence & Stream Logs */}
                     <div className="lg:col-span-1 space-y-6">
                         <div className="bg-white rounded-2xl border border-[#E2E8F0] p-6 shadow-sm sticky top-6 space-y-6">
-                            
+
                             {/* LIVE PARTICIPANT COUNTER */}
                             <div className="p-4 rounded-xl bg-[#F5F7FB] border border-[#E2E8F0] flex items-center justify-between">
                                 <div className="flex items-center gap-3">

@@ -19,10 +19,20 @@ export class LiveController implements IliveController {
     }
     async joinRoom(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
-            const userId=req.user.id;
-            const auctionId=req.params.id as string
-            const result=await this._liveService.joinRoom(userId,auctionId);
-            SuccessResponse(res,MESSAGES.ACTION_SUCCESS,result,HttpStatus.OK)
+            const userId = req.user.id;
+            const auctionId = req.params.id as string
+            const result = await this._liveService.joinRoom(userId, auctionId);
+            SuccessResponse(res, MESSAGES.ACTION_SUCCESS, result, HttpStatus.OK)
+        } catch (error) {
+            next(error)
+        }
+    }
+    async startLive(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const startedBy = req.user.id;
+            const { auctionId } = req.body;
+            const result = await this._liveService.startLive(startedBy, auctionId)
+            SuccessResponse(res, MESSAGES.LIVE_STARTED, result, HttpStatus.OK)
         } catch (error) {
             next(error)
         }

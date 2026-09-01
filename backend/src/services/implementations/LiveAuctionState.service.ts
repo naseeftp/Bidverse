@@ -4,7 +4,7 @@ import { ILiveAuctionStateRepository } from "../../repositories/interfaces/ILive
 import { ILiveAcutionStateService } from "../interface/ILiveAuctionSate.service";
 import { LiveStateMapper } from "../../mappers/liveState.mapper";
 import { NotFoundError, UnauthorizedError } from "../../errors/AppError";
-import { MESSAGES } from "../../constants/constants";
+import { LiveAuctionStatus, MESSAGES } from "../../constants/constants";
 import { AuctionItemDetailDTO, AuctionItemResponseDTO } from "../../dtos/auctionHouse.dto/auctionItem.dto";
 import { ISlotRepository } from "../../repositories/interfaces/ISlot.repository";
 import { IAuctionItemRepository } from "../../repositories/interfaces/IAuctionItem.repository";
@@ -24,8 +24,8 @@ export class LiveAuctionStateService implements ILiveAcutionStateService {
         }
         return LiveStateMapper.toLiveStateResponseDTO(result)
     }
-    async joinRoom(userId: string,auctionId:string): Promise<AuctionItemDetailDTO> {
-        const userSlot = await this._slotRepo.findOne({auctionId:new Types.ObjectId(auctionId),userId:new Types.ObjectId(userId)})
+    async joinRoom(userId: string, auctionId: string): Promise<AuctionItemDetailDTO> {
+        const userSlot = await this._slotRepo.findOne({ auctionId: new Types.ObjectId(auctionId), userId: new Types.ObjectId(userId) })
         if (!userSlot) {
             throw new NotFoundError(MESSAGES.SLOT_NOT_FOUND)
         };
@@ -37,5 +37,20 @@ export class LiveAuctionStateService implements ILiveAcutionStateService {
             throw new NotFoundError(MESSAGES.AUCTION_NOT_FOUND)
         }
         return auction
+    }
+    async startLive(startedBy: string, auctionId: string): Promise<LiveAuctionStateResponseDTO> {
+        const liveExist = await this._liveStateRepo.findOne({ auctionItemId: new Types.ObjectId(auctionId) });
+        if (!liveExist) {
+            throw new NotFoundError(MESSAGES.LIVE_STATE_NOT_FOUND)
+        }
+        const updatedLive = await this._liveStateRepo.updateById(liveExist._id, {
+            startBy: new Types.ObjectId(startedBy),
+            startedAt: new Date(),
+            status: LiveAuctionStatus.LIVE
+        })
+        if (!updatedLive) {
+            throw new NotFoundError(MESSAGES.LIVE_STATE_NOT_FOUND)
+        }
+        return LiveStateMapper.toLiveStateResponseDTO(updatedLive)
     }
 }

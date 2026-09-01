@@ -123,6 +123,8 @@ export const NOTIFICATION_ROUTES = {
 }
 export const LIVE_ROUTES = {
     GET_LIVE_STATE: '/get-liveState',
-    JOIN_ROOM: '/join_room'
+    JOIN_ROOM: '/join_room',
+    START_LIVE: '/start-live'
+
 
 }
