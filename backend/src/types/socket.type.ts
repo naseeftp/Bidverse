@@ -22,6 +22,7 @@ export interface ServerToClientEvents {  // this events emitted by backend and f
     'message:edited': (data: { conversationId: string, messageId: string, newContent: string, isLastMessage: boolean; }) => void;
     'chat:activity': () => void;
     "notification:new": (notification: NotificationResponseDTO) => void;//Emitted for real-time background system alerts.
+
     'auction:state': (
         data: {
             auctionItemId: string;
@@ -73,6 +74,18 @@ export interface ServerToClientEvents {  // this events emitted by backend and f
             error: string;
         }
     ) => void;
+    'auction:user_joined': (data: {
+        auctionItemId: string;
+        userId: string;
+        userName: string;
+        activeCount: number;
+    }) => void;
+    'auction:user_left': (data: {
+        auctionItemId: string;
+        userId: string;
+        userName: string;
+        activeCount: number;
+    }) => void;
 
 }
 
@@ -96,5 +109,7 @@ export interface ClientToServerEvents {
 
 export interface SocketData {
     userId: string;
-    role: roles;             //Structure for custom variables attached directly to the network connection
+    role: roles;
+    userName: string;
+    auctionRooms?: Set<string>;             //Structure for custom variables attached directly to the network connection
 }

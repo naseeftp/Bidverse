@@ -5,6 +5,7 @@ import toast from "react-hot-toast";
 import auctionItemMangementService from "../../services/auctionItemMangement.service";
 import type { LiveAuctionStateResponseDTO } from "../../types/liveState.dto";
 import liveService from "../../services/liveService";
+import { getSocket } from "../../services/socket.service";
 
 const LiveRoom: React.FC = () => {
     const { id } = useParams<{ id: string }>();
@@ -46,8 +47,17 @@ const LiveRoom: React.FC = () => {
     }, [id]);
 
     useEffect(() => {
+        if(!id) return
         fetchAuctionDetails();
-    }, [fetchAuctionDetails]);
+        const socket=getSocket();
+        if(!socket.connected){
+            socket.connect()
+        }
+        socket.emit('auction:join',id)
+        return ()=>{
+            socket.emit('auction:leave',id)
+        }
+    }, [fetchAuctionDetails,id]);
 
     const formatCurrency = (amount?: number | null, currency: string = "INR") => {
         if (amount === null || amount === undefined) return "N/A";

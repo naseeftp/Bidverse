@@ -15,10 +15,10 @@ export const getSocket=():Socket=>{
     return socket
 }
 
-export const connectSocket=(userId:string,role:string)=>{
+export const connectSocket=(userId:string,role:string,userName:string)=>{
     const s=getSocket();
     if(s.connected) return;
-    s.auth={userId,role}
+    s.auth={userId,role,userName}
     s.off('connect');
     s.connect()
 }

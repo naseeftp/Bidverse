@@ -5,7 +5,14 @@ import toast from "react-hot-toast";
 import auctionItemMangementService from "../../services/auctionItemMangement.service";
 import type { LiveAuctionStateResponseDTO } from "../../types/liveState.dto";
 import liveService from "../../services/liveService";
+import { getSocket } from "../../services/socket.service";
 
+
+interface StreamLog {
+    id: string;
+    message: string;
+    timestamp: string;
+}
 const TenantAuctionControllPage: React.FC = () => {
     const { id } = useParams<{ id: string }>();
     const [loading, setLoading] = useState<boolean>(true);
@@ -13,6 +20,8 @@ const TenantAuctionControllPage: React.FC = () => {
     const [auction, setAuction] = useState<AuctionItemDetailDTO | null>(null);
     const [liveState, setLiveState] = useState<LiveAuctionStateResponseDTO | null>(null);
     const navigate = useNavigate();
+    const [activeViewers, setActiveViewers] = useState<number>(0);
+    const [activityLogs, setActivityLogs] = useState<StreamLog[]>([]);
 
     const fetchAuctionDetails = useCallback(async () => {
         if (!id) return;
@@ -62,13 +71,62 @@ const TenantAuctionControllPage: React.FC = () => {
     //       setStarting(false);
     //     }
     //   };
+    useEffect(()=>{
+        if(!id) return;
+        const socket=getSocket();
+        if(!socket.connected){
+            socket.connect()
+        };
+        socket.emit('auction:join',id)
+        const handleUserJoined = (data: { auctionItemId: string; userId: string; userName: string; activeCount: number }) => {
+            if (data.auctionItemId !== id) return;
 
-    const formatCurrency = (amount: number, currency: string = "INR") => {
+            setActiveViewers(data.activeCount);
+            const timeString = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+
+            setActivityLogs((prev) => [
+                {
+                    id: Math.random().toString(),
+                    message: `${data.userName} joined the room`,
+                    timestamp: timeString
+                },
+                ...prev.slice(0, 19)
+            ]);
+        };
+
+        const handleUserLeft = (data: { auctionItemId: string; userId: string; userName: string; activeCount: number }) => {
+            if (data.auctionItemId !== id) return;
+
+            setActiveViewers(data.activeCount);
+            const timeString = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+
+            setActivityLogs((prev) => [
+                {
+                    id: Math.random().toString(),
+                    message: `${data.userName} left the room`,
+                    timestamp: timeString
+                },
+                ...prev.slice(0, 19)
+            ]);
+        };
+
+        socket.on("auction:user_joined", handleUserJoined);
+        socket.on("auction:user_left", handleUserLeft);
+
+        return () => {
+            socket.emit("auction:leave", id);
+            socket.off("auction:user_joined", handleUserJoined);
+            socket.off("auction:user_left", handleUserLeft);
+        };
+    },[id])
+
+   const formatCurrency = (amount: number, currency: string = "INR") => {
         return new Intl.NumberFormat("en-IN", {
             style: "currency",
             currency: currency
         }).format(amount);
     };
+
     if (loading) {
         return (
             <div className="min-h-screen bg-[#F5F7FB] flex items-center justify-center p-6">
@@ -104,13 +162,9 @@ const TenantAuctionControllPage: React.FC = () => {
             <div className="max-w-7xl mx-auto">
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-                    {/* LEFT SIDE (Main 2 Columns): Item Overview, Financials & Schedule */}
+                    {/* LEFT SIDE: Item Overview & Parameters */}
                     <div className="lg:col-span-2 space-y-6">
-
-                        {/* ITEM OVERVIEW CONTAINER */}
                         <div className="bg-white rounded-2xl border border-[#E2E8F0] p-6 shadow-sm space-y-6">
-
-                            {/* Item Header (Name, House, ID & Status) */}
                             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[#E2E8F0]">
                                 <div className="space-y-1">
                                     <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[#475569]">
@@ -131,9 +185,7 @@ const TenantAuctionControllPage: React.FC = () => {
                                 </div>
                             </div>
 
-                            {/* Main Overview Content */}
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                                {/* Product Image */}
                                 <div className="md:col-span-1">
                                     <div className="w-full h-44 rounded-xl bg-[#F5F7FB] border border-[#E2E8F0] overflow-hidden flex items-center justify-center">
                                         {auction.images && auction.images.length > 0 ? (
@@ -150,7 +202,6 @@ const TenantAuctionControllPage: React.FC = () => {
                                     </div>
                                 </div>
 
-                                {/* Description & Type Info */}
                                 <div className="md:col-span-2 flex flex-col justify-between space-y-4">
                                     <div>
                                         <span className="text-xs font-semibold text-[#475569] uppercase tracking-wider">
@@ -174,7 +225,7 @@ const TenantAuctionControllPage: React.FC = () => {
                                 </div>
                             </div>
 
-                            {/* INTEGRATED LIVE CONTROL CONSOLE SECTION */}
+                            {/* LIVE CONTROL CONSOLE SECTION */}
                             <div className="pt-4 border-t border-[#E2E8F0] space-y-4">
                                 <div className="flex items-center justify-between">
                                     <h3 className="text-xs font-bold text-[#0F172A] uppercase tracking-wider">
@@ -186,12 +237,13 @@ const TenantAuctionControllPage: React.FC = () => {
                                                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
                                             )}
                                             <span
-                                                className={`relative inline-flex rounded-full h-2.5 w-2.5 ${liveState?.status === "WAITING"
+                                                className={`relative inline-flex rounded-full h-2.5 w-2.5 ${
+                                                    liveState?.status === "WAITING"
                                                         ? "bg-amber-500"
                                                         : liveState?.status === "LIVE"
-                                                            ? "bg-emerald-500"
-                                                            : "bg-gray-400"
-                                                    }`}
+                                                        ? "bg-emerald-500"
+                                                        : "bg-gray-400"
+                                                }`}
                                             ></span>
                                         </span>
                                         <span className="text-xs font-semibold text-[#475569]">
@@ -211,7 +263,6 @@ const TenantAuctionControllPage: React.FC = () => {
                                     <div>
                                         {liveState?.status === "WAITING" && (
                                             <button
-
                                                 disabled={starting}
                                                 className="w-full bg-[#2F6FED] hover:bg-[#2458c7] text-white font-semibold py-2.5 px-4 rounded-xl transition-all shadow-sm flex items-center justify-center gap-2 disabled:opacity-50"
                                             >
@@ -231,19 +282,12 @@ const TenantAuctionControllPage: React.FC = () => {
                                                 Auction is Currently Active
                                             </div>
                                         )}
-
-                                        {liveState?.status !== "WAITING" && liveState?.status !== "LIVE" && (
-                                            <div className="p-2.5 rounded-xl bg-gray-100 border border-gray-200 text-gray-600 text-xs font-medium text-center">
-                                                Status: {liveState?.status || "N/A"}
-                                            </div>
-                                        )}
                                     </div>
                                 </div>
                             </div>
 
                         </div>
 
-                        {/* FINANCIAL & BIDDING PARAMETERS */}
                         <div className="bg-white rounded-2xl border border-[#E2E8F0] p-6 shadow-sm space-y-4">
                             <h2 className="text-base font-bold text-[#0F172A] pb-3 border-b border-[#E2E8F0]">
                                 Financial & Bidding Parameters
@@ -272,21 +316,50 @@ const TenantAuctionControllPage: React.FC = () => {
                                 </div>
                             </div>
                         </div>
-
-                        
-
                     </div>
 
-
+                    {/* RIGHT SIDE: Real-Time Presence & Stream Logs */}
                     <div className="lg:col-span-1 space-y-6">
-                        <div className="bg-white rounded-2xl border border-[#E2E8F0] p-6 shadow-sm min-h-[380px] sticky top-6 flex flex-col justify-center items-center text-center space-y-3">
-                            <div className="w-12 h-12 rounded-full bg-blue-50 text-[#2F6FED] flex items-center justify-center font-bold text-xl">
-                                ⏱️
+                        <div className="bg-white rounded-2xl border border-[#E2E8F0] p-6 shadow-sm sticky top-6 space-y-6">
+                            
+                            {/* LIVE PARTICIPANT COUNTER */}
+                            <div className="p-4 rounded-xl bg-[#F5F7FB] border border-[#E2E8F0] flex items-center justify-between">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-10 h-10 rounded-full bg-blue-50 text-[#2F6FED] flex items-center justify-center font-bold text-lg">
+                                        👥
+                                    </div>
+                                    <div>
+                                        <span className="block text-xs font-medium text-[#475569]">Active Viewers</span>
+                                        <span className="text-2xl font-extrabold text-[#0F172A]">{activeViewers}</span>
+                                    </div>
+                                </div>
+                                <span className="flex h-3 w-3 relative">
+                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                                    <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
+                                </span>
                             </div>
-                            <h3 className="text-base font-bold text-[#0F172A]">Live Bidding Console</h3>
-                            <p className="text-xs text-[#475569] max-w-[220px] leading-relaxed">
-                                This space is reserved for your live countdown timer and real-time bid notification stream.
-                            </p>
+
+                            {/* ROOM ACTIVITY STREAM */}
+                            <div className="space-y-3">
+                                <h3 className="text-xs font-bold text-[#0F172A] uppercase tracking-wider">
+                                    Presence Log Stream
+                                </h3>
+                                <div className="h-64 rounded-xl bg-[#F5F7FB] border border-[#E2E8F0] p-3 overflow-y-auto text-xs space-y-2">
+                                    {activityLogs.length === 0 ? (
+                                        <div className="h-full flex items-center justify-center text-[#475569]">
+                                            Waiting for participant activity...
+                                        </div>
+                                    ) : (
+                                        activityLogs.map((log) => (
+                                            <div key={log.id} className="flex items-center justify-between bg-white p-2 rounded-lg border border-[#E2E8F0]">
+                                                <span className="text-[#0F172A] font-medium">{log.message}</span>
+                                                <span className="text-[10px] text-[#475569]">{log.timestamp}</span>
+                                            </div>
+                                        ))
+                                    )}
+                                </div>
+                            </div>
+
                         </div>
                     </div>
 

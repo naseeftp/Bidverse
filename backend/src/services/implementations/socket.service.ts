@@ -13,11 +13,11 @@ export class SocketService {
     private _io: TypedServer | null = null;
     private _onlineUsers = new Map<string, string>()// used to store user id sockt id, Map stred in server ram
     private _chatService: IChatService | null = null
-    
+
     public setChatService(chatService: IChatService): void {
-    this._chatService = chatService;
+        this._chatService = chatService;
     }
-      
+
     public initialize(server: HttpServer): void {
         const envOrgins = [env.CLIENT_URL]
             .filter((url): url is string => !!url)
@@ -42,10 +42,11 @@ export class SocketService {
         this._io.on('connection', (socket: TypedSocket) => {
             const userId = socket.handshake.auth.userId;
             const role = socket.handshake.auth.role;
-
+            const userName = socket.handshake.auth.userName || 'Anonymous User';
             if (userId) {
                 this._onlineUsers.set(userId, socket.id);
                 socket.data.userId = userId;
+                socket.data.userName = userName;
                 if (role) {
                     socket.data.role = role;
                 }
@@ -60,13 +61,39 @@ export class SocketService {
                 const roomName = `room:${conversationId}`;
                 socket.leave(roomName)
             })
+            // socket.on('disconnect', () => {
+            //     if (socket.data.userId) {
+            //         this._onlineUsers.delete(socket.data.userId);
+            //         this._io?.emit('user:status', { userId: socket.data.userId, isOnline: false });
+            //     }
+            // });
             socket.on('disconnect', () => {
-                if (socket.data.userId) {
-                    this._onlineUsers.delete(socket.data.userId);
-                    this._io?.emit('user:status', { userId: socket.data.userId, isOnline: false });
+                const currentUserId = socket.data.userId;
+                const currentUserName = socket.data.userName || 'User';
+
+                if (currentUserId) {
+                    this._onlineUsers.delete(currentUserId);
+                    this._io?.emit('user:status', { userId: currentUserId, isOnline: false });
                 }
 
+                if (socket.data.auctionRooms) {
+                    socket.data.auctionRooms.forEach((auctionItemId) => {
+                        const roomName = `auction:${auctionItemId}`;
+                        const activeCount = this._io?.sockets.adapter.rooms.get(roomName)?.size || 0;
+
+                        if (currentUserId) {
+                            this.emitToAuctionRoom(auctionItemId, 'auction:user_left', {
+                                auctionItemId,
+                                userId: currentUserId,
+                                userName: currentUserName,
+                                activeCount
+                            });
+                        }
+                    });
+                    socket.data.auctionRooms.clear();
+                }
             });
+
 
             socket.on('typing:status', (data: { conversationId: string, userId: string, isTyping: boolean }) => {
                 this.emitToRoomExcluding(
@@ -87,25 +114,45 @@ export class SocketService {
                     const activeUserId = socket.data.userId || data.userId;
                     if (!this._chatService) return;
 
-                   
+
                     await this._chatService.markMessageRead(data.conversationId, activeUserId);
-                } catch{
+                } catch {
                     throw new AppError('Message reading failed')
                 }
             })
 
-            socket.on(
-                'auction:join',
-                 async(auctionItemId:string)=>{
-                    const roomName=`auction:${auctionItemId}`
-                    socket.join(roomName)
-                 }
-            )
-            socket.on('auction:leave',
-                async(auctionItemId:string)=>{
-                    const roomName=`auction:${auctionItemId}`;
-                    socket.leave(roomName)
-                })
+          socket.on('auction:join', async (auctionItemId: string) => {
+                const roomName = `auction:${auctionItemId}`;
+                socket.join(roomName)
+                if (!socket.data.auctionRooms) {
+                    socket.data.auctionRooms = new Set();
+                }
+                socket.data.auctionRooms.add(auctionItemId);
+                const activeCount = this._io?.sockets.adapter.rooms.get(roomName)?.size || 0;
+                this.emitToAuctionRoom(auctionItemId, 'auction:user_joined', {
+                    auctionItemId,
+                    userId: socket.data.userId,
+                    userName: socket.data.userName || 'User',
+                    activeCount
+                });
+            })
+            socket.on('auction:leave', async (auctionItemId: string) => {
+                const roomName = `auction:${auctionItemId}`;
+                socket.leave(roomName);
+
+                if (socket.data.auctionRooms) {
+                    socket.data.auctionRooms.delete(auctionItemId);
+                }
+
+                const activeCount = this._io?.sockets.adapter.rooms.get(roomName)?.size || 0;
+
+                this.emitToAuctionRoom(auctionItemId, 'auction:user_left', {
+                    auctionItemId,
+                    userId: socket.data.userId,
+                    userName: socket.data.userName || 'User',
+                    activeCount
+                });
+            });
 
         });
     }
@@ -147,6 +194,18 @@ export class SocketService {
         const targetRoom = `room:${conversationId}`;
 
         const emitter = this._io.to(targetRoom).except(excludeSocketId) as unknown as {
+            emit: (e: Ev, p: typeof payload) => void;
+        };
+        emitter.emit(event, payload);
+    }
+    public emitToAuctionRoom<Ev extends keyof ServerToClientEvents>(
+        auctionItemId: string,
+        event: Ev,
+        payload: Parameters<ServerToClientEvents[Ev]>[0]
+    ): void {
+        if (!this._io) return;
+        const targetRoom = `auction:${auctionItemId}`;
+        const emitter = this._io.to(targetRoom) as unknown as {
             emit: (e: Ev, p: typeof payload) => void;
         };
         emitter.emit(event, payload);
