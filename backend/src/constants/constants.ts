@@ -177,7 +177,7 @@ export const MESSAGES = {
     PAYMENT_NOT_FOUND: 'Payment not Found',
 
     NOTIFICATION_NOT_FOUND: 'Notification Notfound',
-    LIVE_STATE_NOT_FOUND:'Live State Not found',
+    LIVE_STATE_NOT_FOUND: 'Live State Not found',
     LOGOUT_SUCCESS: "Logout success",
     LOGOUT_FAILED: "Logout failed",
 

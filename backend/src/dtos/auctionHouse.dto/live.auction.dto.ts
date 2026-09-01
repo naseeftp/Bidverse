@@ -6,9 +6,9 @@ export interface CreateLiveAuctionStateDTO {
     totalPausedDuration?: number;
 }
 
-export interface LiveAuctionStateResponseDTO{
-    liveStateId:string,
-    auctionId:String,
-    status:LiveAuctionStatus,
-    totalPause:Number,
+export interface LiveAuctionStateResponseDTO {
+    liveStateId: string,
+    auctionId: String,
+    status: LiveAuctionStatus,
+    totalPause: Number,
 }

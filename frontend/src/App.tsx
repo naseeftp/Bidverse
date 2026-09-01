@@ -34,6 +34,7 @@ import MyBidsPage from "./pages/users/myBids.page";
 import MySlotsPage from "./pages/users/mySlots";
 import MyTransactions from "./pages/users/myTransactions";
 import UserNotificationPage from "./pages/users/notificationPage";
+import LiveRoom from "./pages/users/liveRoomPage";
 
 import TenantRegisterPage from "./pages/tenant/RegiterPage";
 import TenantVerifyOtpPage from "./pages/tenant/VerifyotpPage";
@@ -106,7 +107,7 @@ function App() {
                   <Route path="/change-email-verify" element={<ChangeEmailVerifyPage />} />
                   <Route path="/watch-list" element={<WatchlistPage />} />
                   <Route path="/notifications" element={<UserNotificationPage />} />
-
+                  <Route path="/join-room/:id" element={<LiveRoom />} />
                </Route>
             </Route>
 
@@ -148,7 +149,7 @@ function App() {
                   <Route path="/tenant/update-auctions/:id" element={<TenantEditAuctionPage />} />
                   <Route path="/tenant/bid-history/:id" element={<TenantBidHistoryPage />} />
                   <Route path="/tenant/notifications" element={<TenantNotificationPage />} />
-                  <Route path="/tenant/live-controll/:id" element={<TenantAuctionControllPage/>}/>
+                  <Route path="/tenant/live-controll/:id" element={<TenantAuctionControllPage />} />
 
                </Route>
 

@@ -256,7 +256,7 @@ const MySlotsPage: React.FC = () => {
                       <div className="space-y-2">
                         {isLive && !isCancelled && (
                           <button
-                            onClick={() => navigate(`/auctions/${item.auctionId}/live`)}
+                            onClick={() => navigate(`/join-room/${item.auctionId}`)}
                             className="w-full py-2 px-3 bg-rose-600 hover:bg-rose-700 text-white text-[11px] font-bold uppercase tracking-wider rounded-lg transition-all duration-200 flex items-center justify-center gap-1.5 shadow-sm"
                           >
                             Enter Bidding Room

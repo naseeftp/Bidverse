@@ -3,19 +3,39 @@ import { LiveAuctionStateResponseDTO } from "../../dtos/auctionHouse.dto/live.au
 import { ILiveAuctionStateRepository } from "../../repositories/interfaces/ILiveAuctionStateRepository";
 import { ILiveAcutionStateService } from "../interface/ILiveAuctionSate.service";
 import { LiveStateMapper } from "../../mappers/liveState.mapper";
-import { NotFoundError } from "../../errors/AppError";
+import { NotFoundError, UnauthorizedError } from "../../errors/AppError";
 import { MESSAGES } from "../../constants/constants";
+import { AuctionItemDetailDTO, AuctionItemResponseDTO } from "../../dtos/auctionHouse.dto/auctionItem.dto";
+import { ISlotRepository } from "../../repositories/interfaces/ISlot.repository";
+import { IAuctionItemRepository } from "../../repositories/interfaces/IAuctionItem.repository";
 
-export class LiveAuctionStateService implements ILiveAcutionStateService{
+export class LiveAuctionStateService implements ILiveAcutionStateService {
     constructor(
-        private _liveStateRepo:ILiveAuctionStateRepository
-    ){}
+        private _liveStateRepo: ILiveAuctionStateRepository,
+        private _slotRepo: ISlotRepository,
+        private _auctionRepo: IAuctionItemRepository
+
+    ) { }
 
     async findLiveState(auctionId: string): Promise<LiveAuctionStateResponseDTO> {
-        const result=await this._liveStateRepo.findOne({auctionItemId:new Types.ObjectId(auctionId)})
-        if(!result){
+        const result = await this._liveStateRepo.findOne({ auctionItemId: new Types.ObjectId(auctionId) })
+        if (!result) {
             throw new NotFoundError(MESSAGES.LIVE_STATE_NOT_FOUND)
         }
         return LiveStateMapper.toLiveStateResponseDTO(result)
+    }
+    async joinRoom(userId: string,auctionId:string): Promise<AuctionItemDetailDTO> {
+        const userSlot = await this._slotRepo.findOne({auctionId:new Types.ObjectId(auctionId),userId:new Types.ObjectId(userId)})
+        if (!userSlot) {
+            throw new NotFoundError(MESSAGES.SLOT_NOT_FOUND)
+        };
+        if (userId !== userSlot.userId.toString()) {
+            throw new UnauthorizedError(MESSAGES.NOT_PERMITTED)
+        }
+        const auction = await this._auctionRepo.getAuctionItemDetails(userSlot.auctionId.toString());
+        if (!auction) {
+            throw new NotFoundError(MESSAGES.AUCTION_NOT_FOUND)
+        }
+        return auction
     }
 }

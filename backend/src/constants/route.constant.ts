@@ -15,7 +15,7 @@ export const BASE_ROUTES = {
     PAYMENT: '/payment',
     TRANSACTION: '/transaction',
     NOTIFICATION: '/notification',
-    LIVE:'/LIVE'
+    LIVE: '/LIVE'
 } as const
 
 export const AUTH_ROUTES = {
@@ -121,8 +121,9 @@ export const NOTIFICATION_ROUTES = {
     MARK_AS_READ: '/mark-read',
     READ_ALL: '/read-all'
 }
-export const LIVE_ROUTES={
-    GET_LIVE_STATE:'/get-liveState/:id'
+export const LIVE_ROUTES = {
+    GET_LIVE_STATE: '/get-liveState/:id',
+    JOIN_ROOM: '/join_room/:id'
 }
 
 
