@@ -34,6 +34,15 @@ totalPauseDuration:{
     type:Number,
     default:0,
     min:0
+},
+currentRound:{
+    type:Number,
+    default:1,
+    min:1,
+    max:3
+},
+roundEndsAt:{
+    type:Date
 }
 },{timestamps:true})
 

@@ -5,4 +5,5 @@ import { AuctionItemListDTO, AuctionItemDetailDTO } from "../../dtos/auctionHous
 export interface IAuctionItemRepository extends IBaseRepository<IAuctionItemDocument> {
   listAllAuctionItems(page: number, limit: number, search?: string, status?: string | string[], type?: string, houseId?: string): Promise<{ auctions: AuctionItemListDTO[], total: number }>
   getAuctionItemDetails(itemId: string): Promise<AuctionItemDetailDTO | null>;
+  validCheckAndUpdateAmount(userId:string,auctionItemId:string,amount:number,reservePrice:number):Promise<IAuctionItemDocument|null>
 }

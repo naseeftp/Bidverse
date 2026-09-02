@@ -12,7 +12,7 @@ export class NotificationRepository extends BaseRepository<INotificationDocument
         const targetedObjectId = new Types.ObjectId(userId);
         return await this.model.find({
             recipientId: targetedObjectId
-        })
+        }).sort({createdAt:-1})
     }
     async markAllRead(userId: string): Promise<INotificationDocument[]> {
         const targetedObjectId = new Types.ObjectId(userId)

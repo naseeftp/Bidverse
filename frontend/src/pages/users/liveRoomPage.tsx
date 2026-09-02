@@ -7,6 +7,8 @@ import type { LiveAuctionStateResponseDTO } from "../../types/liveState.dto";
 import liveService from "../../services/liveService";
 import { getSocket } from "../../services/socket.service";
 
+
+
 const LiveRoom: React.FC = () => {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
@@ -16,6 +18,13 @@ const LiveRoom: React.FC = () => {
     const [loading, setLoading] = useState<boolean>(true);
     const [customBid, setCustomBid] = useState<string>("");
 
+    const [round, setRound] = useState<number>(1);
+    const [roundEndsAt, setRoundEndsAt] = useState<number | null>(null);
+    const [timeLeftMs, setTimeLeftMs] = useState<number>(0);
+    const [placing, setPlacing] = useState(false);
+
+    const roundLabel = round === 1 ? "Going Once" : round === 2 ? "Going Twice" : "Final Call";
+    const seconds = Math.ceil(timeLeftMs / 1000);
     const fetchAuctionDetails = useCallback(async () => {
         if (!id) return;
         setLoading(true);
@@ -46,30 +55,81 @@ const LiveRoom: React.FC = () => {
         }
     }, [id]);
 
-    const handleAuctionStarted = (data: { auctionItemId: string; status?: string; liveStateId?: string }) => {
+    const handleAuctionStarted = useCallback((data: { auctionItemId: string; status?: string; liveStateId?: string }) => {
         if (data.auctionItemId !== id) return;
-
-        const timeString = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" });
-
         setLiveState((prev) => (prev ? { ...prev, status: "LIVE" } : prev))
-    };
-    
+    }, [id]);
+
+    const handleBidNew = useCallback((data: { auctionItemId: string; amount: number; bidderId: string; bidCount: number }) => {
+        if (data.auctionItemId !== id) return;
+        setAuction((prev) => prev ? { ...prev, currentHighestBid: data.amount } : prev);
+    }, [id]);
+
+    const handleRound = useCallback((data: { auctionItemId: string; round: number; roundEndsAt: string }) => {
+        if (data.auctionItemId !== id) return;
+        setRound(data.round);
+        setRoundEndsAt(new Date(data.roundEndsAt).getTime());
+    }, [id]);
+
+    const handleEnded = useCallback((data: { auctionItemId: string; winningBidder?: string; winningBid: number }) => {
+        if (data.auctionItemId !== id) return;
+        setLiveState((prev) => prev ? { ...prev, status: "ENDED" } : prev);
+        toast.success(`Auction ended — winning bid ${data.winningBid}`);
+    }, [id]);
+
+
     useEffect(() => {
-        if(!id) return
+        if (!id) return
         fetchAuctionDetails();
-        const socket=getSocket();
-        if(!socket.connected){
+        const socket = getSocket();
+        if (!socket.connected) {
             socket.connect()
         }
-        socket.emit('auction:join',id)
+        socket.emit('auction:join', id)
         socket.off("auction:started", handleAuctionStarted);
 
         socket.on("auction:started", handleAuctionStarted);
-        return ()=>{
-            socket.emit('auction:leave',id)
+        socket.on("bid:new", handleBidNew);
+        socket.on("auction:round", handleRound);
+        socket.on("auction:ended", handleEnded);
+        socket.on("auction:error", (d) => toast.error(d.error));
+
+        return () => {
+            socket.emit('auction:leave', id)
             socket.off("auction:started", handleAuctionStarted)
+            socket.off("bid:new", handleBidNew);
+            socket.off("auction:round", handleRound);
+            socket.off("auction:ended", handleEnded);
         }
-    }, [fetchAuctionDetails,id]);
+    }, [fetchAuctionDetails, id, handleBidNew, handleRound, handleEnded, handleAuctionStarted]);
+    useEffect(() => {
+        if (!roundEndsAt) return;
+        const tick = () => setTimeLeftMs(Math.max(0, roundEndsAt - Date.now()));
+        tick();
+        const interval = setInterval(tick, 250);
+        return () => clearInterval(interval);
+    }, [roundEndsAt]);
+
+    const handlePlaceBid = async () => {
+        const amount = Number(customBid);
+        if (!amount || amount < nextMinBid) {
+            toast.error(`Bid must be at least ${nextMinBid}`);
+            return;
+        }
+        setPlacing(true);
+        try {
+            const res = await liveService.placeBid(id!, amount,auction?.auctionHouse.id??"")
+            if(res.success){
+                toast.success(res.message)
+            }
+            if (!res.success) toast.error(res.message || "Bid failed");
+
+        } catch {
+            toast.error("Bid failed, please try again");
+        } finally {
+            setPlacing(false);
+        }
+    };
 
     const formatCurrency = (amount?: number | null, currency: string = "INR") => {
         if (amount === null || amount === undefined) return "N/A";
@@ -116,7 +176,15 @@ const LiveRoom: React.FC = () => {
     }
 
     return (
+
+
         <div className="min-h-screen bg-[#FFF9F4] text-[#1F1F1F] font-sans p-4 sm:p-6 lg:p-8">
+            {!isWaiting && (
+                <div className="flex items-center justify-between px-4 py-2 rounded-xl bg-[#FFF9F4] border border-[#E6E0DA]">
+                    <span className="text-xs font-bold text-[#C9653B]">{roundLabel} — Round {round}/3</span>
+                    <span className="text-sm font-mono font-bold">{seconds}s</span>
+                </div>
+            )}
             <div className="max-w-6xl mx-auto space-y-6">
 
                 <div className="flex items-center justify-between pb-2 border-b border-[#E6E0DA]">
@@ -267,9 +335,11 @@ const LiveRoom: React.FC = () => {
                                     </div>
 
                                     <button
-                                        className="w-full bg-[#C9653B] hover:bg-[#b0552f] text-white font-bold py-3 px-4 rounded-xl transition-all shadow-sm flex items-center justify-center gap-2"
+                                        disabled={placing}
+                                        onClick={handlePlaceBid}
+                                        className="w-full bg-[#C9653B] hover:bg-[#b0552f] text-white font-bold py-3 px-4 rounded-xl transition-all shadow-sm disabled:opacity-60"
                                     >
-                                        Place Bid Now
+                                        {placing ? "Placing..." : "Place Bid Now"}
                                     </button>
                                 </div>
                             )}

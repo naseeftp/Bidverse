@@ -179,6 +179,8 @@ export const MESSAGES = {
     NOTIFICATION_NOT_FOUND: 'Notification Notfound',
     LIVE_STATE_NOT_FOUND: 'Live Not found',
     LIVE_STARTED: 'Live Started',
+    NOT_LIVE:'Auction Not Live',
+    OUTBID_JUST_NOW:'OutBid Just Now',
     LOGOUT_SUCCESS: "Logout success",
     LOGOUT_FAILED: "Logout failed",
 
@@ -230,6 +232,9 @@ export enum LiveAuctionStatus {
     PAUSED = "PAUSED",
     ENDED = "ENDED"
 }
+
+export const ROUND_DURATIONS_MS = [30_000, 20_000, 15_000]; // round 1, 2, 3
+export const MAX_ROUND = 3; 
 
 export const LiveAuctionStatusValues = Object.values(LiveAuctionStatus);
 

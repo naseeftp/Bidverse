@@ -86,6 +86,11 @@ export interface ServerToClientEvents {  // this events emitted by backend and f
         userName: string;
         activeCount: number;
     }) => void;
+    'auction:round': (data: {
+        auctionItemId: string;
+        round: number;
+        roundEndsAt: string;
+    }) => void;
 
 }
 

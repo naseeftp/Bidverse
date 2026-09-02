@@ -4,7 +4,7 @@ import { env } from '../../config/env';
 import { ServerToClientEvents, ClientToServerEvents, SocketData } from '../../types/socket.type';
 import { IChatService } from '../interface/IChat.service';
 import { AppError } from '../../errors/AppError';
-
+import { auctionRoundTimerService } from './auctionRoundTimer.service';
 
 type TypedSocket = Socket<ClientToServerEvents, ServerToClientEvents, Record<string, never>, SocketData>
 type TypedServer = SocketIOServer<ClientToServerEvents, ServerToClientEvents, Record<string, never>, SocketData>
@@ -17,6 +17,7 @@ export class SocketService {
     public setChatService(chatService: IChatService): void {
         this._chatService = chatService;
     }
+   
 
     public initialize(server: HttpServer): void {
         const envOrgins = [env.CLIENT_URL]
@@ -121,7 +122,7 @@ export class SocketService {
                 }
             })
 
-          socket.on('auction:join', async (auctionItemId: string) => {
+            socket.on('auction:join', async (auctionItemId: string) => {
                 const roomName = `auction:${auctionItemId}`;
                 socket.join(roomName)
                 if (!socket.data.auctionRooms) {
@@ -153,10 +154,8 @@ export class SocketService {
                     activeCount
                 });
             });
-
-        });
+      });
     }
-    //methods for backend services and controllers
     public isUserOnline(userId: string): boolean {
         return this._onlineUsers.has(userId)
     }

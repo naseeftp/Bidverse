@@ -3,7 +3,7 @@ import { LiveAuctionStateResponseDTO } from "../../dtos/auctionHouse.dto/live.au
 import { ILiveAuctionStateRepository } from "../../repositories/interfaces/ILiveAuctionStateRepository";
 import { ILiveAcutionStateService } from "../interface/ILiveAuctionSate.service";
 import { LiveStateMapper } from "../../mappers/liveState.mapper";
-import { NotFoundError, UnauthorizedError } from "../../errors/AppError";
+import { BadRequestError, NotFoundError, UnauthorizedError } from "../../errors/AppError";
 import { LiveAuctionStatus, MESSAGES } from "../../constants/constants";
 import { AuctionItemDetailDTO} from "../../dtos/auctionHouse.dto/auctionItem.dto";
 import { ISlotRepository } from "../../repositories/interfaces/ISlot.repository";
@@ -12,13 +12,18 @@ import { socketService } from "./socket.service";
 import { INotificationService } from "../interface/INotification.service";
 import { Role } from "../../dtos/Common.dto";
 import { NotificationEvent, NotificationType } from "../../constants/notification.constant";
+import { placeBidDTO, bidResponseDTO } from "../../dtos/user.dto/bid.dto";
+import { IBidRepository } from "../../repositories/interfaces/IBid.repository";
+import { BidMapper } from "../../mappers/bid.mapper";
+import { auctionRoundTimerService } from "./auctionRoundTimer.service";
 
 export class LiveAuctionStateService implements ILiveAcutionStateService {
     constructor(
         private _liveStateRepo: ILiveAuctionStateRepository,
         private _slotRepo: ISlotRepository,
         private _auctionRepo: IAuctionItemRepository,
-        private _notificationService:INotificationService
+        private _notificationService:INotificationService,
+        private _bidRepo:IBidRepository
 
     ) { }
 
@@ -62,6 +67,7 @@ export class LiveAuctionStateService implements ILiveAcutionStateService {
             auctionItemId:auctionId,
             startedAt:new Date().toISOString()
         })
+        await auctionRoundTimerService.startRounds(auctionId)
         const validSlotOwners=await this._slotRepo.validSlotOwnerForAuction(auctionId)
          await Promise.all([
             validSlotOwners.map(async (receiverId)=>{
@@ -76,5 +82,45 @@ export class LiveAuctionStateService implements ILiveAcutionStateService {
             })
          ])
         return responseDTO
+    }
+
+    async placeBid(userId: string, auctionId:string,amount:number,tenantId:string): Promise<bidResponseDTO> {
+        const liveState=await this._liveStateRepo.findOne({
+            auctionItemId:new Types.ObjectId(auctionId)
+        })
+        if(!liveState||liveState.status!==LiveAuctionStatus.LIVE){
+            throw new BadRequestError(MESSAGES.NOT_LIVE)
+        };
+        const slot=await this._slotRepo.findOne({
+            auctionId:new Types.ObjectId(auctionId),
+            userId:new Types.ObjectId(userId)
+        });
+        if(!slot){
+            throw new UnauthorizedError(MESSAGES.SLOT_NOT_FOUND)
+        };
+        const auction=await this._auctionRepo.findById(auctionId);
+        if(!auction) throw new NotFoundError(MESSAGES.AUCTION_NOT_FOUND);
+        const minValid=(auction.currentHighestBid||auction.startingPrice)+auction.minimumIncrement;
+        if(amount<minValid){
+            throw new BadRequestError(`Bid Must be atleast ${minValid}`)
+        }
+        const updated=await this._auctionRepo.validCheckAndUpdateAmount(userId,auctionId,amount,auction.reservePrice)
+        if(!updated){
+            throw new BadRequestError(MESSAGES.OUTBID_JUST_NOW)
+        }
+        const bid=await this._bidRepo.create({
+            auctionId:new Types.ObjectId(auctionId),
+            bidderId:new Types.ObjectId(userId),
+            bidAmount:amount,
+            tenantId:new Types.ObjectId(tenantId)
+        })
+        socketService.emitToAuctionRoom(auctionId,'bid:new',{
+            auctionItemId:auctionId,
+            amount:amount,
+            bidderId:userId,
+            bidCount:updated.bidCount
+        })
+        await auctionRoundTimerService.resetOnBid(auctionId)
+        return BidMapper.toBidResponseDTO(bid)
     }
 }

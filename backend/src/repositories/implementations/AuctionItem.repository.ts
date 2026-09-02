@@ -3,7 +3,7 @@ import { IAuctionItemRepository } from "../interfaces/IAuctionItem.repository";
 import { BaseRepository } from "./Base.repository";
 import { AuctionItem } from '../../models/auctionItem.model'
 import { AuctionItemDetailDTO, AuctionItemListDTO } from "../../dtos/auctionHouse.dto/auctionItem.dto";
-import mongoose, { PipelineStage } from "mongoose";
+import mongoose, { PipelineStage, Types } from "mongoose";
 
 export class AuctionItemRepository extends BaseRepository<IAuctionItemDocument> implements IAuctionItemRepository {
     constructor() {
@@ -198,5 +198,33 @@ export class AuctionItemRepository extends BaseRepository<IAuctionItemDocument> 
         return (result[0] as AuctionItemDetailDTO) || null
     }
 
+    async validCheckAndUpdateAmount(
+        userId: string,
+        auctionItemId: string,
+        amount: number,
+        reservePrice:number,
+    ): Promise<IAuctionItemDocument | null> {
+        const reserveMet=amount>=(reservePrice||0)
+        const updatedDoc = await this.model.findOneAndUpdate(
+            {
+                _id: new Types.ObjectId(auctionItemId),
+                currentHighestBid: { $lt: amount }
+            },
+            
+                {
+                    $set: {
+                        currentHighestBid: amount,
+                        currentHighestBidder: new Types.ObjectId(userId),
+                        reserveMet:reserveMet,
+                        
+                    },
+                    $inc:{bidCount:1}
+                },
+            
+            { new: true }
+        );
+
+        return updatedDoc;
+    }
 
 }

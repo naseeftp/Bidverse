@@ -2,6 +2,7 @@ import axiosInstance from "../api/axios.instance"
 import { BASE_ROUTES, LIVE_ROUTES } from "../constants/api.constant"
 import type { AuctionItemDetailDTO} from "../types/auctionItem.dto"
 import type { ApiResponse } from "../types/auth.type"
+import type { bidResponseDTO, placeBidDTO } from "../types/bid.dto"
 import type { LiveAuctionStateResponseDTO } from "../types/liveState.dto"
 import { apiErrorHandler } from "../utils/error.handle"
 
@@ -43,6 +44,19 @@ class LiveService {
             }
         } catch (error) {
            return apiErrorHandler(error,'Failed to Start Live')
+        }
+    }
+    async placeBid(auctionId:string,amount:number,tenantId:string){
+        try {
+            const url=`${BASE_ROUTES.LIVE}${LIVE_ROUTES.PLACE_BID}`;
+            const response=await axiosInstance.post<bidResponseDTO,ApiResponse<placeBidDTO>>(url,{auctionId:auctionId,amount:amount,tenantId:tenantId});
+            return{
+                success:true,
+                message:response.message,
+                data:response.data
+            }
+        } catch (error) {
+            return apiErrorHandler(error,'Failed to place bid')
         }
     }
 

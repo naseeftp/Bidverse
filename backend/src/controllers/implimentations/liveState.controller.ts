@@ -37,4 +37,14 @@ export class LiveController implements IliveController {
             next(error)
         }
     }
+    async placeBid(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const userId=req.user.id;
+            const {auctionId,amount,tenantId}=req.body;
+            const result=await this._liveService.placeBid(userId,auctionId,amount,tenantId);
+            SuccessResponse(res,MESSAGES.BID_PLACED,result,HttpStatus.OK)
+        } catch (error) {
+            next(error)
+        }
+    }
 }
