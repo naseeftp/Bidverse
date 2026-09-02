@@ -9,12 +9,16 @@ import { AuctionItemDetailDTO} from "../../dtos/auctionHouse.dto/auctionItem.dto
 import { ISlotRepository } from "../../repositories/interfaces/ISlot.repository";
 import { IAuctionItemRepository } from "../../repositories/interfaces/IAuctionItem.repository";
 import { socketService } from "./socket.service";
+import { INotificationService } from "../interface/INotification.service";
+import { Role } from "../../dtos/Common.dto";
+import { NotificationEvent, NotificationType } from "../../constants/notification.constant";
 
 export class LiveAuctionStateService implements ILiveAcutionStateService {
     constructor(
         private _liveStateRepo: ILiveAuctionStateRepository,
         private _slotRepo: ISlotRepository,
-        private _auctionRepo: IAuctionItemRepository
+        private _auctionRepo: IAuctionItemRepository,
+        private _notificationService:INotificationService
 
     ) { }
 
@@ -44,6 +48,7 @@ export class LiveAuctionStateService implements ILiveAcutionStateService {
         if (!liveExist) {
             throw new NotFoundError(MESSAGES.LIVE_STATE_NOT_FOUND)
         }
+        const auctionExist=await this._auctionRepo.findById(auctionId)
         const updatedLive = await this._liveStateRepo.updateById(liveExist._id, {
             startBy: new Types.ObjectId(startedBy),
             startedAt: new Date(),
@@ -57,7 +62,19 @@ export class LiveAuctionStateService implements ILiveAcutionStateService {
             auctionItemId:auctionId,
             startedAt:new Date().toISOString()
         })
-       
+        const validSlotOwners=await this._slotRepo.validSlotOwnerForAuction(auctionId)
+         await Promise.all([
+            validSlotOwners.map(async (receiverId)=>{
+                await this._notificationService.createAndSendNotification({
+                    recipientId:receiverId,
+                    recipientRole:Role.USER,
+                    type:NotificationType.WARNING,
+                    event:NotificationEvent.AUCTION_STARTED,
+                    title:'Live Auction Strated',
+                    message:`The Live Auction for ${auctionExist?.title} just Started Join Fast to dont Miss the Chance to Particiipate`
+                })
+            })
+         ])
         return responseDTO
     }
 }
