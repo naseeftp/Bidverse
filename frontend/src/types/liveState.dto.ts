@@ -1,6 +1,8 @@
 export interface LiveAuctionStateResponseDTO {
     liveStateId: string,
-    auctionId: String,
+    auctionId: string,
     status: string,
-    totalPause: Number,
+    totalPause: number,
+    currentRound: number,
+    roundsEndsAt: string,
 }

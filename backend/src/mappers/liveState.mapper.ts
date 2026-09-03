@@ -7,7 +7,11 @@ export class LiveStateMapper {
             liveStateId: data._id.toString(),
             status: data.status,
             totalPause: data.totalPauseDuration,
-            auctionId: data.auctionItemId.toString()
+            auctionId: data.auctionItemId.toString(),
+            currentRound: data.currentRound,
+            roundsEndsAt: data.roundEndsAt
+                ? new Date(data.roundEndsAt).toISOString()
+                : ''
         }
     }
 }

@@ -12,7 +12,7 @@ import { socketService } from "./socket.service";
 import { INotificationService } from "../interface/INotification.service";
 import { Role } from "../../dtos/Common.dto";
 import { NotificationEvent, NotificationType } from "../../constants/notification.constant";
-import { placeBidDTO, bidResponseDTO } from "../../dtos/user.dto/bid.dto";
+import { bidResponseDTO } from "../../dtos/user.dto/bid.dto";
 import { IBidRepository } from "../../repositories/interfaces/IBid.repository";
 import { BidMapper } from "../../mappers/bid.mapper";
 import { auctionRoundTimerService } from "./auctionRoundTimer.service";

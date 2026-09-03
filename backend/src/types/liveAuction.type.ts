@@ -9,6 +9,6 @@ export interface ILiveAuctionStateDocument extends Document {
     pausedAt?: Date;
     endedAt?: Date;
     totalPauseDuration: number,
-    currentRound: Number,
+    currentRound: number,
     roundEndsAt:Date
 }

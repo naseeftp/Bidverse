@@ -8,7 +8,9 @@ export interface CreateLiveAuctionStateDTO {
 
 export interface LiveAuctionStateResponseDTO {
     liveStateId: string,
-    auctionId: String,
+    auctionId: string,
     status: LiveAuctionStatus,
-    totalPause: Number,
+    totalPause: number,
+    currentRound:number,
+    roundsEndsAt:string,
 }
