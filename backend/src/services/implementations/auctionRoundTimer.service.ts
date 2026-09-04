@@ -2,7 +2,7 @@ import { Types } from "mongoose";
 import { socketService } from "./socket.service";
 import { ILiveAuctionStateRepository } from "../../repositories/interfaces/ILiveAuctionStateRepository";
 import { IAuctionItemRepository } from "../../repositories/interfaces/IAuctionItem.repository";
-import { ROUND_DURATIONS_MS, LiveAuctionStatus } from "../../constants/constants";
+import { ROUND_DURATIONS_MS, LiveAuctionStatus, AuctionItemStatus } from "../../constants/constants";
 import { LiveAuctionSateRepository } from "../../repositories/implementations/LiveAuctionState.repository";
 import { AuctionItemRepository } from "../../repositories/implementations/AuctionItem.repository";
 
@@ -87,14 +87,17 @@ export class AuctionRoundTimerService {
                 endedAt: new Date()
             });
         }
-
+        const isReserveMet=auction.reserveMet;
+        const auctionStatus=isReserveMet?AuctionItemStatus.SOLD:AuctionItemStatus.PASSED;
         await this._auctionRepo.updateById(auctionItemId, {
-            status: 'ENDED', 
+            status: auctionStatus, 
             winningBidder: auction.currentHighestBidder
         });
 
         socketService.emitToAuctionRoom(auctionItemId, 'auction:ended', {
             auctionItemId,
+            status:auctionStatus,
+            reserveMet:isReserveMet,
             winningBidder: auction.currentHighestBidder?.toString(),
             winningBid: auction.currentHighestBid
         });

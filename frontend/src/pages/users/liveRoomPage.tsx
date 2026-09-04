@@ -6,6 +6,7 @@ import auctionItemMangementService from "../../services/auctionItemMangement.ser
 import type { LiveAuctionStateResponseDTO } from "../../types/liveState.dto";
 import liveService from "../../services/liveService";
 import { getSocket } from "../../services/socket.service";
+import { useAppSelector } from "../../hooks/redux.hooks";
 
 interface ActivityLog {
   id: string;
@@ -13,6 +14,10 @@ interface ActivityLog {
   time: string;
   type: "bid" | "round" | "system";
 }
+type Outcome =
+  | { type: "won"; amount: number }
+  | { type: "lost"; amount: number }
+  | { type: "passed" };
 
 const LiveRoom: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -28,8 +33,11 @@ const LiveRoom: React.FC = () => {
   const [timeLeftMs, setTimeLeftMs] = useState<number>(0);
   const [placing, setPlacing] = useState(false);
   const [logs, setLogs] = useState<ActivityLog[]>([]);
+  const [outcome, setOutcome] = useState<Outcome | null>(null);
+
 
   const fallbackTriggeredRef = useRef(false);
+  const currentUserId = useAppSelector((state) => state.auth.user?.userId)
 
   const isEnded = liveState?.status === "ENDED";
   const isWaiting = liveState?.status === "WAITING";
@@ -118,15 +126,31 @@ const LiveRoom: React.FC = () => {
     fallbackTriggeredRef.current = false;
     setRound(data.round);
     setRoundEndsAt(new Date(data.roundEndsAt).getTime());
-    
+
   }, [id, addLog]);
 
-  const handleEnded = useCallback((data: { auctionItemId: string; winningBidder?: string; winningBid: number }) => {
+  const handleEnded = useCallback((data: { auctionItemId: string; status: 'SOLD' | 'PASSED', reserveMet: boolean, winningBidder?: string; winningBid: number }) => {
     if (data.auctionItemId !== id) return;
     setLiveState((prev) => (prev ? { ...prev, status: "ENDED" } : prev));
     setTimeLeftMs(0);
-    toast.success(`Auction ended — winning bid ₹${data.winningBid.toLocaleString("en-IN")}`);
-    addLog(`Auction Closed. Winning Bid: ₹${data.winningBid.toLocaleString("en-IN")}`, "system");
+    if (data.status === 'PASSED') {
+      setOutcome({ type: 'passed' });
+      toast('Item Passed-reserve Price is Not Met,{ icon: "⚠️" }')
+      addLog("Auction closed. Reserve price not met — item passed.", "system");
+      return
+    }
+    const isWinner = currentUserId === data.winningBidder;
+    if (isWinner) {
+      setOutcome({ type: "won", amount: data.winningBid });
+      toast.success(`Congratulations! You won at ₹${data.winningBid.toLocaleString("en-IN")}`);
+      addLog(`You won the auction at ₹${data.winningBid.toLocaleString("en-IN")}!`, "system");
+    }
+    else {
+      setOutcome({ type: "lost", amount: data.winningBid });
+      toast("Item sold. Better luck next time!", { icon: "🙁" });
+      addLog(`Auction closed. Sold for ₹${data.winningBid.toLocaleString("en-IN")}`, "system");
+    }
+
   }, [id, addLog]);
 
   useEffect(() => {
@@ -247,7 +271,6 @@ const LiveRoom: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-[#FFF9F4] text-[#1F1F1F] font-sans p-4 sm:p-6 lg:p-8">
-      {/* Top Header Bar */}
       <div className="max-w-7xl mx-auto mb-6 flex items-center justify-between pb-4 border-b border-[#E6E0DA]">
         <button
           onClick={() => navigate(-1)}
@@ -265,11 +288,9 @@ const LiveRoom: React.FC = () => {
 
       <div className="max-w-7xl mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          
-          {/* LEFT COLUMN: Item Overview + Bidding Console */}
+
           <div className="lg:col-span-7 space-y-6">
-            
-            {/* 1. Item Overview Card */}
+
             <div className="bg-white rounded-2xl border border-[#E6E0DA] p-6 shadow-sm space-y-5">
               <div className="flex justify-between items-start gap-4">
                 <div>
@@ -341,7 +362,6 @@ const LiveRoom: React.FC = () => {
                 )}
               </div>
 
-              {/* Interactive Bidding Form */}
               {isEnded ? (
                 <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 text-center space-y-1">
                   <h3 className="text-sm font-bold text-gray-800">Bidding Finished</h3>
@@ -354,7 +374,6 @@ const LiveRoom: React.FC = () => {
                 </div>
               ) : (
                 <div className="space-y-4">
-                  {/* Quick Bid Options */}
                   <div className="grid grid-cols-2 gap-3">
                     <button
                       disabled={isProcessingRound || placing}
@@ -372,7 +391,6 @@ const LiveRoom: React.FC = () => {
                     </button>
                   </div>
 
-                  {/* Custom Bid Input Field */}
                   <div className="space-y-1.5">
                     <label className="text-xs font-bold text-[#6B6B6B] uppercase tracking-wider">
                       Custom Bid Amount
@@ -390,7 +408,6 @@ const LiveRoom: React.FC = () => {
                     </div>
                   </div>
 
-                  {/* Primary Submit Button */}
                   <button
                     disabled={isProcessingRound || placing}
                     onClick={handlePlaceBid}
@@ -404,10 +421,8 @@ const LiveRoom: React.FC = () => {
 
           </div>
 
-          {/* RIGHT COLUMN: Timer & Live Stream Log */}
           <div className="lg:col-span-5 space-y-6">
-            
-            {/* Live Status & Timer Card */}
+
             <div className="bg-white rounded-2xl border border-[#E6E0DA] p-6 shadow-sm space-y-4">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-bold uppercase tracking-wider text-[#6B6B6B]">
@@ -429,7 +444,6 @@ const LiveRoom: React.FC = () => {
                 )}
               </div>
 
-              {/* Round Badge Display */}
               {!isEnded && !isWaiting && (
                 <div className={`p-3 rounded-xl border flex items-center justify-between ${currentRoundConfig.badgeBg}`}>
                   <div className="flex items-center gap-2">
@@ -516,6 +530,50 @@ const LiveRoom: React.FC = () => {
 
         </div>
       </div>
+
+      {outcome && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl p-8 max-w-sm w-full text-center space-y-4 shadow-xl">
+            {outcome.type === "won" && (
+              <>
+                <h2 className="text-2xl font-black text-emerald-600">Congratulations! 🎉</h2>
+                <p className="text-sm text-[#6B6B6B]">
+                  You won this item for {formatCurrency(outcome.amount, auction.currency)}.
+                </p>
+                <button
+                  onClick={() => navigate(`/orders/checkout/${id}`)}
+                  className="w-full bg-[#C9653B] hover:bg-[#b0552f] text-white font-bold py-3 rounded-xl"
+                >
+                  Complete Your Order
+                </button>
+              </>
+            )}
+            {outcome.type === "lost" && (
+              <>
+                <h2 className="text-2xl font-black text-[#1F1F1F]">Item Sold</h2>
+                <p className="text-sm text-[#6B6B6B]">
+                  This item sold for {formatCurrency(outcome.amount, auction.currency)}. Better luck next time!
+                </p>
+                <button onClick={() => navigate("/auctions")} className="w-full border border-[#E6E0DA] font-bold py-3 rounded-xl">
+                  Browse More Auctions
+                </button>
+              </>
+            )}
+            {outcome.type === "passed" && (
+              <>
+                <h2 className="text-2xl font-black text-amber-600">Item Passed</h2>
+                <p className="text-sm text-[#6B6B6B]">
+                  Bidding closed without meeting the reserve price. This item did not sell.
+                </p>
+                <button onClick={() => navigate("/auctions")} className="w-full border border-[#E6E0DA] font-bold py-3 rounded-xl">
+                  Back to Catalog
+                </button>
+              </>
+            )}
+          </div>
+        </div>
+      )}
+
     </div>
   );
 };

@@ -56,6 +56,8 @@ export interface ServerToClientEvents {  // this events emitted by backend and f
         data: {
             auctionItemId: string;
             winningBidder?: string;
+            status:'SOLD'|'PASSED';
+            reserveMet:boolean;
             winningBid: number;
         }
     ) => void;

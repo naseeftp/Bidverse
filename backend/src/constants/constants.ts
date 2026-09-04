@@ -233,7 +233,7 @@ export enum LiveAuctionStatus {
     ENDED = "ENDED"
 }
 
-export const ROUND_DURATIONS_MS = [30_000, 20_000, 15_000]; // round 1, 2, 3
+export const ROUND_DURATIONS_MS = [40_000, 20_000, 15_000]; 
 export const MAX_ROUND = 3; 
 
 export const LiveAuctionStatusValues = Object.values(LiveAuctionStatus);
