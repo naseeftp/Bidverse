@@ -125,6 +125,14 @@ const LiveRoom: React.FC = () => {
     setTimeLeftMs(0);
     addLog("Auction paused by host. Standby for resumption.", "system");
   }, [id, addLog]);
+     const handleResumeCallBack = (data: {
+      auctionItemId: string
+    }) => {
+      if (data.auctionItemId !== id) return;
+      setLiveState((prev) => (prev ? { ...prev, status: 'LIVE' } : prev));
+      addLog('Auction  Resumed ','system');
+
+    }
 
   const handleBidNew = useCallback((data: { auctionItemId: string; amount: number; bidderId: string }) => {
     if (data.auctionItemId !== id) return;
@@ -176,6 +184,7 @@ const LiveRoom: React.FC = () => {
     socket.on("auction:round", handleRound);
     socket.on("auction:ended", handleEnded);
     socket.on("auction:paused", handlePauseCallBack);
+    socket.on('auction:resumed',handleResumeCallBack)
     socket.on("auction:error", (d) => toast.error(d.error));
 
     return () => {
@@ -185,6 +194,7 @@ const LiveRoom: React.FC = () => {
       socket.off("auction:round", handleRound);
       socket.off("auction:ended", handleEnded);
       socket.off("auction:paused", handlePauseCallBack);
+      socket.off('auction:paused',handleResumeCallBack)
     };
   }, [fetchAuctionDetails, id, handleBidNew, handleRound, handleEnded, handleAuctionStarted, handlePauseCallBack]);
 

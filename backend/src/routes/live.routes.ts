@@ -34,4 +34,9 @@ router.patch(
     allowedTo(Role.TENANT),
     (req, res, next) => liveController.pauseLive(req, res, next)
 )
+router.patch(
+    LIVE_ROUTES.RESUME_LIVE,
+    allowedTo(Role.TENANT),
+    (req, res, next) => liveController.resumeLive(req, res, next)
+)
 export default router;

@@ -124,9 +124,41 @@ export class LiveAuctionStateService implements ILiveAcutionStateService {
 
     }
 
-    // async resumeLive(auctionId: string): Promise<LiveAuctionStateResponseDTO> {
-        
-    // }
+    async resumeLive(auctionId: string): Promise<LiveAuctionStateResponseDTO> {
+        const liveExist = await this._liveStateRepo.findOne({ auctionItemId: new Types.ObjectId(auctionId) });
+        if (!liveExist) {
+            throw new NotFoundError(MESSAGES.LIVE_STATE_NOT_FOUND)
+        };
+        const auctionExist = await this._auctionRepo.findById(auctionId);
+        if (!auctionExist) {
+            throw new NotFoundError(MESSAGES.AUCTION_NOT_FOUND)
+        };
+        const updatedLive = await this._liveStateRepo.updateById(liveExist._id, {
+            status: LiveAuctionStatus.LIVE
+        });
+        if (!updatedLive) {
+            throw new NotFoundError(MESSAGES.LIVE_STATE_NOT_FOUND)
+        }
+        const validSlotOwners = await this._slotRepo.validSlotOwnerForAuction(auctionId);
+        await Promise.all(
+            validSlotOwners.map(async (receiverId) => {
+                await this._notificationService.createAndSendNotification({
+                    recipientId: receiverId,
+                    recipientRole: Role.USER,
+                    type: NotificationType.SUCCESS,
+                    event: NotificationEvent.AUCTION_RESUMED,
+                    title: 'Live Auction Resumed',
+                    message: `The Live Auction For ${auctionExist.title} Resumed.`
+                });
+            })
+        );
+        socketService.emitToAuctionRoom(auctionId, 'auction:resumed', {
+            auctionItemId: auctionId
+        })
+        await auctionRoundTimerService.startRounds(auctionId)
+
+        return LiveStateMapper.toLiveStateResponseDTO(updatedLive)
+    }
 
     async placeBid(userId: string, auctionId: string, amount: number, tenantId: string): Promise<bidResponseDTO> {
         const liveState = await this._liveStateRepo.findOne({

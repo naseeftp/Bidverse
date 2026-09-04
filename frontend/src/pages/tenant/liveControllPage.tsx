@@ -39,7 +39,8 @@ const TenantAuctionControllPage: React.FC = () => {
 
   const [loading, setLoading] = useState<boolean>(true);
   const [starting, setStarting] = useState<boolean>(false);
-  const [pausing,setPausing]=useState<boolean>(false);
+  const [pausing, setPausing] = useState<boolean>(false);
+  const [resuming, setResuming] = useState<boolean>(false);
   const [auction, setAuction] = useState<AuctionItemDetailDTO | null>(null);
   const [liveState, setLiveState] = useState<LiveAuctionStateResponseDTO | null>(null);
 
@@ -57,6 +58,7 @@ const TenantAuctionControllPage: React.FC = () => {
 
   const isLive = liveState?.status === "LIVE";
   const isWaiting = liveState?.status === "WAITING";
+  const isPaused=liveState?.status==='PAUSED'
   const isEnded = liveState?.status === "ENDED";
   const isProcessingRound = isLive && timeLeftMs === 0 && !!roundEndsAt;
 
@@ -195,25 +197,40 @@ const TenantAuctionControllPage: React.FC = () => {
       setStarting(false);
     }
   };
-  const handlePauseAuction=async()=>{
-    if(!id) return
+  const handlePauseAuction = async () => {
+    if (!id) return
     setPausing(true);
-   try {
-    const response=await liveService.pauseLive(id);
-    if(response.success&&response.data){
-      toast.success(response.message)
+    try {
+      const response = await liveService.pauseLive(id);
+      if (response.success && response.data) {
+        toast.success(response.message)
+      }
+      else {
+        toast.error(response.message)
+      }
+    } catch {
+      toast.error('Failed to Pause Auction')
+    } finally {
+      setPausing(false)
     }
-    else{
-      toast.error(response.message)
-    }
-   } catch {
-    toast.error('Failed to Pause Auction')
-   }finally{
-    setPausing(false)
-   }
   }
-
-
+  const handleResumeAuction = async () => {
+    if (!id) return;
+    setResuming(true);
+    try {
+      const response = await liveService.resumeLive(id);
+      if (response.success && response.data) {
+        toast.success(response.message)
+      }
+      else {
+        toast.error(response.message)
+      }
+    } catch {
+      toast.error('Failed to Resume the live')
+    } finally {
+      setResuming(false)
+    }
+  }
 
   useEffect(() => {
     if (!id) return;
@@ -253,13 +270,21 @@ const TenantAuctionControllPage: React.FC = () => {
       addActivityLog("Auction is officially LIVE", "SYSTEM");
     };
 
-    const handlePauseCallBack=(data:{
-    auctionItemId:string
-    })=>{
-       if(data.auctionItemId!==id) return;
-       setLiveState((prev)=>(prev?{...prev,status:'PAUSED'}:prev));
-       setRound(1)
-       addActivityLog('Auction Paused Resume to continue')
+    const handlePauseCallBack = (data: {
+      auctionItemId: string
+    }) => {
+      if (data.auctionItemId !== id) return;
+      setLiveState((prev) => (prev ? { ...prev, status: 'PAUSED' } : prev));
+      setRound(1)
+      addActivityLog('Auction Paused Resume to continue', "SYSTEM")
+    }
+    const handleResumeCallBack = (data: {
+      auctionItemId: string
+    }) => {
+      if (data.auctionItemId !== id) return;
+      setLiveState((prev) => (prev ? { ...prev, status: 'LIVE' } : prev));
+      addActivityLog('Auction Paused Resumed to continue', "SYSTEM");
+
     }
 
 
@@ -300,7 +325,7 @@ const TenantAuctionControllPage: React.FC = () => {
       ]);
     };
 
-  
+
     const handleBidPlaced = (data: {
       auctionItemId: string;
       amount: number;
@@ -354,7 +379,8 @@ const TenantAuctionControllPage: React.FC = () => {
     socket.on("bid:new", handleBidNew);
     socket.on("auction:ended", handleAuctionEnded);
     socket.on("auction:error", handleSocketError);
-    socket.on('auction:paused',handlePauseCallBack)
+    socket.on('auction:paused', handlePauseCallBack);
+    socket.on('auction:resumed',handleResumeCallBack)
     socket.emit("auction:join", id);
 
     return () => {
@@ -367,7 +393,8 @@ const TenantAuctionControllPage: React.FC = () => {
       socket.off("bid:new", handleBidNew);
       socket.off("auction:ended", handleAuctionEnded);
       socket.off("auction:error", handleSocketError);
-      socket.off('auction:paused',handlePauseCallBack)
+      socket.off('auction:paused', handlePauseCallBack)
+      socket.off('auction:resumed',handleResumeCallBack)
     };
   }, [id, auction?.currency, addActivityLog]);
 
@@ -408,7 +435,7 @@ const TenantAuctionControllPage: React.FC = () => {
     <div className="min-h-screen bg-slate-50 text-slate-900 font-sans p-4 sm:p-6 lg:p-8">
       <div className="max-w-7xl mx-auto space-y-6">
 
-  
+
         <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="space-y-1">
             <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-slate-500">
@@ -431,9 +458,8 @@ const TenantAuctionControllPage: React.FC = () => {
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
                 )}
                 <span
-                  className={`relative inline-flex rounded-full h-2.5 w-2.5 ${
-                    isLive ? "bg-emerald-500" : isWaiting ? "bg-amber-500" : "bg-slate-400"
-                  }`}
+                  className={`relative inline-flex rounded-full h-2.5 w-2.5 ${isLive ? "bg-emerald-500" : isWaiting ? "bg-amber-500" : "bg-slate-400"
+                    }`}
                 ></span>
               </span>
               <span className="text-xs font-bold text-slate-900 uppercase tracking-wider">
@@ -457,7 +483,7 @@ const TenantAuctionControllPage: React.FC = () => {
                 )}
               </button>
             )}
-            {isLive&&(
+            {isLive && (
               <button
                 onClick={handlePauseAuction}
                 disabled={pausing}
@@ -473,10 +499,26 @@ const TenantAuctionControllPage: React.FC = () => {
                 )}
               </button>
             )}
+               {isPaused && (
+              <button
+                onClick={handleResumeAuction}
+                disabled={resuming}
+                className="bg-slate-900 hover:bg-black text-white font-semibold py-2 px-5 rounded-xl transition-all shadow-sm flex items-center gap-2 text-sm disabled:opacity-50"
+              >
+                {resuming ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    <span>Resuming...</span>
+                  </>
+                ) : (
+                  <span>Resume Auction</span>
+                )}
+              </button>
+            )}
           </div>
         </div>
 
-      
+
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
           <div className="lg:col-span-2 space-y-6">
@@ -494,11 +536,10 @@ const TenantAuctionControllPage: React.FC = () => {
                       {formatCurrency(currentBid, auction.currency)}
                     </span>
                     <span
-                      className={`text-[11px] font-bold px-2 py-0.5 rounded-md border ${
-                        reserveMet
-                          ? "bg-emerald-50 text-emerald-700 border-emerald-200"
-                          : "bg-amber-50 text-amber-700 border-amber-200"
-                      }`}
+                      className={`text-[11px] font-bold px-2 py-0.5 rounded-md border ${reserveMet
+                        ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                        : "bg-amber-50 text-amber-700 border-amber-200"
+                        }`}
                     >
                       {reserveMet ? "Reserve Met" : "Reserve Pending"}
                     </span>
@@ -528,8 +569,8 @@ const TenantAuctionControllPage: React.FC = () => {
                     {isLive
                       ? formatCountdown(timeLeftMs)
                       : isEnded
-                      ? "00:00:00"
-                      : "Awaiting Start"}
+                        ? "00:00:00"
+                        : "Awaiting Start"}
                   </div>
                   <div className="pt-2 border-t border-slate-200 flex items-center justify-between text-xs text-slate-600">
                     <span>Min Increment:</span>
@@ -611,19 +652,17 @@ const TenantAuctionControllPage: React.FC = () => {
                   bidsHistory.map((bid, idx) => (
                     <div
                       key={bid.id}
-                      className={`flex items-center justify-between p-3 rounded-xl border ${
-                        idx === 0
-                          ? "bg-slate-900 text-white border-slate-900"
-                          : "bg-white text-slate-900 border-slate-200"
-                      }`}
+                      className={`flex items-center justify-between p-3 rounded-xl border ${idx === 0
+                        ? "bg-slate-900 text-white border-slate-900"
+                        : "bg-white text-slate-900 border-slate-200"
+                        }`}
                     >
                       <div className="flex items-center gap-3">
                         <div
-                          className={`w-7 h-7 rounded-full flex items-center justify-center font-bold text-xs border ${
-                            idx === 0
-                              ? "bg-slate-800 text-white border-slate-700"
-                              : "bg-slate-100 text-slate-900 border-slate-200"
-                          }`}
+                          className={`w-7 h-7 rounded-full flex items-center justify-center font-bold text-xs border ${idx === 0
+                            ? "bg-slate-800 text-white border-slate-700"
+                            : "bg-slate-100 text-slate-900 border-slate-200"
+                            }`}
                         >
                           #{bidsHistory.length - idx}
                         </div>
@@ -632,9 +671,8 @@ const TenantAuctionControllPage: React.FC = () => {
                             {bid.bidderName}
                           </span>
                           <span
-                            className={`block text-[10px] ${
-                              idx === 0 ? "text-slate-400" : "text-slate-500"
-                            }`}
+                            className={`block text-[10px] ${idx === 0 ? "text-slate-400" : "text-slate-500"
+                              }`}
                           >
                             {bid.timestamp}
                           </span>
@@ -643,9 +681,8 @@ const TenantAuctionControllPage: React.FC = () => {
 
                       <div className="text-right">
                         <span
-                          className={`text-sm font-extrabold ${
-                            idx === 0 ? "text-white" : "text-slate-900"
-                          }`}
+                          className={`text-sm font-extrabold ${idx === 0 ? "text-white" : "text-slate-900"
+                            }`}
                         >
                           {formatCurrency(bid.amount, auction.currency)}
                         </span>
@@ -699,15 +736,14 @@ const TenantAuctionControllPage: React.FC = () => {
                     activityLogs.map((log) => (
                       <div
                         key={log.id}
-                        className={`p-2.5 rounded-lg border text-xs space-y-1 ${
-                          log.type === "BID"
-                            ? "bg-slate-100 border-slate-300"
-                            : log.type === "ROUND"
+                        className={`p-2.5 rounded-lg border text-xs space-y-1 ${log.type === "BID"
+                          ? "bg-slate-100 border-slate-300"
+                          : log.type === "ROUND"
                             ? "bg-blue-50 border-blue-200"
                             : log.type === "SYSTEM"
-                            ? "bg-emerald-50 border-emerald-200"
-                            : "bg-white border-slate-200"
-                        }`}
+                              ? "bg-emerald-50 border-emerald-200"
+                              : "bg-white border-slate-200"
+                          }`}
                       >
                         <div className="flex items-center justify-between">
                           <span className="text-slate-900 font-medium break-words">

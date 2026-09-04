@@ -181,6 +181,7 @@ export const MESSAGES = {
     LIVE_STATE_NOT_FOUND: 'Live Not found',
     LIVE_STARTED: 'Live Started',
     NOT_LIVE: 'Auction Not Live',
+    AUCTION_RESUMED:'Auction Resumed Successfully',
     OUTBID_JUST_NOW: 'OutBid Just Now',
     LOGOUT_SUCCESS: "Logout success",
     LOGOUT_FAILED: "Logout failed",

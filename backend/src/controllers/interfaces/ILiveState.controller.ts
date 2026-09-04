@@ -6,4 +6,5 @@ export interface IliveController {
     startLive(req: Request, res: Response, next: NextFunction): Promise<void>
     placeBid(req: Request, res: Response, next: NextFunction): Promise<void>
     pauseLive(req: Request, res: Response, next: NextFunction): Promise<void>
+    resumeLive(req:Request,res:Response,next:NextFunction):Promise<void>
 }

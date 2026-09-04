@@ -56,4 +56,13 @@ export class LiveController implements IliveController {
             next(error)
         }
     }
+    async resumeLive(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const {auctionId}=req.body;
+            const result=await this._liveService.resumeLive(auctionId);
+            SuccessResponse(res,MESSAGES.AUCTION_RESUMED,result,HttpStatus.OK)
+        } catch (error) {
+            next(error)
+        }
+    }
 }

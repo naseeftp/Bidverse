@@ -72,6 +72,19 @@ class LiveService {
             return apiErrorHandler(error,'Failed to pause auction')
         }
     }
+    async resumeLive(auctionId:string){
+        try {
+            const url=`${BASE_ROUTES.LIVE}${LIVE_ROUTES.RESUME_LIVE}`;
+            const response=await axiosInstance.patch<LiveAuctionStateResponseDTO,ApiResponse<LiveAuctionStateResponseDTO>>(url,{auctionId:auctionId});
+            return{
+                success:true,
+                message:response.message,
+                data:response.data
+            }
+        } catch (error) {
+            return apiErrorHandler(error,'Failed to resume the review')
+        }
+    }
 
 }
 export default new LiveService()

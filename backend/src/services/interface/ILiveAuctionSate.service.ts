@@ -8,5 +8,5 @@ export interface ILiveAcutionStateService {
     startLive(startedBy: string, auctionId: string): Promise<LiveAuctionStateResponseDTO>
     placeBid(userId: string, auctionId: string, amount: number, tenantId: string): Promise<bidResponseDTO>
     pauseLive(auctionId: string): Promise<LiveAuctionStateResponseDTO>
-    // resumeLive(auctionId:string):Promise<LiveAuctionStateResponseDTO>
+    resumeLive(auctionId:string):Promise<LiveAuctionStateResponseDTO>
 }

@@ -126,7 +126,8 @@ export const LIVE_ROUTES = {
     JOIN_ROOM: '/join_room/:id',
     START_LIVE: '/start-live',
     PLACE_BID: '/place-bid',
-    PAUSE_LIVE: '/pause-live'
+    PAUSE_LIVE: '/pause-live',
+    RESUME_LIVE:'/resume-live'
 }
 
 
