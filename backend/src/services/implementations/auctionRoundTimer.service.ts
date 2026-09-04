@@ -31,7 +31,9 @@ export class AuctionRoundTimerService {
     stop(auctionItemId: string): void {
         this._clear(auctionItemId);
     }
-
+    async pause(auctionId:string){
+        this._clear(auctionId)
+    }
     private _clear(auctionItemId: string): void {
         const existing = this._timers.get(auctionItemId);
         if (existing) {
@@ -63,7 +65,7 @@ export class AuctionRoundTimerService {
 
         this._timers.set(auctionItemId, { timeout, round });
     }
-
+  
     private async _onRoundExpire(auctionItemId: string, expiredRound: number): Promise<void> {
         if (expiredRound < ROUND_DURATIONS_MS.length) {
             await this._enterRound(auctionItemId, expiredRound + 1);

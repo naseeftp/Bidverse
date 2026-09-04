@@ -27,6 +27,11 @@ router.patch(
 router.post(
     LIVE_ROUTES.PLACE_BID,
     allowedTo(Role.USER),
-    (req,res,next)=>liveController.placeBid(req,res,next)
+    (req, res, next) => liveController.placeBid(req, res, next)
+)
+router.patch(
+    LIVE_ROUTES.PAUSE_LIVE,
+    allowedTo(Role.TENANT),
+    (req, res, next) => liveController.pauseLive(req, res, next)
 )
 export default router;

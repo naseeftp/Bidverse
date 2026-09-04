@@ -35,13 +35,13 @@ const LiveRoom: React.FC = () => {
   const [logs, setLogs] = useState<ActivityLog[]>([]);
   const [outcome, setOutcome] = useState<Outcome | null>(null);
 
-
   const fallbackTriggeredRef = useRef(false);
-  const currentUserId = useAppSelector((state) => state.auth.user?.userId)
+  const currentUserId = useAppSelector((state) => state.auth.user?.userId);
 
   const isEnded = liveState?.status === "ENDED";
   const isWaiting = liveState?.status === "WAITING";
-  const isProcessingRound = timeLeftMs === 0 && !isWaiting && !isEnded;
+  const isPaused = liveState?.status === "PAUSED";
+  const isProcessingRound = timeLeftMs === 0 && !isWaiting && !isEnded && !isPaused;
 
   const seconds = Math.ceil(timeLeftMs / 1000);
 
@@ -98,7 +98,9 @@ const LiveRoom: React.FC = () => {
       if (liveStateResponse.success && liveStateResponse.data) {
         setLiveState(liveStateResponse.data);
         setRound(liveStateResponse.data.currentRound);
-        setRoundEndsAt(new Date(liveStateResponse.data.roundsEndsAt).getTime());
+        if (liveStateResponse.data.roundsEndsAt) {
+          setRoundEndsAt(new Date(liveStateResponse.data.roundsEndsAt).getTime());
+        }
       } else {
         toast.error(liveStateResponse.message || "Failed to load live state");
       }
@@ -115,6 +117,15 @@ const LiveRoom: React.FC = () => {
     addLog("Auction is now live! Bidding opened.", "system");
   }, [id, addLog]);
 
+  const handlePauseCallBack = useCallback((data: { auctionItemId: string }) => {
+    if (data.auctionItemId !== id) return;
+    setLiveState((prev) => (prev ? { ...prev, status: "PAUSED" } : prev));
+    setRound(1);
+    setRoundEndsAt(null);
+    setTimeLeftMs(0);
+    addLog("Auction paused by host. Standby for resumption.", "system");
+  }, [id, addLog]);
+
   const handleBidNew = useCallback((data: { auctionItemId: string; amount: number; bidderId: string }) => {
     if (data.auctionItemId !== id) return;
     setAuction((prev) => (prev ? { ...prev, currentHighestBid: data.amount } : prev));
@@ -126,7 +137,7 @@ const LiveRoom: React.FC = () => {
     fallbackTriggeredRef.current = false;
     setRound(data.round);
     setRoundEndsAt(new Date(data.roundEndsAt).getTime());
-
+    addLog(`Round ${data.round} started!`, "round");
   }, [id, addLog]);
 
   const handleEnded = useCallback((data: { auctionItemId: string; status: 'SOLD' | 'PASSED', reserveMet: boolean, winningBidder?: string; winningBid: number }) => {
@@ -135,23 +146,21 @@ const LiveRoom: React.FC = () => {
     setTimeLeftMs(0);
     if (data.status === 'PASSED') {
       setOutcome({ type: 'passed' });
-      toast('Item Passed-reserve Price is Not Met,{ icon: "⚠️" }')
+      toast('Item Passed - Reserve Price is Not Met', { icon: "⚠️" });
       addLog("Auction closed. Reserve price not met — item passed.", "system");
-      return
+      return;
     }
     const isWinner = currentUserId === data.winningBidder;
     if (isWinner) {
       setOutcome({ type: "won", amount: data.winningBid });
       toast.success(`Congratulations! You won at ₹${data.winningBid.toLocaleString("en-IN")}`);
       addLog(`You won the auction at ₹${data.winningBid.toLocaleString("en-IN")}!`, "system");
-    }
-    else {
+    } else {
       setOutcome({ type: "lost", amount: data.winningBid });
       toast("Item sold. Better luck next time!", { icon: "🙁" });
       addLog(`Auction closed. Sold for ₹${data.winningBid.toLocaleString("en-IN")}`, "system");
     }
-
-  }, [id, addLog]);
+  }, [id, currentUserId, addLog]);
 
   useEffect(() => {
     if (!id) return;
@@ -166,6 +175,7 @@ const LiveRoom: React.FC = () => {
     socket.on("bid:new", handleBidNew);
     socket.on("auction:round", handleRound);
     socket.on("auction:ended", handleEnded);
+    socket.on("auction:paused", handlePauseCallBack);
     socket.on("auction:error", (d) => toast.error(d.error));
 
     return () => {
@@ -174,11 +184,12 @@ const LiveRoom: React.FC = () => {
       socket.off("bid:new", handleBidNew);
       socket.off("auction:round", handleRound);
       socket.off("auction:ended", handleEnded);
+      socket.off("auction:paused", handlePauseCallBack);
     };
-  }, [fetchAuctionDetails, id, handleBidNew, handleRound, handleEnded, handleAuctionStarted]);
+  }, [fetchAuctionDetails, id, handleBidNew, handleRound, handleEnded, handleAuctionStarted, handlePauseCallBack]);
 
   useEffect(() => {
-    if (!roundEndsAt || isEnded) return;
+    if (!roundEndsAt || isEnded || isPaused) return;
 
     const tick = () => {
       const remaining = Math.max(0, roundEndsAt - Date.now());
@@ -188,23 +199,25 @@ const LiveRoom: React.FC = () => {
     tick();
     const interval = setInterval(tick, 250);
     return () => clearInterval(interval);
-  }, [roundEndsAt, isEnded]);
+  }, [roundEndsAt, isEnded, isPaused]);
 
   useEffect(() => {
-    if (timeLeftMs === 0 && !isWaiting && !isEnded && !fallbackTriggeredRef.current && roundEndsAt) {
+    if (timeLeftMs === 0 && !isWaiting && !isEnded && !isPaused && !fallbackTriggeredRef.current && roundEndsAt) {
       fallbackTriggeredRef.current = true;
       const timeout = setTimeout(async () => {
         const res = await liveService.findLiveState(id!);
         if (res.success && res.data) {
           setLiveState(res.data);
           setRound(res.data.currentRound);
-          setRoundEndsAt(new Date(res.data.roundsEndsAt).getTime());
+          if (res.data.roundsEndsAt) {
+            setRoundEndsAt(new Date(res.data.roundsEndsAt).getTime());
+          }
         }
       }, 2500);
 
       return () => clearTimeout(timeout);
     }
-  }, [timeLeftMs, isWaiting, isEnded, id, roundEndsAt]);
+  }, [timeLeftMs, isWaiting, isEnded, isPaused, id, roundEndsAt]);
 
   const handlePlaceBid = async () => {
     const amount = Number(customBid);
@@ -341,9 +354,9 @@ const LiveRoom: React.FC = () => {
                   Bidding Console
                 </h2>
                 <div className="flex items-center gap-1.5">
-                  <span className={`w-2 h-2 rounded-full ${isEnded ? "bg-gray-400" : isWaiting ? "bg-amber-500" : "bg-[#C9653B] animate-pulse"}`}></span>
+                  <span className={`w-2 h-2 rounded-full ${isEnded ? "bg-gray-400" : isWaiting || isPaused ? "bg-amber-500" : "bg-[#C9653B] animate-pulse"}`}></span>
                   <span className="text-xs font-bold text-[#6B6B6B]">
-                    {isEnded ? "CONSOLE CLOSED" : isWaiting ? "STANDBY" : "LIVE AGENT ACTIVE"}
+                    {isEnded ? "CONSOLE CLOSED" : isWaiting ? "STANDBY" : isPaused ? "SESSION PAUSED" : "LIVE AGENT ACTIVE"}
                   </span>
                 </div>
               </div>
@@ -371,6 +384,11 @@ const LiveRoom: React.FC = () => {
                 <div className="bg-[#FEF7E0] border border-amber-200 rounded-xl p-4 text-center space-y-1">
                   <h3 className="text-sm font-bold text-[#1F1F1F]">Auction Waiting To Launch</h3>
                   <p className="text-xs text-[#6B6B6B]">Controls will unlock as soon as the host initiates the session.</p>
+                </div>
+              ) : isPaused ? (
+                <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 text-center space-y-1">
+                  <h3 className="text-sm font-bold text-amber-800">Auction Temporarily Paused</h3>
+                  <p className="text-xs text-amber-700">Bidding is on hold. Controls will reactivate when the host resumes the session.</p>
                 </div>
               ) : (
                 <div className="space-y-4">
@@ -436,6 +454,10 @@ const LiveRoom: React.FC = () => {
                   <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-amber-50 text-amber-700 border border-amber-200">
                     STANDBY
                   </span>
+                ) : isPaused ? (
+                  <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-amber-50 text-amber-700 border border-amber-200">
+                    PAUSED
+                  </span>
                 ) : (
                   <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center gap-1.5">
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse"></span>
@@ -444,7 +466,7 @@ const LiveRoom: React.FC = () => {
                 )}
               </div>
 
-              {!isEnded && !isWaiting && (
+              {!isEnded && !isWaiting && !isPaused && (
                 <div className={`p-3 rounded-xl border flex items-center justify-between ${currentRoundConfig.badgeBg}`}>
                   <div className="flex items-center gap-2">
                     <span className="text-xs font-extrabold uppercase">
@@ -468,6 +490,11 @@ const LiveRoom: React.FC = () => {
                   <div className="py-2">
                     <p className="text-sm font-bold text-amber-800">Waiting for Host</p>
                     <p className="text-xs text-amber-600 mt-1">Timer starts automatically when session launches</p>
+                  </div>
+                ) : isPaused ? (
+                  <div className="py-2">
+                    <p className="text-sm font-bold text-amber-800">Session On Hold</p>
+                    <p className="text-xs text-amber-600 mt-1">Timer will resume when host restarts the round</p>
                   </div>
                 ) : (
                   <>
@@ -496,7 +523,7 @@ const LiveRoom: React.FC = () => {
               <div className="h-72 rounded-xl bg-[#FFF9F4] border border-[#E6E0DA] p-3 text-xs overflow-y-auto space-y-2">
                 {logs.length === 0 ? (
                   <div className="h-full flex items-center justify-center text-center text-[#6B6B6B] p-4">
-                    <p>{isWaiting ? "Waiting for room startup..." : "No bids or events logged yet."}</p>
+                    <p>{isWaiting ? "Waiting for room startup..." : isPaused ? "Auction paused." : "No bids or events logged yet."}</p>
                   </div>
                 ) : (
                   logs.map((log) => (

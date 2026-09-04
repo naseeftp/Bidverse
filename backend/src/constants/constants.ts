@@ -149,6 +149,7 @@ export const MESSAGES = {
     AUCTION_STATUS_UPDATED: 'Auction status updated',
     AUCTION_UPDATED: 'Auction Details updated Successfully',
     AUCTION_CANCELLED: 'Auction Cancelled Successfully',
+    AUCTION_PAUSED: 'Auction paused resume to continue the Auction',
     WATCHLIST_ADDED: 'Item Added To WatchList Successfully',
     WATCHLIST_DELETED: 'Item Removed From WatchList Successfully',
     WATCHLIST_EXISTED: 'Item Allredy existed on watchlist',
@@ -179,8 +180,8 @@ export const MESSAGES = {
     NOTIFICATION_NOT_FOUND: 'Notification Notfound',
     LIVE_STATE_NOT_FOUND: 'Live Not found',
     LIVE_STARTED: 'Live Started',
-    NOT_LIVE:'Auction Not Live',
-    OUTBID_JUST_NOW:'OutBid Just Now',
+    NOT_LIVE: 'Auction Not Live',
+    OUTBID_JUST_NOW: 'OutBid Just Now',
     LOGOUT_SUCCESS: "Logout success",
     LOGOUT_FAILED: "Logout failed",
 
@@ -233,8 +234,8 @@ export enum LiveAuctionStatus {
     ENDED = "ENDED"
 }
 
-export const ROUND_DURATIONS_MS = [40_000, 20_000, 15_000]; 
-export const MAX_ROUND = 3; 
+export const ROUND_DURATIONS_MS = [40_000, 20_000, 15_000];
+export const MAX_ROUND = 3;
 
 export const LiveAuctionStatusValues = Object.values(LiveAuctionStatus);
 

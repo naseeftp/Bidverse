@@ -39,6 +39,7 @@ const TenantAuctionControllPage: React.FC = () => {
 
   const [loading, setLoading] = useState<boolean>(true);
   const [starting, setStarting] = useState<boolean>(false);
+  const [pausing,setPausing]=useState<boolean>(false);
   const [auction, setAuction] = useState<AuctionItemDetailDTO | null>(null);
   const [liveState, setLiveState] = useState<LiveAuctionStateResponseDTO | null>(null);
 
@@ -194,6 +195,24 @@ const TenantAuctionControllPage: React.FC = () => {
       setStarting(false);
     }
   };
+  const handlePauseAuction=async()=>{
+    if(!id) return
+    setPausing(true);
+   try {
+    const response=await liveService.pauseLive(id);
+    if(response.success&&response.data){
+      toast.success(response.message)
+    }
+    else{
+      toast.error(response.message)
+    }
+   } catch {
+    toast.error('Failed to Pause Auction')
+   }finally{
+    setPausing(false)
+   }
+  }
+
 
 
   useEffect(() => {
@@ -233,6 +252,15 @@ const TenantAuctionControllPage: React.FC = () => {
 
       addActivityLog("Auction is officially LIVE", "SYSTEM");
     };
+
+    const handlePauseCallBack=(data:{
+    auctionItemId:string
+    })=>{
+       if(data.auctionItemId!==id) return;
+       setLiveState((prev)=>(prev?{...prev,status:'PAUSED'}:prev));
+       setRound(1)
+       addActivityLog('Auction Paused Resume to continue')
+    }
 
 
     const handleRoundChanged = (data: { auctionItemId: string; round: number; roundEndsAt: string }) => {
@@ -316,6 +344,7 @@ const TenantAuctionControllPage: React.FC = () => {
     socket.off("bid:new");
     socket.off("auction:ended");
     socket.off("auction:error");
+    socket.off('auction:paused');
 
     socket.on("auction:user_joined", handleUserJoined);
     socket.on("auction:user_left", handleUserLeft);
@@ -325,7 +354,7 @@ const TenantAuctionControllPage: React.FC = () => {
     socket.on("bid:new", handleBidNew);
     socket.on("auction:ended", handleAuctionEnded);
     socket.on("auction:error", handleSocketError);
-
+    socket.on('auction:paused',handlePauseCallBack)
     socket.emit("auction:join", id);
 
     return () => {
@@ -338,6 +367,7 @@ const TenantAuctionControllPage: React.FC = () => {
       socket.off("bid:new", handleBidNew);
       socket.off("auction:ended", handleAuctionEnded);
       socket.off("auction:error", handleSocketError);
+      socket.off('auction:paused',handlePauseCallBack)
     };
   }, [id, auction?.currency, addActivityLog]);
 
@@ -424,6 +454,22 @@ const TenantAuctionControllPage: React.FC = () => {
                   </>
                 ) : (
                   <span>Start Auction</span>
+                )}
+              </button>
+            )}
+            {isLive&&(
+              <button
+                onClick={handlePauseAuction}
+                disabled={pausing}
+                className="bg-slate-900 hover:bg-black text-white font-semibold py-2 px-5 rounded-xl transition-all shadow-sm flex items-center gap-2 text-sm disabled:opacity-50"
+              >
+                {pausing ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    <span>pausing...</span>
+                  </>
+                ) : (
+                  <span>Pause Auction</span>
                 )}
               </button>
             )}

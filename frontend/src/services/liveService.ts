@@ -59,6 +59,19 @@ class LiveService {
             return apiErrorHandler(error,'Failed to place bid')
         }
     }
+    async pauseLive(auctionId:string){
+        try {
+            const url=`${BASE_ROUTES.LIVE}${LIVE_ROUTES.PAUSE_LIVE}`;
+            const response=await axiosInstance.patch<LiveAuctionStateResponseDTO,ApiResponse<LiveAuctionStateResponseDTO>>(url,{auctionId:auctionId});
+            return{
+                success:true,
+                message:response.message,
+                data:response.data
+            }
+        } catch (error) {
+            return apiErrorHandler(error,'Failed to pause auction')
+        }
+    }
 
 }
 export default new LiveService()

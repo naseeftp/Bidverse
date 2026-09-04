@@ -43,7 +43,7 @@ export interface ServerToClientEvents {  // this events emitted by backend and f
     'auction:paused': (
         data: {
             auctionItemId: string;
-            pausedAt: string;
+            
         }
     ) => void;
     'auction:resumed': (

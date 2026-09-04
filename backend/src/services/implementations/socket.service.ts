@@ -17,7 +17,7 @@ export class SocketService {
     public setChatService(chatService: IChatService): void {
         this._chatService = chatService;
     }
-   
+
 
     public initialize(server: HttpServer): void {
         const envOrgins = [env.CLIENT_URL]
@@ -154,7 +154,7 @@ export class SocketService {
                     activeCount
                 });
             });
-      });
+        });
     }
     public isUserOnline(userId: string): boolean {
         return this._onlineUsers.has(userId)

@@ -6,5 +6,7 @@ export interface ILiveAcutionStateService {
     findLiveState(auctionId: string): Promise<LiveAuctionStateResponseDTO>
     joinRoom(userId: string, auctionId: string): Promise<AuctionItemDetailDTO>
     startLive(startedBy: string, auctionId: string): Promise<LiveAuctionStateResponseDTO>
-    placeBid(userId:string,auctionId:string,amount:number,tenantId:string):Promise<bidResponseDTO>
+    placeBid(userId: string, auctionId: string, amount: number, tenantId: string): Promise<bidResponseDTO>
+    pauseLive(auctionId: string): Promise<LiveAuctionStateResponseDTO>
+    // resumeLive(auctionId:string):Promise<LiveAuctionStateResponseDTO>
 }
