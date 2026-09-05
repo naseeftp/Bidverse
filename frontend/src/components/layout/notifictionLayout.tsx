@@ -113,7 +113,7 @@ export const NotificationWorkSpace: React.FC<NotificationWorkspaceProps> = ({ ro
       } else {
         toast.error(response?.message)
       }
-    } catch (error) {
+    } catch {
       toast.error('Error updating notifications');
     } finally {
       SetMarkingAll(false)

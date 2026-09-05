@@ -4,7 +4,6 @@ import { env } from '../../config/env';
 import { ServerToClientEvents, ClientToServerEvents, SocketData } from '../../types/socket.type';
 import { IChatService } from '../interface/IChat.service';
 import { AppError } from '../../errors/AppError';
-import { auctionRoundTimerService } from './auctionRoundTimer.service';
 
 type TypedSocket = Socket<ClientToServerEvents, ServerToClientEvents, Record<string, never>, SocketData>
 type TypedServer = SocketIOServer<ClientToServerEvents, ServerToClientEvents, Record<string, never>, SocketData>

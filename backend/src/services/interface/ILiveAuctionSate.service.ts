@@ -1,6 +1,6 @@
 import { AuctionItemDetailDTO } from "../../dtos/auctionHouse.dto/auctionItem.dto";
 import { LiveAuctionStateResponseDTO } from "../../dtos/auctionHouse.dto/live.auction.dto";
-import { bidResponseDTO, placeBidDTO } from "../../dtos/user.dto/bid.dto";
+import { bidResponseDTO} from "../../dtos/user.dto/bid.dto";
 
 export interface ILiveAcutionStateService {
     findLiveState(auctionId: string): Promise<LiveAuctionStateResponseDTO>

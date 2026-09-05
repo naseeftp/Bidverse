@@ -54,8 +54,11 @@ export class AuctionItemMangementSevice implements IAuctionItemMangementSevice {
         }
         const createdItem = await this._auctionItemRepo.create(auctionItemData)
         const admin=await this._userRepo.findOne({role:'admin'});
+        if(!admin){
+            throw new NotFoundError('Admin Not Found')
+        }
         await this._notificationService.createAndSendNotification({
-            recipientId:admin?._id!,
+            recipientId:admin._id,
             recipientRole:Role.ADMIN,
             type:NotificationType.WARNING,
             event:NotificationEvent.AUCTION_VERIFICATION_REQUESTED,
@@ -132,8 +135,11 @@ export class AuctionItemMangementSevice implements IAuctionItemMangementSevice {
         `You are auction item named ${updatedAuction.title} is Approved `
         :`You are auction item named ${updatedAuction.title} is rejected due to ${reason}`;
         const auctionOwner=await this._auctionHouseRepo.findById(updatedAuction.houseId);
+        if(!auctionOwner){
+            throw new NotFoundError(MESSAGES.AUCTION_HOUSE_NOT_FOUND)
+        }
         await this._notificationService.createAndSendNotification({
-            recipientId:auctionOwner?.userId!,
+            recipientId:auctionOwner.userId,
             recipientRole:Role.TENANT,
             type:notificationType,
             event:notificationEvent,

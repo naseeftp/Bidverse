@@ -125,14 +125,15 @@ const LiveRoom: React.FC = () => {
     setTimeLeftMs(0);
     addLog("Auction paused by host. Standby for resumption.", "system");
   }, [id, addLog]);
-     const handleResumeCallBack = (data: {
+
+     const handleResumeCallBack =useCallback ((data: {
       auctionItemId: string
     }) => {
       if (data.auctionItemId !== id) return;
       setLiveState((prev) => (prev ? { ...prev, status: 'LIVE' } : prev));
       addLog('Auction  Resumed ','system');
 
-    }
+    },[id,addLog])
 
   const handleBidNew = useCallback((data: { auctionItemId: string; amount: number; bidderId: string }) => {
     if (data.auctionItemId !== id) return;
@@ -194,9 +195,9 @@ const LiveRoom: React.FC = () => {
       socket.off("auction:round", handleRound);
       socket.off("auction:ended", handleEnded);
       socket.off("auction:paused", handlePauseCallBack);
-      socket.off('auction:paused',handleResumeCallBack)
+      socket.off('auction:resumed',handleResumeCallBack)
     };
-  }, [fetchAuctionDetails, id, handleBidNew, handleRound, handleEnded, handleAuctionStarted, handlePauseCallBack]);
+  }, [fetchAuctionDetails, id, handleBidNew, handleRound, handleEnded, handleAuctionStarted, handlePauseCallBack,handleResumeCallBack]);
 
   useEffect(() => {
     if (!roundEndsAt || isEnded || isPaused) return;
@@ -326,7 +327,7 @@ const LiveRoom: React.FC = () => {
                 <div className="w-full sm:w-48 h-48 rounded-xl bg-[#FFF9F4] border border-[#E6E0DA] overflow-hidden flex-shrink-0 flex items-center justify-center">
                   {auction.images && auction.images.length > 0 ? (
                     <img
-                      src={typeof auction.images[0] === "string" ? auction.images[0] : (auction.images[0] as any)?.url}
+                      src={typeof auction.images[0] === "string" ? auction.images[0] : (auction.images[0] )?.url} // as any
                       alt={auction.title}
                       className="w-full h-full object-cover object-center"
                     />
