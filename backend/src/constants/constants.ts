@@ -237,6 +237,7 @@ export enum LiveAuctionStatus {
 
 export const ROUND_DURATIONS_MS = [40_000, 20_000, 15_000];
 export const MAX_ROUND = 3;
+export const DEFAULT_EXPIRATION_HOURS = 48;
 
 export const LiveAuctionStatusValues = Object.values(LiveAuctionStatus);
 

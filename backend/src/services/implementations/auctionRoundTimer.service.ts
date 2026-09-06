@@ -5,6 +5,9 @@ import { IAuctionItemRepository } from "../../repositories/interfaces/IAuctionIt
 import { ROUND_DURATIONS_MS, LiveAuctionStatus, AuctionItemStatus } from "../../constants/constants";
 import { LiveAuctionSateRepository } from "../../repositories/implementations/LiveAuctionState.repository";
 import { AuctionItemRepository } from "../../repositories/implementations/AuctionItem.repository";
+import { IPaymentRequestService } from "../interface/IPaymentRequest.service";
+import { PaymentRequestService } from "./PaymentRequest.service";
+import { PaymentRequestRepository } from "../../repositories/implementations/PaymentRequest.repository";
 
 interface TimerHandle {
     timeout: NodeJS.Timeout;
@@ -16,7 +19,8 @@ export class AuctionRoundTimerService {
 
     constructor(
         private _liveStateRepo: ILiveAuctionStateRepository,
-        private _auctionRepo: IAuctionItemRepository
+        private _auctionRepo: IAuctionItemRepository,
+        private _paymentRequestService: IPaymentRequestService
     ) { }
 
     async startRounds(auctionItemId: string): Promise<void> {
@@ -95,7 +99,9 @@ export class AuctionRoundTimerService {
             status: auctionStatus, 
             winningBidder: auction.currentHighestBidder
         });
-
+        if(isReserveMet){
+            await this._paymentRequestService.createPaymentRequest(auctionItemId)
+        }
         socketService.emitToAuctionRoom(auctionItemId, 'auction:ended', {
             auctionItemId,
             status:auctionStatus,
@@ -106,8 +112,13 @@ export class AuctionRoundTimerService {
     }
 }
 const liveAuctionStateRepository=new LiveAuctionSateRepository()
-const auctionItemRepository=new AuctionItemRepository()
+const auctionItemRepository=new AuctionItemRepository();
+const paymentRequestRepo=new PaymentRequestRepository();
+const auctionRepo=new AuctionItemRepository();
+
+const paymentRequestService=new PaymentRequestService(paymentRequestRepo,auctionRepo)
 export const auctionRoundTimerService = new AuctionRoundTimerService(
     liveAuctionStateRepository,
-    auctionItemRepository
+    auctionItemRepository,
+    paymentRequestService
 );
