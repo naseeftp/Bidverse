@@ -1,4 +1,4 @@
-import { Types,Document } from "mongoose";
+import { Types, Document } from "mongoose";
 
 export enum PaymentRequestStatus {
   PENDING = "PENDING",
@@ -21,4 +21,12 @@ export interface IPaymentRequest {
   createdAt: Date;
   updatedAt: Date;
 }
-export type IPaymentRequestDocument=IPaymentRequest&Document;
+export type IPaymentRequestDocument = IPaymentRequest & Document;
+
+export interface IPaymentRequestAggregateDoc extends IPaymentRequestDocument {
+  auction?: {
+    _id: string;
+    title: string;
+    images?: string[];
+  };
+}

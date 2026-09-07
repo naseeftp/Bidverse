@@ -35,7 +35,7 @@ export class AuctionRoundTimerService {
     stop(auctionItemId: string): void {
         this._clear(auctionItemId);
     }
-    async pause(auctionId:string){
+    async pause(auctionId: string) {
         this._clear(auctionId)
     }
     private _clear(auctionItemId: string): void {
@@ -53,7 +53,7 @@ export class AuctionRoundTimerService {
         const liveState = await this._liveStateRepo.findOne({
             auctionItemId: new Types.ObjectId(auctionItemId)
         });
-        if (!liveState) return; 
+        if (!liveState) return;
 
         await this._liveStateRepo.updateById(liveState._id, { currentRound: round, roundEndsAt });
 
@@ -69,7 +69,7 @@ export class AuctionRoundTimerService {
 
         this._timers.set(auctionItemId, { timeout, round });
     }
-  
+
     private async _onRoundExpire(auctionItemId: string, expiredRound: number): Promise<void> {
         if (expiredRound < ROUND_DURATIONS_MS.length) {
             await this._enterRound(auctionItemId, expiredRound + 1);
@@ -93,32 +93,32 @@ export class AuctionRoundTimerService {
                 endedAt: new Date()
             });
         }
-        const isReserveMet=auction.reserveMet;
-        const auctionStatus=isReserveMet?AuctionItemStatus.SOLD:AuctionItemStatus.PASSED;
+        const isReserveMet = auction.reserveMet;
+        const auctionStatus = isReserveMet ? AuctionItemStatus.SOLD : AuctionItemStatus.PASSED;
         await this._auctionRepo.updateById(auctionItemId, {
-            status: auctionStatus, 
+            status: auctionStatus,
             winningBidder: auction.currentHighestBidder
         });
-        if(isReserveMet){
+        if (isReserveMet) {
             await this._paymentRequestService.createPaymentRequest(auctionItemId)
         }
         socketService.emitToAuctionRoom(auctionItemId, 'auction:ended', {
             auctionItemId,
-            status:auctionStatus,
-            reserveMet:isReserveMet,
+            status: auctionStatus,
+            reserveMet: isReserveMet,
             winningBidder: auction.currentHighestBidder?.toString(),
             winningBid: auction.currentHighestBid
         });
     }
 }
-const liveAuctionStateRepository=new LiveAuctionSateRepository()
-const auctionItemRepository=new AuctionItemRepository();
-const paymentRequestRepo=new PaymentRequestRepository();
-const auctionRepo=new AuctionItemRepository();
+const liveAuctionStateRepository = new LiveAuctionSateRepository()
+const auctionItemRepository = new AuctionItemRepository();
+const paymentRequestRepo = new PaymentRequestRepository();
+const auctionRepo = new AuctionItemRepository();
 
-const paymentRequestService=new PaymentRequestService(paymentRequestRepo,auctionRepo)
+const paymentRequestService = new PaymentRequestService(paymentRequestRepo, auctionRepo)
 export const auctionRoundTimerService = new AuctionRoundTimerService(
     liveAuctionStateRepository,
     auctionItemRepository,
-    paymentRequestService
+    paymentRequestService,
 );

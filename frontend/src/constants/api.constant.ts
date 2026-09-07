@@ -12,7 +12,9 @@ export const BASE_ROUTES = {
     PAYMENT: '/payment',
     TRANSACTION: '/transaction',
     NOTIFICATION: '/notification',
-    LIVE: '/LIVE'
+    LIVE: '/LIVE',
+    PAYMENT_REQUEST: '/payment-request'
+
 }
 export const AUTH_ROUTES = {
     REGISTER: "/auth/register",
@@ -127,4 +129,8 @@ export const LIVE_ROUTES = {
     PLACE_BID: '/place-bid',
     PAUSE_LIVE: '/pause-live',
     RESUME_LIVE: '/resume-live'
+}
+
+export const PAYMENT_REQUEST_ROUTES = {
+    LIST_REQUEST: '/list-payment-requests'
 }

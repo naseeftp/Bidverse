@@ -25,6 +25,7 @@ import PaymentRoutes from './routes/payment.routes'
 import TransactionRoutes from './routes/transaction.routes'
 import NotificationRoutes from './routes/notification.routes'
 import LiveRoutes from './routes/live.routes'
+import PaymentRequestRoutes from './routes/paymentRequest.routes'
 
 import { LoggerService } from "./services/implementations/Logger.service";
 
@@ -63,6 +64,7 @@ app.use(BASE_ROUTES.PAYMENT, PaymentRoutes)
 app.use(BASE_ROUTES.TRANSACTION, TransactionRoutes)
 app.use(BASE_ROUTES.NOTIFICATION, NotificationRoutes)
 app.use(BASE_ROUTES.LIVE, LiveRoutes)
+app.use(BASE_ROUTES.PAYMENT_REQUEST, PaymentRequestRoutes)
 
 app.use(errorHandler);
 const startServer = async () => {
