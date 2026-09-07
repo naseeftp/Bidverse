@@ -27,6 +27,7 @@ const LiveRoom: React.FC = () => {
   const [liveState, setLiveState] = useState<LiveAuctionStateResponseDTO | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [customBid, setCustomBid] = useState<string>("");
+  const [highestBidderId, setHighestBidderId] = useState<string | null>(null);
 
   const [round, setRound] = useState<number>(1);
   const [roundEndsAt, setRoundEndsAt] = useState<number | null>(null);
@@ -44,7 +45,8 @@ const LiveRoom: React.FC = () => {
   const isProcessingRound = timeLeftMs === 0 && !isWaiting && !isEnded && !isPaused;
 
   const seconds = Math.ceil(timeLeftMs / 1000);
-
+  const isHighestBidder = Boolean(currentUserId && highestBidderId && currentUserId === highestBidderId);
+  const isOutbid = Boolean(currentUserId && highestBidderId && currentUserId !== highestBidderId && auction?.currentHighestBid);
   const getRoundConfig = (r: number) => {
     switch (r) {
       case 1:
@@ -90,7 +92,12 @@ const LiveRoom: React.FC = () => {
       ]);
 
       if (auctionResponse.success && auctionResponse.data) {
+
         setAuction(auctionResponse.data);
+        const initialBidder = auctionResponse.data.highestBidder;
+        if (initialBidder) {
+          setHighestBidderId(initialBidder.userId)
+        }
       } else {
         toast.error(auctionResponse.message || "Failed to load item details");
       }
@@ -126,19 +133,23 @@ const LiveRoom: React.FC = () => {
     addLog("Auction paused by host. Standby for resumption.", "system");
   }, [id, addLog]);
 
-     const handleResumeCallBack =useCallback ((data: {
-      auctionItemId: string
-    }) => {
-      if (data.auctionItemId !== id) return;
-      setLiveState((prev) => (prev ? { ...prev, status: 'LIVE' } : prev));
-      addLog('Auction  Resumed ','system');
+  const handleResumeCallBack = useCallback((data: {
+    auctionItemId: string
+  }) => {
+    if (data.auctionItemId !== id) return;
+    setLiveState((prev) => (prev ? { ...prev, status: 'LIVE' } : prev));
+    addLog('Auction  Resumed ', 'system');
 
-    },[id,addLog])
+  }, [id, addLog])
 
   const handleBidNew = useCallback((data: { auctionItemId: string; amount: number; bidderId: string }) => {
     if (data.auctionItemId !== id) return;
     setAuction((prev) => (prev ? { ...prev, currentHighestBid: data.amount } : prev));
-    addLog(`New highest bid: ₹${data.amount.toLocaleString("en-IN")}`, "bid");
+    setHighestBidderId(data.bidderId)
+    const isUserBid = currentUserId === data.bidderId;
+    addLog(isUserBid
+      ? `You placed highest bid: ₹${data.amount.toLocaleString("en-IN")}`
+      : `New highest bid: ₹${data.amount.toLocaleString("en-IN")}`);
   }, [id, addLog]);
 
   const handleRound = useCallback((data: { auctionItemId: string; round: number; roundEndsAt: string }) => {
@@ -185,7 +196,7 @@ const LiveRoom: React.FC = () => {
     socket.on("auction:round", handleRound);
     socket.on("auction:ended", handleEnded);
     socket.on("auction:paused", handlePauseCallBack);
-    socket.on('auction:resumed',handleResumeCallBack)
+    socket.on('auction:resumed', handleResumeCallBack)
     socket.on("auction:error", (d) => toast.error(d.error));
 
     return () => {
@@ -195,9 +206,9 @@ const LiveRoom: React.FC = () => {
       socket.off("auction:round", handleRound);
       socket.off("auction:ended", handleEnded);
       socket.off("auction:paused", handlePauseCallBack);
-      socket.off('auction:resumed',handleResumeCallBack)
+      socket.off('auction:resumed', handleResumeCallBack)
     };
-  }, [fetchAuctionDetails, id, handleBidNew, handleRound, handleEnded, handleAuctionStarted, handlePauseCallBack,handleResumeCallBack]);
+  }, [fetchAuctionDetails, id, handleBidNew, handleRound, handleEnded, handleAuctionStarted, handlePauseCallBack, handleResumeCallBack]);
 
   useEffect(() => {
     if (!roundEndsAt || isEnded || isPaused) return;
@@ -220,6 +231,7 @@ const LiveRoom: React.FC = () => {
         if (res.success && res.data) {
           setLiveState(res.data);
           setRound(res.data.currentRound);
+
           if (res.data.roundsEndsAt) {
             setRoundEndsAt(new Date(res.data.roundsEndsAt).getTime());
           }
@@ -327,7 +339,7 @@ const LiveRoom: React.FC = () => {
                 <div className="w-full sm:w-48 h-48 rounded-xl bg-[#FFF9F4] border border-[#E6E0DA] overflow-hidden flex-shrink-0 flex items-center justify-center">
                   {auction.images && auction.images.length > 0 ? (
                     <img
-                      src={typeof auction.images[0] === "string" ? auction.images[0] : (auction.images[0] )?.url} // as any
+                      src={typeof auction.images[0] === "string" ? auction.images[0] : (auction.images[0])?.url} // as any
                       alt={auction.title}
                       className="w-full h-full object-cover object-center"
                     />
@@ -371,7 +383,37 @@ const LiveRoom: React.FC = () => {
                   </span>
                 </div>
               </div>
+              {!isEnded && !isWaiting && !isPaused && (
+                <>
+                  {isHighestBidder && (
+                    <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-3.5 flex items-center justify-between shadow-2xs">
+                      <div className="flex items-center gap-2.5">
+                        <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                        <span className="text-xs font-bold text-emerald-800 tracking-wide">
+                          You are currently the highest bidder!
+                        </span>
+                      </div>
+                      <span className="text-[10px] font-extrabold bg-emerald-100 text-emerald-800 px-2.5 py-1 rounded-md uppercase border border-emerald-200">
+                        WINNING
+                      </span>
+                    </div>
+                  )}
 
+                  {isOutbid && (
+                    <div className="bg-rose-50 border border-rose-200 rounded-xl p-3.5 flex items-center justify-between shadow-2xs">
+                      <div className="flex items-center gap-2.5">
+                        <span className="w-2.5 h-2.5 rounded-full bg-rose-500 animate-ping"></span>
+                        <span className="text-xs font-bold text-rose-800 tracking-wide">
+                          You have been outbid! Place a higher bid.
+                        </span>
+                      </div>
+                      <span className="text-[10px] font-extrabold bg-rose-100 text-rose-800 px-2.5 py-1 rounded-md uppercase border border-rose-200">
+                        OUTBID
+                      </span>
+                    </div>
+                  )}
+                </>
+              )}
               <div className="bg-[#FFF9F4] p-5 rounded-2xl border border-[#E6E0DA] text-center space-y-1">
                 <span className="text-xs font-bold uppercase tracking-wider text-[#6B6B6B]">
                   Current Highest Bid
@@ -579,10 +621,10 @@ const LiveRoom: React.FC = () => {
                   You won this item for {formatCurrency(outcome.amount, auction.currency)}.
                 </p>
                 <button
-                  onClick={() => navigate(`/orders/checkout/${id}`)}
+                  onClick={() => navigate('/payment-requests')}
                   className="w-full bg-[#C9653B] hover:bg-[#b0552f] text-white font-bold py-3 rounded-xl"
                 >
-                  Complete Your Order
+                  Go to Next Step
                 </button>
               </>
             )}
