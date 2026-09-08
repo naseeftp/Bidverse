@@ -112,19 +112,33 @@ class AuctionItemMangementService {
 
         }
     }
-    async cancellAuction(data:cancelAuctionItemDTO){
+    async cancellAuction(data: cancelAuctionItemDTO) {
         try {
-            const url=`${BASE_ROUTES.AUCTION_ITEM}${AUCTION_ITEM_ROUTES.CANCEL_AUCTION}`;
-            const response=await axiosInstance.patch<AuctionItemResponseDTO,ApiResponse<AuctionItemResponseDTO>>(url,data)
-            return{
-                success:true,
-                message:response.message,
-                data:response.data,
+            const url = `${BASE_ROUTES.AUCTION_ITEM}${AUCTION_ITEM_ROUTES.CANCEL_AUCTION}`;
+            const response = await axiosInstance.patch<AuctionItemResponseDTO, ApiResponse<AuctionItemResponseDTO>>(url, data)
+            return {
+                success: true,
+                message: response.message,
+                data: response.data,
             }
         } catch (error) {
-          return apiErrorHandler(error,'Failed to cancel Auction')
+            return apiErrorHandler(error, 'Failed to cancel Auction')
         }
     }
 
+    async markAsComplete(auctionId: string) {
+        try {
+            const url = `${BASE_ROUTES.AUCTION_ITEM}${AUCTION_ITEM_ROUTES.MARK_COMPLETE}`;
+            const response = await axiosInstance.patch<AuctionItemResponseDTO, ApiResponse<AuctionItemResponseDTO>>(url, { auctionId: auctionId })
+            return {
+                success: true,
+                message: response.message,
+                data: response.data
+            }
+        } catch (error) {
+            return apiErrorHandler(error, 'Failed to Mark As complete')
+
+        }
+    }
 }
 export default new AuctionItemMangementService()

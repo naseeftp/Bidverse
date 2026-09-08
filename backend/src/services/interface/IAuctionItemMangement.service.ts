@@ -8,5 +8,6 @@ export interface IAuctionItemMangementSevice {
     getAuctionDetails(itemId: string): Promise<AuctionItemDetailDTO | null>
     updateAuctionStatus(data: updateAuctionStatusDTO): Promise<AuctionItemResponseDTO>
     editAuction(userId: string, itemId: string, data: UpdateAuctionDTO): Promise<AuctionItemResponseDTO>
-    cancellAuction(userId:string,data:cancelAuctionItemDTO):Promise<AuctionItemResponseDTO>
+    cancellAuction(userId: string, data: cancelAuctionItemDTO): Promise<AuctionItemResponseDTO>
+    completeAuction(userId: string, itemId: string): Promise<AuctionItemResponseDTO>;
 }

@@ -15,8 +15,9 @@ import {
     FaExclamationTriangle,
     FaHistory,
     FaBan,
-    FaSlidersH
-    
+    FaSlidersH,
+    FaCheckCircle 
+
 } from "react-icons/fa";
 
 const TenantAuctionDetailPage: React.FC = () => {
@@ -28,6 +29,7 @@ const TenantAuctionDetailPage: React.FC = () => {
     const [isZoomed, setIsZoomed] = useState(false);
     const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
     const [timerLabel, setTimerLabel] = useState<'STARTS IN' | 'ENDS IN' | 'CONCLUDED'>('STARTS IN');
+    const [completeLoading, setCompleteLoading] = useState(false);
     const navigate = useNavigate();
 
     const [cancelModalOpen, setCancelModalOpen] = useState(false);
@@ -67,10 +69,10 @@ const TenantAuctionDetailPage: React.FC = () => {
         fetchAuctionDetail();
     }, [fetchAuctionDetail]);
 
+
     useEffect(() => {
         if (!auction) return;
 
-        // Skip timer for rejected or cancelled auctions
         const isCancelled =
             auction.status === 'CANCELLED_BY_ADMIN' ||
             auction.status === 'CANCELLED_BY_HOUSE' ||
@@ -111,6 +113,32 @@ const TenantAuctionDetailPage: React.FC = () => {
 
         return () => clearInterval(interval);
     }, [auction]);
+
+    const handleMarkAsComplete = async () => {
+        if (!auction) return;
+        setCompleteLoading(true);
+        try {
+            const response = await auctionItemMangementService.markAsComplete(auction.auctionItemId);
+            if (response.success && response.data) {
+                const updated = response.data;
+                setAuction(prev =>
+                    prev ? {
+                        ...prev,
+                        status: updated.status,
+                        currentHighestBid: updated.currentHighestBid
+                    }
+                        : prev
+                )
+                toast.success(response.message)
+            } else {
+                toast.error(response.message)
+            }
+        } catch {
+            toast.error('Failed to mark As complete')
+        } finally {
+            setCompleteLoading(false)
+        }
+    }
 
     const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
         const { left, top, width, height } = e.currentTarget.getBoundingClientRect();
@@ -182,7 +210,7 @@ const TenantAuctionDetailPage: React.FC = () => {
 
     const cancellationReason = auction.cancellationReason
     const isLiveHandleAvailable = auction.type == 'LIVE' && auction.status === 'SCHEDULED'
-
+    const canMarkComplete = isScheduled && timerLabel === "CONCLUDED";
     return (
         <div className="min-h-screen bg-[#F5F7FB] px-4 py-8 md:px-8 text-[#0F172A] font-sans antialiased">
 
@@ -304,12 +332,12 @@ const TenantAuctionDetailPage: React.FC = () => {
                                 </span>
 
                                 <span className={`px-2.5 py-1 text-[10px] font-bold tracking-wider uppercase rounded border ${auction.status === "PENDING_APPROVAL"
-                                        ? "bg-amber-50 border-amber-200 text-amber-700"
-                                        : auction.status === "DRAFT"
-                                            ? "bg-slate-100 border-slate-200 text-slate-600"
-                                            : isRejected || isCancelled
-                                                ? "bg-red-50 border-red-200 text-red-600"
-                                                : "bg-emerald-50 border-emerald-200 text-emerald-700"
+                                    ? "bg-amber-50 border-amber-200 text-amber-700"
+                                    : auction.status === "DRAFT"
+                                        ? "bg-slate-100 border-slate-200 text-slate-600"
+                                        : isRejected || isCancelled
+                                            ? "bg-red-50 border-red-200 text-red-600"
+                                            : "bg-emerald-50 border-emerald-200 text-emerald-700"
                                     }`}>
                                     {auction.status?.replace(/_/g, " ")}
                                 </span>
@@ -448,7 +476,7 @@ const TenantAuctionDetailPage: React.FC = () => {
                                 )}
                             </div>
 
-                            {isScheduled && (
+                            {isScheduled &&timerLabel!== "CONCLUDED"&& (
 
                                 <button
                                     onClick={openCancelModal}
@@ -459,10 +487,25 @@ const TenantAuctionDetailPage: React.FC = () => {
 
 
                             )}
+                            {canMarkComplete && (
+                                <button
+                                    onClick={handleMarkAsComplete}
+                                    disabled={completeLoading}
+                                    className="w-full bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold uppercase tracking-wider py-3.5 rounded-xl transition-all flex items-center justify-center gap-2 shadow-md disabled:opacity-50"
+                                >
+                                    {completeLoading ? (
+                                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                                    ) : (
+                                        <>
+                                            <FaCheckCircle size={12} /> Mark As Complete
+                                        </>
+                                    )}
+                                </button>
+                            )}
                             {isLiveHandleAvailable &&
                                 (
                                     <button
-                                     onClick={()=>navigate(`/tenant/live-controll/${auction.auctionItemId}`)}
+                                        onClick={() => navigate(`/tenant/live-controll/${auction.auctionItemId}`)}
                                         className="w-full bg-[#0F172A] hover:bg-black text-white text-xs font-bold uppercase tracking-wider py-3.5 rounded-xl transition-all flex items-center justify-center gap-2 shadow-md"
                                     >
                                         <FaSlidersH size={12} /> Control Room
@@ -553,8 +596,8 @@ const TenantAuctionDetailPage: React.FC = () => {
                                     }}
                                     placeholder="Enter the reason for terminating this auction (minimum 5 characters)..."
                                     className={`w-full text-xs font-medium bg-[#F5F7FB] border rounded-xl p-3 text-[#0F172A] placeholder-[#94A3B8] focus:outline-none focus:ring-1 transition-all ${cancelValidationError
-                                            ? 'border-red-500 focus:ring-red-500'
-                                            : 'border-[#E2E8F0] focus:ring-[#2F6FED]'
+                                        ? 'border-red-500 focus:ring-red-500'
+                                        : 'border-[#E2E8F0] focus:ring-[#2F6FED]'
                                         }`}
                                 />
                                 {cancelValidationError && (

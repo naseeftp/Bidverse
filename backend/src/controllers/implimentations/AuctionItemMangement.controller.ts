@@ -100,10 +100,20 @@ export class AuctionItemMangementController implements IAuctionItemMangementCont
     }
     async cancellAuction(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
-            const userId=req.user.id;
-            const {auctionId,cancelledRole,cencelingReason}=req.body;
-            const result=await this._auctionItemService.cancellAuction(userId,{auctionId,cancelledRole,cencelingReason});
-            SuccessResponse(res,MESSAGES.AUCTION_CANCELLED,result,HttpStatus.OK)
+            const userId = req.user.id;
+            const { auctionId, cancelledRole, cencelingReason } = req.body;
+            const result = await this._auctionItemService.cancellAuction(userId, { auctionId, cancelledRole, cencelingReason });
+            SuccessResponse(res, MESSAGES.AUCTION_CANCELLED, result, HttpStatus.OK)
+        } catch (error) {
+            next(error)
+        }
+    }
+    async completeAuction(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const userId = req.user.id;
+            const { auctionId } = req.body;
+            const result = await this._auctionItemService.completeAuction(userId, auctionId)
+            SuccessResponse(res, MESSAGES.AUCTION_MARKED_COMPLETED, result, HttpStatus.OK)
         } catch (error) {
             next(error)
         }

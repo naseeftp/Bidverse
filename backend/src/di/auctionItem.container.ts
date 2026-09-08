@@ -13,6 +13,8 @@ import { NotificationService } from "../services/implementations/Notification.se
 import { NotificationRepository } from "../repositories/implementations/NotificationRepository";
 import { UserRepository } from "../repositories/implementations/User.repository";
 import { LiveAuctionSateRepository } from "../repositories/implementations/LiveAuctionState.repository";
+import { PaymentRequestRepository } from "../repositories/implementations/PaymentRequest.repository";
+import { PaymentRequestService } from "../services/implementations/PaymentRequest.service";
 
 const auctionHouseRepo = new AuctionHouseRepository();
 const auctionItemRepo = new AuctionItemRepository();
@@ -25,8 +27,10 @@ const transactionService = new TransactionService(transactionRepo);
 const paymentService = new PaymentService(paymentRepo, slotRepo, auctionItemRepo, transactionService, razorpay)
 const notificationRepo = new NotificationRepository();
 const notificationService = new NotificationService(notificationRepo)
-const userRepo=new UserRepository()
-const liveAuctionItemRepo=new LiveAuctionSateRepository()
-const auctioItemMangementService = new AuctionItemMangementSevice(auctionItemRepo, auctionHouseRepo, paymentService, aucionItemServiceLogger,notificationService,userRepo,liveAuctionItemRepo)
+const userRepo = new UserRepository()
+const liveAuctionItemRepo = new LiveAuctionSateRepository()
+const paymentRequestRepo = new PaymentRequestRepository();
+const paymentRequestService = new PaymentRequestService(paymentRequestRepo, auctionItemRepo)
+const auctioItemMangementService = new AuctionItemMangementSevice(auctionItemRepo, auctionHouseRepo, paymentService, aucionItemServiceLogger, notificationService, userRepo, liveAuctionItemRepo, paymentRequestService)
 const auctionItemControllerLogger = new LoggerService('auctionItemMangemenController')
 export const auctionItemMangementController = new AuctionItemMangementController(auctionItemControllerLogger, auctioItemMangementService)

@@ -29,7 +29,7 @@ export class PaymentRequestService implements IPaymentRequestService {
         if (existingRequest) {
             return PaymentRequestMapper.toPaymentRequestResponseDTO(existingRequest, {
                 title: auction.title,
-                image: auction.title
+                image: auction.images?.[0]?.url
             })
         }
         const expiresAt = new Date(

@@ -73,9 +73,8 @@ export const AUCTION_ITEM_ROUTES = {
     GET_AUCTION: '/get-auction',
     UPDATE_STATUS: '/update-status',
     UPDATE_AUCTION: '/update-auction',
-    CANCEL_AUCTION: '/cancel-auction'
-
-
+    CANCEL_AUCTION: '/cancel-auction',
+    MARK_COMPLETE: '/mark-complete'
 }
 export const WATCH_LIST_ROUTES = {
     ADD_TO_WATCH_LIST: '/add',

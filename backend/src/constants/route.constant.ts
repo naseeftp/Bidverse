@@ -79,7 +79,8 @@ export const AUCTION_ITEM_ROUTES = {
     GET_AUCTION: '/get-auction/:id',
     UPDATE_STATUS: '/update-status',
     UPDATE_AUCTION: '/update-auction/:id',
-    CANCEL_AUCTION: '/cancel-auction'
+    CANCEL_AUCTION: '/cancel-auction',
+    MARK_COMPLETE: '/mark-complete'
 }
 
 export const WATCH_LIST_ROUTES = {

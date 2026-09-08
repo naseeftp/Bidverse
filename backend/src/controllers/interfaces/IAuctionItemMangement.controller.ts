@@ -8,5 +8,6 @@ export interface IAuctionItemMangementController {
     updateAuctionStatus(req: Request, res: Response, next: NextFunction): Promise<void>
     editAuction(req: Request, res: Response, next: NextFunction): Promise<void>
     cancellAuction(req: Request, res: Response, next: NextFunction): Promise<void>
+    completeAuction(req: Request, res: Response, next: NextFunction): Promise<void>
 
 }

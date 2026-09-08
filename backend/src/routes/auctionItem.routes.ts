@@ -30,7 +30,7 @@ router.get(
 )
 router.get(
     AUCTION_ITEM_ROUTES.GET_AUCTION,
-    allowedTo(Role.ADMIN, Role.TENANT,Role.USER),
+    allowedTo(Role.ADMIN, Role.TENANT, Role.USER),
     (req, res, next) => auctionItemMangementController.getAuctionDetails(req, res, next)
 )
 router.patch(
@@ -47,7 +47,12 @@ router.patch(
 )
 router.patch(
     AUCTION_ITEM_ROUTES.CANCEL_AUCTION,
-    allowedTo(Role.TENANT,Role.ADMIN),
-    (req,res,next)=>auctionItemMangementController.cancellAuction(req,res,next)
+    allowedTo(Role.TENANT, Role.ADMIN),
+    (req, res, next) => auctionItemMangementController.cancellAuction(req, res, next)
+)
+router.patch(
+    AUCTION_ITEM_ROUTES.MARK_COMPLETE,
+    allowedTo(Role.TENANT),
+    (req, res, next) => auctionItemMangementController.completeAuction(req, res, next)
 )
 export default router

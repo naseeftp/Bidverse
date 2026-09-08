@@ -15,6 +15,7 @@ import { INotificationService } from "../interface/INotification.service";
 import { IUserRepository } from "../../repositories/interfaces/iUser.repository";
 import { NotificationEvent, NotificationType } from "../../constants/notification.constant";
 import { ILiveAuctionStateRepository } from "../../repositories/interfaces/ILiveAuctionStateRepository";
+import { IPaymentRequestService } from "../interface/IPaymentRequest.service";
 
 export class AuctionItemMangementSevice implements IAuctionItemMangementSevice {
     constructor(
@@ -24,7 +25,8 @@ export class AuctionItemMangementSevice implements IAuctionItemMangementSevice {
         private _logger: ILoggerService,
         private _notificationService: INotificationService,
         private _userRepo: IUserRepository,
-        private _liveAuction: ILiveAuctionStateRepository
+        private _liveAuction: ILiveAuctionStateRepository,
+        private _paymentRequestService: IPaymentRequestService
 
     ) { }
 
@@ -221,5 +223,41 @@ export class AuctionItemMangementSevice implements IAuctionItemMangementSevice {
         const cancelledAuction = await auctionExist.save();
         await this._paymentService.refundForCancelAuction(auctionExist._id.toString())
         return AuctionItemMapper.toResponseDTO(cancelledAuction)
+    }
+    async completeAuction(userId: string, itemId: string): Promise<AuctionItemResponseDTO> {
+        const houseExist = await this._auctionHouseRepo.findOne({ userId: userId })
+        if (!houseExist) {
+            throw new NotFoundError(MESSAGES.AUCTION_HOUSE_NOT_FOUND)
+        }
+        const existingAuction = await this._auctionItemRepo.findById(itemId);
+        if (!existingAuction) {
+            throw new NotFoundError(MESSAGES.AUCTION_NOT_FOUND);
+        }
+        if (existingAuction.houseId.toString() !== houseExist._id.toString()) {
+            throw new ForbiddenError(MESSAGES.NOT_PERMITTED)
+        }
+        if (existingAuction.status !== AuctionItemStatus.SCHEDULED) {
+            throw new BadRequestError('Only ongoing Action Can Mark As complete')
+        }
+        if (existingAuction.endTime && existingAuction.endTime.getTime() > Date.now()) {
+            throw new BadRequestError('Auction timer has not ended yet');
+
+        }
+        const hasWinner = existingAuction.bidCount > 0 &&
+            existingAuction.reserveMet &&
+            !!existingAuction.currentHighestBidder;
+
+        const updateData = hasWinner
+            ? { status: AuctionItemStatus.SOLD, winningBidder: existingAuction.currentHighestBidder }
+            : { status: AuctionItemStatus.PASSED, winningBidder: null }
+        const completeAuction = await this._auctionItemRepo.markAuctionCompleted(itemId, updateData)
+        if (!completeAuction) {
+            throw new BadRequestError('Auction Has Already been completed')
+        }
+        if (hasWinner) {
+            await this._paymentRequestService.createPaymentRequest(itemId)
+        }
+        // handle notification logic here
+        return AuctionItemMapper.toResponseDTO(completeAuction)
     }
 }

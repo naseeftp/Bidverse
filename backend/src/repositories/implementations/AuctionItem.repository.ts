@@ -4,6 +4,7 @@ import { BaseRepository } from "./Base.repository";
 import { AuctionItem } from '../../models/auctionItem.model'
 import { AuctionItemDetailDTO, AuctionItemListDTO } from "../../dtos/auctionHouse.dto/auctionItem.dto";
 import mongoose, { PipelineStage, Types } from "mongoose";
+import { AuctionItemStatus } from "../../constants/constants";
 
 export class AuctionItemRepository extends BaseRepository<IAuctionItemDocument> implements IAuctionItemRepository {
     constructor() {
@@ -202,29 +203,41 @@ export class AuctionItemRepository extends BaseRepository<IAuctionItemDocument> 
         userId: string,
         auctionItemId: string,
         amount: number,
-        reservePrice:number,
+        reservePrice: number,
     ): Promise<IAuctionItemDocument | null> {
-        const reserveMet=amount>=(reservePrice||0)
+        const reserveMet = amount >= (reservePrice || 0)
         const updatedDoc = await this.model.findOneAndUpdate(
             {
                 _id: new Types.ObjectId(auctionItemId),
                 currentHighestBid: { $lt: amount }
             },
-            
-                {
-                    $set: {
-                        currentHighestBid: amount,
-                        currentHighestBidder: new Types.ObjectId(userId),
-                        reserveMet:reserveMet,
-                        
-                    },
-                    $inc:{bidCount:1}
+
+            {
+                $set: {
+                    currentHighestBid: amount,
+                    currentHighestBidder: new Types.ObjectId(userId),
+                    reserveMet: reserveMet,
+
                 },
-            
+                $inc: { bidCount: 1 }
+            },
+
             { new: true }
         );
 
         return updatedDoc;
+    }
+    async markAuctionCompleted(auctionItemId: string, updateData: { status: AuctionItemStatus, winningBidder?: Types.ObjectId | null; }): Promise<IAuctionItemDocument | null> {
+        return await this.model.findOneAndUpdate(
+            {
+                _id: new Types.ObjectId(auctionItemId),
+                status: AuctionItemStatus.SCHEDULED,
+            },
+            {
+                $set: updateData
+            },
+            { new: true }
+        )
     }
 
 }
