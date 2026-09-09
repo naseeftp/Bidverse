@@ -35,10 +35,10 @@ const CheckoutPage: React.FC = () => {
           setSelectedAddressId(defaultAddress.id);
         }
       } else {
-        toast.error(response.message || "Failed to load checkout details");
+        toast.error(response.message);
       }
-    } catch (error: any) {
-      toast.error(error?.response?.data?.message || "Failed to fetch Checkout details");
+    } catch{
+      toast.error("Failed to fetch Checkout details");
     } finally {
       setLoading(false);
     }
@@ -49,7 +49,7 @@ const CheckoutPage: React.FC = () => {
   }, [fetchCheckoutDetails]);
 
   const handleAddNewAddress = () => {
-    navigate("/profile/addresses", { state: { returnTo: `/checkout/${id}` } });
+    navigate("/addresses", { state: { returnTo: `/check-out/${id}` } });
   };
 
   const handleProceedToPayment = async () => {

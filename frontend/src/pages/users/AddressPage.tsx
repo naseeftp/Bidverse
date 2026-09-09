@@ -6,6 +6,7 @@ import { X } from "lucide-react";
 import { addressFormSchema } from "../../types/address.dto";
 import type { addAddressDTO, AddressResponseDTO } from "../../types/address.dto";
 import toast from "react-hot-toast";
+import { useNavigate, useLocation } from "react-router-dom";
 
 const AddressPage: React.FC = () => {
     const [isModalOpen, setIsModalOpen] = useState(false)
@@ -14,6 +15,9 @@ const AddressPage: React.FC = () => {
     const [addressToDelete, setAddressToDelete] = useState<string | null>(null)
     const [isEditing, setIsEditing] = useState(false)
     const [currentAddressId, setCurrentAddressId] = useState<string | null>(null)
+    const navigate = useNavigate();
+    const location = useLocation();
+    const returnTo = (location.state as { returnTo?: string })?.returnTo;
     const { register, handleSubmit, formState: { errors }, reset } = useForm({
         resolver: yupResolver(addressFormSchema),
         defaultValues: {
@@ -69,7 +73,12 @@ const AddressPage: React.FC = () => {
             if (result.success) {
                 toast.success(result.message)
                 closeModal()
-                await getAddress()
+                if (returnTo) {
+                    navigate(returnTo, { replace: true });
+                } else {
+                    await getAddress()
+                }
+
             } else {
                 toast.error(result.message)
             }
