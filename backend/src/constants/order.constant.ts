@@ -1,0 +1,10 @@
+export enum OrderStatus {
+    PENDING = "PENDING",
+    PROCESSING = "PROCESSING",
+    SHIPPED = "SHIPPED",
+    OUT_FOR_DELIVERY = "OUT_FOR_DELIVERY",
+    DELIVERED = "DELIVERED",
+    COMPLETED = "COMPLETED",
+    CANCELLED = "CANCELLED",
+    REFUNDED = "REFUNDED",
+}   // re work on return logic

@@ -16,7 +16,8 @@ export const BASE_ROUTES = {
     TRANSACTION: '/transaction',
     NOTIFICATION: '/notification',
     LIVE: '/LIVE',
-    PAYMENT_REQUEST: '/payment-request'
+    PAYMENT_REQUEST: '/payment-request',
+    CHECKOUT: '/checkout'
 } as const
 
 export const AUTH_ROUTES = {
@@ -134,6 +135,9 @@ export const LIVE_ROUTES = {
 
 export const PAYMENT_REQUEST_ROUTES = {
     LIST_REQUEST: '/list-payment-requests'
+}
+export const CHECKOUT_ROUTES = {
+    GET_CHECKOUT: '/get-checkout/:id'
 }
 
 

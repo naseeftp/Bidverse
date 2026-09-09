@@ -61,4 +61,10 @@ export class AddressRepository extends BaseRepository<IAddressDocument> implemen
 
       }).exec()
    }
+   async findActiveByUserId(userId: string): Promise<IAddressDocument[]> {
+      return Address.find({ userId, isActive: true })
+         .sort({ isDefault: -1, createdAt: -1 })
+         .exec();
+   }
+
 }

@@ -177,6 +177,7 @@ export const MESSAGES = {
     ALLREADY_BOOKED: 'You are allready own a slot for this auction',
     PAYMENT_SUCCESS: 'Payment Success',
     PAYMENT_NOT_FOUND: 'Payment not Found',
+    PAYMENT_REQUEST_NOT_FOUND: 'Payment Request Not Found',
 
     NOTIFICATION_NOT_FOUND: 'Notification Notfound',
     LIVE_STATE_NOT_FOUND: 'Live Not found',

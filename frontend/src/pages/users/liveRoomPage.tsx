@@ -532,7 +532,6 @@ const LiveRoom: React.FC = () => {
                 </div>
               )}
 
-              {/* Countdown Timer Display */}
               <div className="bg-[#FFF9F4] rounded-2xl border border-[#E6E0DA] p-6 text-center space-y-1">
                 {isEnded ? (
                   <div className="py-2">
@@ -563,7 +562,6 @@ const LiveRoom: React.FC = () => {
               </div>
             </div>
 
-            {/* Live Stream Activity Log */}
             <div className="bg-white rounded-2xl border border-[#E6E0DA] p-6 shadow-sm space-y-3">
               <div className="flex items-center justify-between pb-2 border-b border-[#E6E0DA]">
                 <h3 className="text-xs font-bold text-[#1F1F1F] uppercase tracking-wider flex items-center gap-2">

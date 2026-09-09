@@ -36,6 +36,7 @@ import MyTransactions from "./pages/users/myTransactions";
 import UserNotificationPage from "./pages/users/notificationPage";
 import LiveRoom from "./pages/users/liveRoomPage";
 import PaymentRequestPage from './pages/users/paymentRequestPage'
+import CheckoutPage from "./pages/users/checkoutPage";
 
 import TenantRegisterPage from "./pages/tenant/RegiterPage";
 import TenantVerifyOtpPage from "./pages/tenant/VerifyotpPage";
@@ -120,6 +121,7 @@ function App() {
                   <Route path="/my-slots" element={<MySlotsPage />} />
                   <Route path="/my-transactions" element={<MyTransactions />} />
                   <Route path="/payment-requests" element={<PaymentRequestPage />} />
+                  <Route path="/check-out/:id" element={<CheckoutPage />} />
 
                </Route>
             </Route>

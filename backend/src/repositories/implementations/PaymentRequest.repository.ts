@@ -5,7 +5,7 @@ import { IPaymentRequestAggregateDoc, IPaymentRequestDocument } from "../../type
 import { CreatePaymentRequestDTO } from "../../dtos/user.dto/paymentRequest.dto";
 import { Types } from "mongoose";
 import { PaymentRequestStatus } from "../../types/paymentRequest.types";
-
+import { IPopulatedPaymentRequest, IPopulatedAuctionItem } from "../../types/paymentRequest.types";
 
 
 export class PaymentRequestRepository extends BaseRepository<IPaymentRequestDocument> implements IPaymentRequestRepository {
@@ -93,5 +93,16 @@ export class PaymentRequestRepository extends BaseRepository<IPaymentRequestDocu
       .lean<IPaymentRequestDocument>()
       .exec();
   }
+
+  async findWithAuctionDetails(paymentRequestId: string): Promise<IPopulatedPaymentRequest | null> {
+    const document = await this.model.findById(paymentRequestId)
+      .populate<{ auctionId: IPopulatedAuctionItem }>({
+        path: 'auctionId',
+        select: "title description images currency startingPrice shippingCost",
+      })
+      .exec()
+    return document as IPopulatedPaymentRequest | null
+  }
+
 
 }

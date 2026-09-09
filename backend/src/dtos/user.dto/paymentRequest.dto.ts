@@ -1,5 +1,6 @@
 import { PaymentRequestStatus } from "../../types/paymentRequest.types";
 
+
 export interface CreatePaymentRequestDTO {
   tenantId: string;
   auctionId: string;
@@ -21,3 +22,4 @@ export interface PaymentRequestResponseDTO {
   orderId?: string;
   createdAt: string;
 }
+

@@ -7,4 +7,5 @@ export interface IAddressRepository extends IBaseRepository<IAddressDocument> {
     unsetDefaults(userId: string | Types.ObjectId): Promise<void>
     findAllUserAddress(userId: string | Types.ObjectId, page: number, limit: number): Promise<{ docs: IAddressDocument[], total: number }>
     findDuplicate(userId: string | Types.ObjectId, fullAddress: string, city: string, pincode: string): Promise<IAddressDocument | null>
+    findActiveByUserId(userId: string): Promise<IAddressDocument[]>;
 }

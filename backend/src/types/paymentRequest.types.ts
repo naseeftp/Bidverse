@@ -30,3 +30,17 @@ export interface IPaymentRequestAggregateDoc extends IPaymentRequestDocument {
     images?: string[];
   };
 }
+
+export interface IPopulatedAuctionItem {
+  _id: Types.ObjectId;
+  title: string;
+  description?: string;
+  images?: Array<string | { url: string }>;
+  currency?: string;
+  startingPrice?: number;
+  shippingCost?: number;
+}
+
+export type IPopulatedPaymentRequest = Omit<IPaymentRequestDocument, "auctionItemId"> & {
+  auctionId: IPopulatedAuctionItem;
+};

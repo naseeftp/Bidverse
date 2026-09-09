@@ -6,12 +6,10 @@ import { X } from "lucide-react";
 import { addressFormSchema } from "../../types/address.dto";
 import type { addAddressDTO, AddressResponseDTO } from "../../types/address.dto";
 import toast from "react-hot-toast";
-// import type { IPaginationMeta } from "../../types/auth.type";
 
 const AddressPage: React.FC = () => {
     const [isModalOpen, setIsModalOpen] = useState(false)
     const [addresses, setAddress] = useState<AddressResponseDTO[]>([])
-    // const [pagination, setPageination] = useState<IPaginationMeta | null>(null)
     const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
     const [addressToDelete, setAddressToDelete] = useState<string | null>(null)
     const [isEditing, setIsEditing] = useState(false)
@@ -27,7 +25,6 @@ const AddressPage: React.FC = () => {
             const response = await addressService.getUserAddressed(1, 5)
             if (response.success) {
                 setAddress(response.data ?? [])
-                // setPageination(response.pagination ?? null)
             }
             else {
                 toast.error(response.message)

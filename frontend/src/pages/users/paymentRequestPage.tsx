@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import type { PaymentRequestResponseDTO } from "../../types/paymentRequest.dto";
 import type { IPaginationMeta } from "../../types/auth.type";
 import toast from "react-hot-toast";
@@ -19,7 +20,7 @@ const MyPaymentRequest: React.FC = () => {
     const [loading, setLoading] = useState<boolean>(false);
     const [page, setPage] = useState<number>(1);
     const [statusFilter, setStatusFilter] = useState<string>("all");
-
+    const navigate=useNavigate()
     const fetchRequests = useCallback(async () => {
         setLoading(true);
         try {
@@ -95,10 +96,7 @@ const MyPaymentRequest: React.FC = () => {
         }
     };
 
-    const handlePayNow = (requestId: string) => {
-        toast.success(`Redirecting to payment for request #${requestId.substring(0, 6)}...`);
-    };
-
+  
     return (
         <div className="min-h-screen bg-[#FFF9F4] px-4 py-8 md:px-8 text-[#1F1F1F] font-sans antialiased">
             <div className="max-w-6xl mx-auto space-y-6">
@@ -214,10 +212,10 @@ const MyPaymentRequest: React.FC = () => {
                                                     <td className="py-4 px-4 text-center">
                                                         {isPending ? (
                                                             <button
-                                                                onClick={() => handlePayNow(req.id)}
+                                                                onClick={()=>navigate(`/check-out/${req.id}`)}
                                                                 className="px-3 py-1.5 bg-[#1F1F1F] hover:bg-[#C9653B] text-white text-[10px] font-bold uppercase tracking-wider rounded transition-colors shadow-sm"
                                                             >
-                                                                Pay Now
+                                                                Complete Payment
                                                             </button>
                                                         ) : (
                                                             <span className="text-[10px] font-bold text-[#6B6B6B] uppercase">
