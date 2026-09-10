@@ -34,6 +34,10 @@ const OrderSchema = new Schema<IOrderDocument>({
         ref: 'PaymentRequest',
         required: true
     },
+    paymentId: {
+        type: Types.ObjectId,
+        ref: 'Payment'
+    },
     tenantId:
     {
         type: Types.ObjectId,

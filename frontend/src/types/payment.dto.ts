@@ -3,3 +3,11 @@ export interface verifyPaymentDTO {
     razorpayPaymentId: string;
     razorpaySignature: string;
 }
+
+export interface OrderPaymentResponseDTO {
+    paymentId: string;
+    orderId: string;
+    amount: number;
+    currency: string;
+    keyId:string
+}

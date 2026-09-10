@@ -3,14 +3,17 @@ import { useParams, useNavigate } from "react-router-dom";
 import type { CheckoutDetailsResponseDTO } from "../../types/chekout.dto";
 import checkoutService from "../../services/checkout.service";
 import toast from "react-hot-toast";
-import { 
-  HiOutlineMapPin as MapPinIcon, 
-  HiOutlinePlus as PlusIcon, 
-  HiOutlineCheckCircle as CheckCircleIcon, 
-  HiOutlineClock as ClockIcon, 
+import {
+  HiOutlineMapPin as MapPinIcon,
+  HiOutlinePlus as PlusIcon,
+  HiOutlineCheckCircle as CheckCircleIcon,
+  HiOutlineClock as ClockIcon,
   HiOutlineShieldCheck as ShieldCheckIcon,
   HiOutlineArrowPath as ArrowPathIcon
 } from "react-icons/hi2";
+import orderService from "../../services/order.service";
+import { openRazorpayCheckout } from "../../utils/razorpay";
+import paymentService from "../../services/payment.service";
 
 const CheckoutPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -28,7 +31,7 @@ const CheckoutPage: React.FC = () => {
       const response = await checkoutService.getCheckoutDetails(id);
       if (response.success && response.data) {
         setDetails(response.data);
-        
+
         const addresses = response.data.addresses || [];
         const defaultAddress = addresses.find((addr) => addr.isDefault) || addresses[0];
         if (defaultAddress) {
@@ -37,7 +40,7 @@ const CheckoutPage: React.FC = () => {
       } else {
         toast.error(response.message);
       }
-    } catch{
+    } catch {
       toast.error("Failed to fetch Checkout details");
     } finally {
       setLoading(false);
@@ -58,20 +61,48 @@ const CheckoutPage: React.FC = () => {
       return;
     }
 
-    if (!details) return;
+    if (!details || !id) return;
 
     setIsSubmitting(true);
     try {
-      // Call your order/payment processing service here
-      // const orderResponse = await orderService.createOrder({
-      //   paymentRequestId: details.paymentRequest.id,
-      //   addressId: selectedAddressId,
-      // });
-      
-      toast.success("Redirecting to payment gateway...");
-      // Handle Gateway logic (Razorpay/Stripe)
-    } catch (error: any) {
-      toast.error(error?.response?.data?.message || "Payment initialization failed");
+      const response = await orderService.placeOrder({
+        paymentRequestId: id,
+        addressId: selectedAddressId
+      })
+        if (!response.success || !response.data) {
+            toast.error(response.message || "Failed to initiate payment");
+            setIsSubmitting(false);
+            return;
+        }
+        openRazorpayCheckout(
+            {
+                orderId: response.data.orderId,
+                amount: response.data.amount,
+                currency: response.data.currency,
+                keyId: response.data.keyId
+            },
+            async (paymentResponse) => {
+                try {
+                    await paymentService.verifyPayment({
+                        razorpayOrderId: paymentResponse.razorpay_order_id,
+                        razorpayPaymentId: paymentResponse.razorpay_payment_id,
+                        razorpaySignature: paymentResponse.razorpay_signature,
+                    });
+                    toast.success("Payment successful! Order placed.");
+                    navigate("/my-orders"); 
+                } catch {
+                    toast.error("Payment verification failed.");
+                } finally {
+                    setIsSubmitting(false);
+                }
+            },
+            () => {
+                setIsSubmitting(false);
+            }
+        );
+
+    } catch {
+      toast.error("Payment initialization failed");
     } finally {
       setIsSubmitting(false);
     }
@@ -203,11 +234,10 @@ const CheckoutPage: React.FC = () => {
                     return (
                       <label
                         key={address.id}
-                        className={`block relative rounded-xl border p-4 cursor-pointer transition-all ${
-                          isSelected
+                        className={`block relative rounded-xl border p-4 cursor-pointer transition-all ${isSelected
                             ? "border-[#C9653B] bg-[#FFF9F4]/40 ring-1 ring-[#C9653B]"
                             : "border-[#E6E0DA] bg-white hover:border-gray-300"
-                        }`}
+                          }`}
                       >
                         <div className="flex items-start gap-3">
                           <input
@@ -290,11 +320,10 @@ const CheckoutPage: React.FC = () => {
                 onClick={handleProceedToPayment}
                 disabled={!selectedAddressId || isSubmitting}
                 type="button"
-                className={`w-full mt-6 py-3 px-4 rounded-xl font-bold text-white text-sm shadow-md transition-all flex items-center justify-center gap-2 ${
-                  !selectedAddressId || isSubmitting
+                className={`w-full mt-6 py-3 px-4 rounded-xl font-bold text-white text-sm shadow-md transition-all flex items-center justify-center gap-2 ${!selectedAddressId || isSubmitting
                     ? "bg-gray-300 cursor-not-allowed shadow-none"
                     : "bg-[#C9653B] hover:bg-[#b0542e] active:scale-[0.99]"
-                }`}
+                  }`}
               >
                 {isSubmitting ? (
                   <div className="flex items-center gap-2">

@@ -5,7 +5,7 @@ export enum TransactionDirection {
 
 export enum TransactionPurpose {
     SLOT_BOOKING = "slot_booking",
-    AUCTION_PAYMENT = "auction_payment",
+    ORDER_PAYMENT = "order_payment",
     PLATFORM_COMMISSION = "platform_commission",
     REFUND = "refund",
     PAYOUT = "payout",

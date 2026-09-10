@@ -1,9 +1,10 @@
-import { createSlotPaymentDTO,slotPaymentResponseDTO, verifyPaymentDTO } from "../../dtos/user.dto/payment.dto"
+import { CreateOrderPaymentIntentDTO, createSlotPaymentDTO, OrderPaymentResponseDTO, slotPaymentResponseDTO, verifyPaymentDTO } from "../../dtos/user.dto/payment.dto"
 
 
-export interface IPaymentService{
-    createSlotPayment(data:createSlotPaymentDTO):Promise<slotPaymentResponseDTO>
-    verifyPayment(data:verifyPaymentDTO):Promise<void>
-    refundSlotPayment(slotId:string):Promise<void>;
-    refundForCancelAuction(auctionId:string):Promise<void>
+export interface IPaymentService {
+    createSlotPayment(data: createSlotPaymentDTO): Promise<slotPaymentResponseDTO>
+    verifyPayment(data: verifyPaymentDTO): Promise<void>
+    refundSlotPayment(slotId: string): Promise<void>;
+    refundForCancelAuction(auctionId: string): Promise<void>
+    createOrderPayment(data: CreateOrderPaymentIntentDTO): Promise<OrderPaymentResponseDTO>
 }

@@ -1,5 +1,12 @@
-import { Types,Document} from "mongoose";
-import { PaymentType, PaymentStatus,EscrowStatus} from "../constants/payment.constants";
+import { Types, Document } from "mongoose";
+import { PaymentType, PaymentStatus, EscrowStatus } from "../constants/payment.constants";
+
+export interface IOrderPaymentMetadata {
+    paymentRequestId: string;
+    addressId: string;
+    tenantId: string;
+}
+
 export interface IPayment {
     userId: Types.ObjectId;
     auctionItemId?: Types.ObjectId;
@@ -9,7 +16,7 @@ export interface IPayment {
     amount: number;
     currency: string;
     status: PaymentStatus;
-    escrowStatus?:EscrowStatus
+    escrowStatus?: EscrowStatus
     razorpayOrderId: string;
     razorpayPaymentId?: string;
     razorpaySignature?: string;
@@ -17,7 +24,8 @@ export interface IPayment {
     refundedAt?: Date;
     platformCommission?: number;
     netAmount?: number;
-    platformCommision?:number;
+    platformCommision?: number;
     releasedAt?: Date;
+    metadata?: IOrderPaymentMetadata;
 }
-export type IPaymentDocument= IPayment&Document;
+export type IPaymentDocument = IPayment & Document;

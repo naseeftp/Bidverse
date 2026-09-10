@@ -39,10 +39,10 @@ const PaymentSchema = new Schema<IPaymentDocument>({
         enum: PaymentStatusValues,
         required: true
     },
-    escrowStatus:{
-    type:String,
-    enum:EscrowStatusValues,
-    required:true
+    escrowStatus: {
+        type: String,
+        enum: EscrowStatusValues,
+        required: true
     },
     razorpayOrderId: {
         type: String,
@@ -71,13 +71,16 @@ const PaymentSchema = new Schema<IPaymentDocument>({
     netAmount: {
         type: Number,
     },
-    platformCommision:{
-        type:Number
+    platformCommision: {
+        type: Number
     },
     releasedAt: {
         type: Date
+    },
+    metadata: {
+        type: Schema.Types.Mixed,
+        default: {}
     }
-
 })
 
 export const Payment = mongoose.model<IPaymentDocument>('Payment', PaymentSchema)

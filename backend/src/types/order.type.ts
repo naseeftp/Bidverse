@@ -31,7 +31,8 @@ export interface IOrder {
     status: OrderStatus;
     shippedAt?: Date;
     deliveredAt?: Date;
-
+    createdAt:Date,
+    updatedAt:Date,
 }
 
 export type IOrderDocument = IOrder & Document

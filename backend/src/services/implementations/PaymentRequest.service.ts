@@ -35,16 +35,16 @@ export class PaymentRequestService implements IPaymentRequestService {
         const expiresAt = new Date(
             Date.now() + DEFAULT_EXPIRATION_HOURS * 60 * 60 * 1000
         )
+        const amount=auction.currentHighestBid;
         const paymentRequest = await this._paymentRequestRepo.createPaymentRequest({
             tenantId: auction.houseId.toString(),
             auctionId: auction._id.toString(),
             bidderId: auction.winningBidder.toString(),
-            amount: auction.currentHighestBid,
+            amount: amount,
             currency: 'INR',
             expiresAt,
         })
-        // handle notification logic here
-        // if auction have payment indication status handle it here
+    
         return PaymentRequestMapper.toPaymentRequestResponseDTO(paymentRequest, {
             title: auction.title,
             image: auction.images?.[0].url

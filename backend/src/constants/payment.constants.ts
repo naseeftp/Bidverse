@@ -1,13 +1,13 @@
 
 export enum PaymentType {
     SLOT_BOOKING = "slot_booking",
-    AUCTION_PAYMENT = "auction_payment"
+    ORDER = "order"
 }
 
 export const PaymentTypeValues = Object.values(PaymentType);
 
 export enum PaymentStatus {
-   PENDING = "pending",
+    PENDING = "pending",
     PAID = "paid",
     FAILED = "failed",
     REFUNDED = "refunded"
@@ -21,4 +21,4 @@ export enum EscrowStatus {
     REFUND_PENDING = "refund_pending",
     REFUNDED = "refunded"
 }
-export const EscrowStatusValues=Object.values(EscrowStatus)
+export const EscrowStatusValues = Object.values(EscrowStatus)

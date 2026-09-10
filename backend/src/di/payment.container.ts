@@ -6,12 +6,18 @@ import { SlotRepository } from "../repositories/implementations/Slot.repository"
 import { AuctionItemRepository } from "../repositories/implementations/AuctionItem.repository";
 import { TransactionService } from "../services/implementations/Transaction.service";
 import { TransactionRepository } from "../repositories/implementations/Transaction.respository";
+import { OrderRepository } from "../repositories/implementations/Order.repository";
+import { AddressRepository } from "../repositories/implementations/Address.repository";
+import { PaymentRequestRepository } from "../repositories/implementations/PaymentRequest.repository";
 
 const paymentRepo = new PaymentRepository();
 const slotrepo = new SlotRepository()
 const auctionItemRepo = new AuctionItemRepository()
 const transactionRepo = new TransactionRepository()
 const transactionService = new TransactionService(transactionRepo)
-const paymentService = new PaymentService(paymentRepo, slotrepo, auctionItemRepo, transactionService, razorpay)
+const orderRepo = new OrderRepository();
+const addressRepo = new AddressRepository()
+const paymentRequestRepo=new PaymentRequestRepository()
+const paymentService = new PaymentService(paymentRepo, slotrepo, auctionItemRepo, transactionService, razorpay, orderRepo, addressRepo,paymentRequestRepo)
 export const paymentController = new PaymentController(paymentService)
 
