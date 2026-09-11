@@ -43,6 +43,17 @@ export interface IOrderAggregateDOC extends IOrderDocument {
         images?: string[];
     };
 }
+export interface IOrderTenantAggregateDOC extends IOrderDocument{
+    auction?: {
+        _id: string;
+        title: string;
+        images?: string[];
+    };
+    buyer?:{
+        _id:string;
+        buyerName:string,
+    }
+}
 
 export interface IOrderDetailsAggregateDoc {
     _id: Types.ObjectId;

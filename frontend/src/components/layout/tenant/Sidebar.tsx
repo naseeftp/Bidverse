@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { LayoutDashboard, Gavel, Settings, LogOut } from "lucide-react";
+import { LayoutDashboard, Gavel, Settings, LogOut ,ShoppingBag} from "lucide-react";
 import { useAppDispatch } from "../../../hooks/redux.hooks";
 import { logout } from "../../../redux/user/auth.slice";
 import { VerificationStatus } from "../../../types/auctionHouse.type";
@@ -38,6 +38,7 @@ const Sidebar: React.FC = () => {
 
   const verifiedItems = [
     { name: "My Auctions", path: "/tenant/auctions", icon: <Gavel size={18} /> },
+    { name: "My Orders", path: "/tenant/my-orders", icon: <ShoppingBag size={18} /> },
     { name: "Profile Settings", path: "/tenant/profile", icon: <Settings size={18} /> },
   ];
 

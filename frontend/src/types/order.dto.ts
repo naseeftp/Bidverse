@@ -29,7 +29,20 @@ export interface OrderListResponseDTO {
     status: string,
 }
 
-
+export interface OrderTenantListResponseDTO{
+    id:string,
+    orderNumber:string,
+    auctionId:string,
+    itemImage?: {
+        url: string;
+        altText?: string;
+    } | null,
+    itemTitle?:string,
+    buyerName?:string,
+    buyerId?:string,
+    orderAmount:number,
+    status:OrderStatus
+}
 
 export interface ShippingSnapshotDTO {
     recipientName: string;

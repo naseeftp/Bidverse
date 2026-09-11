@@ -1,5 +1,5 @@
-import { OrderListResponseDTO, OrderResponseDTO,OrderDetailsResponseDTO} from "../dtos/user.dto/order.dto";
-import { IOrderDocument,IOrderDetailsAggregateDoc } from "../types/order.type";
+import { OrderListResponseDTO, OrderResponseDTO,OrderDetailsResponseDTO, OrderTenantListResponseDTO} from "../dtos/user.dto/order.dto";
+import { IOrderDocument,IOrderDetailsAggregateDoc,IOrderAggregateDOC,IOrderTenantAggregateDOC } from "../types/order.type";
 
 export class OrderMapper {
     static toResponseDTO(doc: IOrderDocument): OrderResponseDTO {
@@ -21,20 +21,32 @@ export class OrderMapper {
             updatedAt: doc.updatedAt
         }
     }
-    static toListDTO(doc: IOrderDocument,
-        auctionMeta?: { title: string; image?: string }
-    ): OrderListResponseDTO {
+    static toListDTO(doc:IOrderAggregateDOC): OrderListResponseDTO {
         return {
          id:doc._id.toString(),
          orderNumber:doc.orderNumber,
          auctionId:doc.auctionItemId.toString(),
-         itemImage:auctionMeta?.image,
-         itemTitle:auctionMeta?.title,
+         itemImage:doc.auction?.images?.[0],
+         itemTitle:doc.auction?.title,
          orderAmount:doc.totalAmount,
          status:doc.status
         }
     }
-     static toDetailsDTO(doc: IOrderDetailsAggregateDoc): OrderDetailsResponseDTO {
+       static toTenantOrdersListDTO(doc:IOrderTenantAggregateDOC): OrderTenantListResponseDTO {
+        return {
+         id:doc._id.toString(),
+         orderNumber:doc.orderNumber,
+         auctionId:doc.auctionItemId.toString(),
+         itemImage:doc.auction?.images?.[0],
+         itemTitle:doc.auction?.title,
+         buyerName:doc.buyer?.buyerName,
+         buyerId:doc.buyer?._id.toString(),
+         orderAmount:doc.totalAmount,
+         status:doc.status
+        }
+    }
+
+    static toDetailsDTO(doc: IOrderDetailsAggregateDoc): OrderDetailsResponseDTO {
         let imageUrl: string | null = null;
         if (doc.auction?.images && doc.auction.images.length > 0) {
             const firstImg = doc.auction.images[0];

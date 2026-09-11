@@ -72,6 +72,18 @@ export interface OrderListResponseDTO{
     status:OrderStatus
 }
 
+export interface OrderTenantListResponseDTO{
+    id:string,
+    orderNumber:string,
+    auctionId:string,
+    itemImage?:string,
+    itemTitle?:string,
+    buyerName?:string,
+    buyerId?:string,
+    orderAmount:number,
+    status:OrderStatus
+}
+
 export interface IOrderItemDTO {
     id: string;
     title: string;

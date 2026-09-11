@@ -1,4 +1,4 @@
-import { IOrderDocument, IOrderAggregateDOC,IOrderDetailsAggregateDoc} from "../../types/order.type";
+import { IOrderDocument, IOrderAggregateDOC, IOrderDetailsAggregateDoc, IOrderTenantAggregateDOC } from "../../types/order.type";
 import { IOrderRepository } from "../interfaces/IOrder.repository";
 import { BaseRepository } from "./Base.repository";
 import { Order } from "../../models/order.model";
@@ -80,15 +80,84 @@ export class OrderRepository extends BaseRepository<IOrderDocument> implements I
             total: result?.total?.[0]?.count || 0
         };
     }
-    async findOrderDetailsById(orderId:string,buyerId:string):Promise<IOrderDetailsAggregateDoc|null>{
+    async getTenantOrders(tenantId: string, page: number, limit: number, status?: string, search?: string): Promise<{ docs: IOrderTenantAggregateDOC[], total: number }> {
+        const skip = (page - 1) * limit;
+        const initialMatch: Record<string, unknown> = {
+            tenantId: new Types.ObjectId(tenantId)
+        }
+        if (status && status != 'ALL') {
+            initialMatch.status = status
+        }
+        const pipeline: PipelineStage[] = [
+            { $match: initialMatch },
+            {
+                $lookup: {
+                    from: 'auctionitems',
+                    localField: 'auctionItemId',
+                    foreignField: '_id',
+                    pipeline: [{ $project: { _id: 1, title: 1, images: 1 } }],
+                    as: 'auction'
+                }
+            },
+            { $unwind: { path: '$auction', preserveNullAndEmptyArrays: true } },
+            {
+                $lookup: {
+                    from: 'users',
+                    localField: 'buyerId',
+                    foreignField: '_id',
+                    pipeline: [{ $project: { _id: 1, buyerName: { $ifNull: ['$name', '$buyerName'] } } }],
+                    as: 'buyer'
+                }
+            },
+            { $unwind: { path: '$buyer', preserveNullAndEmptyArrays: true } }
+
+        ];
+        if (search && search.trim() !== '') {
+            const cleanSearch = search.trim();
+            const searchConditions: Record<string, unknown>[] = [
+                { 'auction.title': { $regex: cleanSearch, $options: 'i' } },
+                { orderNumber: { $regex: cleanSearch, $options: 'i' } },
+                { 'buyer.buyerName': { $regex: cleanSearch, $options: 'i' } }
+            ];
+
+            if (Types.ObjectId.isValid(cleanSearch)) {
+                searchConditions.push({ _id: new Types.ObjectId(cleanSearch) });
+            }
+
+            pipeline.push({
+                $match: {
+                    $or: searchConditions
+                }
+            });
+        }
+        pipeline.push({
+            $facet: {
+                docs: [
+                    { $sort: { createdAt: -1 } },
+                    { $skip: skip },
+                    { $limit: limit }
+                ],
+                total: [{ $count: 'count' }]
+            }
+        });
+
+        const [result] = await this.model.aggregate(pipeline);
+          return {
+            docs: result?.docs || [],
+            total: result?.total?.[0]?.count || 0
+        };
+    }
+
+
+    async findOrderDetailsById(orderId: string, buyerId: string): Promise<IOrderDetailsAggregateDoc | null> {
         if (!Types.ObjectId.isValid(orderId) || !Types.ObjectId.isValid(buyerId)) {
             return null;
         }
-        const [result]=await this.model.aggregate<IOrderDetailsAggregateDoc>([
+        const [result] = await this.model.aggregate<IOrderDetailsAggregateDoc>([
             {
-                $match:{
-                    _id:new Types.ObjectId(orderId),
-                    buyerId:new Types.ObjectId(buyerId)
+                $match: {
+                    _id: new Types.ObjectId(orderId),
+                    buyerId: new Types.ObjectId(buyerId)
                 }
             },
             {
@@ -134,7 +203,7 @@ export class OrderRepository extends BaseRepository<IOrderDocument> implements I
             },
             { $unwind: { path: "$tenant", preserveNullAndEmptyArrays: true } },
         ])
-        return result ||null
+        return result || null
     }
-   
+
 }
