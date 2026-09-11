@@ -96,4 +96,10 @@ export interface IOrderDetailsAggregateDoc {
         name: string;
         email?: string;
     };
+    buyer?:{
+        _id:Types.ObjectId,
+        name:string,
+        email?:string
+    }
 }
+

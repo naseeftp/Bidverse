@@ -149,15 +149,14 @@ export class OrderRepository extends BaseRepository<IOrderDocument> implements I
     }
 
 
-    async findOrderDetailsById(orderId: string, buyerId: string): Promise<IOrderDetailsAggregateDoc | null> {
-        if (!Types.ObjectId.isValid(orderId) || !Types.ObjectId.isValid(buyerId)) {
+    async findOrderDetailsById(orderId: string): Promise<IOrderDetailsAggregateDoc | null> {
+        if (!Types.ObjectId.isValid(orderId)){
             return null;
         }
         const [result] = await this.model.aggregate<IOrderDetailsAggregateDoc>([
             {
                 $match: {
                     _id: new Types.ObjectId(orderId),
-                    buyerId: new Types.ObjectId(buyerId)
                 }
             },
             {
@@ -202,6 +201,17 @@ export class OrderRepository extends BaseRepository<IOrderDocument> implements I
                 },
             },
             { $unwind: { path: "$tenant", preserveNullAndEmptyArrays: true } },
+
+             {
+                $lookup: {
+                    from: "users",
+                    localField: "buyerId",
+                    foreignField: "_id",
+                    pipeline: [{ $project: { _id: 1, name: 1, email: 1 } }],
+                    as: "buyer",
+                },
+            },
+            { $unwind: { path: "$buyer", preserveNullAndEmptyArrays: true } },
         ])
         return result || null
     }

@@ -29,19 +29,19 @@ export interface OrderListResponseDTO {
     status: string,
 }
 
-export interface OrderTenantListResponseDTO{
-    id:string,
-    orderNumber:string,
-    auctionId:string,
+export interface OrderTenantListResponseDTO {
+    id: string,
+    orderNumber: string,
+    auctionId: string,
     itemImage?: {
         url: string;
         altText?: string;
     } | null,
-    itemTitle?:string,
-    buyerName?:string,
-    buyerId?:string,
-    orderAmount:number,
-    status:OrderStatus
+    itemTitle?: string,
+    buyerName?: string,
+    buyerId?: string,
+    orderAmount: number,
+    status: OrderStatus
 }
 
 export interface ShippingSnapshotDTO {
@@ -81,6 +81,11 @@ export interface IOrderSellerDTO {
     name: string;
     email?: string;
 }
+export interface IBuyerDTO {
+    id: string;
+    name: string;
+    email?: string;
+}
 export interface OrderDetailsResponseDTO {
     id: string;
     orderNumber: string;
@@ -89,8 +94,10 @@ export interface OrderDetailsResponseDTO {
     shippedAt?: string;
     deliveredAt?: string;
     item: IOrderItemDTO;
-    shippingAddress:ShippingSnapshotDTO;
+    shippingAddress: ShippingSnapshotDTO;
     financials: IOrderFinancialsDTO;
     payment?: IOrderPaymentDTO;
     seller?: IOrderSellerDTO;
+    buyer?: IBuyerDTO
+
 }

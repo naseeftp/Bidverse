@@ -262,7 +262,7 @@ const TenantOrders: React.FC = () => {
                                                     </td>
                                                     <td className="py-4 px-4 text-center">
                                                         <button
-                                                            onClick={() => navigate(`/order-details/${order.id}`)}
+                                                            onClick={() => navigate(`/tenant/order-details/${order.id}`)}
                                                             className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-[#2F6FED] text-white text-[11px] font-semibold uppercase tracking-wider hover:bg-[#2558C7] transition-colors cursor-pointer shadow-xs"
                                                         >
                                                             <FaEye size={11} /> View

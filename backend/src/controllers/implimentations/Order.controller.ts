@@ -40,16 +40,15 @@ export class OrderController implements IOrderController {
             const status = req.query.status as string;
             const search = req.query.search as string
             const result = await this._orderService.getTenantOrders(tenantId, page, limit, status, search)
-            SuccessResponse(res,MESSAGES.ACTION_SUCCESS,result,HttpStatus.OK)
+            SuccessResponse(res, MESSAGES.ACTION_SUCCESS, result, HttpStatus.OK)
         } catch (error) {
             next(error)
         }
     }
     async getUserOrderDetails(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
-            const buyerId = req.user.id;
             const orderId = req.params.id as string;
-            const result = await this._orderService.getOrderDetails(orderId, buyerId)
+            const result = await this._orderService.getOrderDetails(orderId)
             SuccessResponse(res, MESSAGES.ACTION_SUCCESS, result, HttpStatus.OK)
         } catch (error) {
             next(error)

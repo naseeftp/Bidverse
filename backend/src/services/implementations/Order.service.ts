@@ -77,8 +77,8 @@ export class OrderService implements IOrderService {
         }
     }
 
-    async getOrderDetails(orderId: string, buyerId: string): Promise<OrderDetailsResponseDTO> {
-        const order = await this._orderRepo.findOrderDetailsById(orderId, buyerId);
+    async getOrderDetails(orderId: string): Promise<OrderDetailsResponseDTO> {
+        const order = await this._orderRepo.findOrderDetailsById(orderId);
         if (!order) {
             throw new NotFoundError(MESSAGES.ORDER_NOT_FOUND)
         }

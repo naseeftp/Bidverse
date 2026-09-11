@@ -110,6 +110,11 @@ export interface IOrderSellerDTO {
     name: string;
     email?: string;
 }
+export interface IBuyerDTO{
+    id: string;
+    name: string;
+    email?: string;
+}
 export interface OrderDetailsResponseDTO {
     id: string;
     orderNumber: string;
@@ -122,4 +127,5 @@ export interface OrderDetailsResponseDTO {
     financials: IOrderFinancialsDTO;
     payment?: IOrderPaymentDTO;
     seller?: IOrderSellerDTO;
+    buyer?:IBuyerDTO
 }

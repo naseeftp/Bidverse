@@ -6,5 +6,5 @@ export interface IOrderService{
     initiateOrderPayment(buyerId: string,  data: CreateOrderDTO): Promise<OrderPaymentResponseDTO>;
     getUserOrders(userId:string,page:number,limit:number,status?:string,search?:string):Promise<IGenericPaginatedResposnse<OrderListResponseDTO>>
     getTenantOrders(tenantId:string,page:number,limit:number,status?:string,search?:string):Promise<IGenericPaginatedResposnse<OrderTenantListResponseDTO>>
-    getOrderDetails(orderId: string, buyerId: string): Promise<OrderDetailsResponseDTO>
+    getOrderDetails(orderId: string): Promise<OrderDetailsResponseDTO>
 }

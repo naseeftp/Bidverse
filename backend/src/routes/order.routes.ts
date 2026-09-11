@@ -21,7 +21,7 @@ router.get(
 )
 router.get(
     ORDER_ROUTES.ORDER_DEATAILS,
-    allowedTo(Role.USER),
+    allowedTo(Role.USER,Role.TENANT),
     (req,res,next)=>orderController.getUserOrderDetails(req,res,next)
 )
 router.get(

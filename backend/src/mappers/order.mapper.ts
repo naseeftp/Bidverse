@@ -1,5 +1,5 @@
-import { OrderListResponseDTO, OrderResponseDTO,OrderDetailsResponseDTO, OrderTenantListResponseDTO} from "../dtos/user.dto/order.dto";
-import { IOrderDocument,IOrderDetailsAggregateDoc,IOrderAggregateDOC,IOrderTenantAggregateDOC } from "../types/order.type";
+import { OrderListResponseDTO, OrderResponseDTO, OrderDetailsResponseDTO, OrderTenantListResponseDTO } from "../dtos/user.dto/order.dto";
+import { IOrderDocument, IOrderDetailsAggregateDoc, IOrderAggregateDOC, IOrderTenantAggregateDOC } from "../types/order.type";
 
 export class OrderMapper {
     static toResponseDTO(doc: IOrderDocument): OrderResponseDTO {
@@ -21,28 +21,28 @@ export class OrderMapper {
             updatedAt: doc.updatedAt
         }
     }
-    static toListDTO(doc:IOrderAggregateDOC): OrderListResponseDTO {
+    static toListDTO(doc: IOrderAggregateDOC): OrderListResponseDTO {
         return {
-         id:doc._id.toString(),
-         orderNumber:doc.orderNumber,
-         auctionId:doc.auctionItemId.toString(),
-         itemImage:doc.auction?.images?.[0],
-         itemTitle:doc.auction?.title,
-         orderAmount:doc.totalAmount,
-         status:doc.status
+            id: doc._id.toString(),
+            orderNumber: doc.orderNumber,
+            auctionId: doc.auctionItemId.toString(),
+            itemImage: doc.auction?.images?.[0],
+            itemTitle: doc.auction?.title,
+            orderAmount: doc.totalAmount,
+            status: doc.status
         }
     }
-       static toTenantOrdersListDTO(doc:IOrderTenantAggregateDOC): OrderTenantListResponseDTO {
+    static toTenantOrdersListDTO(doc: IOrderTenantAggregateDOC): OrderTenantListResponseDTO {
         return {
-         id:doc._id.toString(),
-         orderNumber:doc.orderNumber,
-         auctionId:doc.auctionItemId.toString(),
-         itemImage:doc.auction?.images?.[0],
-         itemTitle:doc.auction?.title,
-         buyerName:doc.buyer?.buyerName,
-         buyerId:doc.buyer?._id.toString(),
-         orderAmount:doc.totalAmount,
-         status:doc.status
+            id: doc._id.toString(),
+            orderNumber: doc.orderNumber,
+            auctionId: doc.auctionItemId.toString(),
+            itemImage: doc.auction?.images?.[0],
+            itemTitle: doc.auction?.title,
+            buyerName: doc.buyer?.buyerName,
+            buyerId: doc.buyer?._id.toString(),
+            orderAmount: doc.totalAmount,
+            status: doc.status
         }
     }
 
@@ -88,23 +88,28 @@ export class OrderMapper {
 
             payment: doc.payment
                 ? {
-                      paymentId: doc.payment._id.toString(),
-                      razorpayOrderId: doc.payment.razorpayOrderId,
-                      razorpayPaymentId: doc.payment.razorpayPaymentId,
-                      status: doc.payment.status,
-                      escrowStatus: doc.payment.escrowStatus,
-                      type: doc.payment.type,
-                      paidAt: doc.payment.paidAt ? doc.payment.paidAt.toISOString() : undefined,
-                  }
+                    paymentId: doc.payment._id.toString(),
+                    razorpayOrderId: doc.payment.razorpayOrderId,
+                    razorpayPaymentId: doc.payment.razorpayPaymentId,
+                    status: doc.payment.status,
+                    escrowStatus: doc.payment.escrowStatus,
+                    type: doc.payment.type,
+                    paidAt: doc.payment.paidAt ? doc.payment.paidAt.toISOString() : undefined,
+                }
                 : undefined,
 
             seller: doc.tenant
                 ? {
-                      id: doc.tenant._id.toString(),
-                      name: doc.tenant.name,
-                      email: doc.tenant.email,
-                  }
+                    id: doc.tenant._id.toString(),
+                    name: doc.tenant.name,
+                    email: doc.tenant.email,
+                }
                 : undefined,
+            buyer: doc.buyer ? {
+                id: doc.buyer._id.toString(),
+                name: doc.buyer.name,
+                email: doc.buyer.email,
+            } : undefined
         };
     }
 }

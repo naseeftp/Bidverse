@@ -62,6 +62,7 @@ import TenantBidHistoryPage from "./pages/tenant/bidHistoryPage";
 import TenantNotificationPage from "./pages/tenant/notificationPage";
 import TenantAuctionControllPage from "./pages/tenant/liveControllPage";
 import TenantOrders from "./pages/tenant/tenantOrders";
+import TenantOrderDetailsPage from "./pages/tenant/orderDetails";
 
 import AdminLoginPage from "./pages/admin/LoginPage";
 import AdminDashboard from "./pages/admin/Dashboard";
@@ -162,6 +163,7 @@ function App() {
                   <Route path="/tenant/notifications" element={<TenantNotificationPage />} />
                   <Route path="/tenant/live-controll/:id" element={<TenantAuctionControllPage />} />
                   <Route path="/tenant/my-orders" element={<TenantOrders />} />
+                  <Route path="/tenant/order-details/:id" element={<TenantOrderDetailsPage/>} />
 
                </Route>
 
