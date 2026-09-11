@@ -19,11 +19,14 @@ async placeOrder(data:CreateOrderDTO){
         return apiErrorHandler(error,'Failed to place order')
     }
 }
-async getMyOrders(page:number,limit:number,status?:string){
+async getMyOrders(page:number,limit:number,status?:string,search?:string){
     try {
        let url=`${BASE_ROUTES.ORDER}${ORDER_ROUTES.GET_MY_ORDERS}?page=${page}&limit=${limit}` 
        if(status&&status!=='ALL'){
          url+=`&status=${status}`
+       }
+       if(search&&search.trim()!==''){
+        url+=`&search=${search}`
        }
        const response=await axiosInstance.get<OrderListResponseDTO,ApiResponse<{data:OrderListResponseDTO[],pagination:IPaginationMeta}>>(url)
        const paginatedResult=response.data;

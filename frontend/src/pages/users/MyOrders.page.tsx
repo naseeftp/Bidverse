@@ -16,6 +16,8 @@ import {
     FaUndo,
     FaBox,
     FaEye,
+    FaSearch,
+    FaTimes,
 } from "react-icons/fa";
 
 const MyOrders: React.FC = () => {
@@ -25,22 +27,34 @@ const MyOrders: React.FC = () => {
     const [page, setPage] = useState<number>(1);
     const [statusFilter, setStatusFilter] = useState<string>("ALL");
 
+    const [searchInput, setSearchInput] = useState<string>("");
+    const [searchTerm, setSearchTerm] = useState<string>("");
+
+    useEffect(() => {
+        const handler = setTimeout(() => {
+            setSearchTerm(searchInput);
+            setPage(1); 
+        }, 400);
+
+        return () => clearTimeout(handler);
+    }, [searchInput]);
+
     const fetchOrders = useCallback(async () => {
         setLoading(true);
         try {
-            const response = await orderService.getMyOrders(page, 6, statusFilter);
+            const response = await orderService.getMyOrders(page, 6, statusFilter, searchTerm);
             if (response.success && response.data) {
                 setOrders(response.data || []);
                 setPagination(response.pagination ?? null);
             } else {
-                toast.error(response.message || "Failed to retrieve orders");
+                toast.error(response.message);
             }
         } catch {
             toast.error("Failed to get your orders");
         } finally {
             setLoading(false);
         }
-    }, [page, statusFilter]);
+    }, [page, statusFilter, searchTerm]);
 
     useEffect(() => {
         fetchOrders();
@@ -98,7 +112,6 @@ const MyOrders: React.FC = () => {
     };
 
     const handleViewOrder = (orderId: string) => {
-        // Implement navigation to order details page or open modal
         toast.success(`View order details: ${orderId}`);
     };
 
@@ -116,36 +129,65 @@ const MyOrders: React.FC = () => {
                         </p>
                     </div>
 
-                    <div className="w-full md:w-auto min-w-[220px] relative group">
-                        <label className="text-[9px] font-black uppercase tracking-[0.2em] text-[#6B6B6B] mb-1.5 block">
-                            Status Filter
-                        </label>
-                        <div className="relative">
-                            <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#6B6B6B] group-focus-within:text-[#C9653B] transition-colors pointer-events-none">
-                                <FaFilter size={10} />
+                    <div className="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
+                        <div className="w-full sm:w-64 relative group">
+                            <label className="text-[9px] font-black uppercase tracking-[0.2em] text-[#6B6B6B] mb-1.5 block">
+                                Search Orders
+                            </label>
+                            <div className="relative">
+                                <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#6B6B6B] group-focus-within:text-[#C9653B] transition-colors pointer-events-none">
+                                    <FaSearch size={10} />
+                                </div>
+                                <input
+                                    type="text"
+                                    value={searchInput}
+                                    onChange={(e) => setSearchInput(e.target.value)}
+                                    placeholder="TITLE, ORDER NO, ID..."
+                                    className="w-full bg-white border border-[#E6E0DA] rounded-lg pl-9 pr-8 py-2.5 text-[11px] text-[#1F1F1F] font-bold tracking-wider placeholder-[#6B6B6B]/50 focus:outline-none focus:border-[#C9653B] shadow-sm transition-all"
+                                />
+                                {searchInput && (
+                                    <button
+                                        onClick={() => setSearchInput("")}
+                                        className="absolute right-3 top-1/2 -translate-y-1/2 text-[#6B6B6B] hover:text-[#1F1F1F] transition-colors"
+                                    >
+                                        <FaTimes size={10} />
+                                    </button>
+                                )}
                             </div>
-                            <select
-                                value={statusFilter}
-                                onChange={(e) => {
-                                    setStatusFilter(e.target.value);
-                                    setPage(1);
-                                }}
-                                className="w-full bg-white border border-[#E6E0DA] rounded-lg pl-9 pr-8 py-2.5 text-[11px] text-[#1F1F1F] font-bold uppercase tracking-wider focus:outline-none focus:border-[#C9653B] appearance-none cursor-pointer shadow-sm transition-all"
-                            >
-                                <option value="ALL">ALL ORDERS</option>
-                                {Object.values(OrderStatus).map((status) => (
-                                    <option key={status} value={status}>
-                                        {status.replace(/_/g, " ")}
-                                    </option>
-                                ))}
-                            </select>
-                            <div className="absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none text-[#6B6B6B] text-[8px]">
-                                ▼
+                        </div>
+
+                        <div className="w-full sm:w-52 relative group">
+                            <label className="text-[9px] font-black uppercase tracking-[0.2em] text-[#6B6B6B] mb-1.5 block">
+                                Status Filter
+                            </label>
+                            <div className="relative">
+                                <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#6B6B6B] group-focus-within:text-[#C9653B] transition-colors pointer-events-none">
+                                    <FaFilter size={10} />
+                                </div>
+                                <select
+                                    value={statusFilter}
+                                    onChange={(e) => {
+                                        setStatusFilter(e.target.value);
+                                        setPage(1);
+                                    }}
+                                    className="w-full bg-white border border-[#E6E0DA] rounded-lg pl-9 pr-8 py-2.5 text-[11px] text-[#1F1F1F] font-bold uppercase tracking-wider focus:outline-none focus:border-[#C9653B] appearance-none cursor-pointer shadow-sm transition-all"
+                                >
+                                    <option value="ALL">ALL ORDERS</option>
+                                    {Object.values(OrderStatus).map((status) => (
+                                        <option key={status} value={status}>
+                                            {status.replace(/_/g, " ")}
+                                        </option>
+                                    ))}
+                                </select>
+                                <div className="absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none text-[#6B6B6B] text-[8px]">
+                                    ▼
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                {/* Table Content */}
                 {loading ? (
                     <div className="flex justify-center items-center h-64">
                         <div className="w-8 h-8 border-4 border-[#C9653B] border-t-transparent rounded-full animate-spin" />
@@ -157,7 +199,9 @@ const MyOrders: React.FC = () => {
                             No Orders Found
                         </p>
                         <p className="text-[#6B6B6B] text-xs max-w-sm mx-auto">
-                            You haven&rsquo;t placed or won any orders matching this filter yet.
+                            {searchTerm 
+                                ? `No results found for "${searchTerm}". Try clearing your search.` 
+                                : "You haven't placed or won any orders matching this filter yet."}
                         </p>
                     </div>
                 ) : (
@@ -187,7 +231,6 @@ const MyOrders: React.FC = () => {
                                                     key={order.id}
                                                     className="hover:bg-[#FFF9F4]/50 transition-colors"
                                                 >
-                                                    {/* Item Image */}
                                                     <td className="py-3 px-4">
                                                         <div className="w-12 h-12 rounded-lg bg-[#FFF9F4] border border-[#E6E0DA] overflow-hidden flex items-center justify-center mx-auto">
                                                             {imageUrl ? (
@@ -201,37 +244,25 @@ const MyOrders: React.FC = () => {
                                                             )}
                                                         </div>
                                                     </td>
-
-                                                    {/* Item Name */}
                                                     <td className="py-4 px-4 font-bold text-[#1F1F1F] max-w-[220px]">
                                                         <span className="line-clamp-2" title={order.itemTitle}>
                                                             {order.itemTitle}
                                                         </span>
                                                     </td>
-
-                                                    {/* Order ID / Auction ID */}
                                                     <td className="py-4 px-4 font-mono text-[11px] text-[#6B6B6B]">
                                                         {order.id || order.auctionId}
                                                     </td>
-
-                                                    {/* Order Number */}
                                                     <td className="py-4 px-4">
                                                         <span className="font-mono text-xs text-[#1F1F1F] font-semibold bg-[#FFF9F4] px-2 py-1 rounded border border-[#E6E0DA] inline-block">
                                                             {order.orderNumber}
                                                         </span>
                                                     </td>
-
-                                                    {/* Amount */}
                                                     <td className="py-4 px-4 text-right font-black text-sm text-[#1F1F1F]">
                                                         ₹{order.orderAmount.toLocaleString("en-IN")}
                                                     </td>
-
-                                                    {/* Status */}
                                                     <td className="py-4 px-4 text-center">
                                                         {renderStatusBadge(order.status)}
                                                     </td>
-
-                                                    {/* Action / View Button */}
                                                     <td className="py-4 px-4 text-center">
                                                         <button
                                                             onClick={() => handleViewOrder(order.id)}

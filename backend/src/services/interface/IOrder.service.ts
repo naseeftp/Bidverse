@@ -4,5 +4,5 @@ import { IGenericPaginatedResposnse } from "../../types/response.type";
 
 export interface IOrderService{
     initiateOrderPayment(buyerId: string,  data: CreateOrderDTO): Promise<OrderPaymentResponseDTO>;
-    getUserOrders(userId:string,page:number,limit:number,status?:string):Promise<IGenericPaginatedResposnse<OrderListResponseDTO>>
+    getUserOrders(userId:string,page:number,limit:number,status?:string,search?:string):Promise<IGenericPaginatedResposnse<OrderListResponseDTO>>
 }

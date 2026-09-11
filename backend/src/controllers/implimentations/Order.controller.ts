@@ -25,7 +25,8 @@ export class OrderController implements IOrderController {
             const page=Number(req.query.page);
             const limit=Number(req.query.limit);
             const status=req.query.status as string;
-            const result=await this._orderService.getUserOrders(userId,page,limit,status)
+            const search=req.query.search as string
+            const result=await this._orderService.getUserOrders(userId,page,limit,status,search)
             SuccessResponse(res,MESSAGES.LIST_RETRIEVED,result,HttpStatus.OK)
         } catch (error) {
            next(error) 

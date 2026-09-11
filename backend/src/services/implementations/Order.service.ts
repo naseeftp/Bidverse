@@ -34,8 +34,8 @@ export class OrderService implements IOrderService {
         })
     }
 
-    async getUserOrders(userId: string, page: number, limit: number, status?: string): Promise<IGenericPaginatedResposnse<OrderListResponseDTO>> {
-        const {docs,total}=await this._orderRepo.getUserOrders(userId,page,limit,status);
+    async getUserOrders(userId: string, page: number, limit: number, status?: string,search?:string): Promise<IGenericPaginatedResposnse<OrderListResponseDTO>> {
+        const {docs,total}=await this._orderRepo.getUserOrders(userId,page,limit,status,search);
         const mappedDocs=docs.map((doc)=>
         OrderMapper.toListDTO(doc,{
             title:doc.auction?.title||'Unknown auction',
