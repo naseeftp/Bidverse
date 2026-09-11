@@ -61,3 +61,13 @@ export interface OrderResponseDTO {
     createdAt: Date;
     updatedAt: Date;
 }
+
+export interface OrderListResponseDTO{
+    id:string,
+    orderNumber:string,
+    auctionId:string,
+    itemImage?:string,
+    itemTitle?:string,
+    orderAmount:number,
+    status:OrderStatus
+}

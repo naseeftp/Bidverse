@@ -7,7 +7,7 @@ const Sidebar: React.FC = () => {
     { name: 'My Slots', icon: CalendarCheck, path: '/my-slots' },
     { name: 'Payment Requests', icon: HandCoins, path: '/payment-requests'},
     { name: 'Transactions', icon: Receipt, path: '/my-transactions' },
-    { name: 'Orders', icon: ShoppingBag, path: '/orders' },
+    { name: 'Orders', icon: ShoppingBag, path: '/my-orders' },
     { name: 'Addresses', icon: MapPin, path: '/addresses' },
     { name: 'Profile', icon: User, path: '/profile' },
   ];

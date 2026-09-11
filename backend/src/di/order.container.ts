@@ -23,5 +23,5 @@ const transactionRepo=new TransactionRepository()
 const transactionService=new TransactionService(transactionRepo)
 
 const paymentService=new PaymentService(paymentRepo,slotRepo,auctionRepo,transactionService,razorpay,orderRepo,addressRepo,paymentRequestRepo)
-const orderService=new OrderService(paymentRequestRepo,addressRepo,paymentService)
+const orderService=new OrderService(paymentRequestRepo,addressRepo,paymentService,orderRepo)
 export const orderController=new OrderController(orderService)

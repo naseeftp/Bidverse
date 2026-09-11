@@ -19,4 +19,16 @@ export class OrderController implements IOrderController {
             next(error)
         }
     }
+     async getUserOrders(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const userId=req.user.id;
+            const page=Number(req.query.page);
+            const limit=Number(req.query.limit);
+            const status=req.query.status as string;
+            const result=await this._orderService.getUserOrders(userId,page,limit,status)
+            SuccessResponse(res,MESSAGES.LIST_RETRIEVED,result,HttpStatus.OK)
+        } catch (error) {
+           next(error) 
+        }
+    }
 }

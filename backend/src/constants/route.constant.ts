@@ -142,7 +142,8 @@ export const CHECKOUT_ROUTES = {
 }
 
 export const ORDER_ROUTES = {
-   PLACE_ORDER:'/place-order'
+   PLACE_ORDER:'/place-order',
+   GET_MY_ORDERS:'/my-orders',
 }
 
 

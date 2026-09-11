@@ -1,4 +1,4 @@
-import { OrderResponseDTO } from "../dtos/user.dto/order.dto";
+import { OrderListResponseDTO, OrderResponseDTO } from "../dtos/user.dto/order.dto";
 import { IOrderDocument } from "../types/order.type";
 
 export class OrderMapper {
@@ -19,6 +19,19 @@ export class OrderMapper {
             status: doc.status,
             createdAt: doc.createdAt,
             updatedAt: doc.updatedAt
+        }
+    }
+    static toListDTO(doc: IOrderDocument,
+        auctionMeta?: { title: string; image?: string }
+    ): OrderListResponseDTO {
+        return {
+         id:doc._id.toString(),
+         orderNumber:doc.orderNumber,
+         auctionId:doc.auctionItemId.toString(),
+         itemImage:auctionMeta?.image,
+         itemTitle:auctionMeta?.title,
+         orderAmount:doc.totalAmount,
+         status:doc.status
         }
     }
 }

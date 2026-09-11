@@ -14,5 +14,10 @@ router.post(
     allowedTo(Role.USER),
     (req, res, next) => orderController.initiateOrderPayment(req, res, next)
 )
+router.get(
+    ORDER_ROUTES.GET_MY_ORDERS,
+    allowedTo(Role.USER),
+    (req,res,next)=>orderController.getUserOrders(req,res,next)
+)
 
 export default router

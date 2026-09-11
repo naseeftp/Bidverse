@@ -37,6 +37,7 @@ import UserNotificationPage from "./pages/users/notificationPage";
 import LiveRoom from "./pages/users/liveRoomPage";
 import PaymentRequestPage from './pages/users/paymentRequestPage'
 import CheckoutPage from "./pages/users/checkoutPage";
+import MyOrders from "./pages/users/MyOrders.page";
 
 import TenantRegisterPage from "./pages/tenant/RegiterPage";
 import TenantVerifyOtpPage from "./pages/tenant/VerifyotpPage";
@@ -110,6 +111,8 @@ function App() {
                   <Route path="/watch-list" element={<WatchlistPage />} />
                   <Route path="/notifications" element={<UserNotificationPage />} />
                   <Route path="/join-room/:id" element={<LiveRoom />} />
+
+
                </Route>
             </Route>
 
@@ -122,6 +125,7 @@ function App() {
                   <Route path="/my-transactions" element={<MyTransactions />} />
                   <Route path="/payment-requests" element={<PaymentRequestPage />} />
                   <Route path="/check-out/:id" element={<CheckoutPage />} />
+                  <Route path="/my-orders" element={<MyOrders />} />
 
                </Route>
             </Route>

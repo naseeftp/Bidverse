@@ -1,17 +1,21 @@
 import { IOrderService } from "../interface/IOrder.service";
 import { IPaymentRequestRepository } from "../../repositories/interfaces/IPaymentRequest.repository";
-import { CreateOrderDTO, } from "../../dtos/user.dto/order.dto";
+import { CreateOrderDTO,OrderListResponseDTO } from "../../dtos/user.dto/order.dto";
 import { NotFoundError } from "../../errors/AppError";
 import { MESSAGES } from "../../constants/constants";
 import { IAddressRepository } from "../../repositories/interfaces/IAddress.repository";
 import { IPaymentService } from "../interface/IPayment.service";
 import { OrderPaymentResponseDTO } from "../../dtos/user.dto/payment.dto";
+import { IOrderRepository } from "../../repositories/interfaces/IOrder.repository";
+import { OrderMapper } from "../../mappers/order.mapper";
+import { IGenericPaginatedResposnse } from "../../types/response.type";
 
 export class OrderService implements IOrderService {
     constructor(
         private _paymentRepo: IPaymentRequestRepository,
         private _addressRepo: IAddressRepository,
-        private _paymentService: IPaymentService
+        private _paymentService: IPaymentService,
+        private _orderRepo:IOrderRepository,
     ) { }
     async initiateOrderPayment(buyerId: string,data: CreateOrderDTO): Promise<OrderPaymentResponseDTO> {
         const paymentRequest = await this._paymentRepo.findByRequestId(data.paymentRequestId);
@@ -28,5 +32,27 @@ export class OrderService implements IOrderService {
             amount: paymentRequest.amount,
             
         })
+    }
+
+    async getUserOrders(userId: string, page: number, limit: number, status?: string): Promise<IGenericPaginatedResposnse<OrderListResponseDTO>> {
+        const {docs,total}=await this._orderRepo.getUserOrders(userId,page,limit,status);
+        const mappedDocs=docs.map((doc)=>
+        OrderMapper.toListDTO(doc,{
+            title:doc.auction?.title||'Unknown auction',
+            image:doc.auction?.images?.[0]
+        })
+        )
+
+        return{
+           data:mappedDocs,
+           pagination:{
+            totalItems:total,
+            itemsPerPage:limit,
+            currentPage:page,
+            totalPages:Math.ceil(total/limit),
+            hasNextPage:page*limit>total,
+            hasPrevPage:page>1
+           }
+        }
     }
 }

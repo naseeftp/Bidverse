@@ -31,8 +31,15 @@ export interface IOrder {
     status: OrderStatus;
     shippedAt?: Date;
     deliveredAt?: Date;
-    createdAt:Date,
-    updatedAt:Date,
+    createdAt: Date,
+    updatedAt: Date,
 }
 
 export type IOrderDocument = IOrder & Document
+export interface IOrderAggregateDOC extends IOrderDocument {
+    auction?: {
+        _id: string;
+        title: string;
+        images?: string[];
+    };
+}
