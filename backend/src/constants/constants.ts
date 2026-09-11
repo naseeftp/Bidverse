@@ -179,7 +179,7 @@ export const MESSAGES = {
     PAYMENT_NOT_FOUND: 'Payment not Found',
     PAYMENT_REQUEST_NOT_FOUND: 'Payment Request Not Found',
     ORDER_PLACED:'Order Process Completed',
-
+    ORDER_NOT_FOUND:'Order Not Found',
     NOTIFICATION_NOT_FOUND: 'Notification Notfound',
     LIVE_STATE_NOT_FOUND: 'Live Not found',
     LIVE_STARTED: 'Live Started',

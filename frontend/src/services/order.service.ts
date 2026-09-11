@@ -1,7 +1,7 @@
 import axiosInstance from "../api/axios.instance";
 import { BASE_ROUTES, ORDER_ROUTES } from "../constants/api.constant";
 import type { ApiResponse, IPaginationMeta } from "../types/auth.type";
-import type { CreateOrderDTO, OrderListResponseDTO } from "../types/order.dto";
+import type { CreateOrderDTO, OrderDetailsResponseDTO, OrderListResponseDTO } from "../types/order.dto";
 import type { OrderPaymentResponseDTO } from "../types/payment.dto";
 import { apiErrorHandler } from "../utils/error.handle";
 
@@ -38,6 +38,19 @@ async getMyOrders(page:number,limit:number,status?:string,search?:string){
        }
     } catch (error) {
         return apiErrorHandler(error,'Failed to list orders')
+    }
+}
+async getOrderDetails(id:string){
+    try {
+        const url=`${BASE_ROUTES.ORDER}${ORDER_ROUTES.ORDER_DEATAILS}/${id}`;
+        const response=await axiosInstance.get<OrderDetailsResponseDTO,ApiResponse<OrderDetailsResponseDTO>>(url)
+        return{
+            success:true,
+            message:response.message,
+            data:response.data
+        }
+    } catch (error) {
+        return apiErrorHandler(error,'Failed to get order details')
     }
 }
 }

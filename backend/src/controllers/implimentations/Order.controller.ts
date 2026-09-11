@@ -32,4 +32,14 @@ export class OrderController implements IOrderController {
            next(error) 
         }
     }
+    async getUserOrderDetails(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const buyerId=req.user.id;
+            const orderId=req.params.id as string;
+            const result=await this._orderService.getOrderDetails(orderId,buyerId)
+            SuccessResponse(res,MESSAGES.ACTION_SUCCESS,result,HttpStatus.OK)
+        } catch (error) {
+            next(error)
+        }
+    }
 }

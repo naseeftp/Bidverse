@@ -19,5 +19,10 @@ router.get(
     allowedTo(Role.USER),
     (req,res,next)=>orderController.getUserOrders(req,res,next)
 )
+router.get(
+    ORDER_ROUTES.ORDER_DEATAILS,
+    allowedTo(Role.USER),
+    (req,res,next)=>orderController.getUserOrderDetails(req,res,next)
+)
 
 export default router

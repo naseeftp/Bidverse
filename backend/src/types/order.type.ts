@@ -43,3 +43,46 @@ export interface IOrderAggregateDOC extends IOrderDocument {
         images?: string[];
     };
 }
+
+export interface IOrderDetailsAggregateDoc {
+    _id: Types.ObjectId;
+    orderNumber: string;
+    status: string;
+    itemAmount: number;
+    shippingCost: number;
+    totalAmount: number;
+    currency: string;
+    createdAt: Date;
+    shippedAt?: Date;
+    deliveredAt?: Date;
+    shippingSnapshot: {
+        recipientName: string;
+        phone: string;
+        altPhone?: string;
+        fullAddress: string;
+        pincode: string;
+        landMark?: string;
+        city: string;
+        state: string;
+        country: string;
+    };
+    auction?: {
+        _id: Types.ObjectId;
+        title: string;
+        images?: Array<{ url: string } | string>;
+    };
+    payment?: {
+        _id: Types.ObjectId;
+        razorpayOrderId: string;
+        razorpayPaymentId?: string;
+        status: string;
+        escrowStatus: string;
+        type: string;
+        paidAt?: Date;
+    };
+    tenant?: {
+        _id: Types.ObjectId;
+        name: string;
+        email?: string;
+    };
+}

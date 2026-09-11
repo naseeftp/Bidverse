@@ -19,6 +19,7 @@ import {
     FaSearch,
     FaTimes,
 } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 
 const MyOrders: React.FC = () => {
     const [orders, setOrders] = useState<OrderListResponseDTO[]>([]);
@@ -29,6 +30,7 @@ const MyOrders: React.FC = () => {
 
     const [searchInput, setSearchInput] = useState<string>("");
     const [searchTerm, setSearchTerm] = useState<string>("");
+    const navigate=useNavigate()
 
     useEffect(() => {
         const handler = setTimeout(() => {
@@ -111,9 +113,7 @@ const MyOrders: React.FC = () => {
         }
     };
 
-    const handleViewOrder = (orderId: string) => {
-        toast.success(`View order details: ${orderId}`);
-    };
+  
 
     return (
         <div className="min-h-screen bg-[#FFF9F4] px-4 py-8 md:px-8 text-[#1F1F1F] font-sans antialiased">
@@ -265,7 +265,7 @@ const MyOrders: React.FC = () => {
                                                     </td>
                                                     <td className="py-4 px-4 text-center">
                                                         <button
-                                                            onClick={() => handleViewOrder(order.id)}
+                                                            onClick={() => navigate(`/order-details/${order.id}`)}
                                                             className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-[#1F1F1F] text-white text-[11px] font-bold uppercase tracking-wider hover:bg-[#C9653B] transition-colors cursor-pointer shadow-xs"
                                                         >
                                                             <FaEye size={11} /> View

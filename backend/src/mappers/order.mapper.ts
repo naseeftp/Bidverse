@@ -1,5 +1,5 @@
-import { OrderListResponseDTO, OrderResponseDTO } from "../dtos/user.dto/order.dto";
-import { IOrderDocument } from "../types/order.type";
+import { OrderListResponseDTO, OrderResponseDTO,OrderDetailsResponseDTO} from "../dtos/user.dto/order.dto";
+import { IOrderDocument,IOrderDetailsAggregateDoc } from "../types/order.type";
 
 export class OrderMapper {
     static toResponseDTO(doc: IOrderDocument): OrderResponseDTO {
@@ -33,5 +33,66 @@ export class OrderMapper {
          orderAmount:doc.totalAmount,
          status:doc.status
         }
+    }
+     static toDetailsDTO(doc: IOrderDetailsAggregateDoc): OrderDetailsResponseDTO {
+        let imageUrl: string | null = null;
+        if (doc.auction?.images && doc.auction.images.length > 0) {
+            const firstImg = doc.auction.images[0];
+            imageUrl = typeof firstImg === "string" ? firstImg : firstImg.url;
+        }
+
+        return {
+            id: doc._id.toString(),
+            orderNumber: doc.orderNumber,
+            status: doc.status,
+            createdAt: doc.createdAt.toISOString(),
+            shippedAt: doc.shippedAt ? doc.shippedAt.toISOString() : undefined,
+            deliveredAt: doc.deliveredAt ? doc.deliveredAt.toISOString() : undefined,
+
+            item: {
+                id: doc.auction?._id?.toString() || "",
+                title: doc.auction?.title || "Item details unavailable",
+                imageUrl,
+            },
+
+            shippingAddress: {
+                recipientName: doc.shippingSnapshot.recipientName,
+                phone: doc.shippingSnapshot.phone,
+                altPhone: doc.shippingSnapshot.altPhone,
+                fullAddress: doc.shippingSnapshot.fullAddress,
+                pincode: doc.shippingSnapshot.pincode,
+                landMark: doc.shippingSnapshot.landMark,
+                city: doc.shippingSnapshot.city,
+                state: doc.shippingSnapshot.state,
+                country: doc.shippingSnapshot.country,
+            },
+
+            financials: {
+                itemAmount: doc.itemAmount,
+                shippingCost: doc.shippingCost,
+                totalAmount: doc.totalAmount,
+                currency: doc.currency,
+            },
+
+            payment: doc.payment
+                ? {
+                      paymentId: doc.payment._id.toString(),
+                      razorpayOrderId: doc.payment.razorpayOrderId,
+                      razorpayPaymentId: doc.payment.razorpayPaymentId,
+                      status: doc.payment.status,
+                      escrowStatus: doc.payment.escrowStatus,
+                      type: doc.payment.type,
+                      paidAt: doc.payment.paidAt ? doc.payment.paidAt.toISOString() : undefined,
+                  }
+                : undefined,
+
+            seller: doc.tenant
+                ? {
+                      id: doc.tenant._id.toString(),
+                      name: doc.tenant.name,
+                      email: doc.tenant.email,
+                  }
+                : undefined,
+        };
     }
 }

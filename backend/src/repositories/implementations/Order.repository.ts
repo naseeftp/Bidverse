@@ -1,4 +1,4 @@
-import { IOrderDocument, IOrderAggregateDOC } from "../../types/order.type";
+import { IOrderDocument, IOrderAggregateDOC,IOrderDetailsAggregateDoc} from "../../types/order.type";
 import { IOrderRepository } from "../interfaces/IOrder.repository";
 import { BaseRepository } from "./Base.repository";
 import { Order } from "../../models/order.model";
@@ -80,5 +80,61 @@ export class OrderRepository extends BaseRepository<IOrderDocument> implements I
             total: result?.total?.[0]?.count || 0
         };
     }
-
+    async findOrderDetailsById(orderId:string,buyerId:string):Promise<IOrderDetailsAggregateDoc|null>{
+        if (!Types.ObjectId.isValid(orderId) || !Types.ObjectId.isValid(buyerId)) {
+            return null;
+        }
+        const [result]=await this.model.aggregate<IOrderDetailsAggregateDoc>([
+            {
+                $match:{
+                    _id:new Types.ObjectId(orderId),
+                    buyerId:new Types.ObjectId(buyerId)
+                }
+            },
+            {
+                $lookup: {
+                    from: "auctionitems",
+                    localField: "auctionItemId",
+                    foreignField: "_id",
+                    pipeline: [{ $project: { _id: 1, title: 1, images: 1 } }],
+                    as: "auction",
+                },
+            },
+            { $unwind: { path: "$auction", preserveNullAndEmptyArrays: true } },
+            {
+                $lookup: {
+                    from: "payments",
+                    localField: "paymentId",
+                    foreignField: "_id",
+                    pipeline: [
+                        {
+                            $project: {
+                                _id: 1,
+                                razorpayOrderId: 1,
+                                razorpayPaymentId: 1,
+                                status: 1,
+                                escrowStatus: 1,
+                                type: 1,
+                                paidAt: 1,
+                            },
+                        },
+                    ],
+                    as: "payment",
+                },
+            },
+            { $unwind: { path: "$payment", preserveNullAndEmptyArrays: true } },
+            {
+                $lookup: {
+                    from: "auctionhouses",
+                    localField: "tenantId",
+                    foreignField: "_id",
+                    pipeline: [{ $project: { _id: 1, name: 1, email: 1 } }],
+                    as: "tenant",
+                },
+            },
+            { $unwind: { path: "$tenant", preserveNullAndEmptyArrays: true } },
+        ])
+        return result ||null
+    }
+   
 }

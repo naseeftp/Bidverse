@@ -1,6 +1,6 @@
 import { IOrderService } from "../interface/IOrder.service";
 import { IPaymentRequestRepository } from "../../repositories/interfaces/IPaymentRequest.repository";
-import { CreateOrderDTO,OrderListResponseDTO } from "../../dtos/user.dto/order.dto";
+import { CreateOrderDTO,OrderListResponseDTO,OrderDetailsResponseDTO} from "../../dtos/user.dto/order.dto";
 import { NotFoundError } from "../../errors/AppError";
 import { MESSAGES } from "../../constants/constants";
 import { IAddressRepository } from "../../repositories/interfaces/IAddress.repository";
@@ -55,4 +55,11 @@ export class OrderService implements IOrderService {
            }
         }
     }
+   async getOrderDetails(orderId: string, buyerId: string): Promise<OrderDetailsResponseDTO>{
+    const order=await this._orderRepo.findOrderDetailsById(orderId,buyerId);
+    if(!order){
+        throw new NotFoundError(MESSAGES.ORDER_NOT_FOUND)
+    }
+    return OrderMapper.toDetailsDTO(order)
+   }
 }
