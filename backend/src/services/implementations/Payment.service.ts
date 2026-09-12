@@ -195,7 +195,7 @@ export class PaymentService implements IPaymentService {
                     totalAmount,
                     currency: payment.currency
                 });
-                await this._paymentRequestRepo.updateStatus(payment.metadata?.paymentRequestId!,PaymentRequestStatus.COMPLETED)
+                await this._paymentRequestRepo.updateStatus(payment.metadata?.paymentRequestId??'',PaymentRequestStatus.COMPLETED)
                 await this._transactionService.createTransaction({
                     partyType: TransactionPartyType.USER,
                     userId: payment.userId.toString(),

@@ -54,6 +54,21 @@ export interface IOrderTenantAggregateDOC extends IOrderDocument{
         buyerName:string,
     }
 }
+export interface IOrderAdminAggregateDOC extends IOrderDocument{
+    auction?: {
+        _id: string;
+        title: string;
+        images?: string[];
+    };
+    buyer?:{
+        _id:string;
+        buyerName:string,
+    },
+    house?:{
+        _id:string,
+        name:string
+    }
+}
 
 export interface IOrderDetailsAggregateDoc {
     _id: Types.ObjectId;

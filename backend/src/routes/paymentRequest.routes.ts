@@ -7,8 +7,8 @@ import paymentRequestController from "../di/paymentRequest.container";
 
 
 const router = Router();
-router.use(protect),
-    router.use(CheckUserBlocked)
+router.use(protect);
+router.use(CheckUserBlocked);
 router.get(
     PAYMENT_REQUEST_ROUTES.LIST_REQUEST,
     allowedTo(Role.USER),

@@ -1,5 +1,5 @@
 import { IBaseRepository } from "./IBase.repository";
-import { IOrderDocument,IOrderAggregateDOC, IOrderDetailsAggregateDoc,IOrderTenantAggregateDOC} from "../../types/order.type";
+import { IOrderDocument,IOrderAggregateDOC, IOrderDetailsAggregateDoc,IOrderTenantAggregateDOC,IOrderAdminAggregateDOC} from "../../types/order.type";
 import { CreateOrderInputDTO } from "../../dtos/user.dto/order.dto";
 
 export interface IOrderRepository extends IBaseRepository<IOrderDocument> {
@@ -8,4 +8,5 @@ export interface IOrderRepository extends IBaseRepository<IOrderDocument> {
     getUserOrders(userId:string,page:number,limit:number,status?:string,search?:string):Promise<{docs:IOrderAggregateDOC[],total:number}>
     findOrderDetailsById(orderId:string):Promise<IOrderDetailsAggregateDoc|null>
     getTenantOrders(tenantId:string,page:number,limit:number,status?:string,search?:string):Promise<{docs:IOrderTenantAggregateDOC[],total:number}>
+    getAllOrdersByAdmin(page:number,limit:number,status?:string,search?:string):Promise<{docs:IOrderAdminAggregateDOC[],total:number}>
 }

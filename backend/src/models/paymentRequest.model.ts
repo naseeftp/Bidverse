@@ -1,6 +1,6 @@
 import { IPaymentRequestDocument } from "../types/paymentRequest.types";
 import { PaymentRequestStatus } from "../types/paymentRequest.types";
-import mongoose,{Types,Schema} from "mongoose";
+import mongoose,{Schema} from "mongoose";
 
 const paymentRequestSchema=new Schema<IPaymentRequestDocument>({
 tenantId: {
