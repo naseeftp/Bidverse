@@ -2,7 +2,7 @@ import { IAuctionItemDocument } from "../../types/auctionItem.type";
 import { IAuctionItemRepository } from "../interfaces/IAuctionItem.repository";
 import { BaseRepository } from "./Base.repository";
 import { AuctionItem } from '../../models/auctionItem.model'
-import { AuctionItemDetailDTO, AuctionItemListDTO } from "../../dtos/auctionHouse.dto/auctionItem.dto";
+import { AuctionItemDetailDTO, AuctionItemListDTO, ModifyAuctionDTO } from "../../dtos/auctionHouse.dto/auctionItem.dto";
 import mongoose, { PipelineStage, Types } from "mongoose";
 import { AuctionItemStatus } from "../../constants/constants";
 
@@ -10,6 +10,21 @@ export class AuctionItemRepository extends BaseRepository<IAuctionItemDocument> 
     constructor() {
         super(AuctionItem)
     }
+    async   updateAuction(id: string, data: ModifyAuctionDTO): Promise<IAuctionItemDocument | null>{
+const updatePayload: Record<string, unknown> = { ...data };
+
+    if (data.currentHighestBidder) {
+      updatePayload.currentHighestBidder = new Types.ObjectId(data.currentHighestBidder);
+    }
+    if (data.winningBidder) {
+      updatePayload.winningBidder = new Types.ObjectId(data.winningBidder);
+    }
+
+    return await this.model.findByIdAndUpdate(
+      id,
+      { $set: updatePayload },
+      { new: true }
+    );    }
     async listAllAuctionItems(page: number, limit: number, search?: string, status?: string | string[], type?: string, houseId?: string): Promise<{ auctions: AuctionItemListDTO[], total: number }> {
         const skip = (page - 1) * limit;
         const pipeline: PipelineStage[] = [];

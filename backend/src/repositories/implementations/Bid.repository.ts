@@ -3,12 +3,21 @@ import { IBidRepository } from "../interfaces/IBid.repository";
 import { IBidDocument } from "../../types/bid.type";
 import { Bid } from '../../models/bid.model'
 import mongoose, { Types, UpdateResult, PipelineStage } from "mongoose";
-import { myBidListDTO, bidHistoryDTO } from "../../dtos/user.dto/bid.dto";
+import { myBidListDTO, bidHistoryDTO,createBidDTO } from "../../dtos/user.dto/bid.dto";
 import { BidStatus } from "../../constants/constants";
 
 export class BidRepository extends BaseRepository<IBidDocument> implements IBidRepository {
     constructor() {
         super(Bid)
+    }
+    async  placeBid(data:createBidDTO):Promise<IBidDocument>{
+     return this.model.create({
+        tenantId:new Types.ObjectId(data.tenantId),
+        bidAmount:data.bidAmount,
+        auctionId:new Types.ObjectId(data.auctionId),
+        bidderId:new Types.ObjectId(data.bidderId),
+        status:data.status
+     })
     }
     async makeOutBid(exceptedBidId: Types.ObjectId, auctionId: string): Promise<UpdateResult> {
         return this.model.updateMany(

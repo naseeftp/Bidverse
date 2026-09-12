@@ -118,15 +118,16 @@ export class AuthService implements IAuthService {
     }
     async forgotPassword(data: ForgetPaswordDTO, purpose: string): Promise<{ email: string; expiresAt: Date }> {
         const existingUser = await this._userRepository.findByEmail(data.email)
+          if (!existingUser) {
+            throw new NotFoundError(MESSAGES.NO_ACCOUNT_FOUND)
+        }
         if (existingUser?.role !== data.role) {
             throw new AppError(`this email registered as ${existingUser?.role} please use correct forgot password portal`)
         }
         if (existingUser && existingUser.googleId) {
             throw new AppError(MESSAGES.GOOGLE_REGISTERED)
         }
-        if (!existingUser) {
-            throw new NotFoundError(MESSAGES.NOT_FOUND)
-        }
+      
         const otpresult = await this._otpService.generateAndSaveForgotOtp(
             existingUser.email,
             existingUser.name,

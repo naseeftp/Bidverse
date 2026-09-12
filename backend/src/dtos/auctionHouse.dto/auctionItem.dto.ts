@@ -245,3 +245,14 @@ export interface cancelAuctionItemDTO{
     cancelledRole:Role,
     cencelingReason:string
 }
+
+
+export interface ModifyAuctionDTO {
+  currentHighestBid?: number;
+  currentHighestBidder?: string; 
+  bidCount?: number;
+  reserveMet?: boolean;
+  winningBidder?: string;        
+  endTime?: Date;
+  status?: AuctionItemStatus;
+}

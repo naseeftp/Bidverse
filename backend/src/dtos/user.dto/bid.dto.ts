@@ -3,12 +3,20 @@ import { BidStatus } from "../../constants/constants"
 export interface placeBidDTO {
     tenantId: string,
     auctionId: string,
-    amount: string
+    amount: string,
 }
 export interface bidResponseDTO {
     bidderId: string,
     bidAmount: string,
     placedAt: Date
+}
+
+export interface createBidDTO{
+tenantId:string,
+bidAmount:number,
+auctionId:string,
+bidderId:string,
+status:BidStatus
 }
 
 export interface myBidListDTO {

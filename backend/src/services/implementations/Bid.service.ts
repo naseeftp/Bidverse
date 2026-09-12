@@ -5,7 +5,6 @@ import { IUserRepository } from "../../repositories/interfaces/iUser.repository"
 import { BadRequestError, NotFoundError } from "../../errors/AppError";
 import { AuctionItemStatus, BidStatus, MESSAGES } from "../../constants/constants";
 import { IAuctionItemRepository } from "../../repositories/interfaces/IAuctionItem.repository";
-import { Types } from "mongoose";
 import { BidMapper } from "../../mappers/bid.mapper";
 import { IGenericPaginatedResposnse } from "../../types/response.type";
 import { INotificationService } from "../interface/INotification.service";
@@ -43,6 +42,8 @@ export class BidService implements IBidService {
             auctionExist.currentHighestBid + auctionExist.minimumIncrement
             : auctionExist.startingPrice + auctionExist.minimumIncrement
 
+
+        const bidAmount=Number(data.amount)
         if (Number(data.amount) < minimumRequiredBid) {
             throw new BadRequestError(`Bid amount must be at least ${minimumRequiredBid}`)
         };
@@ -59,34 +60,32 @@ export class BidService implements IBidService {
         }
 
 
-        const isReserveMet = parseInt(data.amount) >= auctionExist.reservePrice;
+        const isReserveMet = bidAmount >= auctionExist.reservePrice;
         const status = isReserveMet ? BidStatus.WINNING : BidStatus.ACTIVE;
-        const result = await this._bidRepo.create({
-            tenantId: new Types.ObjectId(data.tenantId),
+        const bidData = {
+            tenantId: data.tenantId,
             bidAmount: Number(data.amount),
-            auctionId: new Types.ObjectId(data.auctionId),
-            bidderId: new Types.ObjectId(userId),
+            auctionId: data.auctionId,
+            bidderId: userId,
             status: status
-        })
-
-        auctionExist.currentHighestBid = Number(data.amount);
-        auctionExist.currentHighestBidder = new Types.ObjectId(userId)
-        auctionExist.bidCount += 1;
-        if (isReserveMet && !auctionExist.reserveMet) {
-            auctionExist.reserveMet = true;
         }
-        if (isReserveMet) {
-            auctionExist.winningBidder = new Types.ObjectId(userId)
-        }
+        const result = await this._bidRepo.placeBid(bidData)
+        let updatedEndTime = auctionExist.endTime;
         if (auctionExist.snipingProtectionMinutes) {
             const timeRemainingMs = new Date(auctionExist.endTime).getTime() - now.getTime();
-            const tresholdMs = auctionExist.snipingProtectionMinutes * 60 * 1000;
-            if (timeRemainingMs < tresholdMs) {
-                auctionExist.endTime = new Date(now.getTime() + tresholdMs)
+            const thresholdMs = auctionExist.snipingProtectionMinutes * 60 * 1000;
+            if (timeRemainingMs < thresholdMs) {
+                updatedEndTime = new Date(now.getTime() + thresholdMs);
             }
         }
-
-        await auctionExist.save()
+        await this._auctionRepo.updateAuction(data.auctionId, {
+        currentHighestBid: bidAmount,
+        currentHighestBidder: userId,
+        bidCount: auctionExist.bidCount + 1,
+        reserveMet: isReserveMet ? true : auctionExist.reserveMet,
+        winningBidder: isReserveMet ? userId : auctionExist.winningBidder?.toString(),
+        endTime: updatedEndTime,
+    });
         await this._bidRepo.makeOutBid(result._id, data.auctionId)
         return BidMapper.toBidResponseDTO(result)
 

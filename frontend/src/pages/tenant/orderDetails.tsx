@@ -156,7 +156,7 @@ const TenantOrderDetailsPage: React.FC = () => {
 
                         <div className="bg-white border border-[#E2E8F0] rounded-xl p-5 shadow-xs space-y-4">
                             <h2 className="text-xs font-bold uppercase tracking-wider text-[#475569] flex items-center gap-2 border-b border-[#E2E8F0] pb-3">
-                                <FaTag size={12} className="text-[#2F6FED]" /> Purchased Item
+                                <FaTag size={12} className="text-[#2F6FED]" /> Order Item
                             </h2>
 
                             <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
