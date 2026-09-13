@@ -107,9 +107,7 @@ const AdminOrders: React.FC = () => {
         </p>
       </div>
 
-      {/* Controls */}
       <div className="flex flex-col md:flex-row justify-between items-end gap-4">
-        {/* Search Input */}
         <div className="w-full max-w-md relative group">
           <div className="absolute bottom-3.5 left-4 text-white/20 group-focus-within:text-white transition-colors">
             <FaSearch size={10} />
@@ -123,7 +121,6 @@ const AdminOrders: React.FC = () => {
           />
         </div>
 
-        {/* Status Filter */}
         <div className="w-full md:w-auto min-w-[200px] relative group">
           <label className="text-[9px] font-black uppercase tracking-[0.2em] text-[#111827] mb-2 block ml-1 text-right md:mr-1">
             Status Filter
@@ -152,7 +149,6 @@ const AdminOrders: React.FC = () => {
         </div>
       </div>
 
-      {/* Orders Table Container */}
       <div className="bg-[#111827] rounded-sm border border-white/10 shadow-xl overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse min-w-[900px]">
@@ -239,7 +235,7 @@ const AdminOrders: React.FC = () => {
                       </td>
                       <td className="px-6 py-4 text-right">
                         <button
-                          onClick={() => navigate(`/tenant/order-details/${order.id}`)}
+                          onClick={() => navigate(`/admin/orders-details/${order.id}`)}
                           className="inline-flex items-center gap-2 text-white text-[10px] font-bold uppercase tracking-widest hover:underline transition-all"
                         >
                           Details <FaExternalLinkAlt size={8} />
