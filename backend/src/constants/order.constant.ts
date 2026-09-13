@@ -4,7 +4,19 @@ export enum OrderStatus {
     SHIPPED = "SHIPPED",
     OUT_FOR_DELIVERY = "OUT_FOR_DELIVERY",
     DELIVERED = "DELIVERED",
+    RETURN_REQUESTED = "RETURN_REQUESTED",
     COMPLETED = "COMPLETED",
-    CANCELLED = "CANCELLED",
     REFUNDED = "REFUNDED",
-}   // re work on return logic
+}
+export enum ReturnRequestStatus {
+    PENDING = "PENDING",
+    APPROVED = "APPROVED",
+    REJECTED = "REJECTED",
+}
+export enum ReturnReason {
+    NOT_AS_DESCRIBED = "NOT_AS_DESCRIBED",
+    DAMAGED = "DAMAGED",
+    WRONG_ITEM = "WRONG_ITEM",
+    AUTHENTICITY_ISSUE = "AUTHENTICITY_ISSUE",
+    OTHER = "OTHER",
+}

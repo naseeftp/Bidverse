@@ -66,4 +66,14 @@ export class OrderController implements IOrderController {
             next(error)
         }
     }
+    async updateStatus(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const orderId=req.params.id as string;
+            const {newStatus}=req.body;
+            const result=await this._orderService.updateStatus(orderId,newStatus)
+            SuccessResponse(res,MESSAGES.ACTION_SUCCESS,result,HttpStatus.OK)
+        } catch (error) {
+            next(error)
+        }
+    }
 }

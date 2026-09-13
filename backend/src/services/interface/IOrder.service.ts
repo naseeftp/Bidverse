@@ -1,3 +1,4 @@
+import { OrderStatus } from "../../constants/order.constant";
 import { CreateOrderDTO, OrderListResponseDTO,OrderDetailsResponseDTO,OrderTenantListResponseDTO, OrderAdminListResponseDTO} from "../../dtos/user.dto/order.dto";
 import { OrderPaymentResponseDTO } from "../../dtos/user.dto/payment.dto";
 import { IGenericPaginatedResposnse } from "../../types/response.type";
@@ -8,4 +9,5 @@ export interface IOrderService{
     getTenantOrders(tenantId:string,page:number,limit:number,status?:string,search?:string):Promise<IGenericPaginatedResposnse<OrderTenantListResponseDTO>>
     getAllOrdersByAdmin(page:number,limit:number,status?:string,search?:string):Promise<IGenericPaginatedResposnse<OrderAdminListResponseDTO>>
     getOrderDetails(orderId: string): Promise<OrderDetailsResponseDTO>
+    updateStatus(orderId:string,status:OrderStatus):Promise<void>
 }

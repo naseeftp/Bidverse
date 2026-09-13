@@ -17,21 +17,26 @@ router.post(
 router.get(
     ORDER_ROUTES.GET_MY_ORDERS,
     allowedTo(Role.USER),
-    (req,res,next)=>orderController.getUserOrders(req,res,next)
+    (req, res, next) => orderController.getUserOrders(req, res, next)
 )
 router.get(
     ORDER_ROUTES.ORDER_DEATAILS,
-    allowedTo(Role.USER,Role.TENANT,Role.ADMIN),
-    (req,res,next)=>orderController.getUserOrderDetails(req,res,next)
+    allowedTo(Role.USER, Role.TENANT, Role.ADMIN),
+    (req, res, next) => orderController.getUserOrderDetails(req, res, next)
 )
 router.get(
     ORDER_ROUTES.GET_TENANT_ORDERS,
     allowedTo(Role.TENANT),
-    (req,res,next)=>orderController.getTenantOrders(req,res,next)
+    (req, res, next) => orderController.getTenantOrders(req, res, next)
 )
 router.get(
     ORDER_ROUTES.GET_ADMIN_ORDERS,
     allowedTo(Role.ADMIN),
-    (req,res,next)=>orderController.getAllOrdersByAdmin(req,res,next)
+    (req, res, next) => orderController.getAllOrdersByAdmin(req, res, next)
+)
+router.patch(
+    ORDER_ROUTES.UPDATE_STATUS,
+    allowedTo(Role.TENANT),
+    (req, res, next) => orderController.updateStatus(req, res, next)
 )
 export default router

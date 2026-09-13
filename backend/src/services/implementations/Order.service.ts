@@ -10,6 +10,7 @@ import { IOrderRepository } from "../../repositories/interfaces/IOrder.repositor
 import { OrderMapper } from "../../mappers/order.mapper";
 import { IGenericPaginatedResposnse } from "../../types/response.type";
 import { IAuctionHouseRepository } from "../../repositories/interfaces/IAuctionHouse.repository";
+import { OrderStatus } from "../../constants/order.constant";
 
 export class OrderService implements IOrderService {
     constructor(
@@ -98,5 +99,12 @@ export class OrderService implements IOrderService {
             throw new NotFoundError(MESSAGES.ORDER_NOT_FOUND)
         }
         return OrderMapper.toDetailsDTO(order)
+    }
+    async updateStatus(orderId: string, status: OrderStatus): Promise<void> {
+        const order=await this._orderRepo.findById(orderId);
+        if(!order){
+            throw new NotFoundError(MESSAGES.ORDER_NOT_FOUND)
+        }
+        await this._orderRepo.updateStatus(orderId,status)
     }
 }

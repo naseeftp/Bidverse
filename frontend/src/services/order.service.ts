@@ -97,5 +97,19 @@ export class OrderService {
             return apiErrorHandler(error, 'Failed to get order details')
         }
     }
+
+    async updateOrderStatus(id:string,newStatus:string){
+        try {
+            const ulr=`${BASE_ROUTES.ORDER}${ORDER_ROUTES.UPDATE_STATUS}/${id}`
+            const response=await axiosInstance.patch<void,ApiResponse<void>>(ulr,{newStatus:newStatus});
+            return{
+                success:true,
+                message:response.message,
+                data:response.data
+            }
+        } catch (error) {
+            return apiErrorHandler(error,'Failed to update the Status')
+        }
+    }
 }
 export default new OrderService()

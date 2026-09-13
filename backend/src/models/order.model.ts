@@ -1,5 +1,5 @@
 import { IOrderDocument } from "../types/order.type";
-import { OrderStatus } from "../constants/order.constant";
+import { OrderStatus,ReturnReason,ReturnRequestStatus } from "../constants/order.constant";
 import mongoose, { Schema, Types } from "mongoose";
 
 const ShippingSnapshotSchema = new Schema(
@@ -13,6 +13,53 @@ const ShippingSnapshotSchema = new Schema(
         city: { type: String, required: true, trim: true },
         state: { type: String, required: true, trim: true },
         country: { type: String, required: true, trim: true },
+    },
+    { _id: false }
+);
+
+const ReturnRequestSchema = new Schema(
+    {
+        reason: {
+            type: String,
+            enum: Object.values(ReturnReason),
+            required: true
+        },
+
+        description: {
+            type: String,
+            required: true,
+            trim: true
+        },
+
+        proofs: {
+            type: [String],
+            required: true,
+        },
+
+        status: {
+            type: String,
+            enum: Object.values(ReturnRequestStatus),
+            default: ReturnRequestStatus.PENDING
+        },
+
+        rejectionReason: {
+            type: String,
+            trim: true
+        },
+
+        requestedAt: {
+            type: Date,
+            default: Date.now
+        },
+
+        reviewedAt: {
+            type: Date
+        },
+
+        reviewedBy: {
+            type: Types.ObjectId,
+            ref: "User"
+        }
     },
     { _id: false }
 );
@@ -86,6 +133,12 @@ const OrderSchema = new Schema<IOrderDocument>({
     },
     deliveredAt: {
         type: Date
+    },
+    confirmedAt:{
+        type:Date
+    },
+    returnRequest:{
+        type:ReturnRequestSchema
     }
 
 }, { timestamps: true })

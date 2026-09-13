@@ -4,6 +4,7 @@ import { BaseRepository } from "./Base.repository";
 import { Order } from "../../models/order.model";
 import { PipelineStage, Types } from "mongoose";
 import { CreateOrderInputDTO } from "../../dtos/user.dto/order.dto";
+import { OrderStatus } from "../../constants/order.constant";
 
 export class OrderRepository extends BaseRepository<IOrderDocument> implements IOrderRepository {
     constructor() {
@@ -294,5 +295,17 @@ export class OrderRepository extends BaseRepository<IOrderDocument> implements I
         ])
         return result || null
     }
-
+    async updateStatus(orderId:string,status:OrderStatus):Promise<IOrderDocument|null>{
+       const targetId=new Types.ObjectId(orderId);
+       return this.model.findByIdAndUpdate(
+        targetId,
+        {
+            $set:{
+                status,
+                updatedAt:new Date(),
+            }
+        },{new:true}
+       ).lean<IOrderDocument>()
+       .exec()
+    }
 }

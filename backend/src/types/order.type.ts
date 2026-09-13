@@ -1,5 +1,5 @@
 import { Types, Document } from "mongoose";
-import { OrderStatus } from "../constants/order.constant";
+import { OrderStatus,ReturnReason,ReturnRequestStatus } from "../constants/order.constant";
 
 export interface IOrderShippingSnapshot {
     recipientName: string;
@@ -12,12 +12,22 @@ export interface IOrderShippingSnapshot {
     state: string;
     country: string;
 }
+export interface IReturnRequest {
+    reason: ReturnReason;
+    description: string;
+    proofs: string[];
+    status: ReturnRequestStatus;
+    rejectionReason?: string;
+    requestedAt: Date;
+    reviewedAt?: Date;
+    reviewedBy?: Types.ObjectId;
+}
 
 export interface IOrder {
     orderNumber: string;
     auctionItemId: Types.ObjectId;
     paymentRequestId: Types.ObjectId;
-    paymentId: Types.ObjectId;
+    paymentId?: Types.ObjectId;
     tenantId: Types.ObjectId;
     buyerId: Types.ObjectId;
 
@@ -31,6 +41,9 @@ export interface IOrder {
     status: OrderStatus;
     shippedAt?: Date;
     deliveredAt?: Date;
+    confirmedAt?: Date;
+    returnRequest?: IReturnRequest;
+
     createdAt: Date,
     updatedAt: Date,
 }
