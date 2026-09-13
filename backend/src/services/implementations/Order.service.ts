@@ -1,6 +1,6 @@
 import { IOrderService } from "../interface/IOrder.service";
 import { IPaymentRequestRepository } from "../../repositories/interfaces/IPaymentRequest.repository";
-import { CreateOrderDTO, OrderListResponseDTO, OrderDetailsResponseDTO, OrderTenantListResponseDTO } from "../../dtos/user.dto/order.dto";
+import { CreateOrderDTO, OrderListResponseDTO, OrderDetailsResponseDTO, OrderTenantListResponseDTO, OrderAdminListResponseDTO } from "../../dtos/user.dto/order.dto";
 import { NotFoundError } from "../../errors/AppError";
 import { MESSAGES } from "../../constants/constants";
 import { IAddressRepository } from "../../repositories/interfaces/IAddress.repository";
@@ -73,6 +73,21 @@ export class OrderService implements IOrderService {
                 totalPages: Math.ceil(total / limit),
                 hasNextPage: page * limit > total,
                 hasPrevPage: page > 1
+            }
+        }
+    }
+    async getAllOrdersByAdmin(page: number, limit: number, status?: string, search?: string): Promise<IGenericPaginatedResposnse<OrderAdminListResponseDTO>> {
+        const {docs,total}=await this._orderRepo.getAllOrdersByAdmin(page,limit,status,search)
+        const mappedDocs=docs.map((doc)=>OrderMapper.toAdminOrdersListDTO(doc))
+        return{
+            data:mappedDocs,
+            pagination:{
+                totalItems:total,
+                itemsPerPage:limit,
+                currentPage:page,
+                totalPages:Math.ceil(total/limit),
+                hasNextPage:page*limit>total,
+                hasPrevPage:page>1
             }
         }
     }

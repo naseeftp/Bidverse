@@ -1,5 +1,5 @@
-import { OrderListResponseDTO, OrderResponseDTO, OrderDetailsResponseDTO, OrderTenantListResponseDTO } from "../dtos/user.dto/order.dto";
-import { IOrderDocument, IOrderDetailsAggregateDoc, IOrderAggregateDOC, IOrderTenantAggregateDOC } from "../types/order.type";
+import { OrderListResponseDTO, OrderResponseDTO, OrderDetailsResponseDTO, OrderTenantListResponseDTO, OrderAdminListResponseDTO } from "../dtos/user.dto/order.dto";
+import { IOrderDocument, IOrderDetailsAggregateDoc, IOrderAggregateDOC, IOrderTenantAggregateDOC, IOrderAdminAggregateDOC } from "../types/order.type";
 
 export class OrderMapper {
     static toResponseDTO(doc: IOrderDocument): OrderResponseDTO {
@@ -41,6 +41,21 @@ export class OrderMapper {
             itemTitle: doc.auction?.title,
             buyerName: doc.buyer?.buyerName,
             buyerId: doc.buyer?._id.toString(),
+            orderAmount: doc.totalAmount,
+            status: doc.status
+        }
+    }
+    static toAdminOrdersListDTO(doc:IOrderAdminAggregateDOC):OrderAdminListResponseDTO{
+        return{
+              id: doc._id.toString(),
+            orderNumber: doc.orderNumber,
+            auctionId: doc.auctionItemId.toString(),
+            itemImage: doc.auction?.images?.[0],
+            itemTitle: doc.auction?.title,
+            buyerName: doc.buyer?.buyerName,
+            buyerId: doc.buyer?._id.toString(),
+            houseName:doc.house?.name,
+            houseId:doc.house?._id.toString(),
             orderAmount: doc.totalAmount,
             status: doc.status
         }

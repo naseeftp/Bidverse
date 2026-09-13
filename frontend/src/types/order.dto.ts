@@ -43,7 +43,22 @@ export interface OrderTenantListResponseDTO {
     orderAmount: number,
     status: OrderStatus
 }
-
+export interface OrderAdminListResponseDTO {
+    id: string,
+    orderNumber: string,
+    auctionId: string,
+    itemImage?: {
+        url: string;
+        altText?: string;
+    } | null,
+    itemTitle?: string,
+    buyerName?: string,
+    buyerId?: string,
+    houseName?: string,
+    houseId?: string,
+    orderAmount: number,
+    status: OrderStatus
+}
 export interface ShippingSnapshotDTO {
     recipientName: string;
     phone: string;

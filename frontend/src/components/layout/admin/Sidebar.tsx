@@ -6,7 +6,8 @@ import {
     FaGavel,
     FaSignOutAlt,
     FaShieldAlt,
-    FaStore
+    FaStore,
+    FaShoppingBag
 } from "react-icons/fa";
 
 import { logout } from "../../../redux/user/auth.slice";
@@ -29,9 +30,8 @@ const AdminSidebar: React.FC = () => {
         { name: "User Management", path: "/admin/users", icon: <FaUsers /> },
         { name: "Auction Houses", path: "/admin/auction-houses", icon: < FaStore /> },
         { name: "Auctions", path: "/admin/auctions", icon: <FaGavel /> },
-
-
-    ];
+        { name: "Orders", path: "/admin/orders", icon: <FaShoppingBag/> },
+];
 
     return (
         <aside className="w-64 min-h-screen bg-[#111827] flex flex-col border-r border-[#D4AF37]/10 shadow-2xl">

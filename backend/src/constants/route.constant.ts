@@ -145,6 +145,7 @@ export const ORDER_ROUTES = {
    PLACE_ORDER:'/place-order',
    GET_MY_ORDERS:'/my-orders',
    GET_TENANT_ORDERS:'/tenant-orders',
+   GET_ADMIN_ORDERS:'/admin-orders',
    ORDER_DEATAILS:'/order-details/:id'
 }
 

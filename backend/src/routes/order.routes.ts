@@ -29,4 +29,9 @@ router.get(
     allowedTo(Role.TENANT),
     (req,res,next)=>orderController.getTenantOrders(req,res,next)
 )
+router.get(
+    ORDER_ROUTES.GET_ADMIN_ORDERS,
+    allowedTo(Role.ADMIN),
+    (req,res,next)=>orderController.getAllOrdersByAdmin(req,res,next)
+)
 export default router

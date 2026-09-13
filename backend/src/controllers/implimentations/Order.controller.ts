@@ -45,6 +45,18 @@ export class OrderController implements IOrderController {
             next(error)
         }
     }
+    async getAllOrdersByAdmin(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+             const page = Number(req.query.page);
+            const limit = Number(req.query.limit);
+            const status = req.query.status as string;
+            const search = req.query.search as string
+            const result = await this._orderService.getAllOrdersByAdmin(page, limit, status, search)
+            SuccessResponse(res, MESSAGES.ACTION_SUCCESS, result, HttpStatus.OK)
+        } catch (error) {
+            next(error)
+        }
+    }
     async getUserOrderDetails(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
             const orderId = req.params.id as string;
