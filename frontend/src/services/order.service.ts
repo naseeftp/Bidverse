@@ -111,5 +111,18 @@ export class OrderService {
             return apiErrorHandler(error,'Failed to update the Status')
         }
     }
+    async markAsConfirmed(id:string){
+        try {
+            const ulr=`${BASE_ROUTES.ORDER}${ORDER_ROUTES.MARK_CONFIRMED}/${id}`
+            const response=await axiosInstance.patch<void,ApiResponse<void>>(ulr);
+            return{
+                success:true,
+                message:response.message,
+                data:response.data
+            }
+        } catch (error) {
+            return apiErrorHandler(error,'Failed to update the Status')
+        }
+    }
 }
 export default new OrderService()

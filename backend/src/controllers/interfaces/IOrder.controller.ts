@@ -7,5 +7,5 @@ export interface IOrderController {
     getAllOrdersByAdmin(req: Request, res: Response, next: NextFunction): Promise<void>;
     getUserOrderDetails(req: Request, res: Response, next: NextFunction): Promise<void>;
     updateStatus(req: Request, res: Response, next: NextFunction): Promise<void>;
-
+    markAsConfirmed(req: Request, res: Response, next: NextFunction): Promise<void>;
 }

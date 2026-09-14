@@ -63,11 +63,9 @@ const TenantOrderDetailsPage: React.FC = () => {
     fetchOrderDetails();
   }, [fetchOrderDetails]);
 
-  // Determine current position in the status flow
   const currentStatus = (details?.status?.toUpperCase() as OrderStatus) || OrderStatus.PENDING;
   const currentIndex = FORWARD_STATUS_FLOW.indexOf(currentStatus);
 
-  // Tenant can only update if current status is prior to DELIVERED
   const isUpdatable = currentIndex !== -1 && currentStatus !== OrderStatus.DELIVERED;
 
   const handleStatusUpdate = async (newStatus: string) => {

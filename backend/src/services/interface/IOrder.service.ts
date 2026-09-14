@@ -10,4 +10,5 @@ export interface IOrderService{
     getAllOrdersByAdmin(page:number,limit:number,status?:string,search?:string):Promise<IGenericPaginatedResposnse<OrderAdminListResponseDTO>>
     getOrderDetails(orderId: string): Promise<OrderDetailsResponseDTO>
     updateStatus(orderId:string,status:OrderStatus):Promise<void>
+    markAsConfirmed(orderId:string):Promise<void>
 }

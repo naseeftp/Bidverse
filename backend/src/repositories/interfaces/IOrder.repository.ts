@@ -11,4 +11,5 @@ export interface IOrderRepository extends IBaseRepository<IOrderDocument> {
     getTenantOrders(tenantId:string,page:number,limit:number,status?:string,search?:string):Promise<{docs:IOrderTenantAggregateDOC[],total:number}>
     getAllOrdersByAdmin(page:number,limit:number,status?:string,search?:string):Promise<{docs:IOrderAdminAggregateDOC[],total:number}>
     updateStatus(orderId:string,status:OrderStatus):Promise<IOrderDocument|null>
+    markAsConfirmed(orderId:string,status:OrderStatus):Promise<IOrderDocument|null>
 }

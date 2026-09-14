@@ -308,4 +308,19 @@ export class OrderRepository extends BaseRepository<IOrderDocument> implements I
        ).lean<IOrderDocument>()
        .exec()
     }
+    async markAsConfirmed(orderId:string,status:OrderStatus):Promise<IOrderDocument|null>{
+        const targetId=new Types.ObjectId(orderId);
+       return this.model.findByIdAndUpdate(
+        targetId,
+        {
+            $set:{
+                status,
+                updatedAt:new Date(),
+                confirmedAt:new Date()
+            }
+        },{new:true}
+       ).lean<IOrderDocument>()
+       .exec()
+    }
+    
 }

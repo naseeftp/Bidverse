@@ -147,8 +147,8 @@ export const ORDER_ROUTES = {
    GET_TENANT_ORDERS:'/tenant-orders',
    GET_ADMIN_ORDERS:'/admin-orders',
    ORDER_DEATAILS:'/order-details/:id',
-   UPDATE_STATUS:'/update-status/:id'
-
+   UPDATE_STATUS:'/update-status/:id',
+   MARK_CONFIRMED:'/mark-as-confirmed/:id'
 }
 
 

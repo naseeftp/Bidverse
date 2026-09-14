@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { useParams, useNavigate } from "react-router-dom";
-import type { OrderDetailsResponseDTO } from "../../types/order.dto";
+import { OrderStatus, type OrderDetailsResponseDTO } from "../../types/order.dto";
 import orderService from "../../services/order.service";
 import {
     FaArrowLeft,
@@ -17,6 +17,9 @@ import {
     FaCalendarAlt,
     FaPhone,
     FaTag,
+    FaUndo,
+    FaCheck,
+    FaTimes
 } from "react-icons/fa";
 
 const OrderDetailsPage: React.FC = () => {
@@ -24,7 +27,9 @@ const OrderDetailsPage: React.FC = () => {
     const navigate = useNavigate();
     const [loading, setLoading] = useState<boolean>(true);
     const [details, setOrderDetails] = useState<OrderDetailsResponseDTO | null>(null);
-
+    const [isConfirmModalOpen, setIsConfirmModalOpen] = useState<boolean>(false);
+    const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+    
     const fetchOrderDetails = useCallback(async () => {
         if (!id) return;
         setLoading(true);
@@ -45,6 +50,25 @@ const OrderDetailsPage: React.FC = () => {
     useEffect(() => {
         fetchOrderDetails();
     }, [fetchOrderDetails]);
+
+    const handleConfirmDelivery = async () => {
+        if (!id) return;
+        setIsSubmitting(true);
+        try {
+           const response=await orderService.markAsConfirmed(id);
+           if(response.success){
+              toast.success('Order confirmed successfully!')
+              setOrderDetails((prev) => (prev ? { ...prev, status: OrderStatus.COMPLETED} : null));
+              setIsConfirmModalOpen(false);
+           }else{
+            toast.error(response.message)
+           }
+        } catch {
+            toast.error("Failed to confirm order delivery");
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
 
     const formatDate = (dateString?: string) => {
         if (!dateString) return "N/A";
@@ -113,7 +137,7 @@ const OrderDetailsPage: React.FC = () => {
             </div>
         );
     }
-
+const isDelivered = details.status?.toUpperCase() === "DELIVERED";
     return (
         <div className="min-h-screen bg-[#FFF9F4] px-4 py-8 md:px-8 text-[#1F1F1F] font-sans antialiased">
             <div className="max-w-6xl mx-auto space-y-6">
@@ -147,6 +171,39 @@ const OrderDetailsPage: React.FC = () => {
                         </div>
                     </div>
                 </div>
+                
+                {isDelivered && (
+                    <div className="bg-white border-2 border-emerald-500/30 rounded-xl p-5 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                        <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center flex-shrink-0">
+                                <FaCheckCircle size={20} />
+                            </div>
+                            <div>
+                                <h3 className="text-sm font-black uppercase tracking-wide text-[#1F1F1F]">
+                                    Order Delivered
+                                </h3>
+                                <p className="text-xs text-[#6B6B6B] mt-0.5">
+                                    Please inspect your item. Confirming receipt will release funds to the seller.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div className="flex items-center gap-3 w-full md:w-auto">
+                            <button
+                                // onClick={() => setIsRejectModalOpen(true)}
+                                className="flex-1 md:flex-initial inline-flex justify-center items-center gap-2 px-4 py-2.5 rounded-lg border border-rose-300 bg-rose-50 text-rose-700 text-xs font-black uppercase tracking-wider hover:bg-rose-100 transition-colors cursor-pointer"
+                            >
+                                <FaUndo size={11} /> Return / Reject
+                            </button>
+                            <button
+                                onClick={() => setIsConfirmModalOpen(true)}
+                                className="flex-1 md:flex-initial inline-flex justify-center items-center gap-2 px-5 py-2.5 rounded-lg bg-[#1F1F1F] text-white text-xs font-black uppercase tracking-wider hover:bg-[#C9653B] transition-colors cursor-pointer shadow-sm"
+                            >
+                                <FaCheck size={11} /> Confirm Delivery
+                            </button>
+                        </div>
+                    </div>
+                )}
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
@@ -299,6 +356,52 @@ const OrderDetailsPage: React.FC = () => {
                 </div>
 
             </div>
+            {isConfirmModalOpen && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
+                    <div className="bg-white border border-[#E6E0DA] rounded-xl max-w-md w-full p-6 shadow-xl space-y-5 animate-in fade-in zoom-in duration-150">
+                        <div className="flex justify-between items-start">
+                            <div className="flex items-center gap-3">
+                                <div className="w-9 h-9 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center flex-shrink-0">
+                                    <FaCheckCircle size={18} />
+                                </div>
+                                <h3 className="text-base font-black uppercase tracking-wide text-[#1F1F1F]">
+                                    Confirm Order Delivery
+                                </h3>
+                            </div>
+                            <button
+                                onClick={() => setIsConfirmModalOpen(false)}
+                                className="text-[#6B6B6B] hover:text-[#1F1F1F] p-1 cursor-pointer"
+                            >
+                                <FaTimes size={14} />
+                            </button>
+                        </div>
+
+                        <p className="text-xs text-[#6B6B6B] leading-relaxed font-medium">
+                            By confirming, you verify that you have received the item in good condition. 
+                            This action will release the held escrow funds to the seller and mark this order as completed.
+                        </p>
+
+                        <div className="flex items-center justify-end gap-3 pt-2 border-t border-[#E6E0DA]">
+                            <button
+                                type="button"
+                                disabled={isSubmitting}
+                                onClick={() => setIsConfirmModalOpen(false)}
+                                className="px-4 py-2 rounded-lg border border-[#E6E0DA] text-xs font-bold uppercase tracking-wider text-[#6B6B6B] hover:bg-[#FFF9F4] transition-colors cursor-pointer"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                type="button"
+                                disabled={isSubmitting}
+                                onClick={handleConfirmDelivery}
+                                className="px-5 py-2 rounded-lg bg-emerald-700 text-white text-xs font-black uppercase tracking-wider hover:bg-emerald-800 transition-colors disabled:opacity-50 cursor-pointer"
+                            >
+                                {isSubmitting ? "Processing..." : "Confirm & Release Escrow"}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

@@ -107,4 +107,11 @@ export class OrderService implements IOrderService {
         }
         await this._orderRepo.updateStatus(orderId,status)
     }
+    async markAsConfirmed(orderId: string): Promise<void> {
+        const order=await this._orderRepo.findById(orderId);
+        if(!order){
+            throw new NotFoundError(MESSAGES.ORDER_NOT_FOUND);
+        }
+        await this._orderRepo.markAsConfirmed(orderId,OrderStatus.COMPLETED)
+    }
 }

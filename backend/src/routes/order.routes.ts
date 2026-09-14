@@ -39,4 +39,9 @@ router.patch(
     allowedTo(Role.TENANT),
     (req, res, next) => orderController.updateStatus(req, res, next)
 )
+router.patch(
+    ORDER_ROUTES.MARK_CONFIRMED,
+    allowedTo(Role.USER),
+    (req,res,next)=>orderController.markAsConfirmed(req,res,next)
+)
 export default router
