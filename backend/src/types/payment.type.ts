@@ -24,7 +24,6 @@ export interface IPayment {
     refundedAt?: Date;
     platformCommission?: number;
     netAmount?: number;
-    platformCommision?: number;
     releasedAt?: Date;
     metadata?: IOrderPaymentMetadata;
 }

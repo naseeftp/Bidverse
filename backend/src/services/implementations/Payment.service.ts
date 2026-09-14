@@ -26,7 +26,7 @@ export class PaymentService implements IPaymentService {
         private _razorpay: Razorpay,
         private _orderRepo: IOrderRepository,
         private _addressRepo: IAddressRepository,
-        private _paymentRequestRepo:IPaymentRequestRepository,
+        private _paymentRequestRepo: IPaymentRequestRepository,
     ) { }
     async createSlotPayment(data: createSlotPaymentDTO): Promise<slotPaymentResponseDTO> {
         const amountInPaise = Math.round(data.amount * 100);
@@ -44,7 +44,7 @@ export class PaymentService implements IPaymentService {
             slotBookingId: new Types.ObjectId(data.slotBookingId),
             amount: data.amount,
             netAmount: netAmount,
-            platformCommision: platformCommision,
+            platformCommission: platformCommision,
             currency: 'INR',
             status: PaymentStatus.PENDING,
             escrowStatus: EscrowStatus.NOT_APPLICABLE,
@@ -59,11 +59,11 @@ export class PaymentService implements IPaymentService {
     }
 
     async createOrderPayment(data: CreateOrderPaymentIntentDTO): Promise<OrderPaymentResponseDTO> {
-        const auctionExist=await this._auctionRepo.findById(data.auctionId);
-        if(!auctionExist){
+        const auctionExist = await this._auctionRepo.findById(data.auctionId);
+        if (!auctionExist) {
             throw new NotFoundError(MESSAGES.AUCTION_CREATED)
         }
-        const totalPayingAmount=data.amount+auctionExist.shippingCost;
+        const totalPayingAmount = data.amount + auctionExist.shippingCost;
         const amountInPaise = Math.round(totalPayingAmount * 100);
         const razorPayOrder = await this._razorpay.orders.create({
             amount: amountInPaise,
@@ -74,7 +74,7 @@ export class PaymentService implements IPaymentService {
             userId: new Types.ObjectId(data.userId),
             auctionItemId: new Types.ObjectId(data.auctionId),
             type: PaymentType.ORDER,
-            amount: data.amount,
+            amount: totalPayingAmount,
             currency: 'INR',
             status: PaymentStatus.PENDING,
             escrowStatus: EscrowStatus.NOT_APPLICABLE,
@@ -90,7 +90,7 @@ export class PaymentService implements IPaymentService {
             orderId: razorPayOrder.id,
             amount: payment.amount,
             currency: 'INR',
-            keyId:process.env.RAZORPAY_KEY_ID!
+            keyId: process.env.RAZORPAY_KEY_ID!
         };
     }
     async verifyPayment(data: verifyPaymentDTO): Promise<void> {
@@ -180,7 +180,7 @@ export class PaymentService implements IPaymentService {
                 };
 
                 const orderNumber = `ORD-${Date.now()}-${Math.floor(1000 + Math.random() * 9000)}`;
-                const totalAmount = payment.amount + auctionItem.shippingCost;
+                const totalAmount = payment.amount;
                 const newOrder = await this._orderRepo.createOrder({
                     orderNumber,
                     auctionItemId: payment.auctionItemId!.toString(),
@@ -190,18 +190,18 @@ export class PaymentService implements IPaymentService {
                     buyerId: payment.userId.toString(),
                     addressId: payment.metadata?.addressId ?? '',
                     shippingSnapshot,
-                    itemAmount: payment.amount,
+                    itemAmount: auctionItem.currentHighestBid,
                     shippingCost: auctionItem.shippingCost,
                     totalAmount,
                     currency: payment.currency
                 });
-                await this._paymentRequestRepo.updateStatus(payment.metadata?.paymentRequestId??'',PaymentRequestStatus.COMPLETED)
+                await this._paymentRequestRepo.updateStatus(payment.metadata?.paymentRequestId ?? '', PaymentRequestStatus.COMPLETED)
                 await this._transactionService.createTransaction({
                     partyType: TransactionPartyType.USER,
                     userId: payment.userId.toString(),
                     paymentId: payment._id.toString(),
                     auctionItemId: payment.auctionItemId?.toString(),
-                    purpose: TransactionPurpose.ORDER_PAYMENT, 
+                    purpose: TransactionPurpose.ORDER_PAYMENT,
                     direction: TransactionDirection.DEBIT,
                     amount: totalAmount,
                     currency: payment.currency,
@@ -312,5 +312,50 @@ export class PaymentService implements IPaymentService {
             })
 
         }
+    }
+    async releaseEscrowForOrder(orderId: string, paymentId: string, tenantId: string, shippingCost: number,houseId:string,adminId:string): Promise<void> {
+        const payment = await this._paymentRepo.findById(paymentId);
+        if (!payment) {
+            throw new NotFoundError(MESSAGES.PAYMENT_NOT_FOUND)
+        }
+        if (payment.status !== PaymentStatus.PAID || payment.escrowStatus !== EscrowStatus.HELD) {
+            return
+        };
+        const excludeShipping=payment.amount-shippingCost;
+        const platformCommission = (PLATFORM_COMMISSION / 100) * excludeShipping;
+        const netAmount = (payment.amount - platformCommission)+shippingCost;
+       
+        await this._paymentRepo.updateById(payment._id.toString(), {
+            netAmount,
+            platformCommission,
+            escrowStatus: EscrowStatus.RELEASED,
+            releasedAt: new Date()
+        })
+        await this._transactionService.createTransaction({
+            partyType: TransactionPartyType.AUCTION_HOUSE,
+            userId:houseId,
+            auctionHouseId: tenantId,
+            paymentId: payment._id.toString(),
+            auctionItemId: payment.auctionItemId?.toString(),
+            purpose: TransactionPurpose.ORDER_PAYMENT,
+            direction: TransactionDirection.CREDIT,
+            amount:netAmount,
+            currency: payment.currency,
+            status: TransactionStatus.COMPLETED,
+            description: `Order settlement payout for order ${orderId}`,
+        });
+        await this._transactionService.createTransaction({
+            partyType: TransactionPartyType.PLATFORM,
+            userId:adminId,
+            paymentId: payment._id.toString(),
+            auctionItemId: payment.auctionItemId?.toString(),
+            purpose: TransactionPurpose.PLATFORM_COMMISSION,
+            direction: TransactionDirection.CREDIT,
+            amount: platformCommission,
+            currency: payment.currency,
+            status: TransactionStatus.COMPLETED,
+            description: `Platform commission for order ${orderId}`,
+        });
+
     }
 }

@@ -7,4 +7,5 @@ export interface IPaymentService {
     refundSlotPayment(slotId: string): Promise<void>;
     refundForCancelAuction(auctionId: string): Promise<void>
     createOrderPayment(data: CreateOrderPaymentIntentDTO): Promise<OrderPaymentResponseDTO>
+    releaseEscrowForOrder(orderId: string, paymentId: string, tenantId: string, shippingCost: number,houseId:string,adminId:string): Promise<void>;
 }

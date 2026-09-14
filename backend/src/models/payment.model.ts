@@ -71,9 +71,6 @@ const PaymentSchema = new Schema<IPaymentDocument>({
     netAmount: {
         type: Number,
     },
-    platformCommision: {
-        type: Number
-    },
     releasedAt: {
         type: Date
     },

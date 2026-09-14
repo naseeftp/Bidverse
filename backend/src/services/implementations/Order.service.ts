@@ -11,6 +11,7 @@ import { OrderMapper } from "../../mappers/order.mapper";
 import { IGenericPaginatedResposnse } from "../../types/response.type";
 import { IAuctionHouseRepository } from "../../repositories/interfaces/IAuctionHouse.repository";
 import { OrderStatus } from "../../constants/order.constant";
+import { IUserRepository } from "../../repositories/interfaces/iUser.repository";
 
 export class OrderService implements IOrderService {
     constructor(
@@ -18,7 +19,8 @@ export class OrderService implements IOrderService {
         private _addressRepo: IAddressRepository,
         private _paymentService: IPaymentService,
         private _orderRepo: IOrderRepository,
-        private _houseRepo:IAuctionHouseRepository
+        private _houseRepo:IAuctionHouseRepository,
+        private _userRepo:IUserRepository
     ) { }
     async initiateOrderPayment(buyerId: string, data: CreateOrderDTO): Promise<OrderPaymentResponseDTO> {
         const paymentRequest = await this._paymentRepo.findByRequestId(data.paymentRequestId);
@@ -112,6 +114,18 @@ export class OrderService implements IOrderService {
         if(!order){
             throw new NotFoundError(MESSAGES.ORDER_NOT_FOUND);
         }
+        const house=await this._houseRepo.findById(order.tenantId.toString());
+        const houseUserId=house?.userId.toString();
+        const admin=await this._userRepo.findOne({role:'admin'});
+        const adminId=admin?._id.toString();
+        await this._paymentService.releaseEscrowForOrder(
+            orderId,
+            order.paymentId?.toString()??'',
+            order.tenantId.toString(),
+            order.shippingCost,
+            houseUserId??'',
+            adminId??""
+        )
         await this._orderRepo.markAsConfirmed(orderId,OrderStatus.COMPLETED)
     }
 }
