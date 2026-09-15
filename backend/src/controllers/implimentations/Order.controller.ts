@@ -85,4 +85,14 @@ export class OrderController implements IOrderController {
             next(error)
         }
     }
+    async requestReturn(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const buyerId=req.user.id;
+            const orderId=req.params.id as string;
+            const result=await this._orderService.requestReturn(orderId,buyerId,req.body)
+            SuccessResponse(res,MESSAGES.REJECTION_REQUEST_SUBMITED,result,HttpStatus.OK)
+        } catch (error) {
+            next(error)
+        }
+    }
 }

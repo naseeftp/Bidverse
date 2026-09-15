@@ -4,11 +4,23 @@ export const OrderStatus = {
     SHIPPED: "SHIPPED",
     OUT_FOR_DELIVERY: "OUT_FOR_DELIVERY",
     DELIVERED: "DELIVERED",
-    RETURN_REQUESTED :"RETURN_REQUESTED",
+    RETURN_REQUESTED: "RETURN_REQUESTED",
     COMPLETED: "COMPLETED",
     REFUNDED: "REFUNDED",
 } as const;
-
+export const ReturnRequestStatus = {
+    PENDING: "PENDING",
+    APPROVED: "APPROVED",
+    REJECTED: "REJECTED",
+}
+export const ReturnReason = {
+    NOT_AS_DESCRIBED: "NOT_AS_DESCRIBED",
+    DAMAGED: "DAMAGED",
+    WRONG_ITEM: "WRONG_ITEM",
+    AUTHENTICITY_ISSUE: "AUTHENTICITY_ISSUE",
+    OTHER: "OTHER",
+}
+export type ReturnReason = typeof ReturnReason[keyof typeof ReturnReason]
 export type OrderStatus = (typeof OrderStatus)[keyof typeof OrderStatus];
 
 export interface CreateOrderDTO {

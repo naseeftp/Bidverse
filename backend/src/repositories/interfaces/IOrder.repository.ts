@@ -1,5 +1,5 @@
 import { IBaseRepository } from "./IBase.repository";
-import { IOrderDocument,IOrderAggregateDOC, IOrderDetailsAggregateDoc,IOrderTenantAggregateDOC,IOrderAdminAggregateDOC} from "../../types/order.type";
+import { IOrderDocument,IOrderAggregateDOC, IOrderDetailsAggregateDoc,IOrderTenantAggregateDOC,IOrderAdminAggregateDOC,IReturnRequest} from "../../types/order.type";
 import { CreateOrderInputDTO } from "../../dtos/user.dto/order.dto";
 import { OrderStatus } from "../../constants/order.constant";
 
@@ -12,4 +12,5 @@ export interface IOrderRepository extends IBaseRepository<IOrderDocument> {
     getAllOrdersByAdmin(page:number,limit:number,status?:string,search?:string):Promise<{docs:IOrderAdminAggregateDOC[],total:number}>
     updateStatus(orderId:string,status:OrderStatus):Promise<IOrderDocument|null>
     markAsConfirmed(orderId:string,status:OrderStatus):Promise<IOrderDocument|null>
+    addReturnRequest(orderId: string, returnRequest: IReturnRequest, status: OrderStatus): Promise<void>;
 }

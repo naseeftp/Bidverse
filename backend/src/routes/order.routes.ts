@@ -44,4 +44,9 @@ router.patch(
     allowedTo(Role.USER),
     (req,res,next)=>orderController.markAsConfirmed(req,res,next)
 )
+router.post(
+    ORDER_ROUTES.RETURN_REQUEST,
+    allowedTo(Role.USER),
+    (req,res,next)=>orderController.requestReturn(req,res,next)
+)
 export default router

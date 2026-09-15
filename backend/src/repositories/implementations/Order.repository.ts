@@ -1,4 +1,4 @@
-import { IOrderDocument, IOrderAggregateDOC, IOrderDetailsAggregateDoc, IOrderTenantAggregateDOC, IOrderAdminAggregateDOC } from "../../types/order.type";
+import { IOrderDocument, IOrderAggregateDOC, IOrderDetailsAggregateDoc, IOrderTenantAggregateDOC, IOrderAdminAggregateDOC ,IReturnRequest} from "../../types/order.type";
 import { IOrderRepository } from "../interfaces/IOrder.repository";
 import { BaseRepository } from "./Base.repository";
 import { Order } from "../../models/order.model";
@@ -322,5 +322,11 @@ export class OrderRepository extends BaseRepository<IOrderDocument> implements I
        ).lean<IOrderDocument>()
        .exec()
     }
-    
+  
+async addReturnRequest(orderId: string, returnRequest: IReturnRequest, status: OrderStatus): Promise<void> {
+    await this.model.updateOne(
+        { _id: orderId },
+        { $set: { returnRequest, status } }
+    );
+}
 }

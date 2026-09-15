@@ -146,6 +146,7 @@ export const ORDER_ROUTES = {
     GET_ADMIN_ORDERS: '/admin-orders',
     ORDER_DEATAILS: '/order-details',
     UPDATE_STATUS:'/update-status',
-    MARK_CONFIRMED:'/mark-as-confirmed'
+    MARK_CONFIRMED:'/mark-as-confirmed',
+    RETURN_REQUEST:'/return-request'
 
 }

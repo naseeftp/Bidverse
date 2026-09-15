@@ -1,7 +1,7 @@
 import { IOrderService } from "../interface/IOrder.service";
 import { IPaymentRequestRepository } from "../../repositories/interfaces/IPaymentRequest.repository";
-import { CreateOrderDTO, OrderListResponseDTO, OrderDetailsResponseDTO, OrderTenantListResponseDTO, OrderAdminListResponseDTO } from "../../dtos/user.dto/order.dto";
-import { NotFoundError } from "../../errors/AppError";
+import { CreateOrderDTO, OrderListResponseDTO, OrderDetailsResponseDTO, OrderTenantListResponseDTO, OrderAdminListResponseDTO,CreateReturnRequestDTO } from "../../dtos/user.dto/order.dto";
+import { NotFoundError,ForbiddenError,BadRequestError } from "../../errors/AppError";
 import { MESSAGES } from "../../constants/constants";
 import { IAddressRepository } from "../../repositories/interfaces/IAddress.repository";
 import { IPaymentService } from "../interface/IPayment.service";
@@ -10,7 +10,7 @@ import { IOrderRepository } from "../../repositories/interfaces/IOrder.repositor
 import { OrderMapper } from "../../mappers/order.mapper";
 import { IGenericPaginatedResposnse } from "../../types/response.type";
 import { IAuctionHouseRepository } from "../../repositories/interfaces/IAuctionHouse.repository";
-import { OrderStatus } from "../../constants/order.constant";
+import { OrderStatus,ReturnRequestStatus } from "../../constants/order.constant";
 import { IUserRepository } from "../../repositories/interfaces/iUser.repository";
 
 export class OrderService implements IOrderService {
@@ -114,6 +114,9 @@ export class OrderService implements IOrderService {
         if(!order){
             throw new NotFoundError(MESSAGES.ORDER_NOT_FOUND);
         }
+        if(order.status!==OrderStatus.DELIVERED){
+            throw new BadRequestError('Only delivered Order Can be Confirmed');
+        }
         const house=await this._houseRepo.findById(order.tenantId.toString());
         const houseUserId=house?.userId.toString();
         const admin=await this._userRepo.findOne({role:'admin'});
@@ -128,4 +131,30 @@ export class OrderService implements IOrderService {
         )
         await this._orderRepo.markAsConfirmed(orderId,OrderStatus.COMPLETED)
     }
+    async requestReturn(orderId: string, buyerId: string, data: CreateReturnRequestDTO): Promise<void> {
+    const order = await this._orderRepo.findById(orderId);
+    if (!order) throw new NotFoundError(MESSAGES.ORDER_NOT_FOUND);
+
+    if (order.buyerId.toString() !== buyerId) {
+        throw new ForbiddenError(MESSAGES.NOT_PERMITTED); 
+    }
+
+    if (order.status !== OrderStatus.DELIVERED) {
+        throw new BadRequestError("Return can only be requested for delivered orders");
+    }
+
+    if (!data.proofs || data.proofs.length === 0) {
+        throw new BadRequestError("At least one proof image is required");
+    }
+
+    const returnRequest = {
+        reason: data.reason,
+        description: data.description,
+        proofs: data.proofs,
+        status: ReturnRequestStatus.PENDING,
+        requestedAt: new Date()
+    };
+
+    await this._orderRepo.addReturnRequest(orderId, returnRequest, OrderStatus.RETURN_REQUESTED);
+}
 }

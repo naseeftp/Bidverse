@@ -124,5 +124,19 @@ export class OrderService {
             return apiErrorHandler(error,'Failed to update the Status')
         }
     }
+
+    async submitReturn(orderId:string,data:{reason: string; description: string; proofs: string[] }){
+        try {
+            const url=`${BASE_ROUTES.ORDER}${ORDER_ROUTES.RETURN_REQUEST}/${orderId}`;
+            const response=await axiosInstance.post<void,ApiResponse<void>>(url,data)
+            return{
+                success:true,
+                message:response.message,
+                data:response.data
+            }
+        } catch (error) {
+            return apiErrorHandler(error,'Failed to submit Retuen Request')
+        }
+    }
 }
 export default new OrderService()

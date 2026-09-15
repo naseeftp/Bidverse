@@ -21,6 +21,7 @@ import {
     FaCheck,
     FaTimes
 } from "react-icons/fa";
+import RejectOrderModal from "../../components/user/rejectOrderModal";
 
 const OrderDetailsPage: React.FC = () => {
     const { id } = useParams<{ id: string }>();
@@ -29,7 +30,9 @@ const OrderDetailsPage: React.FC = () => {
     const [details, setOrderDetails] = useState<OrderDetailsResponseDTO | null>(null);
     const [isConfirmModalOpen, setIsConfirmModalOpen] = useState<boolean>(false);
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
-    
+    const [isRejectModalOpen, setIsRejectModalOpen] = useState(false);
+
+
     const fetchOrderDetails = useCallback(async () => {
         if (!id) return;
         setLoading(true);
@@ -55,14 +58,14 @@ const OrderDetailsPage: React.FC = () => {
         if (!id) return;
         setIsSubmitting(true);
         try {
-           const response=await orderService.markAsConfirmed(id);
-           if(response.success){
-              toast.success('Order confirmed successfully!')
-              setOrderDetails((prev) => (prev ? { ...prev, status: OrderStatus.COMPLETED} : null));
-              setIsConfirmModalOpen(false);
-           }else{
-            toast.error(response.message)
-           }
+            const response = await orderService.markAsConfirmed(id);
+            if (response.success) {
+                toast.success('Order confirmed successfully!')
+                setOrderDetails((prev) => (prev ? { ...prev, status: OrderStatus.COMPLETED } : null));
+                setIsConfirmModalOpen(false);
+            } else {
+                toast.error(response.message)
+            }
         } catch {
             toast.error("Failed to confirm order delivery");
         } finally {
@@ -137,7 +140,7 @@ const OrderDetailsPage: React.FC = () => {
             </div>
         );
     }
-const isDelivered = details.status?.toUpperCase() === "DELIVERED";
+    const isDelivered = details.status?.toUpperCase() === "DELIVERED";
     return (
         <div className="min-h-screen bg-[#FFF9F4] px-4 py-8 md:px-8 text-[#1F1F1F] font-sans antialiased">
             <div className="max-w-6xl mx-auto space-y-6">
@@ -171,7 +174,7 @@ const isDelivered = details.status?.toUpperCase() === "DELIVERED";
                         </div>
                     </div>
                 </div>
-                
+
                 {isDelivered && (
                     <div className="bg-white border-2 border-emerald-500/30 rounded-xl p-5 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                         <div className="flex items-center gap-3">
@@ -190,7 +193,7 @@ const isDelivered = details.status?.toUpperCase() === "DELIVERED";
 
                         <div className="flex items-center gap-3 w-full md:w-auto">
                             <button
-                                // onClick={() => setIsRejectModalOpen(true)}
+                                onClick={() => setIsRejectModalOpen(true)}
                                 className="flex-1 md:flex-initial inline-flex justify-center items-center gap-2 px-4 py-2.5 rounded-lg border border-rose-300 bg-rose-50 text-rose-700 text-xs font-black uppercase tracking-wider hover:bg-rose-100 transition-colors cursor-pointer"
                             >
                                 <FaUndo size={11} /> Return / Reject
@@ -377,7 +380,7 @@ const isDelivered = details.status?.toUpperCase() === "DELIVERED";
                         </div>
 
                         <p className="text-xs text-[#6B6B6B] leading-relaxed font-medium">
-                            By confirming, you verify that you have received the item in good condition. 
+                            By confirming, you verify that you have received the item in good condition.
                             This action will release the held escrow funds to the seller and mark this order as completed.
                         </p>
 
@@ -401,6 +404,16 @@ const isDelivered = details.status?.toUpperCase() === "DELIVERED";
                         </div>
                     </div>
                 </div>
+            )}
+            {isRejectModalOpen && (
+                <RejectOrderModal
+                    orderId={id!}
+                    onClose={() => setIsRejectModalOpen(false)}
+                    onSuccess={() => {
+                        setOrderDetails((prev) => (prev ? { ...prev, status: OrderStatus.RETURN_REQUESTED } : null));
+                        setIsRejectModalOpen(false);
+                    }}
+                />
             )}
         </div>
     );
