@@ -27,12 +27,12 @@ const transactionRepo = new TransactionRepository()
 const transactionService = new TransactionService(transactionRepo);
 const addressRepo = new AddressRepository();
 const orderRepo = new OrderRepository()
-
+const userRepo = new UserRepository()
 const paymentRequestRepo = new PaymentRequestRepository();
-const paymentService = new PaymentService(paymentRepo, slotRepo, auctionItemRepo, transactionService, razorpay, orderRepo, addressRepo,paymentRequestRepo)
+const paymentService = new PaymentService(paymentRepo, slotRepo, auctionItemRepo, transactionService, razorpay, orderRepo, addressRepo,paymentRequestRepo,auctionHouseRepo,userRepo)
 const notificationRepo = new NotificationRepository();
 const notificationService = new NotificationService(notificationRepo)
-const userRepo = new UserRepository()
+
 const liveAuctionItemRepo = new LiveAuctionSateRepository()
 const paymentRequestService = new PaymentRequestService(paymentRequestRepo, auctionItemRepo)
 const auctioItemMangementService = new AuctionItemMangementSevice(auctionItemRepo, auctionHouseRepo, paymentService, aucionItemServiceLogger, notificationService, userRepo, liveAuctionItemRepo, paymentRequestService)

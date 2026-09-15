@@ -8,6 +8,7 @@ import { AuctionItemRepository } from "../../repositories/implementations/Auctio
 import { IPaymentRequestService } from "../interface/IPaymentRequest.service";
 import { PaymentRequestService } from "./PaymentRequest.service";
 import { PaymentRequestRepository } from "../../repositories/implementations/PaymentRequest.repository";
+import { paymentService } from "../../di/payment.container";
 
 interface TimerHandle {
     timeout: NodeJS.Timeout;
@@ -99,6 +100,7 @@ export class AuctionRoundTimerService {
             status: auctionStatus,
             winningBidder: auction.currentHighestBidder
         });
+        await paymentService.releaseEscrowForSlots(auctionItemId)
         if (isReserveMet) {
             await this._paymentRequestService.createPaymentRequest(auctionItemId)
         }

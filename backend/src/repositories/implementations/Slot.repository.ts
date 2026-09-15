@@ -75,6 +75,12 @@ export class SlotRepository extends BaseRepository<ISlotDocument> implements ISl
             status:SlotBookingStatus.CONFIRMED
         })
     }
-    
+   async findConfirmedByAuctionId(auctionId: string): Promise<ISlotDocument[]>{
+     return this.model.find({
+        auctionId: new Types.ObjectId(auctionId),
+        status: SlotBookingStatus.CONFIRMED,
+        paymentId: { $exists: true }
+    });
+   }
 
 }

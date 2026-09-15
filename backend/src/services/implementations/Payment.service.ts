@@ -16,6 +16,8 @@ import { IOrderRepository } from "../../repositories/interfaces/IOrder.repositor
 import { IAddressRepository } from "../../repositories/interfaces/IAddress.repository";
 import { IPaymentRequestRepository } from "../../repositories/interfaces/IPaymentRequest.repository";
 import { PaymentRequestStatus } from "../../types/paymentRequest.types";
+import { IUserRepository } from "../../repositories/interfaces/iUser.repository";
+import { IAuctionHouseRepository } from "../../repositories/interfaces/IAuctionHouse.repository";
 
 export class PaymentService implements IPaymentService {
     constructor(
@@ -27,6 +29,8 @@ export class PaymentService implements IPaymentService {
         private _orderRepo: IOrderRepository,
         private _addressRepo: IAddressRepository,
         private _paymentRequestRepo: IPaymentRequestRepository,
+        private _houseRepo:IAuctionHouseRepository,
+        private _useRepo:IUserRepository,
     ) { }
     async createSlotPayment(data: createSlotPaymentDTO): Promise<slotPaymentResponseDTO> {
         const amountInPaise = Math.round(data.amount * 100);
@@ -358,4 +362,56 @@ export class PaymentService implements IPaymentService {
         });
 
     }
+    async releaseEscrowForSlots(auctionItemId: string): Promise<void> {
+    const slots = await this._slotRepo.findConfirmedByAuctionId(auctionItemId);
+    const auction=await this._auctionRepo.findById(auctionItemId);
+    const house=await this._houseRepo.findById(auction?.houseId.toString()??'')
+    const houseUserId=house?.userId.toString();
+    const admin=await this._useRepo.findOne({role:'admin'})
+    const adminId=admin?._id.toString()
+    for (const slot of slots) {
+        if (!slot.paymentId) continue;
+
+        const payment = await this._paymentRepo.findById(slot.paymentId.toString());
+        if (!payment) continue;
+
+        if (payment.status !== PaymentStatus.PAID || payment.escrowStatus !== EscrowStatus.HELD) {
+            continue;
+        }
+
+        await this._paymentRepo.updateById(payment._id.toString(), {
+            escrowStatus: EscrowStatus.RELEASED,
+            releasedAt: new Date(),
+        });
+
+        await this._transactionService.createTransaction({
+            partyType: TransactionPartyType.AUCTION_HOUSE,
+            userId:houseUserId,
+            auctionHouseId: slot.tenantId.toString(),
+            paymentId: payment._id.toString(),
+            auctionItemId,
+            slotBookingId: slot._id.toString(),
+            purpose: TransactionPurpose.SLOT_BOOKING, 
+            direction: TransactionDirection.CREDIT,
+            amount: payment.netAmount!,
+            currency: payment.currency,
+            status: TransactionStatus.COMPLETED,
+            description: `Slot booking settlement for auction ${auctionItemId}`,
+        });
+
+        await this._transactionService.createTransaction({
+            userId:adminId,
+            partyType: TransactionPartyType.PLATFORM,
+            paymentId: payment._id.toString(),
+            auctionItemId,
+            slotBookingId: slot._id.toString(),
+            purpose: TransactionPurpose.PLATFORM_COMMISSION,
+            direction: TransactionDirection.CREDIT,
+            amount: payment.platformCommission!,
+            currency: payment.currency,
+            status: TransactionStatus.COMPLETED,
+            description: `Platform commission for slot booking, auction ${auctionItemId}`,
+        });
+    }
+}
 }

@@ -7,4 +7,5 @@ export interface ISlotRepository extends IBaseRepository<ISlotDocument> {
     findAllReadyBooked(userId: string, auctionId: string): Promise<ISlotDocument | null>
     listAllSlotForUser(userId: string, page: number, limit: number): Promise<{ data: bookedSlotListDTO[], total: number }>
     validSlotOwnerForAuction(auctionId:string):Promise<Types.ObjectId[]>
+    findConfirmedByAuctionId(auctionId: string): Promise<ISlotDocument[]>;
 }

@@ -26,6 +26,6 @@ const transactionService=new TransactionService(transactionRepo)
 const auctionHouseRepo=new AuctionHouseRepository()
 const userRepo=new UserRepository()
 
-const paymentService=new PaymentService(paymentRepo,slotRepo,auctionRepo,transactionService,razorpay,orderRepo,addressRepo,paymentRequestRepo)
+const paymentService=new PaymentService(paymentRepo,slotRepo,auctionRepo,transactionService,razorpay,orderRepo,addressRepo,paymentRequestRepo,auctionHouseRepo,userRepo)
 const orderService=new OrderService(paymentRequestRepo,addressRepo,paymentService,orderRepo,auctionHouseRepo,userRepo)
 export const orderController=new OrderController(orderService)

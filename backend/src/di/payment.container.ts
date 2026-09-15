@@ -9,6 +9,9 @@ import { TransactionRepository } from "../repositories/implementations/Transacti
 import { OrderRepository } from "../repositories/implementations/Order.repository";
 import { AddressRepository } from "../repositories/implementations/Address.repository";
 import { PaymentRequestRepository } from "../repositories/implementations/PaymentRequest.repository";
+import { UserRepository } from "../repositories/implementations/User.repository";
+import { AuctionHouseRepository } from "../repositories/implementations/AuctionHouse.repository";
+
 
 const paymentRepo = new PaymentRepository();
 const slotrepo = new SlotRepository()
@@ -18,6 +21,8 @@ const transactionService = new TransactionService(transactionRepo)
 const orderRepo = new OrderRepository();
 const addressRepo = new AddressRepository()
 const paymentRequestRepo=new PaymentRequestRepository()
-const paymentService = new PaymentService(paymentRepo, slotrepo, auctionItemRepo, transactionService, razorpay, orderRepo, addressRepo,paymentRequestRepo)
+const useRepo=new UserRepository();
+const houseRepo=new AuctionHouseRepository()
+export const paymentService = new PaymentService(paymentRepo, slotrepo, auctionItemRepo, transactionService, razorpay, orderRepo, addressRepo,paymentRequestRepo,houseRepo,useRepo)
 export const paymentController = new PaymentController(paymentService)
 
