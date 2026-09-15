@@ -11,7 +11,7 @@ router.use(CheckUserBlocked)
 
 router.get(
     TRANSACTION_ROUTES.LIST_TRANSACTIONS,
-    allowedTo(Role.USER),
+    allowedTo(Role.USER,Role.ADMIN,Role.TENANT),
     (req, res, next) => transactionController.listTransactions(req, res, next)
 )
 

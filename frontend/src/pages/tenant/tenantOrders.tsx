@@ -9,7 +9,6 @@ import {
     FaShoppingBag,
     FaFilter,
     FaCheckCircle,
-    FaTimesCircle,
     FaHourglassHalf,
     FaTruck,
     FaShippingFast,
@@ -92,12 +91,7 @@ const TenantOrders: React.FC = () => {
                         <FaShippingFast size={10} /> Out For Delivery
                     </span>
                 );
-            case OrderStatus.CANCELLED:
-                return (
-                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-rose-50 text-rose-700 border border-rose-200/80 text-[10px] font-semibold uppercase tracking-wider">
-                        <FaTimesCircle size={10} /> Cancelled
-                    </span>
-                );
+          
             case OrderStatus.REFUNDED:
                 return (
                     <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-purple-50 text-purple-700 border border-purple-200/80 text-[10px] font-semibold uppercase tracking-wider">

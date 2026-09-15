@@ -63,6 +63,7 @@ import TenantNotificationPage from "./pages/tenant/notificationPage";
 import TenantAuctionControllPage from "./pages/tenant/liveControllPage";
 import TenantOrders from "./pages/tenant/tenantOrders";
 import TenantOrderDetailsPage from "./pages/tenant/orderDetails";
+import TenantTransactions from "./pages/tenant/transactions";
 
 import AdminLoginPage from "./pages/admin/LoginPage";
 import AdminDashboard from "./pages/admin/Dashboard";
@@ -77,6 +78,7 @@ import AdminBidHistoryPage from "./pages/admin/bidHistory";
 import AdminNotificationPage from "./pages/admin/notification";
 import AdminOrders from "./pages/admin/orderLIst";
 import AdminOrderDetailsPage from "./pages/admin/orderDetails";
+import AdminTransactions from "./pages/admin/transactions";
 
 import { useSocketSync } from "./hooks/useSocketSync";
 
@@ -165,6 +167,7 @@ function App() {
                   <Route path="/tenant/live-controll/:id" element={<TenantAuctionControllPage />} />
                   <Route path="/tenant/my-orders" element={<TenantOrders />} />
                   <Route path="/tenant/order-details/:id" element={<TenantOrderDetailsPage/>} />
+                  <Route path="/tenant/transactions" element={<TenantTransactions />} />
 
                </Route>
 
@@ -186,7 +189,7 @@ function App() {
                   <Route path="/admin/notifications" element={<AdminNotificationPage />} />
                   <Route path="/admin/orders" element={<AdminOrders/>}/>
                   <Route path="/admin/orders-details/:id" element={<AdminOrderDetailsPage/>}/>
-
+                  <Route path="/admin/transactions" element={<AdminTransactions/>}/>
                </Route>
             </Route>
          </Routes>
