@@ -24,7 +24,7 @@ import {
     FaUndoAlt,
     FaBan,
 } from "react-icons/fa";
-
+import ReturnRequestPanel from "../../components/common/returnRequestPanel";
 const FORWARD_STATUS_FLOW: OrderStatus[] = [
     OrderStatus.PENDING,
     OrderStatus.PROCESSING,
@@ -63,10 +63,33 @@ const TenantOrderDetailsPage: React.FC = () => {
     fetchOrderDetails();
   }, [fetchOrderDetails]);
 
+  const formatDate = (dateString?: string) => {
+    if (!dateString) return "N/A";
+    return new Date(dateString).toLocaleDateString("en-IN", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
+
+const isInReturnLifecycle = (status?: string) => {
+    const normalized = status?.toUpperCase();
+    return (
+      normalized === OrderStatus.RETURN_REQUESTED ||
+      normalized === OrderStatus.REFUNDED ||
+      normalized === OrderStatus.COMPLETED
+    );
+  };
+
   const currentStatus = (details?.status?.toUpperCase() as OrderStatus) || OrderStatus.PENDING;
   const currentIndex = FORWARD_STATUS_FLOW.indexOf(currentStatus);
 
-  const isUpdatable = currentIndex !== -1 && currentStatus !== OrderStatus.DELIVERED;
+  const isUpdatable =
+    currentIndex !== -1 &&
+    currentStatus !== OrderStatus.DELIVERED &&
+    !isInReturnLifecycle(details?.status);
 
   const handleStatusUpdate = async (newStatus: string) => {
     if (!id || newStatus === details?.status) return;
@@ -88,17 +111,6 @@ const TenantOrderDetailsPage: React.FC = () => {
     } finally {
       setUpdating(false);
     }
-  };
-
-  const formatDate = (dateString?: string) => {
-    if (!dateString) return "N/A";
-    return new Date(dateString).toLocaleDateString("en-IN", {
-      day: "numeric",
-      month: "short",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
   };
 
   const renderStatusBadge = (status?: string) => {
@@ -198,6 +210,11 @@ const TenantOrderDetailsPage: React.FC = () => {
             </div>
           </div>
         </div>
+
+        {/* Return request — read-only for tenant, admin owns approve/reject */}
+        {details.returnRequest && (
+          <ReturnRequestPanel returnRequest={details.returnRequest} formatDate={formatDate} />
+        )}
 
         {/* Main Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -345,8 +362,14 @@ const TenantOrderDetailsPage: React.FC = () => {
                 <div className="p-3 bg-[#F8FAFC] rounded-lg border border-[#E2E8F0] text-center space-y-1">
                   <p className="text-xs font-bold text-[#0F172A]">Status Locked</p>
                   <p className="text-[10px] text-[#475569]">
-                    {currentStatus === OrderStatus.DELIVERED
-                      ? "Item delivered. Waiting for buyer confirmation or issue report."
+                    {currentStatus === OrderStatus.RETURN_REQUESTED
+                      ? "Buyer has requested a return. An admin is reviewing the request — see details above."
+                      : currentStatus === OrderStatus.REFUNDED
+                      ? "This order was refunded following an approved return request."
+                      : currentStatus === OrderStatus.COMPLETED
+                      ? "Order completed. Buyer confirmed delivery and escrow was released."
+                      : currentStatus === OrderStatus.DELIVERED
+                      ? "Item delivered. Waiting for buyer confirmation or a return request."
                       : `Order reached terminal state (${currentStatus.replace(/_/g, " ")}).`}
                   </p>
                 </div>

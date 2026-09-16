@@ -1,4 +1,4 @@
-import { IOrderDocument, IOrderAggregateDOC, IOrderDetailsAggregateDoc, IOrderTenantAggregateDOC, IOrderAdminAggregateDOC ,IReturnRequest} from "../../types/order.type";
+import { IOrderDocument, IOrderAggregateDOC, IOrderDetailsAggregateDoc, IOrderTenantAggregateDOC, IOrderAdminAggregateDOC, IReturnRequest } from "../../types/order.type";
 import { IOrderRepository } from "../interfaces/IOrder.repository";
 import { BaseRepository } from "./Base.repository";
 import { Order } from "../../models/order.model";
@@ -292,41 +292,51 @@ export class OrderRepository extends BaseRepository<IOrderDocument> implements I
                 },
             },
             { $unwind: { path: "$buyer", preserveNullAndEmptyArrays: true } },
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "returnRequest.reviewedBy",
+                    foreignField: "_id",
+                    pipeline: [{ $project: { _id: 1, name: 1 } }],
+                    as: "returnReviewer",
+                },
+            },
+            { $unwind: { path: "$returnReviewer", preserveNullAndEmptyArrays: true } },
         ])
         return result || null
     }
-    async updateStatus(orderId:string,status:OrderStatus):Promise<IOrderDocument|null>{
-       const targetId=new Types.ObjectId(orderId);
-       return this.model.findByIdAndUpdate(
-        targetId,
-        {
-            $set:{
-                status,
-                updatedAt:new Date(),
-            }
-        },{new:true}
-       ).lean<IOrderDocument>()
-       .exec()
+    async updateStatus(orderId: string, status: OrderStatus): Promise<IOrderDocument | null> {
+        const targetId = new Types.ObjectId(orderId);
+        return this.model.findByIdAndUpdate(
+            targetId,
+            {
+                $set: {
+                    status,
+                    updatedAt: new Date(),
+                }
+            }, { new: true }
+        ).lean<IOrderDocument>()
+            .exec()
     }
-    async markAsConfirmed(orderId:string,status:OrderStatus):Promise<IOrderDocument|null>{
-        const targetId=new Types.ObjectId(orderId);
-       return this.model.findByIdAndUpdate(
-        targetId,
-        {
-            $set:{
-                status,
-                updatedAt:new Date(),
-                confirmedAt:new Date()
-            }
-        },{new:true}
-       ).lean<IOrderDocument>()
-       .exec()
+    async markAsConfirmed(orderId: string, status: OrderStatus): Promise<IOrderDocument | null> {
+        const targetId = new Types.ObjectId(orderId);
+        return this.model.findByIdAndUpdate(
+            targetId,
+            {
+                $set: {
+                    status,
+                    updatedAt: new Date(),
+                    confirmedAt: new Date()
+                }
+            }, { new: true }
+        ).lean<IOrderDocument>()
+            .exec()
     }
-  
-async addReturnRequest(orderId: string, returnRequest: IReturnRequest, status: OrderStatus): Promise<void> {
-    await this.model.updateOne(
-        { _id: orderId },
-        { $set: { returnRequest, status } }
-    );
-}
+
+    async addReturnRequest(orderId: string, returnRequest: IReturnRequest, status: OrderStatus): Promise<void> {
+        await this.model.updateOne(
+            { _id: orderId },
+            { $set: { returnRequest, status } }
+        );
+    }
 }

@@ -1,5 +1,5 @@
 import { Types, Document } from "mongoose";
-import { OrderStatus,ReturnReason,ReturnRequestStatus } from "../constants/order.constant";
+import { OrderStatus, ReturnReason, ReturnRequestStatus } from "../constants/order.constant";
 
 export interface IOrderShippingSnapshot {
     recipientName: string;
@@ -56,30 +56,30 @@ export interface IOrderAggregateDOC extends IOrderDocument {
         images?: string[];
     };
 }
-export interface IOrderTenantAggregateDOC extends IOrderDocument{
+export interface IOrderTenantAggregateDOC extends IOrderDocument {
     auction?: {
         _id: string;
         title: string;
         images?: string[];
     };
-    buyer?:{
-        _id:string;
-        buyerName:string,
+    buyer?: {
+        _id: string;
+        buyerName: string,
     }
 }
-export interface IOrderAdminAggregateDOC extends IOrderDocument{
+export interface IOrderAdminAggregateDOC extends IOrderDocument {
     auction?: {
         _id: string;
         title: string;
         images?: string[];
     };
-    buyer?:{
-        _id:string;
-        buyerName:string,
+    buyer?: {
+        _id: string;
+        buyerName: string,
     },
-    house?:{
-        _id:string,
-        name:string
+    house?: {
+        _id: string,
+        name: string
     }
 }
 
@@ -124,10 +124,25 @@ export interface IOrderDetailsAggregateDoc {
         name: string;
         email?: string;
     };
-    buyer?:{
-        _id:Types.ObjectId,
-        name:string,
-        email?:string
-    }
+    buyer?: {
+        _id: Types.ObjectId,
+        name: string,
+        email?: string
+    },
+    returnReviewer?: {
+        _id: Types.ObjectId;
+        name: string
+    };
+    returnRequest?: {                        
+        reason: ReturnReason;
+        description: string;
+        proofs: string[];
+        status: ReturnRequestStatus;
+        rejectionReason?: string;
+        requestedAt: Date;
+        reviewedAt?: Date;
+        reviewedBy?: Types.ObjectId;
+    };
+
 }
 

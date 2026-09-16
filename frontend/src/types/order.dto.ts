@@ -22,6 +22,8 @@ export const ReturnReason = {
 }
 export type ReturnReason = typeof ReturnReason[keyof typeof ReturnReason]
 export type OrderStatus = (typeof OrderStatus)[keyof typeof OrderStatus];
+export type ReturnRequestStatus = typeof ReturnRequestStatus[keyof typeof ReturnRequestStatus]
+
 
 export interface CreateOrderDTO {
     paymentRequestId: string;
@@ -113,6 +115,18 @@ export interface IBuyerDTO {
     name: string;
     email?: string;
 }
+export interface IReturnRequestDTO {
+    reason: ReturnReason;
+    description: string;
+    proofs: string[];
+    status: ReturnRequestStatus;
+    rejectionReason?: string;
+    requestedAt: string;
+    reviewedAt?: string;
+    reviewedBy?: string;
+    reviewedByName?: string; 
+}
+
 export interface OrderDetailsResponseDTO {
     id: string;
     orderNumber: string;
@@ -125,6 +139,8 @@ export interface OrderDetailsResponseDTO {
     financials: IOrderFinancialsDTO;
     payment?: IOrderPaymentDTO;
     seller?: IOrderSellerDTO;
-    buyer?: IBuyerDTO
+    buyer?: IBuyerDTO,
+    returnRequest?: IReturnRequestDTO;
+
 
 }

@@ -45,17 +45,17 @@ export class OrderMapper {
             status: doc.status
         }
     }
-    static toAdminOrdersListDTO(doc:IOrderAdminAggregateDOC):OrderAdminListResponseDTO{
-        return{
-              id: doc._id.toString(),
+    static toAdminOrdersListDTO(doc: IOrderAdminAggregateDOC): OrderAdminListResponseDTO {
+        return {
+            id: doc._id.toString(),
             orderNumber: doc.orderNumber,
             auctionId: doc.auctionItemId.toString(),
             itemImage: doc.auction?.images?.[0],
             itemTitle: doc.auction?.title,
             buyerName: doc.buyer?.buyerName,
             buyerId: doc.buyer?._id.toString(),
-            houseName:doc.house?.name,
-            houseId:doc.house?._id.toString(),
+            houseName: doc.house?.name,
+            houseId: doc.house?._id.toString(),
             orderAmount: doc.totalAmount,
             status: doc.status
         }
@@ -124,7 +124,22 @@ export class OrderMapper {
                 id: doc.buyer._id.toString(),
                 name: doc.buyer.name,
                 email: doc.buyer.email,
-            } : undefined
+            } : undefined,
+            returnRequest: doc.returnRequest
+                ? {
+                    reason: doc.returnRequest.reason,
+                    description: doc.returnRequest.description,
+                    proofs: doc.returnRequest.proofs,
+                    status: doc.returnRequest.status,
+                    rejectionReason: doc.returnRequest.rejectionReason,
+                    requestedAt: doc.returnRequest.requestedAt.toISOString(),
+                    reviewedAt: doc.returnRequest.reviewedAt
+                        ? doc.returnRequest.reviewedAt.toISOString()
+                        : undefined,
+                    reviewedBy: doc.returnRequest.reviewedBy?.toString(),
+                    reviewedByName: doc.returnReviewer?.name,
+                }
+                : undefined,
         };
     }
 }

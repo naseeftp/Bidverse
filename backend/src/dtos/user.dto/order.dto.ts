@@ -1,4 +1,4 @@
-import { OrderStatus ,ReturnReason} from "../../constants/order.constant";
+import { OrderStatus ,ReturnReason,ReturnRequestStatus} from "../../constants/order.constant";
 
 export interface CreateOrderDTO {
     paymentRequestId: string;
@@ -128,6 +128,18 @@ export interface IBuyerDTO{
     name: string;
     email?: string;
 }
+
+export interface IReturnRequestDTO {
+    reason: ReturnReason;
+    description: string;
+    proofs: string[];
+    status: ReturnRequestStatus;
+    rejectionReason?: string;
+    requestedAt: string;
+    reviewedAt?: string;
+    reviewedBy?: string;
+    reviewedByName?: string; 
+}
 export interface OrderDetailsResponseDTO {
     id: string;
     orderNumber: string;
@@ -140,7 +152,8 @@ export interface OrderDetailsResponseDTO {
     financials: IOrderFinancialsDTO;
     payment?: IOrderPaymentDTO;
     seller?: IOrderSellerDTO;
-    buyer?:IBuyerDTO
+    buyer?:IBuyerDTO;
+    returnRequest?: IReturnRequestDTO;
 }
 
 export interface CreateReturnRequestDTO {

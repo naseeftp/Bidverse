@@ -22,6 +22,7 @@ import {
     FaTimes
 } from "react-icons/fa";
 import RejectOrderModal from "../../components/user/rejectOrderModal";
+import ReturnRequestPanel from "../../components/common/returnRequestPanel";
 
 const OrderDetailsPage: React.FC = () => {
     const { id } = useParams<{ id: string }>();
@@ -100,10 +101,17 @@ const OrderDetailsPage: React.FC = () => {
                         <FaTruck size={12} /> SHIPPED
                     </span>
                 );
+            case "RETURN_REQUESTED":
+                return (
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md bg-orange-50 text-orange-700 border border-orange-200 text-xs font-black uppercase tracking-wider">
+                        RETURN REQUESTED
+                    </span>
+                );
+            case "REFUNDED":
             case "CANCELLED":
                 return (
                     <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md bg-rose-50 text-rose-700 border border-rose-200 text-xs font-black uppercase tracking-wider">
-                        CANCELLED
+                        {normalized}
                     </span>
                 );
             default:
@@ -206,6 +214,10 @@ const OrderDetailsPage: React.FC = () => {
                             </button>
                         </div>
                     </div>
+                )}
+
+                {details.returnRequest && (
+                    <ReturnRequestPanel returnRequest={details.returnRequest} formatDate={formatDate} />
                 )}
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -412,6 +424,7 @@ const OrderDetailsPage: React.FC = () => {
                     onSuccess={() => {
                         setOrderDetails((prev) => (prev ? { ...prev, status: OrderStatus.RETURN_REQUESTED } : null));
                         setIsRejectModalOpen(false);
+                        fetchOrderDetails();
                     }}
                 />
             )}
