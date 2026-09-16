@@ -9,5 +9,5 @@ export interface IOrderController {
     updateStatus(req: Request, res: Response, next: NextFunction): Promise<void>;
     markAsConfirmed(req: Request, res: Response, next: NextFunction): Promise<void>;
     requestReturn(req: Request, res: Response, next: NextFunction): Promise<void>;
-
+    reviewReturn(req: Request, res: Response, next: NextFunction): Promise<void>
 }

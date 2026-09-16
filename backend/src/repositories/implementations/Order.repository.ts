@@ -4,7 +4,7 @@ import { BaseRepository } from "./Base.repository";
 import { Order } from "../../models/order.model";
 import { PipelineStage, Types } from "mongoose";
 import { CreateOrderInputDTO } from "../../dtos/user.dto/order.dto";
-import { OrderStatus } from "../../constants/order.constant";
+import { OrderStatus, ReturnRequestStatus } from "../../constants/order.constant";
 
 export class OrderRepository extends BaseRepository<IOrderDocument> implements IOrderRepository {
     constructor() {
@@ -339,4 +339,20 @@ export class OrderRepository extends BaseRepository<IOrderDocument> implements I
             { $set: { returnRequest, status } }
         );
     }
+    async updateReturnReview(orderId: string, reviewFields: { status: ReturnRequestStatus; rejectionReason?: string; reviewedAt: Date; reviewedBy: string; }, orderStatus: OrderStatus): Promise<void> {
+        await this.model.updateOne(
+            { _id: orderId },
+            {
+                $set: {
+                    "returnRequest.status": reviewFields.status,
+                    "returnRequest.rejectionReason": reviewFields.rejectionReason,
+                    "returnRequest.reviewedAt": reviewFields.reviewedAt,
+                    "returnRequest.reviewedBy": reviewFields.reviewedBy,
+                    status: orderStatus,
+                }
+            }
+        );
+    }
+
+
 }

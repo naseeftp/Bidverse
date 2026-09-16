@@ -124,7 +124,7 @@ export interface IReturnRequestDTO {
     requestedAt: string;
     reviewedAt?: string;
     reviewedBy?: string;
-    reviewedByName?: string; 
+    reviewedByName?: string;
 }
 
 export interface OrderDetailsResponseDTO {
@@ -143,4 +143,8 @@ export interface OrderDetailsResponseDTO {
     returnRequest?: IReturnRequestDTO;
 
 
+}
+export interface ReviewReturnRequestDTO {
+    action: "approve" | "reject";
+    rejectionReason?: string;
 }

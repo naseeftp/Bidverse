@@ -68,32 +68,32 @@ const AdminOrderDetailsPage: React.FC = () => {
         });
     };
 
-    // const handleReview = async () => {
-    //     if (!id || !reviewModal) return;
-    //     if (reviewModal === "reject" && rejectionReason.trim().length < 5) {
-    //         toast.error("Please provide a rejection reason");
-    //         return;
-    //     }
-    //     setIsSubmitting(true);
-    //     try {
-    //         const response = await orderService.reviewReturnRequest(id, {
-    //             action: reviewModal,
-    //             rejectionReason: reviewModal === "reject" ? rejectionReason.trim() : undefined,
-    //         });
-    //         if (response.success) {
-    //             toast.success(reviewModal === "approve" ? "Return approved, refund issued" : "Return rejected");
-    //             setReviewModal(null);
-    //             setRejectionReason("");
-    //             fetchOrderDetails();
-    //         } else {
-    //             toast.error(response.message);
-    //         }
-    //     } catch {
-    //         toast.error("Failed to submit review");
-    //     } finally {
-    //         setIsSubmitting(false);
-    //     }
-    // };
+    const handleReview = async () => {
+        if (!id || !reviewModal) return;
+        if (reviewModal === "reject" && rejectionReason.trim().length < 5) {
+            toast.error("Please provide a rejection reason");
+            return;
+        }
+        setIsSubmitting(true);
+        try {
+            const response = await orderService.reviewReturn(id, {
+                action: reviewModal,
+                rejectionReason: reviewModal === "reject" ? rejectionReason.trim() : undefined,
+            });
+            if (response.success) {
+                toast.success(reviewModal === "approve" ? "Return approved, refund issued" : "Return rejected");
+                setReviewModal(null);
+                setRejectionReason("");
+                fetchOrderDetails();
+            } else {
+                toast.error(response.message);
+            }
+        } catch {
+            toast.error("Failed to submit review");
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
 
     const renderStatusBadge = (status?: string) => {
         const normalized = status?.toUpperCase() || "PENDING";
@@ -196,7 +196,6 @@ const AdminOrderDetailsPage: React.FC = () => {
                     </div>
                 </div>
 
-                {/* Return request review action bar */}
                 {isPendingReview && (
                     <div className="bg-white border-2 border-orange-400/40 rounded-xl p-5 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                         <div className="flex items-center gap-3">
@@ -268,7 +267,6 @@ const AdminOrderDetailsPage: React.FC = () => {
                             </div>
                         </div>
 
-                        {/* Return request details */}
                         {returnRequest && (
                             <div className="bg-white border border-orange-200 rounded-xl p-5 shadow-xs space-y-4">
                                 <div className="flex items-center justify-between border-b border-[#E2E8F0] pb-3">
@@ -561,7 +559,7 @@ const AdminOrderDetailsPage: React.FC = () => {
                             </button>
                             <button
                                 disabled={isSubmitting}
-                                // onClick={handleReview}
+                                onClick={handleReview}
                                 className={`px-5 py-2 rounded-lg text-white text-xs font-bold uppercase tracking-wider transition-colors disabled:opacity-50 cursor-pointer ${
                                     reviewModal === "approve"
                                         ? "bg-emerald-700 hover:bg-emerald-800"

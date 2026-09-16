@@ -95,4 +95,14 @@ export class OrderController implements IOrderController {
             next(error)
         }
     }
+    async reviewReturn(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const adminId=req.user.id;
+            const id=req.params.id as string;
+            const result=await this._orderService.reviewReturnRequest(id,adminId,req.body);
+            SuccessResponse(res,MESSAGES.ACTION_SUCCESS,result,HttpStatus.OK)
+        } catch (error) {
+            next(error)
+        }
+    }
 }

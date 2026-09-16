@@ -49,4 +49,9 @@ router.post(
     allowedTo(Role.USER),
     (req,res,next)=>orderController.requestReturn(req,res,next)
 )
+router.patch(
+    ORDER_ROUTES.REVIEW_RETURN,
+    allowedTo(Role.ADMIN),
+    (req,res,next)=>orderController.reviewReturn(req,res,next)
+)
 export default router

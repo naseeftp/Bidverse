@@ -9,4 +9,5 @@ export interface IPaymentService {
     createOrderPayment(data: CreateOrderPaymentIntentDTO): Promise<OrderPaymentResponseDTO>
     releaseEscrowForOrder(orderId: string, paymentId: string, tenantId: string, shippingCost: number,houseId:string,adminId:string): Promise<void>;
     releaseEscrowForSlots(auctionItemId: string): Promise<void> 
+    refundOrderPayment(paymentId: string, totalAmount: number): Promise<void>;
 }

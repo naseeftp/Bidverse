@@ -161,3 +161,9 @@ export interface CreateReturnRequestDTO {
     description: string;
     proofs: string[]; 
 }
+
+
+export interface ReviewReturnRequestDTO {
+    action: "approve" | "reject";
+    rejectionReason?: string;
+}

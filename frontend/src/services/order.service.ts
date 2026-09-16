@@ -1,7 +1,7 @@
 import axiosInstance from "../api/axios.instance";
 import { BASE_ROUTES, ORDER_ROUTES } from "../constants/api.constant";
 import type { ApiResponse, IPaginationMeta } from "../types/auth.type";
-import type { CreateOrderDTO, OrderAdminListResponseDTO, OrderDetailsResponseDTO, OrderListResponseDTO, OrderTenantListResponseDTO } from "../types/order.dto";
+import type { CreateOrderDTO, OrderAdminListResponseDTO, OrderDetailsResponseDTO, OrderListResponseDTO, OrderTenantListResponseDTO, ReviewReturnRequestDTO } from "../types/order.dto";
 import type { OrderPaymentResponseDTO } from "../types/payment.dto";
 import { apiErrorHandler } from "../utils/error.handle";
 
@@ -136,6 +136,19 @@ export class OrderService {
             }
         } catch (error) {
             return apiErrorHandler(error,'Failed to submit Retuen Request')
+        }
+    }
+    async reviewReturn(id:string,data:ReviewReturnRequestDTO){
+        try {
+            const url=`${BASE_ROUTES.ORDER}${ORDER_ROUTES.REVIEW_RETURN}/${id}`
+            const response=await axiosInstance.patch<void,ApiResponse<void>>(url,data)
+            return{
+                success:true,
+                message:response.message,
+                data:response.data
+            }
+        } catch (error) {
+            return apiErrorHandler(error,'Failed to review Return Request')
         }
     }
 }

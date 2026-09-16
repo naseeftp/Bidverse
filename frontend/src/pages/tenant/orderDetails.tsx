@@ -180,7 +180,6 @@ const isInReturnLifecycle = (status?: string) => {
   return (
     <div className="min-h-screen bg-[#F5F7FB] px-4 py-8 md:px-8 text-[#0F172A] font-sans antialiased">
       <div className="max-w-6xl mx-auto space-y-6">
-        {/* Top Header */}
         <div className="border-b border-[#E2E8F0] pb-5">
           <button
             onClick={() => navigate(-1)}

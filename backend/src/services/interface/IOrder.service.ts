@@ -1,5 +1,5 @@
 import { OrderStatus } from "../../constants/order.constant";
-import { CreateOrderDTO, OrderListResponseDTO,OrderDetailsResponseDTO,OrderTenantListResponseDTO, OrderAdminListResponseDTO,CreateReturnRequestDTO} from "../../dtos/user.dto/order.dto";
+import { CreateOrderDTO, OrderListResponseDTO,OrderDetailsResponseDTO,OrderTenantListResponseDTO, OrderAdminListResponseDTO,CreateReturnRequestDTO,ReviewReturnRequestDTO} from "../../dtos/user.dto/order.dto";
 import { OrderPaymentResponseDTO } from "../../dtos/user.dto/payment.dto";
 import { IGenericPaginatedResposnse } from "../../types/response.type";
 
@@ -12,4 +12,5 @@ export interface IOrderService{
     updateStatus(orderId:string,status:OrderStatus):Promise<void>
     markAsConfirmed(orderId:string):Promise<void>
     requestReturn(orderId: string, buyerId: string, data: CreateReturnRequestDTO): Promise<void>
+    reviewReturnRequest(orderId: string, adminId: string, data: ReviewReturnRequestDTO): Promise<void>;
 }

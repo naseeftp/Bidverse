@@ -1,7 +1,7 @@
 import { IOrderService } from "../interface/IOrder.service";
 import { IPaymentRequestRepository } from "../../repositories/interfaces/IPaymentRequest.repository";
-import { CreateOrderDTO, OrderListResponseDTO, OrderDetailsResponseDTO, OrderTenantListResponseDTO, OrderAdminListResponseDTO,CreateReturnRequestDTO } from "../../dtos/user.dto/order.dto";
-import { NotFoundError,ForbiddenError,BadRequestError } from "../../errors/AppError";
+import { CreateOrderDTO, OrderListResponseDTO, OrderDetailsResponseDTO, OrderTenantListResponseDTO, OrderAdminListResponseDTO, CreateReturnRequestDTO, ReviewReturnRequestDTO } from "../../dtos/user.dto/order.dto";
+import { NotFoundError, ForbiddenError, BadRequestError } from "../../errors/AppError";
 import { MESSAGES } from "../../constants/constants";
 import { IAddressRepository } from "../../repositories/interfaces/IAddress.repository";
 import { IPaymentService } from "../interface/IPayment.service";
@@ -10,7 +10,7 @@ import { IOrderRepository } from "../../repositories/interfaces/IOrder.repositor
 import { OrderMapper } from "../../mappers/order.mapper";
 import { IGenericPaginatedResposnse } from "../../types/response.type";
 import { IAuctionHouseRepository } from "../../repositories/interfaces/IAuctionHouse.repository";
-import { OrderStatus,ReturnRequestStatus } from "../../constants/order.constant";
+import { OrderStatus, ReturnRequestStatus } from "../../constants/order.constant";
 import { IUserRepository } from "../../repositories/interfaces/iUser.repository";
 
 export class OrderService implements IOrderService {
@@ -19,8 +19,8 @@ export class OrderService implements IOrderService {
         private _addressRepo: IAddressRepository,
         private _paymentService: IPaymentService,
         private _orderRepo: IOrderRepository,
-        private _houseRepo:IAuctionHouseRepository,
-        private _userRepo:IUserRepository
+        private _houseRepo: IAuctionHouseRepository,
+        private _userRepo: IUserRepository
     ) { }
     async initiateOrderPayment(buyerId: string, data: CreateOrderDTO): Promise<OrderPaymentResponseDTO> {
         const paymentRequest = await this._paymentRepo.findByRequestId(data.paymentRequestId);
@@ -58,11 +58,11 @@ export class OrderService implements IOrderService {
         }
     }
     async getTenantOrders(tenantId: string, page: number, limit: number, status?: string, search?: string): Promise<IGenericPaginatedResposnse<OrderTenantListResponseDTO>> {
-        const houseExist=await this._houseRepo.findOne({userId:tenantId});
-        if(!houseExist){
+        const houseExist = await this._houseRepo.findOne({ userId: tenantId });
+        if (!houseExist) {
             throw new NotFoundError(MESSAGES.AUCTION_HOUSE_NOT_FOUND)
         }
-        const houseId=houseExist._id.toString();
+        const houseId = houseExist._id.toString();
         const { docs, total } = await this._orderRepo.getTenantOrders(houseId, page, limit, status, search);
         const mappedDocs = docs.map((doc) =>
             OrderMapper.toTenantOrdersListDTO(doc)
@@ -80,17 +80,17 @@ export class OrderService implements IOrderService {
         }
     }
     async getAllOrdersByAdmin(page: number, limit: number, status?: string, search?: string): Promise<IGenericPaginatedResposnse<OrderAdminListResponseDTO>> {
-        const {docs,total}=await this._orderRepo.getAllOrdersByAdmin(page,limit,status,search)
-        const mappedDocs=docs.map((doc)=>OrderMapper.toAdminOrdersListDTO(doc))
-        return{
-            data:mappedDocs,
-            pagination:{
-                totalItems:total,
-                itemsPerPage:limit,
-                currentPage:page,
-                totalPages:Math.ceil(total/limit),
-                hasNextPage:page*limit>total,
-                hasPrevPage:page>1
+        const { docs, total } = await this._orderRepo.getAllOrdersByAdmin(page, limit, status, search)
+        const mappedDocs = docs.map((doc) => OrderMapper.toAdminOrdersListDTO(doc))
+        return {
+            data: mappedDocs,
+            pagination: {
+                totalItems: total,
+                itemsPerPage: limit,
+                currentPage: page,
+                totalPages: Math.ceil(total / limit),
+                hasNextPage: page * limit > total,
+                hasPrevPage: page > 1
             }
         }
     }
@@ -103,58 +103,103 @@ export class OrderService implements IOrderService {
         return OrderMapper.toDetailsDTO(order)
     }
     async updateStatus(orderId: string, status: OrderStatus): Promise<void> {
-        const order=await this._orderRepo.findById(orderId);
-        if(!order){
+        const order = await this._orderRepo.findById(orderId);
+        if (!order) {
             throw new NotFoundError(MESSAGES.ORDER_NOT_FOUND)
         }
-        await this._orderRepo.updateStatus(orderId,status)
+        await this._orderRepo.updateStatus(orderId, status)
     }
     async markAsConfirmed(orderId: string): Promise<void> {
-        const order=await this._orderRepo.findById(orderId);
-        if(!order){
+        const order = await this._orderRepo.findById(orderId);
+        if (!order) {
             throw new NotFoundError(MESSAGES.ORDER_NOT_FOUND);
         }
-        if(order.status!==OrderStatus.DELIVERED){
+        if (order.status !== OrderStatus.DELIVERED) {
             throw new BadRequestError('Only delivered Order Can be Confirmed');
         }
-        const house=await this._houseRepo.findById(order.tenantId.toString());
-        const houseUserId=house?.userId.toString();
-        const admin=await this._userRepo.findOne({role:'admin'});
-        const adminId=admin?._id.toString();
+        const house = await this._houseRepo.findById(order.tenantId.toString());
+        const houseUserId = house?.userId.toString();
+        const admin = await this._userRepo.findOne({ role: 'admin' });
+        const adminId = admin?._id.toString();
         await this._paymentService.releaseEscrowForOrder(
             orderId,
-            order.paymentId?.toString()??'',
+            order.paymentId?.toString() ?? '',
             order.tenantId.toString(),
             order.shippingCost,
-            houseUserId??'',
-            adminId??""
+            houseUserId ?? '',
+            adminId ?? ""
         )
-        await this._orderRepo.markAsConfirmed(orderId,OrderStatus.COMPLETED)
+        await this._orderRepo.markAsConfirmed(orderId, OrderStatus.COMPLETED)
     }
     async requestReturn(orderId: string, buyerId: string, data: CreateReturnRequestDTO): Promise<void> {
-    const order = await this._orderRepo.findById(orderId);
-    if (!order) throw new NotFoundError(MESSAGES.ORDER_NOT_FOUND);
+        const order = await this._orderRepo.findById(orderId);
+        if (!order) throw new NotFoundError(MESSAGES.ORDER_NOT_FOUND);
 
-    if (order.buyerId.toString() !== buyerId) {
-        throw new ForbiddenError(MESSAGES.NOT_PERMITTED); 
+        if (order.buyerId.toString() !== buyerId) {
+            throw new ForbiddenError(MESSAGES.NOT_PERMITTED);
+        }
+
+        if (order.status !== OrderStatus.DELIVERED) {
+            throw new BadRequestError("Return can only be requested for delivered orders");
+        }
+
+        if (!data.proofs || data.proofs.length === 0) {
+            throw new BadRequestError("At least one proof image is required");
+        }
+
+        const returnRequest = {
+            reason: data.reason,
+            description: data.description,
+            proofs: data.proofs,
+            status: ReturnRequestStatus.PENDING,
+            requestedAt: new Date()
+        };
+
+        await this._orderRepo.addReturnRequest(orderId, returnRequest, OrderStatus.RETURN_REQUESTED);
+    }
+    async reviewReturnRequest(orderId: string, adminId: string, data: ReviewReturnRequestDTO): Promise<void> {
+        const order = await this._orderRepo.findById(orderId);
+        if (!order) throw new NotFoundError(MESSAGES.ORDER_NOT_FOUND);
+
+        if (order.status !== OrderStatus.RETURN_REQUESTED || !order.returnRequest) {
+            throw new BadRequestError("No pending return request on this order");
+        }
+        if (order.returnRequest.status !== ReturnRequestStatus.PENDING) {
+            throw new BadRequestError("This return request has already been reviewed");
+        }
+
+        if (data.action === "reject" && !data.rejectionReason?.trim()) {
+            throw new BadRequestError("A rejection reason is required");
+        }
+
+        if (data.action === "approve") {
+            await this._paymentService.refundOrderPayment(
+                order.paymentId?.toString() ?? '',
+                order.totalAmount
+            );
+
+            await this._orderRepo.updateReturnReview(
+                orderId,
+                {
+                    status: ReturnRequestStatus.APPROVED,
+                    reviewedAt: new Date(),
+                    reviewedBy: adminId,
+                },
+                OrderStatus.REFUNDED
+            );
+        } else {
+            await this._orderRepo.updateReturnReview(
+                orderId,
+                {
+                    status: ReturnRequestStatus.REJECTED,
+                    rejectionReason: data.rejectionReason,
+                    reviewedAt: new Date(),
+                    reviewedBy: adminId,
+                },
+                OrderStatus.DELIVERED
+            );
+            // await this.markAsConfirmed(orderId)
+        }
     }
 
-    if (order.status !== OrderStatus.DELIVERED) {
-        throw new BadRequestError("Return can only be requested for delivered orders");
-    }
-
-    if (!data.proofs || data.proofs.length === 0) {
-        throw new BadRequestError("At least one proof image is required");
-    }
-
-    const returnRequest = {
-        reason: data.reason,
-        description: data.description,
-        proofs: data.proofs,
-        status: ReturnRequestStatus.PENDING,
-        requestedAt: new Date()
-    };
-
-    await this._orderRepo.addReturnRequest(orderId, returnRequest, OrderStatus.RETURN_REQUESTED);
-}
 }

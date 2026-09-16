@@ -414,4 +414,48 @@ export class PaymentService implements IPaymentService {
         });
     }
 }
+
+async refundOrderPayment(paymentId: string, totalAmount: number): Promise<void> {
+    const payment = await this._paymentRepo.findById(paymentId);
+    if (!payment) {
+        throw new NotFoundError(MESSAGES.PAYMENT_NOT_FOUND);
+    }
+    if (payment.status !== PaymentStatus.PAID || payment.escrowStatus !== EscrowStatus.HELD) {
+        return; 
+    }
+    if (!payment.razorpayPaymentId) {
+        throw new BadRequestError('Razorpay payment ID is missing');
+    }
+
+    await this._razorpay.payments.refund(
+        payment.razorpayPaymentId,
+        {
+            amount: Math.round(totalAmount * 100)
+        }
+    )
+
+    await this._paymentRepo.updateById(
+        payment._id.toString(),
+        {
+            status: PaymentStatus.REFUNDED,
+            escrowStatus: EscrowStatus.REFUNDED,
+            refundedAt: new Date()
+        }
+    )
+
+    await this._transactionService.createTransaction({
+        partyType: TransactionPartyType.USER,
+        userId: payment.userId.toString(),
+        paymentId: payment._id.toString(),
+        auctionItemId: payment.auctionItemId?.toString(),
+        purpose: TransactionPurpose.REFUND,
+        direction: TransactionDirection.CREDIT,
+        amount: totalAmount,
+        currency: payment.currency,
+        status: TransactionStatus.COMPLETED,
+        description: "Refund for approved return request",
+        razorpayPaymentId: payment.razorpayPaymentId,
+        razorpayOrderId: payment.razorpayOrderId,
+    })
+}
 }

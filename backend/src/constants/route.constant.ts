@@ -149,7 +149,8 @@ export const ORDER_ROUTES = {
    ORDER_DEATAILS:'/order-details/:id',
    UPDATE_STATUS:'/update-status/:id',
    MARK_CONFIRMED:'/mark-as-confirmed/:id',
-   RETURN_REQUEST:'/return-request/:id'
+   RETURN_REQUEST:'/return-request/:id',
+   REVIEW_RETURN:'/review-return/:id'
 }
 
 
