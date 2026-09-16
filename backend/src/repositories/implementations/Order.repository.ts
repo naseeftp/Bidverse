@@ -50,21 +50,27 @@ export class OrderRepository extends BaseRepository<IOrderDocument> implements I
             },
             { $unwind: { path: '$auction', preserveNullAndEmptyArrays: true } }
         ]
+
         if (search && search.trim() !== '') {
             const cleanSearch = search.trim();
+            pipeline.push({
+                $addFields: {
+                    orderIdStr: { $toString: '$_id' }
+                }
+            });
             const searchConditions: Record<string, unknown>[] = [
                 { 'auction.title': { $regex: cleanSearch, $options: 'i' } },
-                { orderNumber: { $regex: cleanSearch, $options: 'i' } }
+                { orderNumber: { $regex: cleanSearch, $options: 'i' } },
+                { orderIdStr: { $regex: cleanSearch, $options: 'i' } }
             ]
-            if (Types.ObjectId.isValid(cleanSearch)) {
-                searchConditions.push({ _id: new Types.ObjectId(cleanSearch) });
-            }
+
             pipeline.push({
                 $match: {
                     $or: searchConditions
                 }
             })
         }
+
         pipeline.push({
             $facet: {
                 docs: [
@@ -115,16 +121,18 @@ export class OrderRepository extends BaseRepository<IOrderDocument> implements I
         ];
         if (search && search.trim() !== '') {
             const cleanSearch = search.trim();
+            pipeline.push({
+                $addFields: {
+                    orderIdStr: { $toString: '$_id' }
+                }
+            });
             const searchConditions: Record<string, unknown>[] = [
                 { 'auction.title': { $regex: cleanSearch, $options: 'i' } },
                 { orderNumber: { $regex: cleanSearch, $options: 'i' } },
-                { 'buyer.buyerName': { $regex: cleanSearch, $options: 'i' } }
+                { 'buyer.buyerName': { $regex: cleanSearch, $options: 'i' } },
+                { orderIdStr: { $regex: cleanSearch, $options: 'i' } }
+
             ];
-
-            if (Types.ObjectId.isValid(cleanSearch)) {
-                searchConditions.push({ _id: new Types.ObjectId(cleanSearch) });
-            }
-
             pipeline.push({
                 $match: {
                     $or: searchConditions
@@ -191,18 +199,20 @@ export class OrderRepository extends BaseRepository<IOrderDocument> implements I
         ];
         if (search && search.trim() !== '') {
             const cleanSearch = search.trim();
+            pipeline.push({
+                $addFields: {
+                    orderIdStr: { $toString: '$_id' }
+                }
+            });
             const searchConditions: Record<string, unknown>[] = [
                 { 'auction.title': { $regex: cleanSearch, $options: 'i' } },
                 { orderNumber: { $regex: cleanSearch, $options: 'i' } },
                 { 'buyer.buyerName': { $regex: cleanSearch, $options: 'i' } },
-                { 'house.name': { $regex: cleanSearch, $options: 'i' } }
+                { 'house.name': { $regex: cleanSearch, $options: 'i' } },
+                { orderIdStr: { $regex: cleanSearch, $options: 'i' } }
+
 
             ];
-
-            if (Types.ObjectId.isValid(cleanSearch)) {
-                searchConditions.push({ _id: new Types.ObjectId(cleanSearch) });
-            }
-
             pipeline.push({
                 $match: {
                     $or: searchConditions

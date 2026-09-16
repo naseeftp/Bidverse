@@ -327,7 +327,7 @@ export class PaymentService implements IPaymentService {
         };
         const excludeShipping=payment.amount-shippingCost;
         const platformCommission = (PLATFORM_COMMISSION / 100) * excludeShipping;
-        const netAmount = (payment.amount - platformCommission)+shippingCost;
+        const netAmount = (excludeShipping - platformCommission)+shippingCost;
        
         await this._paymentRepo.updateById(payment._id.toString(), {
             netAmount,

@@ -198,7 +198,7 @@ export class OrderService implements IOrderService {
                 },
                 OrderStatus.DELIVERED
             );
-            // await this.markAsConfirmed(orderId)
+            await this.markAsConfirmed(orderId)
         }
     }
 
