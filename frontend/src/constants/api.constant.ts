@@ -15,7 +15,9 @@ export const BASE_ROUTES = {
     LIVE: '/LIVE',
     PAYMENT_REQUEST: '/payment-request',
     CHECKOUT: '/checkout',
-    ORDER: '/order'
+    ORDER: '/order',
+    DASHBOARD: '/dashboard'
+
 
 }
 export const AUTH_ROUTES = {
@@ -150,4 +152,8 @@ export const ORDER_ROUTES = {
     RETURN_REQUEST: '/return-request',
     REVIEW_RETURN: '/review-return'
 
+}
+
+export const DASHBOARD_ROUTES = {
+    GET_ADMIN_DASHBOARD: '/get-admin-dashboard'
 }

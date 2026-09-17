@@ -18,7 +18,8 @@ export const BASE_ROUTES = {
     LIVE: '/LIVE',
     PAYMENT_REQUEST: '/payment-request',
     CHECKOUT: '/checkout',
-    ORDER:'/order'
+    ORDER: '/order',
+    DASHBOARD: '/dashboard'
 } as const
 
 export const AUTH_ROUTES = {
@@ -142,17 +143,19 @@ export const CHECKOUT_ROUTES = {
 }
 
 export const ORDER_ROUTES = {
-   PLACE_ORDER:'/place-order',
-   GET_MY_ORDERS:'/my-orders',
-   GET_TENANT_ORDERS:'/tenant-orders',
-   GET_ADMIN_ORDERS:'/admin-orders',
-   ORDER_DEATAILS:'/order-details/:id',
-   UPDATE_STATUS:'/update-status/:id',
-   MARK_CONFIRMED:'/mark-as-confirmed/:id',
-   RETURN_REQUEST:'/return-request/:id',
-   REVIEW_RETURN:'/review-return/:id'
+    PLACE_ORDER: '/place-order',
+    GET_MY_ORDERS: '/my-orders',
+    GET_TENANT_ORDERS: '/tenant-orders',
+    GET_ADMIN_ORDERS: '/admin-orders',
+    ORDER_DEATAILS: '/order-details/:id',
+    UPDATE_STATUS: '/update-status/:id',
+    MARK_CONFIRMED: '/mark-as-confirmed/:id',
+    RETURN_REQUEST: '/return-request/:id',
+    REVIEW_RETURN: '/review-return/:id'
 }
-
+export const DASHBOARD_ROUTES = {
+    GET_ADMIN_DASHBOARD: '/get-admin-dashboard'
+}
 
 
 
