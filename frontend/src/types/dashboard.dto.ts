@@ -38,3 +38,5 @@ export interface DashboardResponseDTO {
     topAuctionHouses: TopAuctionHouseDTO[];
     escrowBreakdown: EscrowStatusBreakdownDTO[];
 }
+
+

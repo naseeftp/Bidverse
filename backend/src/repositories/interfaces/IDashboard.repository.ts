@@ -13,4 +13,13 @@ export interface IDashboardRepository {
     getActiveAuctionCount(): Promise<number>;
     getTotalOrders(): Promise<number>;
     getEscrowStatusBreakdown(): Promise<{ status: string; count: number; totalAmount: number }[]>;
+
+    getTenantRevenue(houseId: string): Promise<number>;
+    getTenantRevenueTrend(houseId: string, days: number): Promise<{ date: string; revenue: number }[]>;
+    getTenantListingStatusBreakdown(houseId: string): Promise<{ status: string; count: number }[]>;
+    getTenantOrderStatusBreakdown(houseId: string): Promise<{ status: string; count: number }[]>;
+    getTenantReturnRequestStats(houseId: string): Promise<{ pending: number; approved: number; rejected: number }>;
+    getTenantActiveAuctionCount(houseId: string): Promise<number>;
+    getTenantTotalListings(houseId: string): Promise<number>;
+    getTenantTotalOrders(houseId: string): Promise<number>;
 }

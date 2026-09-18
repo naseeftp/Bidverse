@@ -154,7 +154,8 @@ export const ORDER_ROUTES = {
     REVIEW_RETURN: '/review-return/:id'
 }
 export const DASHBOARD_ROUTES = {
-    GET_ADMIN_DASHBOARD: '/get-admin-dashboard'
+    GET_ADMIN_DASHBOARD: '/get-admin-dashboard',
+    GET_TENANT_DASHBOARD: '/get-tenant-dashboard'
 }
 
 

@@ -1,10 +1,15 @@
 import { IDashboardService } from "../interface/IDashboard.service";
 import { IDashboardRepository } from "../../repositories/interfaces/IDashboard.repository";
 import { DashboardResponseDTO } from "../../dtos/admin.dto/dashboard.dto";
+import { IAuctionHouseRepository } from "../../repositories/interfaces/IAuctionHouse.repository";
+import { TenantDashboardResponseDTO } from "../../dtos/auctionHouse.dto/dashboard.dto";
+import { NotFoundError } from "../../errors/AppError";
+import { MESSAGES } from "../../constants/constants";
 
 export class DashboardService implements IDashboardService {
     constructor(
-        private _dashboardRepo: IDashboardRepository
+        private _dashboardRepo: IDashboardRepository,
+        private _houseRepo:IAuctionHouseRepository
     ) { }
     async getAdminDashboard(): Promise<DashboardResponseDTO> {
         const [
@@ -58,6 +63,44 @@ export class DashboardService implements IDashboardService {
             escrowBreakdown
         };
     }
-
+ async getTenantDashboard(tenantUserId: string): Promise<TenantDashboardResponseDTO> {
+     const house=await this._houseRepo.findOne({userId:tenantUserId});
+     if(!house){
+        throw new NotFoundError(MESSAGES.AUCTION_HOUSE_NOT_FOUND)
+     }
+     const houseId=house._id.toString();
+          const [
+            totalRevenue,
+            revenueTrend,
+            listingStatusBreakdown,
+            orderStatusBreakdown,
+            returnRequestStats,
+            activeAuctions,
+            totalListings,
+            totalOrders,
+        ] = await Promise.all([
+            this._dashboardRepo.getTenantRevenue(tenantUserId),
+            this._dashboardRepo.getTenantRevenueTrend(tenantUserId, 30),
+            this._dashboardRepo.getTenantListingStatusBreakdown(houseId),
+            this._dashboardRepo.getTenantOrderStatusBreakdown(houseId),
+            this._dashboardRepo.getTenantReturnRequestStats(houseId),
+            this._dashboardRepo.getTenantActiveAuctionCount(houseId),
+            this._dashboardRepo.getTenantTotalListings(houseId),
+            this._dashboardRepo.getTenantTotalOrders(houseId),
+        ])
+         return {
+            overview: {
+                totalRevenue,
+                totalOrders,
+                activeAuctions,
+                totalListings,
+                pendingReturnRequests: returnRequestStats.pending,
+            },
+            revenueTrend,
+            listingStatusBreakdown,
+            orderStatusBreakdown,
+            returnRequestStats,
+        };
+ }
 
 }

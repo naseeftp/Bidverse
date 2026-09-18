@@ -15,4 +15,13 @@ export class DashboardController implements IDashboardController {
             next(error)
         }
     }
+     async getTenantDashboard(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const tenantUserId=req.user.id;
+            const result=await this._dashboardService.getTenantDashboard(tenantUserId);
+            SuccessResponse(res,MESSAGES.ACTION_SUCCESS,result,HttpStatus.OK)
+        } catch (error) {
+            next(error)
+        }
+    }
 }

@@ -450,13 +450,14 @@ const AdminDashboardContent: React.FC = () => {
                     </div>
                 ) : (
                     <>
-                        {/* Executive KPIs */}
+                       
                         <div className="space-y-3">
                             <h2 className="text-xs font-bold uppercase tracking-wider text-[#6B7280]">Platform Overview</h2>
                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                                 <PrimaryMetricCard
                                     title="Gross Platform Revenue"
-                                    value={formatINR(dashboardData.overview.totalRevenue)}
+                                    // value={formatINR(dashboardData.overview.totalRevenue)}
+                                    value={dashboardData.overview.totalRevenue.toString()}
                                     subtitle={`Generated from ${dashboardData.overview.totalOrders} settled orders`}
                                     trend="Active"
                                     highlight={true}
@@ -481,13 +482,10 @@ const AdminDashboardContent: React.FC = () => {
                                 />
                             </div>
                         </div>
-
-                        {/* Revenue Trajectory Model */}
-                        <div>
+                         <div>
                             <RevenueTrajectoryCard points={dashboardData.revenueTrend} />
                         </div>
 
-                        {/* Secondary System Stats */}
                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                             <SecondaryStatCard
                                 label="Registered Platform Users"
@@ -506,7 +504,6 @@ const AdminDashboardContent: React.FC = () => {
                             />
                         </div>
 
-                        {/* Financial & Order Pipeline Breakdown */}
                         <div className="space-y-3">
                             <h2 className="text-xs font-bold uppercase tracking-wider text-[#6B7280]">Financial & Fulfillment Pipeline</h2>
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -528,7 +525,6 @@ const AdminDashboardContent: React.FC = () => {
                             </div>
                         </div>
 
-                        {/* Network & Catalog Operations */}
                         <div className="space-y-3">
                             <h2 className="text-xs font-bold uppercase tracking-wider text-[#6B7280]">Network & Catalog Operations</h2>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -548,7 +544,6 @@ const AdminDashboardContent: React.FC = () => {
                             </div>
                         </div>
 
-                        {/* Leaderboard Table */}
                         <div>
                             <LeaderboardTableCard houses={dashboardData.topAuctionHouses} />
                         </div>

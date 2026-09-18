@@ -9,6 +9,7 @@ import { Order } from "../../models/order.model";
 import { ReturnRequestStatus } from "../../constants/order.constant";
 import UserModel from "../../models/user.model";
 import { AuctionItemStatus } from "../../constants/constants";
+import { Types } from "mongoose";
 
 export class DashboardRepository implements IDashboardRepository {
 
@@ -159,6 +160,98 @@ export class DashboardRepository implements IDashboardRepository {
         ]);
         return results.map(r => ({ status: r._id, count: r.count, totalAmount: r.totalAmount }));
 
+    }
+    // tenant
+    async getTenantRevenue(houseId: string): Promise<number> {
+        const [result] = await Transaction.aggregate([
+            {
+                $match: {
+                    partyType: TransactionPartyType.AUCTION_HOUSE,
+                    userId: new Types.ObjectId(houseId)
+                }
+            },
+            { $group: { _id: null, total: { $sum: '$amount' } } }
+        ]);
+        return result?.total ?? 0;
+    }
+    async getTenantRevenueTrend(houseId: string, days: number): Promise<{ date: string; revenue: number; }[]> {
+        const since = new Date();
+        since.setDate(since.getDate() - days);
+        const results = await Transaction.aggregate([
+            {
+                $match: {
+                    partyType: TransactionPartyType.AUCTION_HOUSE,
+                    userId: new Types.ObjectId(houseId),
+                    createdAt: { $gte: since }
+                }
+            },
+            {
+                $group: {
+                    _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
+                    revenue: { $sum: "$amount" }
+                }
+            },
+            { $sort: { _id: 1 } }
+        ])
+        return results.map(r => ({ date: r._id, revenue: r.revenue }));
+
+    }
+    async getTenantListingStatusBreakdown(houseId: string): Promise<{ status: string; count: number; }[]> {
+        const results = await AuctionItem.aggregate([
+            {
+                $match: {
+                    houseId: new Types.ObjectId(houseId)
+                }
+            },
+            {
+                $group: {
+                    _id: '$status', count: { $sum: 1 }
+                }
+            }
+        ])
+        return results.map(r => ({ status: r._id, count: r.count }))
+    }
+    async getTenantOrderStatusBreakdown(houseId: string): Promise<{ status: string; count: number }[]> {
+        const results = await Order.aggregate([
+            { $match: { tenantId: new Types.ObjectId(houseId) } },
+            { $group: { _id: "$status", count: { $sum: 1 } } }
+        ]);
+        return results.map(r => ({ status: r._id, count: r.count }));
+    }
+    async getTenantReturnRequestStats(houseId: string): Promise<{ pending: number; approved: number; rejected: number }> {
+        const [result] = await Order.aggregate([
+            {
+                $match: {
+                    tenantId: new Types.ObjectId(houseId),
+                    returnRequest: { $exists: true }
+                }
+            },
+            {
+                $group: {
+                    _id: null,
+                    pending: { $sum: { $cond: [{ $eq: ["$returnRequest.status", ReturnRequestStatus.PENDING] }, 1, 0] } },
+                    approved: { $sum: { $cond: [{ $eq: ["$returnRequest.status", ReturnRequestStatus.APPROVED] }, 1, 0] } },
+                    rejected: { $sum: { $cond: [{ $eq: ["$returnRequest.status", ReturnRequestStatus.REJECTED] }, 1, 0] } },
+                }
+            }
+        ]);
+        return result
+            ? { pending: result.pending, approved: result.approved, rejected: result.rejected }
+            : { pending: 0, approved: 0, rejected: 0 };
+    }
+    async getTenantActiveAuctionCount(houseId: string): Promise<number> {
+        return AuctionItem.countDocuments({
+            houseId:new Types.ObjectId(houseId),
+            status:AuctionItemStatus.SCHEDULED
+        })
+    }
+    async getTenantTotalListings(houseId: string): Promise<number> {
+        return AuctionItem.countDocuments({
+            houseId: new Types.ObjectId(houseId) 
+        })
+    }
+      async getTenantTotalOrders(houseId: string): Promise<number> {
+        return Order.countDocuments({ tenantId: new Types.ObjectId(houseId) });
     }
 
 }

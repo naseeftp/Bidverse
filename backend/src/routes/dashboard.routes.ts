@@ -14,4 +14,10 @@ router.get(
     allowedTo(Role.ADMIN),
     (req, res, next) => dashboardController.getAdminDashboard(req, res, next)
 )
+router.get(
+    DASHBOARD_ROUTES.GET_TENANT_DASHBOARD,
+    allowedTo(Role.TENANT),
+    (req, res, next) => dashboardController.getTenantDashboard(req, res, next)
+
+)
 export default router

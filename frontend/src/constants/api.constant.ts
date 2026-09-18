@@ -155,5 +155,7 @@ export const ORDER_ROUTES = {
 }
 
 export const DASHBOARD_ROUTES = {
-    GET_ADMIN_DASHBOARD: '/get-admin-dashboard'
+    GET_ADMIN_DASHBOARD: '/get-admin-dashboard',
+    GET_TENANT_DASHBOARD: '/get-tenant-dashboard'
+
 }
