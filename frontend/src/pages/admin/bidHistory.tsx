@@ -5,161 +5,249 @@ import Pagination from "../../components/admin/pagination";
 import toast from "react-hot-toast";
 import bidService from "../../services/bid.service";
 import type { IPaginationMeta } from "../../types/auth.type";
-import { FaArrowLeft, FaGavel } from "react-icons/fa";
+import { FaArrowLeft as ArrowIcon, FaFilter as FilterIcon, FaTimes as TimesIcon } from "react-icons/fa";
 
 const AdminBidHistoryPage: React.FC = () => {
-    const { id } = useParams<{ id: string }>();
-    const [bids, setBids] = useState<bidHistoryDTO[]>([]);
-    const [pagination, setPagination] = useState<IPaginationMeta | null>(null);
-    const [loading, setLoading] = useState(false);
-    const [page, setPage] = useState(1);
-    const navigate = useNavigate();
+  const { id } = useParams<{ id: string }>();
+  const [bids, setBids] = useState<bidHistoryDTO[]>([]);
+  const [pagination, setPagination] = useState<IPaginationMeta | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [page, setPage] = useState(1);
+  const [minPrice, setMinPrice] = useState<string>("");
+  const [maxPrice, setMaxPrice] = useState<string>("");
+  const [appliedMinPrice, setAppliedMinPrice] = useState<string>("");
+  const [appliedMaxPrice, setAppliedMaxPrice] = useState<string>("");
 
-    const fetchBids = useCallback(async () => {
-        if (!id) return;
-        setLoading(true);
-        try {
-            const result = await bidService.getBidHistory(id, page, 6);
-            if (result && result.success && result.data) {
-                setBids(result.data ?? []);
-                setPagination(result.pagination ?? null);
-            } else {
-                toast.error(result?.message || "Failed to load bid history");
-            }
-        } catch {
-            toast.error("Error while fetching bid history");
-        } finally {
-            setLoading(false);
-        }
-    }, [id, page]);
+  const navigate = useNavigate();
 
-    useEffect(() => {
-        fetchBids();
-    }, [fetchBids]);
+  const fetchBids = useCallback(async () => {
+    if (!id) return;
+    setLoading(true);
+    try {
+      const min = appliedMinPrice ? Number(appliedMinPrice) : undefined;
+      const max = appliedMaxPrice ? Number(appliedMaxPrice) : undefined;
+      const result = await bidService.getBidHistory(id, page, 10, min, max);
+      if (result && result.success && result.data) {
+        setBids(result.data ?? []);
+        setPagination(result.pagination ?? null);
+      } else {
+        toast.error(result?.message || "Failed to load bid history");
+      }
+    } catch {
+      toast.error("Failed to sync bid registry");
+    } finally {
+      setLoading(false);
+    }
+  }, [id, page, appliedMaxPrice, appliedMinPrice]);
 
-    const getStatusBadge = (status: string) => {
-        const lowerStatus = status.toLowerCase();
-        switch (lowerStatus) {
-            case "winning":
-            case "won":
-                return (
-                    <span className="px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-wider rounded-md bg-emerald-50 text-[#16A34A] border border-emerald-200">
-                        Winning
-                    </span>
-                );
-            case "outbid":
-                return (
-                    <span className="px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-wider rounded-md bg-amber-50 text-[#D4AF37] border border-[#D4AF37]/30">
-                        Outbid
-                    </span>
-                );
-            case "cancelled":
-            case "rejected":
-                return (
-                    <span className="px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-wider rounded-md bg-rose-50 text-[#DC2626] border border-rose-200">
-                        {status}
-                    </span>
-                );
-            default:
-                return (
-                    <span className="px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-wider rounded-md bg-[#F3F4F6] text-[#6B7280] border border-[#E5E7EB]">
-                        {status}
-                    </span>
-                );
-        }
-    };
+  useEffect(() => {
+    fetchBids();
+  }, [fetchBids]);
 
-    return (
-        <div className="min-h-screen bg-[#F3F4F6] px-4 py-8 md:px-8 text-[#0F172A] font-sans">
-            <div className="max-w-7xl mx-auto mb-8">
-                <button
-                    onClick={() => navigate(-1)}
-                    className="inline-flex items-center gap-2 text-xs font-bold text-[#6B7280] hover:text-[#0F172A] mb-4 transition-colors uppercase tracking-wider"
-                >
-                    <FaArrowLeft size={10} /> BACK TO AUCTIONS
-                </button>
+  const handleApplyFilter = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (minPrice && maxPrice && Number(minPrice) > Number(maxPrice)) {
+      toast.error("Min price cannot be greater than Max price");
+      return;
+    }
+    setPage(1);
+    setAppliedMinPrice(minPrice);
+    setAppliedMaxPrice(maxPrice);
+  };
 
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                    <div>
-                        <h1 className="text-2xl font-black tracking-tight text-[#0F172A] flex items-center gap-2.5">
-                            <FaGavel className="text-[#D4AF37]" size={22} /> Bid Audit Logs
-                        </h1>
-                        <p className="text-sm text-[#6B7280] mt-0.5">
-                            Real-time transparent history recorded for Item ID:{" "}
-                            <span className="font-mono font-semibold text-[#0F172A]">
-                                #{id?.slice(-8).toUpperCase()}
-                            </span>
-                        </p>
-                    </div>
-                </div>
-            </div>
+  const handleResetFilter = () => {
+    setMinPrice("");
+    setMaxPrice("");
+    setAppliedMinPrice("");
+    setAppliedMaxPrice("");
+    setPage(1);
+  };
 
-            <div className="max-w-7xl mx-auto">
-                {loading ? (
-                    <div className="flex flex-col items-center justify-center py-28 space-y-4 bg-white rounded-xl border border-[#E5E7EB]">
-                        <div className="w-10 h-10 border-4 border-[#111827] border-t-[#D4AF37] rounded-full animate-spin"></div>
-                        <p className="text-xs uppercase tracking-widest font-bold text-[#6B7280] animate-pulse">
-                            Syncing Bid Logs...
-                        </p>
-                    </div>
-                ) : bids && bids.length > 0 ? (
-                    <div className="bg-white rounded-xl border border-[#E5E7EB] shadow-sm overflow-hidden">
-                        <div className="overflow-x-auto">
-                            <table className="w-full text-left border-collapse">
-                                <thead>
-                                    <tr className="bg-[#111827] border-b border-[#E5E7EB] text-[11px] font-bold text-[#F3F4F6] uppercase tracking-wider">
-                                        <th className="py-4 px-6">Bidder</th>
-                                        <th className="py-4 px-6">Bid Amount</th>
-                                        <th className="py-4 px-6">Date & Time</th>
-                                        <th className="py-4 px-6 text-right">Status</th>
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y divide-[#E5E7EB] text-sm font-medium">
-                                    {bids.map((bid) => (
-                                        <tr
-                                            key={bid.bidId}
-                                            className="hover:bg-[#F3F4F6]/50 transition-colors"
-                                        >
-                                            <td className="py-4 px-6 font-bold text-[#0F172A]">
-                                                {bid.bidderName || "Anonymous Bidder"}
-                                            </td>
-                                            <td className="py-4 px-6 font-extrabold text-[#111827] text-base">
-                                                {bid.bidAmount?.toLocaleString()}
-                                            </td>
-                                            <td className="py-4 px-6 text-xs text-[#6B7280]">
-                                                {bid.bidPlacedAt
-                                                    ? new Date(bid.bidPlacedAt).toLocaleString("en-US", {
-                                                          dateStyle: "medium",
-                                                          timeStyle: "short",
-                                                      })
-                                                    : "N/A"}
-                                            </td>
-                                            <td className="py-4 px-6 text-right">
-                                                {getStatusBadge(bid.bidStatus)}
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
+  const getStatusBadge = (status: string) => {
+    const lowerStatus = status.toLowerCase();
+    switch (lowerStatus) {
+      case "winning":
+      case "won":
+        return (
+          <span className="px-2 py-1 text-[8px] font-black uppercase tracking-widest rounded-[2px] bg-white text-black border border-white">
+            Winning
+          </span>
+        );
+      case "outbid":
+        return (
+          <span className="px-2 py-1 text-[8px] font-black uppercase tracking-widest rounded-[2px] border border-white/40 text-white">
+            Outbid
+          </span>
+        );
+      case "cancelled":
+      case "rejected":
+        return (
+          <span className="px-2 py-1 text-[8px] font-black uppercase tracking-widest rounded-[2px] border border-white/20 text-white/40">
+            {status}
+          </span>
+        );
+      default:
+        return (
+          <span className="px-2 py-1 text-[8px] font-black uppercase tracking-widest rounded-[2px] border border-white/20 text-white/60">
+            {status}
+          </span>
+        );
+    }
+  };
 
-                        <Pagination
-                            paginationMeta={pagination}
-                            currentPage={page}
-                            onPageChange={setPage}
-                            isLoading={loading}
-                        />
-                    </div>
-                ) : (
-                    <div className="bg-white rounded-xl border border-[#E5E7EB] py-24 text-center shadow-sm">
-                        <p className="text-sm font-bold text-[#6B7280] uppercase tracking-widest">
-                            No bids recorded for this item yet
-                        </p>
-                    </div>
-                )}
-            </div>
+  return (
+    <div className="space-y-6">
+      {/* Header Section */}
+      <div>
+        <button
+          onClick={() => navigate(-1)}
+          className="inline-flex items-center gap-2 text-[10px] font-black text-[#111827] hover:underline uppercase tracking-[0.2em] mb-3 transition-all"
+        >
+          <ArrowIcon size={9} /> BACK TO AUCTIONS
+        </button>
+        <h1 className="text-xl font-black uppercase tracking-[0.25em] text-[#111827]">
+          Bid Audit Logs
+        </h1>
+        <p className="text-[10px] font-bold text-[#111827] uppercase tracking-widest mt-1">
+          System Administration Panel — Item ID:{" "}
+          <span className="font-mono font-semibold">
+            #{id?.slice(-8).toUpperCase()}
+          </span>
+        </p>
+      </div>
+
+      <form
+        onSubmit={handleApplyFilter}
+        className="bg-[#111827] rounded-sm border border-white/10 p-5 shadow-xl flex flex-col md:flex-row items-end justify-between gap-4"
+      >
+        <div className="flex flex-col sm:flex-row items-end gap-4 w-full md:w-auto">
+          <div className="w-full sm:w-48 group">
+            <label className="text-[9px] font-black uppercase tracking-[0.2em] text-white/70 mb-2 block">
+              Min Bid Amount
+            </label>
+            <input
+              type="number"
+              min="0"
+              placeholder="e.g. 100"
+              value={minPrice}
+              onChange={(e) => setMinPrice(e.target.value)}
+              className="w-full bg-[#111827] border border-white/10 px-4 py-3 text-[10px] text-white font-bold uppercase tracking-widest focus:outline-none focus:border-white/30 transition-all placeholder:text-white/30"
+            />
+          </div>
+
+          <div className="w-full sm:w-48 group">
+            <label className="text-[9px] font-black uppercase tracking-[0.2em] text-white/70 mb-2 block">
+              Max Bid Amount
+            </label>
+            <input
+              type="number"
+              min="0"
+              placeholder="e.g. 5000"
+              value={maxPrice}
+              onChange={(e) => setMaxPrice(e.target.value)}
+              className="w-full bg-[#111827] border border-white/10 px-4 py-3 text-[10px] text-white font-bold uppercase tracking-widest focus:outline-none focus:border-white/30 transition-all placeholder:text-white/30"
+            />
+          </div>
         </div>
-    );
+
+        <div className="flex items-center gap-3 w-full md:w-auto justify-end">
+          {(appliedMinPrice || appliedMaxPrice) && (
+            <button
+              type="button"
+              onClick={handleResetFilter}
+              className="px-4 py-3 text-[10px] font-black uppercase tracking-widest text-white/70 hover:text-white border border-white/20 hover:border-white transition-all flex items-center gap-1.5 cursor-pointer"
+            >
+              <TimesIcon size={9} /> Clear Filter
+            </button>
+          )}
+          <button
+            type="submit"
+            className="px-6 py-3 text-[10px] font-black uppercase tracking-widest text-black bg-white border border-white hover:bg-white/90 transition-all flex items-center gap-2 cursor-pointer"
+          >
+            <FilterIcon size={9} /> Apply Filter
+          </button>
+        </div>
+      </form>
+
+      <div className="bg-[#111827] rounded-sm border border-white/10 shadow-xl overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full text-left border-collapse">
+            <thead>
+              <tr className="bg-white/[0.05] border-b border-white/10">
+                <th className="px-6 py-4 text-[10px] font-black uppercase tracking-[0.2em] text-white border-r border-white/5">
+                  Bidder
+                </th>
+                <th className="px-6 py-4 text-[10px] font-black uppercase tracking-[0.2em] text-white border-r border-white/5">
+                  Bid Amount
+                </th>
+                <th className="px-6 py-4 text-[10px] font-black uppercase tracking-[0.2em] text-white border-r border-white/5">
+                  Date & Time
+                </th>
+                <th className="px-6 py-4 text-[10px] font-black uppercase tracking-[0.2em] text-white text-center">
+                  Status
+                </th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-white/10">
+              {loading ? (
+                <tr>
+                  <td
+                    colSpan={4}
+                    className="py-20 text-center text-white animate-pulse uppercase text-[10px] font-black tracking-widest"
+                  >
+                    Syncing Bid Registry...
+                  </td>
+                </tr>
+              ) : bids && bids.length > 0 ? (
+                bids.map((bid) => (
+                  <tr
+                    key={bid.bidId}
+                    className="hover:bg-white/[0.03] transition-colors group"
+                  >
+                    <td className="px-6 py-4 border-r border-white/5 text-xs font-bold uppercase tracking-wider text-white">
+                      {bid.bidderName || "Anonymous Bidder"}
+                    </td>
+                    <td className="px-6 py-4 border-r border-white/5 font-mono text-xs font-black text-white">
+                      ₹{bid.bidAmount?.toLocaleString()}
+                    </td>
+                    <td className="px-6 py-4 border-r border-white/5 font-mono text-[10px] text-white/60">
+                      {bid.bidPlacedAt
+                        ? new Date(bid.bidPlacedAt)
+                            .toLocaleString("en-US", {
+                              dateStyle: "medium",
+                              timeStyle: "short",
+                            })
+                            .toUpperCase()
+                        : "N/A"}
+                    </td>
+                    <td className="px-6 py-4 text-center">
+                      {getStatusBadge(bid.bidStatus)}
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td
+                    colSpan={4}
+                    className="py-20 text-center text-white/50 text-[10px] font-bold uppercase tracking-widest"
+                  >
+                    No Bids Recorded For This Item
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+
+        <Pagination
+          currentPage={page}
+          paginationMeta={pagination}
+          isLoading={loading}
+          onPageChange={setPage}
+        />
+      </div>
+    </div>
+  );
 };
 
 export default AdminBidHistoryPage;
