@@ -2,7 +2,7 @@ import { BaseRepository } from "./Base.repository";
 import { IBidRepository } from "../interfaces/IBid.repository";
 import { IBidDocument } from "../../types/bid.type";
 import { Bid } from '../../models/bid.model'
-import mongoose, { Types, UpdateResult, PipelineStage } from "mongoose";
+import mongoose, { Types, UpdateResult, PipelineStage, QueryFilter } from "mongoose";
 import { myBidListDTO, bidHistoryDTO,createBidDTO } from "../../dtos/user.dto/bid.dto";
 import { BidStatus } from "../../constants/constants";
 
@@ -143,17 +143,22 @@ export class BidRepository extends BaseRepository<IBidDocument> implements IBidR
             total: results[0]?.totalCount[0]?.count || 0
         }
     }
-    async getBidHistory(auctionId: string, page: number, limit: number): Promise<{ docs: bidHistoryDTO[], total: number }> {
-        const skip = (page - 1) * limit;
-        const targateAuctionId = new Types.ObjectId(auctionId)
+    async getBidHistory(auctionId: string, page: number, limit: number,min?:number,max?:number): Promise<{ docs: bidHistoryDTO[], total: number }> {
+     const skip = (page - 1) * limit;
+     const filter: QueryFilter<IBidDocument> = { auctionId };
+    if (min !== undefined || max !== undefined) {
+        filter.bidAmount = {};
+        if (min !== undefined) filter.bidAmount.$gte = min;
+        if (max !== undefined) filter.bidAmount.$lte = max;
+    }
         const [bids, total] = await Promise.all([
-            this.model.find({ auctionId: targateAuctionId })
+            this.model.find(filter)
                 .sort({ createdAt: -1 })
                 .skip(skip)
                 .limit(limit)
                 .populate<{ bidderId: { name: string } }>('bidderId', 'name')
                 .lean(),
-            this.model.countDocuments({ auctionId: targateAuctionId })
+            this.model.countDocuments(filter)
         ])
         const docs: bidHistoryDTO[] = bids.map((bid) => ({
             bidId: bid._id.toString(),

@@ -108,12 +108,12 @@ export class BidService implements IBidService {
             }
         }
     }
-    async getBidHistory(auctionId: string, page: number, limit: number): Promise<IGenericPaginatedResposnse<bidHistoryDTO>> {
+    async getBidHistory(auctionId: string, page: number, limit: number,min?:number,max?:number): Promise<IGenericPaginatedResposnse<bidHistoryDTO>> {
         const auctionExist = await this._auctionRepo.findById(auctionId);
         if (!auctionExist) {
             throw new NotFoundError(MESSAGES.AUCTION_NOT_FOUND)
         }
-        const { docs, total } = await this._bidRepo.getBidHistory(auctionId, page, limit);
+        const { docs, total } = await this._bidRepo.getBidHistory(auctionId, page, limit,min,max);
         return {
             data: docs,
             pagination: {

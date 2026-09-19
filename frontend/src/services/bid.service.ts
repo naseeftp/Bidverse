@@ -35,9 +35,15 @@ export class BidService{
         return apiErrorHandler(error,'Failed to get User Bids')
       }
     }
-    async getBidHistory(auctionId:string,page:number,limit:number){
+    async getBidHistory(auctionId:string,page:number,limit:number,min?:number,max?:number){
       try {
-        const url=`${BASE_ROUTES.BID}${BID_ROUTES.BID_HISTORY}/${auctionId}?page=${page}&limit=${limit}`;
+        let  url=`${BASE_ROUTES.BID}${BID_ROUTES.BID_HISTORY}/${auctionId}?page=${page}&limit=${limit}`;
+        if(min!==undefined){
+          url+=`&min=${min}`
+        }
+        if(max!==undefined){
+          url+=`&max=${max}`
+        }
         const response=await axiosInstance.get<bidHistoryDTO,ApiResponse<{data:bidHistoryDTO[],pagination:IPaginationMeta}>>(url)
         const paginatedResult=response.data;
         return{

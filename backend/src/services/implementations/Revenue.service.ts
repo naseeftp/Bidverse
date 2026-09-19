@@ -1,18 +1,19 @@
 import { IRevenueService } from "../interface/IRevenue.service";
-import { IRevenueRepository,RevenueGranularity } from "../../repositories/interfaces/IRevenue.repository";
-import { RevenueBreakdownResponseDTO,IncomingRevenueRowDTO } from "../../dtos/admin.dto/revenue.dto";
+import { IRevenueRepository, RevenueGranularity } from "../../repositories/interfaces/IRevenue.repository";
+import { RevenueBreakdownResponseDTO, IncomingRevenueRowDTO } from "../../dtos/admin.dto/revenue.dto";
 import { IGenericPaginatedResposnse } from "../../types/response.type";
-export class RevenueService implements IRevenueService{
+import { RevenueMapper } from "../../mappers/revenue.mapper";
+export class RevenueService implements IRevenueService {
     constructor(
-        private _revenueRepo:IRevenueRepository
-    ){}
-     private resolveRange(startDate?: string, endDate?: string) {
+        private _revenueRepo: IRevenueRepository
+    ) { }
+    private resolveRange(startDate?: string, endDate?: string) {
         const end = endDate ? new Date(endDate) : new Date();
         const start = startDate ? new Date(startDate) : new Date(end.getTime() - 30 * 24 * 60 * 60 * 1000);
         return { start, end };
     }
-    async getRevenueBreakdown(startDate?: string, endDate?: string, granularity: RevenueGranularity='day'): Promise<RevenueBreakdownResponseDTO> {
-       const { start, end } = this.resolveRange(startDate, endDate);
+    async getRevenueBreakdown(startDate?: string, endDate?: string, granularity: RevenueGranularity = 'day'): Promise<RevenueBreakdownResponseDTO> {
+        const { start, end } = this.resolveRange(startDate, endDate);
 
         const [totalCommission, totalRefunded, refundRate, trend, bySourceRaw, byHouseRaw] = await Promise.all([
             this._revenueRepo.getTotalCommission(start, end),
@@ -22,7 +23,7 @@ export class RevenueService implements IRevenueService{
             this._revenueRepo.getRevenueBySource(start, end),
             this._revenueRepo.getRevenueByHouse(start, end),
         ]);
-         const bySource = bySourceRaw.map(s => ({ source: s.source as "order" | "slot_booking", amount: s.amount, count: s.count }));
+        const bySource = bySourceRaw.map(s => ({ source: s.source as "order" | "slot_booking", amount: s.amount, count: s.count }));
 
         const totalHouseRevenue = byHouseRaw.reduce((sum, h) => sum + h.totalRevenue, 0);
         const byHouse = byHouseRaw.map(h => ({
@@ -47,15 +48,7 @@ export class RevenueService implements IRevenueService{
         const { docs, total } = await this._revenueRepo.getIncomingRevenueList(start, end, page, limit);
 
         return {
-            data: docs.map(d => ({
-                id: d.id,
-                date: d.date.toISOString(),
-                source: d.source as "order" | "slot_booking" | "unknown",
-                auctionTitle: d.auctionTitle,
-                houseName: d.houseName,
-                amount: d.amount,
-                status: d.status,
-            })),
+            data: RevenueMapper.toIncomingRevenueList(docs),
             pagination: {
                 totalItems: total,
                 itemsPerPage: limit,

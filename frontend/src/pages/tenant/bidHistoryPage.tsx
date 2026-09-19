@@ -5,7 +5,8 @@ import Pagination from "../../components/tenant/pagination";
 import toast from "react-hot-toast";
 import bidService from "../../services/bid.service";
 import type { IPaginationMeta } from "../../types/auth.type";
-import { FaArrowLeft, FaGavel } from "react-icons/fa";
+import { FaArrowLeft, FaGavel, FaTimes, FaFilter } from "react-icons/fa";
+
 
 const TenantBidHistoryPage: React.FC = () => {
     const { id } = useParams<{ id: string }>();
@@ -13,13 +14,20 @@ const TenantBidHistoryPage: React.FC = () => {
     const [pagination, setPagination] = useState<IPaginationMeta | null>(null);
     const [loading, setLoading] = useState(false);
     const [page, setPage] = useState(1);
+    const [minPrice, setMinPrice] = useState<string>('');
+    const [maxPrice, setMaxPrice] = useState<string>('');
+    const [appliedMinPrice, setAppliedMinPrice] = useState<string>("");
+    const [appliedMaxPrice, setAppliedMaxPrice] = useState<string>("");
+
     const navigate = useNavigate();
 
     const fetchBids = useCallback(async () => {
         if (!id) return;
         setLoading(true);
         try {
-            const result = await bidService.getBidHistory(id, page, 6);
+            const min = appliedMinPrice ? Number(appliedMinPrice) : undefined;
+            const max = appliedMaxPrice ? Number(appliedMaxPrice) : undefined;
+            const result = await bidService.getBidHistory(id, page, 10, min, max);
             if (result && result.success && result.data) {
                 setBids(result.data ?? []);
                 setPagination(result.pagination ?? null);
@@ -31,12 +39,29 @@ const TenantBidHistoryPage: React.FC = () => {
         } finally {
             setLoading(false);
         }
-    }, [id, page]);
+    }, [id, page,appliedMaxPrice,appliedMinPrice]);
 
     useEffect(() => {
         fetchBids();
     }, [fetchBids]);
 
+    const handleApplyFilter = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (minPrice && maxPrice && Number(minPrice) > Number(maxPrice)) {
+            toast.error('Min price cannot be greater than Max price')
+            return
+        }
+        setPage(1);
+        setAppliedMinPrice(minPrice);
+        setAppliedMaxPrice(maxPrice);
+    }
+    const handleResetFilter = () => {
+        setMinPrice("");
+        setMaxPrice("");
+        setAppliedMinPrice("");
+        setAppliedMaxPrice("");
+        setPage(1);
+    };
     const getStatusBadge = (status: string) => {
         const lowerStatus = status.toLowerCase();
         switch (lowerStatus) {
@@ -94,7 +119,60 @@ const TenantBidHistoryPage: React.FC = () => {
                 </div>
             </div>
 
+
             <div className="max-w-7xl mx-auto">
+                <form
+                    onSubmit={handleApplyFilter}
+                    className="bg-white rounded-xl border border-[#E2E8F0] p-4 mb-6 shadow-sm flex flex-col sm:flex-row items-stretch sm:items-end justify-between gap-4"
+                >
+                    <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
+                        <div className="w-full sm:w-auto">
+                            <label className="block text-[11px] font-bold text-[#475569] uppercase tracking-wider mb-1">
+                                Min Bid Amount
+                            </label>
+                            <input
+                                type="number"
+                                min="0"
+                                placeholder="e.g. 100"
+                                value={minPrice}
+                                onChange={(e) => setMinPrice(e.target.value)}
+                                className="w-full sm:w-40 px-3 py-2 text-sm border border-[#E2E8F0] rounded-lg focus:outline-none focus:border-[#2F6FED] bg-[#F8FAFC] font-medium"
+                            />
+                        </div>
+
+                        <div className="w-full sm:w-auto">
+                            <label className="block text-[11px] font-bold text-[#475569] uppercase tracking-wider mb-1">
+                                Max Bid Amount
+                            </label>
+                            <input
+                                type="number"
+                                min="0"
+                                placeholder="e.g. 5000"
+                                value={maxPrice}
+                                onChange={(e) => setMaxPrice(e.target.value)}
+                                className="w-full sm:w-40 px-3 py-2 text-sm border border-[#E2E8F0] rounded-lg focus:outline-none focus:border-[#2F6FED] bg-[#F8FAFC] font-medium"
+                            />
+                        </div>
+                    </div>
+
+                    <div className="flex items-center gap-2.5 justify-end">
+                        {(appliedMinPrice || appliedMaxPrice) && (
+                            <button
+                                type="button"
+                                onClick={handleResetFilter}
+                                className="px-4 py-2 text-xs font-bold text-[#475569] bg-[#F8FAFC] hover:bg-[#E2E8F0] border border-[#E2E8F0] rounded-lg transition-colors flex items-center gap-1.5"
+                            >
+                                <FaTimes size={10} /> Clear
+                            </button>
+                        )}
+                        <button
+                            type="submit"
+                            className="px-5 py-2 text-xs font-bold text-white bg-[#2F6FED] hover:bg-[#2558C9] rounded-lg transition-colors flex items-center gap-2 shadow-sm"
+                        >
+                            <FaFilter size={10} /> Apply Filter
+                        </button>
+                    </div>
+                </form>
                 {loading ? (
                     <div className="flex flex-col items-center justify-center py-28 space-y-4 bg-white rounded-xl border border-[#E2E8F0]">
                         <div className="w-10 h-10 border-4 border-[#2F6FED] border-t-transparent rounded-full animate-spin"></div>
@@ -129,9 +207,9 @@ const TenantBidHistoryPage: React.FC = () => {
                                             <td className="py-4 px-6 text-xs text-[#475569]">
                                                 {bid.bidPlacedAt
                                                     ? new Date(bid.bidPlacedAt).toLocaleString("en-US", {
-                                                          dateStyle: "medium",
-                                                          timeStyle: "short",
-                                                      })
+                                                        dateStyle: "medium",
+                                                        timeStyle: "short",
+                                                    })
                                                     : "N/A"}
                                             </td>
                                             <td className="py-4 px-6 text-right">

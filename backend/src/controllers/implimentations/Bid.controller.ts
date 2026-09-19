@@ -35,7 +35,9 @@ export class BidController implements IBidController {
       const auctionId = req.params.id as string;
       const page = Number(req.query.page);
       const limit = Number(req.query.limit);
-      const result = await this._bidService.getBidHistory(auctionId, page, limit)
+      const min = req.query.min !== undefined ? Number(req.query.min) : undefined;
+      const max = req.query.max !== undefined ? Number(req.query.max) : undefined;
+      const result = await this._bidService.getBidHistory(auctionId, page, limit, min, max)
       SuccessResponse(res, MESSAGES.ACTION_SUCCESS, result, HttpStatus.OK)
     } catch (error) {
       next(error)

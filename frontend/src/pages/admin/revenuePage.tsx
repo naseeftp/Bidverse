@@ -18,17 +18,6 @@ const formatShortDate = (iso: string) => {
   return d.toLocaleDateString("en-IN", { day: "numeric", month: "short" });
 };
 
-const formatFullDate = (iso: string) => {
-  const d = new Date(iso);
-  if (isNaN(d.getTime())) return iso;
-  return d.toLocaleDateString("en-IN", {
-    day: "numeric",
-    month: "short",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-};
 
 const toInputDate = (d: Date) => d.toISOString().slice(0, 10);
 
@@ -235,7 +224,6 @@ const RevenueBreakdownPage: React.FC = () => {
       `}</style>
 
       <div className="mx-auto max-w-[1100px] px-6 py-10">
-        {/* Header */}
         <div className="mb-8 border-b border-[#2A3B4F] pb-6">
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div>
@@ -249,9 +237,7 @@ const RevenueBreakdownPage: React.FC = () => {
         
           </div>
 
-          {/* Filter Bar */}
           <div className="mt-6 flex flex-wrap items-center justify-between gap-4 rounded-lg border border-[#2A3B4F] bg-[#131F2E] p-3">
-            {/* Range Presets */}
             <div className="flex items-center gap-1 rounded bg-[#0E1826] p-1 border border-[#2A3B4F]">
               {RANGE_PRESETS.map((r) => (
                 <button
@@ -400,7 +386,6 @@ const RevenueBreakdownPage: React.FC = () => {
                 </div>
               </div>
 
-              {/* Revenue by Auction House */}
               <div className="rounded-lg border border-[#2A3B4F] bg-[#131F2E] p-6">
                 <h2 className="mb-4 font-serif text-lg font-medium text-[#EDE8DC]">
                   Revenue by Auction House
@@ -441,14 +426,12 @@ const RevenueBreakdownPage: React.FC = () => {
               </div>
             </div>
 
-            {/* Incoming Revenue Transactions Table */}
             <div className="mb-10">
               <h2 className="mb-4 font-serif text-lg font-medium text-[#EDE8DC]">
                 Incoming Revenue Transactions
               </h2>
 
               <div className="overflow-hidden rounded-lg border border-[#2A3B4F] bg-[#131F2E]">
-                {/* Updated Table Grid Headers with separate Auction Title & House columns */}
                 <div className="grid grid-cols-[110px_130px_1fr_1fr_110px_90px] gap-4 border-b border-[#2A3B4F] bg-[#1B2A3C] px-4 py-2.5 text-[10px] font-medium uppercase tracking-wider text-[#93A2B2]">
                   <span>Date</span>
                   <span>Source</span>
@@ -473,32 +456,26 @@ const RevenueBreakdownPage: React.FC = () => {
                         key={row.id}
                         className="grid grid-cols-[110px_130px_1fr_1fr_110px_90px] gap-4 px-4 py-3 items-center text-xs transition-colors hover:bg-[#1B2A3C]/30"
                       >
-                        {/* Date */}
                         <span className="font-mono text-[#93A2B2]">
                           {formatShortDate(row.date)}
                         </span>
 
-                        {/* Source */}
                         <span className="font-medium text-[#EDE8DC]">
                           {sourceLabel(row.source)}
                         </span>
 
-                        {/* Distinct Auction Title Column */}
                         <span className="truncate text-[#EDE8DC]">
                           {row.auctionTitle ?? "—"}
                         </span>
 
-                        {/* Distinct House Name Column */}
                         <span className="truncate text-[#93A2B2]">
                           {row.houseName ?? "—"}
                         </span>
 
-                        {/* Amount */}
                         <span className="text-right font-mono font-medium text-[#EDE8DC] tabular-nums">
                           {formatINR(row.amount)}
                         </span>
 
-                        {/* Status Badge */}
                         <span className="text-right">
                           <span
                             className={`inline-block rounded px-2 py-0.5 text-[10px] font-mono uppercase ${

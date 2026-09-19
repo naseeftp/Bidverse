@@ -9,5 +9,5 @@ export interface IBidRepository extends IBaseRepository<IBidDocument> {
     placeBid(data:createBidDTO):Promise<IBidDocument>
     makeOutBid(exceptedBidId: Types.ObjectId, auctionId: string): Promise<UpdateResult>
     getUserBids(userId: string, page: number, limit: number, status?: string, search?: string): Promise<{ docs: myBidListDTO[], total: number }>
-    getBidHistory(auctionId: string, page: number, limit: number): Promise<{ docs: bidHistoryDTO[], total: number }>
+    getBidHistory(auctionId: string, page: number, limit: number,min?:number,max?:number): Promise<{ docs: bidHistoryDTO[], total: number }>
 }
