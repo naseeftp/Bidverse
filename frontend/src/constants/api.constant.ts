@@ -16,9 +16,8 @@ export const BASE_ROUTES = {
     PAYMENT_REQUEST: '/payment-request',
     CHECKOUT: '/checkout',
     ORDER: '/order',
-    DASHBOARD: '/dashboard'
-
-
+    DASHBOARD: '/dashboard',
+    REVENUE: '/revenue'
 }
 export const AUTH_ROUTES = {
     REGISTER: "/auth/register",
@@ -158,4 +157,8 @@ export const DASHBOARD_ROUTES = {
     GET_ADMIN_DASHBOARD: '/get-admin-dashboard',
     GET_TENANT_DASHBOARD: '/get-tenant-dashboard'
 
+}
+export const REVENUE_ROUTES = {
+    GET_REVENUE_BREAKDOWN: '/get-revenue-breakDown',
+    GET_REVENUE_LIST: '/get-revenue--list'
 }

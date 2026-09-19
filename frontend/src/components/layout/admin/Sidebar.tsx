@@ -33,6 +33,7 @@ const AdminSidebar: React.FC = () => {
         { name: "Auctions", path: "/admin/auctions", icon: <FaGavel /> },
         { name: "Orders", path: "/admin/orders", icon: <FaShoppingBag/> },
         { name: "Transactions", path: "/admin/transactions", icon: <FaWallet/> },
+        { name: "Revenue", path: "/admin/revenue", icon: <FaWallet/> },
 
 ];
 

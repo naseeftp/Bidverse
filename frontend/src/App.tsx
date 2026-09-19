@@ -79,6 +79,7 @@ import AdminNotificationPage from "./pages/admin/notification";
 import AdminOrders from "./pages/admin/orderLIst";
 import AdminOrderDetailsPage from "./pages/admin/orderDetails";
 import AdminTransactions from "./pages/admin/transactions";
+import RevenueBreakdownPage from './pages/admin/revenuePage'
 
 import { useSocketSync } from "./hooks/useSocketSync";
 
@@ -190,6 +191,8 @@ function App() {
                   <Route path="/admin/orders" element={<AdminOrders/>}/>
                   <Route path="/admin/orders-details/:id" element={<AdminOrderDetailsPage/>}/>
                   <Route path="/admin/transactions" element={<AdminTransactions/>}/>
+                  <Route path="/admin/revenue" element={<RevenueBreakdownPage/>}/>
+
                </Route>
             </Route>
          </Routes>

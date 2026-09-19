@@ -10,7 +10,7 @@ import {
   AlertCircle,
   RefreshCcw,
   MessageSquare,
-  DollarSign,
+  Wallet,
   ShoppingBag,
   Gavel,
   Layers,
@@ -84,7 +84,6 @@ const TenantDashboard: React.FC = () => {
 
   const status = house?.status;
 
-  // Render Verification Status Screen if not approved
   if (status !== "approved") {
     return (
       <div className="min-h-screen bg-[#F5F7FB] flex items-center justify-center px-6">
@@ -158,20 +157,19 @@ const TenantDashboard: React.FC = () => {
     );
   }
 
-  // Calculate max revenue value for scaling trend bars
   const maxRevenue = dashboardData?.revenueTrend?.length
     ? Math.max(...dashboardData.revenueTrend.map((item) => item.revenue), 1)
     : 1;
 
-  // Format numbers to currency format
   const formatCurrency = (val: number = 0) =>
-    new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(val);
+    new Intl.NumberFormat("en-US", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(val);
 
   return (
     <div className="min-h-screen bg-[#F5F7FB] p-6 md:p-8 relative">
       <div className="max-w-7xl mx-auto space-y-8 pb-16">
-        
-        {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <h1 className="text-2xl md:text-3xl font-bold text-[#0F172A] tracking-tight">
@@ -198,17 +196,14 @@ const TenantDashboard: React.FC = () => {
           </div>
         ) : (
           <>
-            {/* KPI Cards Overview */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-              
-              {/* Total Revenue */}
               <div className="bg-[#FFFFFF] border border-[#E2E8F0] p-5 rounded-2xl shadow-sm hover:shadow-md transition-shadow">
                 <div className="flex items-center justify-between mb-3">
                   <span className="text-xs font-semibold text-[#475569] uppercase tracking-wider">
                     Total Revenue
                   </span>
                   <div className="p-2.5 rounded-xl bg-[#2F6FED]/10 text-[#2F6FED]">
-                    <DollarSign size={18} />
+                    <Wallet size={18} />
                   </div>
                 </div>
                 <div className="text-2xl font-bold text-[#0F172A]">
@@ -216,7 +211,6 @@ const TenantDashboard: React.FC = () => {
                 </div>
               </div>
 
-              {/* Total Orders */}
               <div className="bg-[#FFFFFF] border border-[#E2E8F0] p-5 rounded-2xl shadow-sm hover:shadow-md transition-shadow">
                 <div className="flex items-center justify-between mb-3">
                   <span className="text-xs font-semibold text-[#475569] uppercase tracking-wider">
@@ -231,7 +225,6 @@ const TenantDashboard: React.FC = () => {
                 </div>
               </div>
 
-              {/* Active Auctions */}
               <div className="bg-[#FFFFFF] border border-[#E2E8F0] p-5 rounded-2xl shadow-sm hover:shadow-md transition-shadow">
                 <div className="flex items-center justify-between mb-3">
                   <span className="text-xs font-semibold text-[#475569] uppercase tracking-wider">
@@ -246,7 +239,6 @@ const TenantDashboard: React.FC = () => {
                 </div>
               </div>
 
-              {/* Total Listings */}
               <div className="bg-[#FFFFFF] border border-[#E2E8F0] p-5 rounded-2xl shadow-sm hover:shadow-md transition-shadow">
                 <div className="flex items-center justify-between mb-3">
                   <span className="text-xs font-semibold text-[#475569] uppercase tracking-wider">
@@ -261,7 +253,6 @@ const TenantDashboard: React.FC = () => {
                 </div>
               </div>
 
-              {/* Pending Returns */}
               <div className="bg-[#FFFFFF] border border-[#E2E8F0] p-5 rounded-2xl shadow-sm hover:shadow-md transition-shadow">
                 <div className="flex items-center justify-between mb-3">
                   <span className="text-xs font-semibold text-[#475569] uppercase tracking-wider">
@@ -283,17 +274,14 @@ const TenantDashboard: React.FC = () => {
               </div>
             </div>
 
-            {/* Main Visual Content Grid */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              
-              {/* Revenue Trend Visualizer */}
               <div className="lg:col-span-2 bg-[#FFFFFF] border border-[#E2E8F0] p-6 rounded-2xl shadow-sm flex flex-col justify-between">
                 <div>
                   <div className="flex items-center justify-between mb-6">
                     <div>
                       <h2 className="text-lg font-bold text-[#0F172A] flex items-center gap-2">
                         <TrendingUp size={20} className="text-[#2F6FED]" />
-                        Revenue Performance
+                        Revenue Performance Last 30 days
                       </h2>
                       <p className="text-xs text-[#475569] mt-0.5">
                         Daily revenue records over time
@@ -301,7 +289,6 @@ const TenantDashboard: React.FC = () => {
                     </div>
                   </div>
 
-                  {/* Visual Bar Graph */}
                   {dashboardData?.revenueTrend && dashboardData.revenueTrend.length > 0 ? (
                     <div className="h-56 flex items-end justify-between gap-4 pt-8 pb-2 px-2 border-b border-[#E2E8F0]">
                       {dashboardData.revenueTrend.map((trend, idx) => {
@@ -311,18 +298,15 @@ const TenantDashboard: React.FC = () => {
                             key={idx}
                             className="flex-1 flex flex-col items-center h-full justify-end group relative"
                           >
-                            {/* Hover Tooltip */}
                             <div className="absolute -top-10 opacity-0 group-hover:opacity-100 transition-opacity bg-[#0F172A] text-white text-[11px] font-bold py-1 px-2.5 rounded-lg pointer-events-none whitespace-nowrap shadow-md z-10">
                               {formatCurrency(trend.revenue)}
                             </div>
 
-                            {/* Bar */}
                             <div
                               style={{ height: `${Math.max(heightPercentage, 6)}%` }}
                               className="w-full max-w-[56px] bg-[#2F6FED] rounded-t-lg transition-all duration-500 group-hover:bg-[#2557C8]"
                             />
 
-                            {/* Label */}
                             <span className="text-[11px] font-semibold text-[#475569] mt-3">
                               {new Date(trend.date).toLocaleDateString("en-US", {
                                 month: "short",
@@ -348,7 +332,6 @@ const TenantDashboard: React.FC = () => {
                 </div>
               </div>
 
-              {/* Order Status Breakdown */}
               <div className="bg-[#FFFFFF] border border-[#E2E8F0] p-6 rounded-2xl shadow-sm flex flex-col justify-between">
                 <div>
                   <h2 className="text-lg font-bold text-[#0F172A] mb-1 flex items-center gap-2">
@@ -397,10 +380,7 @@ const TenantDashboard: React.FC = () => {
               </div>
             </div>
 
-            {/* Secondary Grid (Listing Status & Return Request Stats) */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              
-              {/* Listing Status Breakdown */}
               <div className="bg-[#FFFFFF] border border-[#E2E8F0] p-6 rounded-2xl shadow-sm">
                 <h2 className="text-lg font-bold text-[#0F172A] mb-1 flex items-center gap-2">
                   <Package size={20} className="text-[#2F6FED]" />
@@ -430,7 +410,6 @@ const TenantDashboard: React.FC = () => {
                 </div>
               </div>
 
-              {/* Return Requests Statistics */}
               <div className="bg-[#FFFFFF] border border-[#E2E8F0] p-6 rounded-2xl shadow-sm">
                 <h2 className="text-lg font-bold text-[#0F172A] mb-1 flex items-center gap-2">
                   <RotateCcw size={20} className="text-[#2F6FED]" />
@@ -441,7 +420,6 @@ const TenantDashboard: React.FC = () => {
                 </p>
 
                 <div className="grid grid-cols-3 gap-3">
-                  {/* Pending */}
                   <div className="p-4 rounded-xl bg-[#FFFBEB] border border-[#FEF3C7] flex flex-col items-center text-center">
                     <Clock size={20} className="text-[#D97706] mb-2" />
                     <span className="text-2xl font-black text-[#B45309]">
@@ -452,7 +430,6 @@ const TenantDashboard: React.FC = () => {
                     </span>
                   </div>
 
-                  {/* Approved */}
                   <div className="p-4 rounded-xl bg-[#ECFDF5] border border-[#A7F3D0] flex flex-col items-center text-center">
                     <CheckCircle2 size={20} className="text-[#059669] mb-2" />
                     <span className="text-2xl font-black text-[#047857]">
@@ -463,7 +440,6 @@ const TenantDashboard: React.FC = () => {
                     </span>
                   </div>
 
-                  {/* Rejected */}
                   <div className="p-4 rounded-xl bg-[#FEF2F2] border border-[#FECACA] flex flex-col items-center text-center">
                     <XCircle size={20} className="text-[#DC2626] mb-2" />
                     <span className="text-2xl font-black text-[#B91C1C]">
@@ -480,7 +456,6 @@ const TenantDashboard: React.FC = () => {
         )}
       </div>
 
-      {/* Floating Chat Support Button */}
       <div className="fixed bottom-8 right-8 z-50">
         <button
           onClick={handleInitiateChat}

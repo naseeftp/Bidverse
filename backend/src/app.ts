@@ -29,6 +29,7 @@ import PaymentRequestRoutes from './routes/paymentRequest.routes'
 import CheckoutRoutes from './routes/checkout.routes'
 import OrderRoutes from './routes/order.routes'
 import DashboardRoutes from './routes/dashboard.routes'
+import RevenueRoutes from './routes/revenue.routes'
 import { LoggerService } from "./services/implementations/Logger.service";
 
 dotenv.config()
@@ -70,6 +71,7 @@ app.use(BASE_ROUTES.PAYMENT_REQUEST, PaymentRequestRoutes)
 app.use(BASE_ROUTES.CHECKOUT, CheckoutRoutes)
 app.use(BASE_ROUTES.ORDER, OrderRoutes)
 app.use(BASE_ROUTES.DASHBOARD, DashboardRoutes)
+app.use(BASE_ROUTES.REVENUE,RevenueRoutes)
 
 app.use(errorHandler);
 const startServer = async () => {
