@@ -64,6 +64,7 @@ import TenantAuctionControllPage from "./pages/tenant/liveControllPage";
 import TenantOrders from "./pages/tenant/tenantOrders";
 import TenantOrderDetailsPage from "./pages/tenant/orderDetails";
 import TenantTransactions from "./pages/tenant/transactions";
+import TenantRevenueBreakdownPage from "./pages/tenant/revenuePage";
 
 import AdminLoginPage from "./pages/admin/LoginPage";
 import AdminDashboard from "./pages/admin/Dashboard";
@@ -169,6 +170,7 @@ function App() {
                   <Route path="/tenant/my-orders" element={<TenantOrders />} />
                   <Route path="/tenant/order-details/:id" element={<TenantOrderDetailsPage/>} />
                   <Route path="/tenant/transactions" element={<TenantTransactions />} />
+                  <Route path="/tenant/revenue" element={<TenantRevenueBreakdownPage/>} />
 
                </Route>
 

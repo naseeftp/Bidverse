@@ -14,7 +14,7 @@ export class RevenueController implements IRevenueController {
             const endDate = req.query.endDate as string;
             const granularity = req.query.granularity as "day" | "week" | "month";
             const result = await this._revenueService.getRevenueBreakdown(startDate, endDate, granularity ?? 'day')
-            SuccessResponse(res,MESSAGES.ACTION_SUCCESS,result,HttpStatus.OK)
+            SuccessResponse(res, MESSAGES.ACTION_SUCCESS, result, HttpStatus.OK)
         } catch (error) {
             next(error)
         }
@@ -25,7 +25,32 @@ export class RevenueController implements IRevenueController {
             const endDate = req.query.endDate as string;
             const page = Number(req.query.page);
             const limit = Number(req.query.limit);
-            const result=await this._revenueService.getIncomingRevenueList(startDate,endDate,page,limit);
+            const result = await this._revenueService.getIncomingRevenueList(startDate, endDate, page, limit);
+            SuccessResponse(res, MESSAGES.LIST_RETRIEVED, result, HttpStatus.OK)
+        } catch (error) {
+            next(error)
+        }
+    }
+    async getTenantRevenueBreakdown(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const tenantUserId = req.user.id;
+            const startDate = req.query.startDate as string;
+            const endDate = req.query.endDate as string;
+            const granularity = req.query.granularity as "day" | "week" | "month";
+            const result = await this._revenueService.getTenantRevenueBreakdown(tenantUserId, startDate, endDate, granularity)
+            SuccessResponse(res, MESSAGES.ACTION_SUCCESS, result, HttpStatus.OK);
+        } catch (error) {
+            next(error)
+        }
+    }
+    async getTenantIncomingRevenueList(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const tenantUserId = req.user.id;
+            const startDate = req.query.startDate as string;
+            const endDate = req.query.endDate as string;
+            const page = Number(req.query.page);
+            const limit = Number(req.query.limit);
+            const result=await this._revenueService.getTenantIncomingRevenueList(tenantUserId,startDate,endDate,page,limit);
             SuccessResponse(res,MESSAGES.LIST_RETRIEVED,result,HttpStatus.OK)
         } catch (error) {
             next(error)

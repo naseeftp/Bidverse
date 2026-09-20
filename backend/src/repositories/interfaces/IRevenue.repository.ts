@@ -16,4 +16,18 @@ export interface IRevenueRepository {
         docs: { id: string; date: Date; source: string; auctionTitle?: string; houseName?: string; amount: number; status: string }[];
         total: number;
     }>;
+    getTenantTotalRevenue(houseId: string, start: Date, end: Date): Promise<number>;
+    getTenantRefundRate(houseId: string, start: Date, end: Date): Promise<number>;
+    getTenantRevenueTrend(houseId: string, start: Date, end: Date, granularity: RevenueGranularity): Promise<{ date: string; revenue: number }[]>;
+    getTenantRevenueBySource(houseId: string, start: Date, end: Date): Promise<{ source: string; amount: number; count: number }[]>;
+    getTenantIncomingRevenueList(
+        houseId: string,
+        start: Date,
+        end: Date,
+        page: number,
+        limit: number
+    ): Promise<{
+        docs: { id: string; date: Date; source: string; auctionTitle?: string; amount: number; status: string }[];
+        total: number;
+    }>;
 }

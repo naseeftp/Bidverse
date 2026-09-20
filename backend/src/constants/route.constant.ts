@@ -161,7 +161,9 @@ export const DASHBOARD_ROUTES = {
 
 export const REVENUE_ROUTES={
     GET_REVENUE_BREAKDOWN:'/get-revenue-breakDown',
-    GET_REVENUE_LIST:'/get-revenue--list'
+    GET_REVENUE_LIST:'/get-revenue-list',
+    GET_TENANT_REVENUE_BREAKDOWN:'/get-tenant-revenue-breakDown',
+    GET_TENANT_REVENUE_LIST:'/get-tenant-revenue-list'
 }
 
 

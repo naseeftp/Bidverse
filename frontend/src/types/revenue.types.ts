@@ -1,9 +1,21 @@
 
 export type RevenueGranularity = "day" | "week" | "month";
 
-export interface RevenueTrendPointDTO { date: string; commission: number; }
-export interface RevenueBySourceDTO { source: "order" | "slot_booking"; amount: number; count: number; }
-export interface HouseRevenueRowDTO { houseId: string; houseName: string; totalRevenue: number; orderCount: number; sharePercent: number; }
+export interface RevenueTrendPointDTO {
+    date: string;
+    commission: number;
+}
+export interface RevenueBySourceDTO {
+    source: "order" | "slot_booking";
+    amount: number; count: number;
+}
+export interface HouseRevenueRowDTO {
+    houseId: string;
+    houseName: string;
+    totalRevenue: number;
+    orderCount: number;
+    sharePercent: number;
+}
 
 export interface RevenueBreakdownResponseDTO {
     range: { startDate: string; endDate: string };
