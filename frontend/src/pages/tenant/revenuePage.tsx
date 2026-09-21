@@ -223,7 +223,6 @@ const TenantRevenueBreakdownPage: React.FC = () => {
   return (
     <div className="min-h-screen w-full bg-[#F5F7FB] font-sans text-[#0F172A]">
       <div className="max-w-[1024px] mx-auto px-6 py-8">
-        {/* Header Section */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between pb-6 mb-6 border-b border-[#E2E8F0] gap-4">
           <div>
             <h1 className="text-2xl font-bold tracking-tight text-[#0F172A]">
@@ -234,7 +233,6 @@ const TenantRevenueBreakdownPage: React.FC = () => {
             </p>
           </div>
 
-          {/* Granularity Selector */}
           <div className="flex gap-1 bg-[#E2E8F0]/50 p-1 rounded-lg self-start md:self-auto">
             {GRANULARITIES.map((g) => {
               const isActive = granularity === g.value;
@@ -255,9 +253,7 @@ const TenantRevenueBreakdownPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Filters Bar */}
         <div className="bg-white p-4 rounded-xl border border-[#E2E8F0] shadow-sm mb-6 flex flex-wrap items-center justify-between gap-4">
-          {/* Presets */}
           <div className="flex items-center gap-2">
             <span className="text-xs font-medium text-[#475569] mr-1">Range:</span>
             {RANGE_PRESETS.map((r) => (
@@ -271,7 +267,6 @@ const TenantRevenueBreakdownPage: React.FC = () => {
             ))}
           </div>
 
-          {/* Date Picker Range */}
           <div className="flex items-center gap-2">
             <input
               type="date"
@@ -302,7 +297,6 @@ const TenantRevenueBreakdownPage: React.FC = () => {
           </div>
         ) : (
           <>
-            {/* Metrics Overview Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
               <div className="bg-white p-5 rounded-xl border border-[#E2E8F0] shadow-sm">
                 <span className="text-xs font-medium text-[#475569]">
@@ -326,7 +320,6 @@ const TenantRevenueBreakdownPage: React.FC = () => {
               </div>
             </div>
 
-            {/* Revenue Trend Chart */}
             <div className="bg-white p-5 rounded-xl border border-[#E2E8F0] shadow-sm mb-6">
               <h2 className="text-sm font-semibold text-[#0F172A] mb-4">
                 Revenue Over Time
@@ -334,7 +327,6 @@ const TenantRevenueBreakdownPage: React.FC = () => {
               <RevenueTrendChart points={data.trend} />
             </div>
 
-            {/* Revenue by Source */}
             <div className="bg-white p-5 rounded-xl border border-[#E2E8F0] shadow-sm mb-6">
               <h2 className="text-sm font-semibold text-[#0F172A] mb-4">
                 Revenue by Source
@@ -376,7 +368,6 @@ const TenantRevenueBreakdownPage: React.FC = () => {
               </div>
             </div>
 
-            {/* Settlements Table */}
             <div className="bg-white rounded-xl border border-[#E2E8F0] shadow-sm overflow-hidden mb-6">
               <div className="px-5 py-4 border-b border-[#E2E8F0]">
                 <h2 className="text-sm font-semibold text-[#0F172A]">
@@ -437,7 +428,6 @@ const TenantRevenueBreakdownPage: React.FC = () => {
                 </div>
               </div>
 
-              {/* Pagination Wrapper */}
               <div className="p-4 border-t border-[#E2E8F0] bg-[#F5F7FB]/30">
                 <Pagination
                   currentPage={txPage}

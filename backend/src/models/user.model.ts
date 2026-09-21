@@ -66,7 +66,7 @@ const UserSchema = new Schema<IUserDocument>({
         type: Date
     }
 
-})
+},{timestamps:true})
 
 const UserModel: Model<IUserDocument> = model<IUserDocument>('User', UserSchema)
 export default UserModel

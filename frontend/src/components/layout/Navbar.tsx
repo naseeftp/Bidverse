@@ -143,7 +143,7 @@ const Navbar: React.FC = () => {
                 {isDropdownOpen && (
                   <div className="absolute right-0 mt-4 w-48 bg-white border border-[#E6E0DA] shadow-xl z-50 py-2 rounded-xl animate-in fade-in slide-in-from-top-2">
                     <Link to="/profile" className={dropdownItemStyle}>Profile</Link>
-                    <Link to="/dashboard" className={dropdownItemStyle}>Dashboard</Link>
+                    {/* <Link to="/dashboard" className={dropdownItemStyle}>Dashboard</Link> */}
                     <div className="h-[1px] bg-[#E6E0DA] my-1 mx-4"></div>
                     <button onClick={handleLogout} className={dropdownItemStyle}>Logout</button>
                   </div>
@@ -185,7 +185,7 @@ const Navbar: React.FC = () => {
             {isAuthenticated ? (
               <>
                 <Link to="/profile" className={mobileNavLinkStyle}>Profile</Link>
-                <Link to="/dashboard" className={mobileNavLinkStyle}>Dashboard</Link>
+                {/* <Link to="/dashboard" className={mobileNavLinkStyle}>Dashboard</Link> */}
                 <button
                   onClick={handleLogout}
                   className="block w-full text-left py-4 text-xs font-bold uppercase tracking-[0.2em] text-[#C9653B] transition-all cursor-pointer"

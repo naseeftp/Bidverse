@@ -26,7 +26,6 @@ import NewPasswordPage from "./pages/users/resetPassword";
 import ChangeEmailPage from "./pages/users/changeEmailPage";
 import ChangeEmailVerifyPage from "./pages/users/changeEmailVerify";
 import AuthSuccessPage from "./pages/users/AuthSuccessPage";
-import Dashboard from "./pages/users/Dashboard";
 import AddressPage from "./pages/users/AddressPage";
 import WatchlistPage from "./pages/users/WatchlistPage";
 import ChatPage from "./pages/users/chatPage";
@@ -112,7 +111,6 @@ function App() {
 
                <Route element={<ProtectedRoute allowedRoles={['user']} />}>
                   <Route path="/home" element={<UserHomePage />} />
-                  <Route path="/profile" element={<ProfilePage />} />
                   <Route path="/change-password" element={<ChangePasswordPage />} />
                   <Route path="/change-email" element={<ChangeEmailPage />} />
                   <Route path="/change-email-verify" element={<ChangeEmailVerifyPage />} />
@@ -126,7 +124,7 @@ function App() {
 
             <Route element={<UsertLayout />}>
                <Route element={<ProtectedRoute allowedRoles={['user']} />}>
-                  <Route path="/dashboard" element={<Dashboard />} />
+                  <Route path="/profile" element={<ProfilePage />} />
                   <Route path="/addresses" element={<AddressPage />} />
                   <Route path="/my-bids" element={<MyBidsPage />} />
                   <Route path="/my-slots" element={<MySlotsPage />} />

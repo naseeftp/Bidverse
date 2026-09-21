@@ -3,7 +3,7 @@ import type { AuctionItemListDTO } from "../../types/auctionItem.dto";
 import type { IPaginationMeta } from "../../types/auth.type";
 import auctionItemMangementService from "../../services/auctionItemMangement.service";
 import toast from "react-hot-toast";
-import { useNavigate } from "react-router-dom";
+import { useNavigate,Link } from "react-router-dom";
 import {
     FaSearch,
     FaFilter,
@@ -11,6 +11,7 @@ import {
     FaEye,
     FaEdit,
     FaCloudUploadAlt,
+    FaPlus
 } from "react-icons/fa";
 import Pagination from "../../components/tenant/pagination";
 
@@ -71,6 +72,12 @@ const TenantAuctions: React.FC = () => {
                         Manage and track your distributed catalog live inventory profiles
                     </p>
                 </div>
+                <Link to='/tenant/create-auction'>
+                    <button className="group px-6 py-3.5 rounded-xl font-bold text-xs uppercase tracking-widest bg-[#2F6FED] text-white hover:bg-[#2557C8] shadow-md shadow-[#2F6FED]/20 transition-all flex items-center gap-2">
+                        <FaPlus size={18} className="group-hover:scale-110 transition-transform" />
+                        Create Auction
+                    </button>
+                </Link>
             </div>
 
             <div className="max-w-7xl mx-auto mb-8 bg-white p-4 rounded-xl border border-[#E2E8F0] shadow-sm flex flex-col md:flex-row gap-4 justify-between items-center">
@@ -147,11 +154,10 @@ const TenantAuctions: React.FC = () => {
                                         />
 
                                         <div className="absolute top-3 left-3 flex flex-col gap-1.5 items-start">
-                                            <span className={`px-2.5 py-1 text-[9px] font-black tracking-wider uppercase rounded-md shadow-sm border ${
-                                                item.type === "LIVE"
+                                            <span className={`px-2.5 py-1 text-[9px] font-black tracking-wider uppercase rounded-md shadow-sm border ${item.type === "LIVE"
                                                     ? "bg-[#0F172A] text-white border-[#0F172A]"
                                                     : "bg-white text-[#0F172A] border-[#E2E8F0]"
-                                            }`}>
+                                                }`}>
                                                 {item.type}
                                             </span>
                                         </div>
@@ -159,25 +165,24 @@ const TenantAuctions: React.FC = () => {
 
                                     <div className="p-5 flex-1 flex flex-col justify-between">
                                         <div className="space-y-3">
-                                      
+
                                             <div className="flex justify-between items-start gap-2">
                                                 <span className="text-[10px] font-mono uppercase tracking-wider text-[#475569]/60">
                                                     #{item.auctionItemId?.slice(-8).toUpperCase()}
                                                 </span>
-                                                <span className={`px-2 py-0.5 text-[9px] font-bold tracking-wide uppercase rounded-md border ${
-                                                    item.auctionStatus === "SCHEDULED" || item.auctionStatus === "SOLD"
+                                                <span className={`px-2 py-0.5 text-[9px] font-bold tracking-wide uppercase rounded-md border ${item.auctionStatus === "SCHEDULED" || item.auctionStatus === "SOLD"
                                                         ? "bg-emerald-50 border-emerald-200 text-emerald-700"
                                                         : item.auctionStatus === "PENDING_APPROVAL"
                                                             ? "bg-amber-50 border-amber-200 text-amber-700"
                                                             : item.auctionStatus === "DRAFT"
                                                                 ? "bg-slate-50 border-slate-200 text-slate-600"
                                                                 : "bg-rose-50 border-rose-200 text-rose-700"
-                                                }`}>
+                                                    }`}>
                                                     {item.auctionStatus?.replace(/_/g, " ")}
                                                 </span>
                                             </div>
 
-                                      
+
                                             <div className="flex justify-between items-start gap-3">
                                                 <div className="min-w-0 flex-1">
                                                     <h3 className="font-bold text-base text-[#0F172A] line-clamp-1 group-hover:text-[#2F6FED] transition-colors" title={item.auctionName}>
@@ -191,12 +196,12 @@ const TenantAuctions: React.FC = () => {
 
                                                 <div className="text-right flex-shrink-0">
                                                     <div className="text-xs font-semibold text-[#0F172A]">
-                                                       <span className="text-[9px] text-[#475569]/70 block font-bold uppercase tracking-wider">Starting Price</span>
-                                                       ${item.startingPrice?.toLocaleString() ?? "0"}
+                                                        <span className="text-[9px] text-[#475569]/70 block font-bold uppercase tracking-wider">Starting Price</span>
+                                                        ${item.startingPrice?.toLocaleString() ?? "0"}
                                                     </div>
                                                     <div className="text-xs font-bold text-[#2F6FED] mt-1">
-                                                     <span className="text-[9px] text-[#475569]/70 block font-bold uppercase tracking-wider">Highest Bid</span>
-                                                          {currentHighestBid <= 0 ? (
+                                                        <span className="text-[9px] text-[#475569]/70 block font-bold uppercase tracking-wider">Highest Bid</span>
+                                                        {currentHighestBid <= 0 ? (
                                                             <span className="text-[#475569]/70 text-[11px] font-medium italic">No bids</span>
                                                         ) : (
                                                             `$${currentHighestBid.toLocaleString()}`
@@ -245,13 +250,13 @@ const TenantAuctions: React.FC = () => {
                     </div>
                 )}
             </div>
-             <Pagination
+            <Pagination
                 pagination={pagination}
                 currentPage={page}
                 onPageChange={setPage}
                 loading={loading}
             />
-            
+
         </div>
     );
 };
