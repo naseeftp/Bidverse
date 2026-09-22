@@ -3,13 +3,11 @@ import { IAddressDocument } from "../../types/address.type";
 import { IAddressRepository } from "../interfaces/IAddress.repository";
 import { Address } from "../../models/address.model";
 import { Types } from "mongoose";
+import { createExactRegex } from "../../constants/address.rejex";
 
 export class AddressRepository extends BaseRepository<IAddressDocument> implements IAddressRepository {
    constructor() {
       super(Address)
-   }
-   private escapeRegex(text: string): string {
-      return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
    }
 
    async countByUserId(userId: string): Promise<number> {
@@ -55,11 +53,8 @@ export class AddressRepository extends BaseRepository<IAddressDocument> implemen
          isActive: true,
          city: normalizedCity,
          pincode: normalizedPincode,
-         fullAddress: {
-            $regex: new RegExp(`^${this.escapeRegex(normalizedfullAddress)}$`, 'i')
-         }
-
-      }).exec()
+         fullAddress:createExactRegex(normalizedfullAddress)
+         }).exec()
    }
    async findActiveByUserId(userId: string): Promise<IAddressDocument[]> {
       return Address.find({ userId, isActive: true })

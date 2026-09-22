@@ -634,13 +634,19 @@ export const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ roleTheme }) => {
     markConversationAsRead(id)
   };
 
+  // On small screens only one pane (list OR chat) is visible at a time.
+  // This clears the active conversation so the list pane shows again.
+  const handleBackToList = () => {
+    setSearchParams({});
+  };
+
   const activeRoomTypingObj = typingUsers[activeConversationId || ''] || {};
   const isPartnerTyping = !!activeRoomTypingObj[activeChatPartner?.userId || ''];
   const validateEditString = editInputText.trim().length > 0
   return (
-    <div className="flex h-[calc(100vh-64px)] w-full bg-white border border-[#E6E0DA] rounded-3xl overflow-hidden shadow-sm">
-      <div className="w-80 md:w-96 border-r border-[#E6E0DA] flex flex-col bg-white">
-        <div className="p-4 border-b border-[#E6E0DA] flex items-center gap-3">
+    <div className="flex h-[calc(100vh-64px)] w-full bg-white border border-[#E6E0DA] rounded-none sm:rounded-3xl overflow-hidden shadow-sm">
+      <div className={`w-full md:w-80 lg:w-96 shrink-0 border-r border-[#E6E0DA] flex-col bg-white ${activeConversationId ? 'hidden md:flex' : 'flex'}`}>
+        <div className="p-3 sm:p-4 border-b border-[#E6E0DA] flex items-center gap-3">
 
           <button
             onClick={() => navigate(-1)}
@@ -685,7 +691,7 @@ export const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ roleTheme }) => {
                 <button
                   key={conv._id}
                   onClick={() => handleSelectConversation(conv._id)}
-                  className={`w-full text-left p-4 transition-all flex items-start gap-3 cursor-pointer ${isActive ? currentStyle.sidebarActive : "hover:bg-[#FFF9F4]/60"}`}
+                  className={`w-full text-left p-3 sm:p-4 transition-all flex items-start gap-3 cursor-pointer ${isActive ? currentStyle.sidebarActive : "hover:bg-[#FFF9F4]/60"}`}
                 >
                   <div className="relative">
                     <div className="w-10 h-10 rounded-xl bg-[#F5F5F5] border border-[#E6E0DA] flex items-center justify-center font-bold text-xs uppercase text-[#6B6B6B]">
@@ -725,13 +731,33 @@ export const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ roleTheme }) => {
       </div>
 
 
-      <div className={`flex-1 flex flex-col ${currentStyle.bgLight}`}>
+      <div className={`flex-1 flex-col min-w-0 ${currentStyle.bgLight} ${activeConversationId ? 'flex' : 'hidden md:flex'}`}>
         {activeConversationId ? (
-          <div className="flex-1 flex flex-col h-full">
+          <div className="flex-1 flex flex-col h-full min-h-0">
 
-            <div className="p-4 bg-white border-b border-[#E6E0DA] flex items-center gap-3">
-              <div className="relative flex items-center gap-2">
-                <span className="relative flex h-2.5 w-2.5">
+            <div className="p-3 sm:p-4 bg-white border-b border-[#E6E0DA] flex items-center gap-2 sm:gap-3">
+              <button
+                onClick={handleBackToList}
+                className="md:hidden p-1 -ml-1 rounded-md text-[#1F1F1F] hover:bg-black/5 transition-colors focus:outline-none shrink-0"
+                aria-label="Back to conversations"
+              >
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M10 19l-7-7m0 0l7-7m-7 7h18"
+                  />
+                </svg>
+              </button>
+              <div className="relative flex items-center gap-2 min-w-0">
+                <span className="relative flex h-2.5 w-2.5 shrink-0">
                   {activeChatPartner?.userId && onlineUsers.has(activeChatPartner.userId) ? (
                     <>
                       <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
@@ -741,7 +767,7 @@ export const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ roleTheme }) => {
                     <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-gray-300"></span>
                   )}
                 </span>
-                <p className="text-xs font-bold uppercase tracking-wider text-[#1F1F1F]">
+                <p className="text-xs font-bold uppercase tracking-wider text-[#1F1F1F] truncate">
                   {activePartnerName}
                   {/* <span className="text-[10px] lowercase font-normal text-[#6B6B6B] ml-2 font-mono">
                     ({activeChatPartner?.userId && onlineUsers.has(activeChatPartner.userId) ? 'online' : 'offline'})
@@ -751,7 +777,7 @@ export const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ roleTheme }) => {
             </div>
 
 
-            <div className="flex-1 p-6 overflow-y-auto space-y-4 flex flex-col">
+            <div className="flex-1 p-3 sm:p-6 overflow-y-auto space-y-4 flex flex-col min-h-0">
               {messagesLoading ? (
                 <p className="text-xs text-center text-[#6B6B6B] font-mono py-8 animate-pulse">Retrieving communication logs...</p>
               ) : messages.length === 0 ? (
@@ -767,7 +793,7 @@ export const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ roleTheme }) => {
                   return (
                     <div
                       key={msg._id}
-                      className={`group relative flex flex-col max-w-[70%] text-xs p-3 rounded-2xl shadow-sm tracking-wide ${isSelf
+                      className={`group relative flex flex-col max-w-[85%] sm:max-w-[75%] md:max-w-[70%] text-xs p-3 rounded-2xl shadow-sm tracking-wide ${isSelf
                         ? `${currentStyle.activeBubble} self-end rounded-tr-none`
                         : `${currentStyle.peerBubble} self-start rounded-tl-none`
                         }`}
@@ -888,9 +914,9 @@ export const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ roleTheme }) => {
             </div>
 
 
-            <div className="p-4 bg-white border-t border-[#E6E0DA] flex items-center gap-2">
+            <div className="p-2 sm:p-4 bg-white border-t border-[#E6E0DA] flex items-center gap-1.5 sm:gap-2">
               {isRecording ? (
-                <div className="flex-1 bg-red-50 border border-red-200 rounded-xl px-4 py-2.5 flex items-center justify-between">
+                <div className="flex-1 bg-red-50 border border-red-200 rounded-xl px-2.5 sm:px-4 py-2.5 flex flex-wrap items-center justify-between gap-2">
                   <div className="flex items-center gap-2">
                     <span className="w-2.5 h-2.5 rounded-full bg-red-500 animate-ping" />
                     <span className="text-xs font-mono font-bold text-red-600">
@@ -926,7 +952,7 @@ export const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ roleTheme }) => {
                   <button
                     onClick={() => fileInputRef.current?.click()}
                     disabled={isUploadingImage}
-                    className="p-3 bg-[#FFF9F4] border border-[#E6E0DA] text-gray-700 hover:text-[#C9653B] rounded-xl transition-all cursor-pointer flex items-center justify-center disabled:opacity-50"
+                    className="p-2.5 sm:p-3 bg-[#FFF9F4] border border-[#E6E0DA] text-gray-700 hover:text-[#C9653B] rounded-xl transition-all cursor-pointer flex items-center justify-center disabled:opacity-50 shrink-0"
                     title="Attach Image"
                   >
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -935,7 +961,7 @@ export const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ roleTheme }) => {
                   </button>
                   <button
                     onClick={handleStartRecord}
-                    className="p-3 bg-[#FFF9F4] border border-[#E6E0DA] text-gray-700 hover:text-[#C9653B] rounded-xl transition-all cursor-pointer flex items-center justify-center"
+                    className="p-2.5 sm:p-3 bg-[#FFF9F4] border border-[#E6E0DA] text-gray-700 hover:text-[#C9653B] rounded-xl transition-all cursor-pointer flex items-center justify-center shrink-0"
                     title="Record Voice Message"
                   >
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -949,11 +975,11 @@ export const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ roleTheme }) => {
                     onChange={handleInptChange}
                     onKeyDown={handleKeyDown}
                     placeholder="Type a message..."
-                    className="flex-1 bg-[#FFF9F4] border border-[#E6E0DA] rounded-xl px-4 py-3 text-xs text-[#1F1F1F] focus:outline-none focus:border-[#C9653B]/60 transition-all"
+                    className="flex-1 min-w-0 bg-[#FFF9F4] border border-[#E6E0DA] rounded-xl px-3 sm:px-4 py-2.5 sm:py-3 text-xs text-[#1F1F1F] focus:outline-none focus:border-[#C9653B]/60 transition-all"
                   />
                   <button
                     onClick={handleSendMessage}
-                    className={`px-5 py-3 text-xs font-bold uppercase tracking-wider text-white rounded-xl transition-all active:scale-95 cursor-pointer ${currentStyle.accent}`}
+                    className={`px-3.5 sm:px-5 py-2.5 sm:py-3 text-xs font-bold uppercase tracking-wider text-white rounded-xl transition-all active:scale-95 cursor-pointer shrink-0 ${currentStyle.accent}`}
                   >
                     Send
                   </button>
