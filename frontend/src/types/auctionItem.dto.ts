@@ -283,6 +283,8 @@ export interface AuctionItemListDTO {
     startingPrice: number;
     currentHighestBid: number;
     minimumIncrement: number;
+    currency?:string;
+    slotFee?:number;
     images: {
         id: string;
         url: string;

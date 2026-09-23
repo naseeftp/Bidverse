@@ -101,8 +101,9 @@ const updatePayload: Record<string, unknown> = { ...data };
                             images: { $ifNull: ['$images', []] },
                             startingPrice: '$startingPrice',
                             currentHighestBid: '$currentHighestBid',
-                            minimumIncrement: '$minimumIncrement'
-
+                            minimumIncrement: '$minimumIncrement',
+                            currency:"$currency",
+                            slotFee:'$slotFee',
                         }
                     }
                 ],

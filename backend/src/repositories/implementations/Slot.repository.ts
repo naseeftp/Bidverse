@@ -17,7 +17,6 @@ export class SlotRepository extends BaseRepository<ISlotDocument> implements ISl
                 auctionId: new Types.ObjectId(auctionId),
                 status: {
                     $in: [
-                        // SlotBookingStatus.PENDING, // later when retry payment use this
                         SlotBookingStatus.CONFIRMED
                     ]
                 }
@@ -29,7 +28,7 @@ export class SlotRepository extends BaseRepository<ISlotDocument> implements ISl
         const skip = (page - 1) * limit;
         const targetedUserId = new Types.ObjectId(userId);
         const [slots, total] = await Promise.all([
-            this.model.find({ userId: targetedUserId })
+            this.model.find({ userId: targetedUserId,status:{$ne:SlotBookingStatus.PENDING}})
                 .sort({ createdAt: -1 })
                 .skip(skip)
                 .limit(limit)

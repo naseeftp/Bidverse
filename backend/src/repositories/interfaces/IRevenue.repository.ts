@@ -31,3 +31,21 @@ export interface IRevenueRepository {
         total: number;
     }>;
 }
+
+export interface RawIncomingRevenueDoc {
+    _id: { toString(): string };
+    createdAt: Date;
+    amount: number;
+    status: string;
+    source?: string;
+    auctionTitle?: string;
+    houseName?: string;
+}
+export interface RawTenantIncomingRevenueDoc {
+    _id: { toString(): string };
+    createdAt: Date;
+    amount: number;
+    status: string;
+    source?: string;
+    auctionTitle?: string;
+}

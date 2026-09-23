@@ -347,7 +347,7 @@ const LeaderboardTableCard: React.FC<{ houses: DashboardResponseDTO["topAuctionH
                             <th className="py-3 px-3 w-12 text-center rounded-l-lg">Rank</th>
                             <th className="py-3 px-3">Auction House</th>
                             <th className="py-3 px-3 text-right">Settled Revenue</th>
-                            <th className="py-3 px-3 text-right rounded-r-lg">Orders</th>
+                            <th className="py-3 px-3 text-right rounded-r-lg">Count</th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-[#E5E7EB]">

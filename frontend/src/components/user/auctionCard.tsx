@@ -7,6 +7,10 @@ import { incrementWatchlistCount } from "../../redux/user/auth.slice";
 import { useAppDispatch } from "../../hooks/redux.hooks";
 import PlaceBidModal from "./placeBid.modal";
 import bidService from "../../services/bid.service";
+import BookSlotModal from "./slotBook.modal";
+import slotService from "../../services/slot.service";
+import { openRazorpayCheckout } from "../../utils/razorpay";
+import paymentService from "../../services/payment.service";
 
 interface AuctionCardProps {
     item: AuctionItemListDTO;
@@ -35,6 +39,7 @@ const AuctionCard: React.FC<AuctionCardProps> = ({ item, onBidSuccess }) => {
     const [isLoading, setIsLoading] = useState<boolean>(false);
 
     const [isBidModalOpen, setBidModalOpen] = useState(false);
+    const [isSlotModalOpen, setIsSlotModalOpen] = useState(false);
 
     const handleWatchlistAction = async (e: React.MouseEvent<HTMLButtonElement>) => {
         e.stopPropagation();
@@ -64,7 +69,7 @@ const AuctionCard: React.FC<AuctionCardProps> = ({ item, onBidSuccess }) => {
             })
             if (response?.success && response.data) {
                 toast.success(response.message)
-                onBidSuccess?.()  // Trigger re-fetch in parent component
+                onBidSuccess?.() 
             }
             else {
                 toast.error(response?.message ?? '')
@@ -73,6 +78,48 @@ const AuctionCard: React.FC<AuctionCardProps> = ({ item, onBidSuccess }) => {
             toast.error('failed to place bid')
         }
     }
+    const handleBookSlotSubmit = async () => {
+        if (!item.auctionItemId || !item.auctionHouseId) {
+            toast.error("Auction details are missing.");
+            return;
+        }
+
+        try {
+            const payload = {
+                auctionId: item.auctionItemId,
+                tenantId: item.auctionHouseId,
+            };
+
+            const response = await slotService.bookSlot(payload);
+            if (response?.success) {
+                openRazorpayCheckout(
+                    {
+                        orderId: response.data?.payment.orderId ?? '',
+                        amount: response.data?.payment.amount ?? 0,
+                        currency: response.data?.payment.currency ?? '',
+                        keyId: response.data?.payment.keyId ?? ''
+                    },
+                    async (paymentResponse) => {
+                        try {
+                            await paymentService.verifyPayment({
+                                razorpayOrderId: paymentResponse.razorpay_order_id,
+                                razorpayPaymentId: paymentResponse.razorpay_payment_id,
+                                razorpaySignature: paymentResponse.razorpay_signature,
+                            });
+                            toast.success("Payment successful! Slot confirmed.");
+                            onBidSuccess?.();
+                        } catch {
+                            toast.error("Payment verification failed.");
+                        }
+                    },
+                );
+            } else {
+                toast.error(response?.message || "Failed to book slot");
+            }
+        } catch {
+            toast.error("An error occurred while booking slot");
+        }
+    };
 
     useEffect(() => {
         if (!item.startTime || !item.endTime) {
@@ -244,6 +291,7 @@ const AuctionCard: React.FC<AuctionCardProps> = ({ item, onBidSuccess }) => {
                         </button>
                     ) : (
                         <button
+                            onClick={() => setIsSlotModalOpen(true)}
                             disabled={timerLabel === "CONCLUDED" || timerLabel === 'ENDS IN'}
                             className="w-full bg-[#C9653B] hover:bg-[#C9653B]/90 text-white font-bold text-[11px] py-1.5 rounded-md transition-colors shadow-sm focus:outline-none disabled:bg-[#E6E0DA] disabled:text-[#6B6B6B] disabled:cursor-not-allowed"
                         >
@@ -273,6 +321,7 @@ const AuctionCard: React.FC<AuctionCardProps> = ({ item, onBidSuccess }) => {
                 </div>
 
             </div>
+           
             <PlaceBidModal
                 isOpen={isBidModalOpen}
                 onClose={() => setBidModalOpen(false)}
@@ -282,6 +331,15 @@ const AuctionCard: React.FC<AuctionCardProps> = ({ item, onBidSuccess }) => {
                 startingPrice={item.startingPrice}
                 onSubmitBid={handleBidSubmit}
             />
+            <BookSlotModal
+            isOpen={isSlotModalOpen}
+            onClose={()=>setIsSlotModalOpen(false)}
+            auctionName={item.auctionName}
+            slotAmount={item.slotFee??0}
+            currency={item.currency}
+            onConfirm={handleBookSlotSubmit}
+            />
+
         </div>
     );
 };
