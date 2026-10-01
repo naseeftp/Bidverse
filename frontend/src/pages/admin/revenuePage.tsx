@@ -63,9 +63,8 @@ const CommissionTrendChart: React.FC<{
   const linePath = coords
     .map((c, i) => `${i === 0 ? "M" : "L"} ${c.x.toFixed(1)} ${c.y.toFixed(1)}`)
     .join(" ");
-  const areaPath = `${linePath} L ${coords[coords.length - 1].x.toFixed(1)} ${
-    height - padY
-  } L ${coords[0].x.toFixed(1)} ${height - padY} Z`;
+  const areaPath = `${linePath} L ${coords[coords.length - 1].x.toFixed(1)} ${height - padY
+    } L ${coords[0].x.toFixed(1)} ${height - padY} Z`;
 
   return (
     <svg
@@ -79,7 +78,6 @@ const CommissionTrendChart: React.FC<{
           <stop offset="100%" stopColor="#CBA45C" stopOpacity="0.0" />
         </linearGradient>
       </defs>
-      {/* Grid lines */}
       <line
         x1={padX}
         y1={height - padY}
@@ -135,8 +133,8 @@ const sourceLabel = (source: string) =>
   source === "slot_booking"
     ? "Slot booking fee"
     : source === "order"
-    ? "Order commission"
-    : "Unknown";
+      ? "Order commission"
+      : "Unknown";
 
 const RevenueBreakdownPage: React.FC = () => {
   const today = new Date();
@@ -153,60 +151,76 @@ const RevenueBreakdownPage: React.FC = () => {
   const [txPage, setTxPage] = useState(1);
   const [txLoading, setTxLoading] = useState(false);
 
-  const rangeAsISO = useCallback(() => {
+
+  const getRangeISO = useCallback(() => {
     const s = new Date(startDate);
     const e = new Date(endDate);
     e.setHours(23, 59, 59, 999);
     return { s: s.toISOString(), e: e.toISOString() };
   }, [startDate, endDate]);
 
-  const fetchBreakdown = useCallback(async () => {
-    setLoading(true);
-    try {
-      const { s, e } = rangeAsISO();
-      const response = await revenueService.getRevenueBreakdown(s, e, granularity);
-      if (response.success && response.data) {
-        setData(response.data);
-      } else {
-        toast.error(response.message);
-      }
-    } catch {
-      toast.error("Failed to load revenue breakdown");
-    } finally {
-      setLoading(false);
-    }
-  }, [rangeAsISO, granularity]);
 
-  const fetchTransactions = useCallback(
-    async (page: number) => {
-      setTxLoading(true);
+
+  useEffect(() => {
+    let isCancelled = false;
+    const fetchBreakdown = async () => {
+      setLoading(true);
       try {
-        const { s, e } = rangeAsISO();
-        const response = await revenueService.getIncomingRevenueList(s, e, page, 10);
-        if (response.success) {
-          setTxRows(response.data ?? []);
-          setTxPagination(response.pagination ?? null);
-        } else {
-          toast.error(response.message);
+        const { s, e } = getRangeISO();
+        const response = await revenueService.getRevenueBreakdown(s, e, granularity);
+        if (!isCancelled) {
+          if (response.success && response.data) {
+            setData(response.data);
+          } else {
+            toast.error(response.message)
+          }
         }
       } catch {
-        toast.error("Failed to load transactions");
-      } finally {
-        setTxLoading(false);
+        if (!isCancelled)
+          toast.error('Failed to load revenue breakdown')
       }
-    },
-    [rangeAsISO]
-  );
-
-  useEffect(() => {
-    fetchBreakdown();
+      finally {
+        if (!isCancelled)
+          setLoading(false)
+      }
+    }
     setTxPage(1);
-    fetchTransactions(1);
-  }, [startDate, endDate, granularity]);
+    fetchBreakdown()
+    return () => {
+      isCancelled = true
+    }
+  }, [startDate, endDate, granularity, getRangeISO])
+
 
   useEffect(() => {
-    fetchTransactions(txPage);
-  }, [txPage]);
+    let isCancelled = false;
+    const fetchTransactions = async () => {
+      setTxLoading(true);
+      try {
+        const { e, s } = getRangeISO();
+        const response = await revenueService.getIncomingRevenueList(s, e, txPage, 10);
+        if (!isCancelled) {
+          if (response.success) {
+            setTxRows(response.data ?? []);
+            setTxPagination(response.pagination ?? null);
+          } else {
+            toast.error(response.message)
+          }
+        }
+      } catch {
+        if (!isCancelled)
+          toast.error('Failed to load Transactions')
+      } finally {
+        if (!isCancelled) setTxLoading(false);
+      }
+    }
+    fetchTransactions()
+    return () => {
+      isCancelled = true;
+    }
+  }, [startDate, endDate, txPage,getRangeISO])
+
+
 
   const applyPreset = (days: number) => {
     const end = new Date();
@@ -234,7 +248,7 @@ const RevenueBreakdownPage: React.FC = () => {
                 Detailed insights into platform commission, auction house performance, and transaction flow.
               </p>
             </div>
-        
+
           </div>
 
           <div className="mt-6 flex flex-wrap items-center justify-between gap-4 rounded-lg border border-[#2A3B4F] bg-[#131F2E] p-3">
@@ -274,11 +288,10 @@ const RevenueBreakdownPage: React.FC = () => {
                 <button
                   key={g.value}
                   onClick={() => setGranularity(g.value)}
-                  className={`rounded px-3 py-1 text-xs font-medium transition-colors ${
-                    granularity === g.value
-                      ? "bg-[#CBA45C] text-[#0E1826]"
-                      : "text-[#93A2B2] hover:text-[#EDE8DC]"
-                  }`}
+                  className={`rounded px-3 py-1 text-xs font-medium transition-colors ${granularity === g.value
+                    ? "bg-[#CBA45C] text-[#0E1826]"
+                    : "text-[#93A2B2] hover:text-[#EDE8DC]"
+                    }`}
                 >
                   {g.label}
                 </button>
@@ -313,9 +326,8 @@ const RevenueBreakdownPage: React.FC = () => {
                   Refunded to Buyers
                 </span>
                 <div
-                  className={`mt-2 font-mono text-2xl font-semibold tabular-nums ${
-                    data.totalRefunded > 0 ? "text-[#C1665A]" : "text-[#EDE8DC]"
-                  }`}
+                  className={`mt-2 font-mono text-2xl font-semibold tabular-nums ${data.totalRefunded > 0 ? "text-[#C1665A]" : "text-[#EDE8DC]"
+                    }`}
                 >
                   {formatINR(data.totalRefunded)}
                 </div>
@@ -327,9 +339,8 @@ const RevenueBreakdownPage: React.FC = () => {
                   Refund Rate
                 </span>
                 <div
-                  className={`mt-2 font-mono text-2xl font-semibold tabular-nums ${
-                    data.refundRate > 15 ? "text-[#C1665A]" : "text-[#EDE8DC]"
-                  }`}
+                  className={`mt-2 font-mono text-2xl font-semibold tabular-nums ${data.refundRate > 15 ? "text-[#C1665A]" : "text-[#EDE8DC]"
+                    }`}
                 >
                   {data.refundRate}%
                 </div>
@@ -478,13 +489,12 @@ const RevenueBreakdownPage: React.FC = () => {
 
                         <span className="text-right">
                           <span
-                            className={`inline-block rounded px-2 py-0.5 text-[10px] font-mono uppercase ${
-                              row.status?.toLowerCase() === "completed"
-                                ? "bg-[#7FAE8C]/15 text-[#7FAE8C] border border-[#7FAE8C]/30"
-                                : row.status?.toLowerCase() === "pending"
+                            className={`inline-block rounded px-2 py-0.5 text-[10px] font-mono uppercase ${row.status?.toLowerCase() === "completed"
+                              ? "bg-[#7FAE8C]/15 text-[#7FAE8C] border border-[#7FAE8C]/30"
+                              : row.status?.toLowerCase() === "pending"
                                 ? "bg-[#CBA45C]/15 text-[#CBA45C] border border-[#CBA45C]/30"
                                 : "bg-[#93A2B2]/15 text-[#93A2B2] border border-[#93A2B2]/30"
-                            }`}
+                              }`}
                           >
                             {row.status}
                           </span>

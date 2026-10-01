@@ -150,7 +150,7 @@ const LiveRoom: React.FC = () => {
     addLog(isUserBid
       ? `You placed highest bid: ₹${data.amount.toLocaleString("en-IN")}`
       : `New highest bid: ₹${data.amount.toLocaleString("en-IN")}`);
-  }, [id, addLog]);
+  }, [id, addLog,currentUserId]);//lint fixed
 
   const handleRound = useCallback((data: { auctionItemId: string; round: number; roundEndsAt: string }) => {
     if (data.auctionItemId !== id) return;

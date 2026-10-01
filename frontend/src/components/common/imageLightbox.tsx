@@ -5,6 +5,7 @@ interface Props {
     images: string[];
     activeIndex: number;
     onClose: () => void;
+    // eslint-disable-next-line no-unused-vars
     onNavigate: (index: number) => void;
 }
 

@@ -123,7 +123,7 @@ const CheckoutPage: React.FC = () => {
         <div className="bg-white p-8 rounded-xl border border-[#E6E0DA] max-w-md w-full shadow-sm">
           <h2 className="text-lg font-bold text-[#1F1F1F]">Checkout Information Unavailable</h2>
           <p className="text-xs text-[#6B6B6B] mt-2 mb-6">
-            We couldn't retrieve the payment request details. It may have expired or already been processed.
+            We couldn&apos;t retrieve the payment request details. It may have expired or already been processed.
           </p>
           <button
             onClick={() => navigate(-1)}

@@ -207,7 +207,7 @@ const AdminOrderDetailsPage: React.FC = () => {
                                     Return Requested — Action Needed
                                 </h3>
                                 <p className="text-xs text-[#475569] mt-0.5">
-                                    Review the buyer's evidence below, then approve (refunds buyer) or reject.
+                                    Review the buyer&apos;s evidence below, then approve (refunds buyer) or reject.
                                 </p>
                             </div>
                         </div>
@@ -303,7 +303,7 @@ const AdminOrderDetailsPage: React.FC = () => {
 
                                 <div>
                                     <div className="text-[#475569] font-bold uppercase text-[9px] tracking-wider mb-1">
-                                        Buyer's Description
+                                        Buyer&apos;s Description
                                     </div>
                                     <p className="text-xs text-[#0F172A] leading-relaxed bg-[#F8FAFC] border border-[#E2E8F0] rounded-lg p-3">
                                         {returnRequest.description}

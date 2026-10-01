@@ -229,7 +229,7 @@ const TenantRevenueBreakdownPage: React.FC = () => {
               Your Revenue
             </h1>
             <p className="text-sm text-[#475569] mt-1">
-              What's settled to your account, and where it came from
+              What&apos;s settled to your account, and where it came from
             </p>
           </div>
 

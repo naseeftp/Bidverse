@@ -5,6 +5,7 @@ import ImageLightbox from './imageLightbox';
 
 interface Props {
     returnRequest: IReturnRequestDTO;
+    // eslint-disable-next-line no-unused-vars
     formatDate: (d?: string) => string;
 }
 
