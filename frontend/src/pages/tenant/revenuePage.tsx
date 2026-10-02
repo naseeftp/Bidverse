@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import revenueService from "../../services/revenue.service";
 
@@ -25,6 +25,13 @@ const GRANULARITIES: { label: string; value: RevenueGranularity }[] = [
 const formatINR = (n: number) =>
   `₹${n.toLocaleString("en-IN", { maximumFractionDigits: 2 })}`;
 
+const formatCompactINR = (n: number) => {
+  if (n >= 10000000) return `₹${(n / 10000000).toFixed(1).replace(/\.0$/, "")}Cr`;
+  if (n >= 100000) return `₹${(n / 100000).toFixed(1).replace(/\.0$/, "")}L`;
+  if (n >= 1000) return `₹${(n / 1000).toFixed(1).replace(/\.0$/, "")}K`;
+  return `₹${Math.round(n)}`;
+};
+
 const formatShortDate = (iso: string) => {
   const d = new Date(iso);
   if (isNaN(d.getTime())) return iso;
@@ -43,10 +50,25 @@ const sourceLabel = (source: string) =>
 const RevenueTrendChart: React.FC<{
   points: { date: string; revenue: number }[];
 }> = ({ points }) => {
-  const width = 760;
-  const height = 200;
-  const padX = 12;
-  const padY = 16;
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [width, setWidth] = useState(760);
+  const [hovered, setHovered] = useState<number | null>(null);
+
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const update = () => setWidth(Math.max(el.clientWidth, 280));
+    update();
+    const ro = new ResizeObserver(update);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
+  const height = 240;
+  const padLeft = 52;
+  const padRight = 16;
+  const padTop = 28;
+  const padBottom = 28;
 
   if (points.length === 0) {
     return (
@@ -58,78 +80,205 @@ const RevenueTrendChart: React.FC<{
 
   const values = points.map((p) => p.revenue);
   const max = Math.max(...values, 1);
-  const span = max || 1;
+  const plotW = width - padLeft - padRight;
+  const plotH = height - padTop - padBottom;
+  const baseY = padTop + plotH;
 
-  const stepX = points.length > 1 ? (width - padX * 2) / (points.length - 1) : 0;
+  const stepX = points.length > 1 ? plotW / (points.length - 1) : 0;
   const coords = points.map((p, i) => ({
-    x: padX + stepX * i,
-    y: padY + (height - padY * 2) * (1 - p.revenue / span),
+    x: points.length > 1 ? padLeft + stepX * i : padLeft + plotW / 2,
+    y: padTop + plotH * (1 - p.revenue / max),
     ...p,
   }));
 
   const linePath = coords
     .map((c, i) => `${i === 0 ? "M" : "L"} ${c.x.toFixed(1)} ${c.y.toFixed(1)}`)
     .join(" ");
+  const areaPath = `${linePath} L ${coords[coords.length - 1].x.toFixed(1)} ${baseY} L ${coords[0].x.toFixed(1)} ${baseY} Z`;
 
-  const areaPath = `${linePath} L ${coords[coords.length - 1].x.toFixed(
-    1
-  )} ${height - padY} L ${coords[0].x.toFixed(1)} ${height - padY} Z`;
+  // Y-axis ticks
+  const tickCount = 4;
+  const yTicks = Array.from({ length: tickCount + 1 }, (_, i) => {
+    const v = (max / tickCount) * i;
+    return { v, y: padTop + plotH * (1 - v / max) };
+  });
+
+  // Which points get a permanent value label
+  const showAllLabels = points.length <= 14;
+  const maxIndex = values.indexOf(Math.max(...values));
+  const isLabelled = (i: number) =>
+    showAllLabels || i === 0 || i === points.length - 1 || i === maxIndex;
+
+  // Thin the X-axis date labels so they don't overlap (~64px per label)
+  const maxXLabels = Math.max(2, Math.floor(plotW / 64));
+  const xEvery = Math.ceil(points.length / maxXLabels);
+
+  const hoveredPoint = hovered !== null ? coords[hovered] : null;
+  const tipW = 118;
+  const tipH = 40;
+  const tipX = hoveredPoint
+    ? Math.min(Math.max(hoveredPoint.x - tipW / 2, 4), width - tipW - 4)
+    : 0;
+  const tipY = hoveredPoint
+    ? hoveredPoint.y - tipH - 12 < 0
+      ? hoveredPoint.y + 12
+      : hoveredPoint.y - tipH - 12
+    : 0;
 
   return (
-    <svg
-      viewBox={`0 0 ${width} ${height}`}
-      className="w-full h-[200px]"
-      preserveAspectRatio="none"
-    >
-      <defs>
-        <linearGradient id="tenantRevFill" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#2F6FED" stopOpacity="0.20" />
-          <stop offset="100%" stopColor="#2F6FED" stopOpacity="0.0" />
-        </linearGradient>
-      </defs>
-      <line
-        x1={padX}
-        y1={height - padY}
-        x2={width - padX}
-        y2={height - padY}
-        className="stroke-[#E2E8F0]"
-        strokeWidth="1"
-      />
-      <path d={areaPath} fill="url(#tenantRevFill)" />
-      <path
-        d={linePath}
-        fill="none"
-        className="stroke-[#2F6FED]"
-        strokeWidth="2"
-      />
-      {coords.map((c, i) => (
-        <circle
-          key={i}
-          cx={c.x}
-          cy={c.y}
-          r="3"
-          className="fill-white stroke-[#2F6FED]"
+    <div ref={containerRef} className="w-full">
+      <svg
+        viewBox={`0 0 ${width} ${height}`}
+        width={width}
+        height={height}
+        className="block"
+      >
+        <defs>
+          <linearGradient id="tenantRevFill" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#2F6FED" stopOpacity="0.20" />
+            <stop offset="100%" stopColor="#2F6FED" stopOpacity="0.0" />
+          </linearGradient>
+        </defs>
+
+        {/* Gridlines + Y-axis value labels */}
+        {yTicks.map((t, i) => (
+          <g key={i}>
+            <line
+              x1={padLeft}
+              y1={t.y}
+              x2={width - padRight}
+              y2={t.y}
+              className="stroke-[#E2E8F0]"
+              strokeWidth="1"
+              strokeDasharray={i === 0 ? undefined : "4 4"}
+            />
+            <text
+              x={padLeft - 8}
+              y={t.y + 3}
+              fontSize="10"
+              textAnchor="end"
+              className="fill-[#475569] font-sans"
+            >
+              {formatCompactINR(t.v)}
+            </text>
+          </g>
+        ))}
+
+        <path d={areaPath} fill="url(#tenantRevFill)" />
+        <path
+          d={linePath}
+          fill="none"
+          className="stroke-[#2F6FED]"
           strokeWidth="2"
         />
-      ))}
-      <text
-        x={padX}
-        y={height - 2}
-        fontSize="10"
-        className="fill-[#475569] font-sans"
-      >
-        {formatShortDate(coords[0].date)}
-      </text>
-      <text
-        x={width - padX}
-        y={height - 2}
-        fontSize="10"
-        className="fill-[#475569] font-sans"
-        textAnchor="end"
-      >
-        {formatShortDate(coords[coords.length - 1].date)}
-      </text>
-    </svg>
+
+        {/* Points + permanent value labels */}
+        {coords.map((c, i) => (
+          <g key={i}>
+            <circle
+              cx={c.x}
+              cy={c.y}
+              r={hovered === i ? 5 : 3}
+              className="fill-white stroke-[#2F6FED]"
+              strokeWidth="2"
+            />
+            {isLabelled(i) && hovered !== i && (
+              <text
+                x={c.x}
+                y={c.y - 9}
+                fontSize="10"
+                fontWeight="600"
+                textAnchor="middle"
+                className="fill-[#0F172A] font-sans"
+              >
+                {formatCompactINR(c.revenue)}
+              </text>
+            )}
+          </g>
+        ))}
+
+        {/* X-axis date labels */}
+        {coords.map((c, i) =>
+          i % xEvery === 0 || i === coords.length - 1 ? (
+            <text
+              key={`x-${i}`}
+              x={c.x}
+              y={height - 8}
+              fontSize="10"
+              textAnchor={
+                i === 0 && points.length > 1
+                  ? "start"
+                  : i === coords.length - 1 && points.length > 1
+                    ? "end"
+                    : "middle"
+              }
+              className="fill-[#475569] font-sans"
+            >
+              {formatShortDate(c.date)}
+            </text>
+          ) : null
+        )}
+
+        {/* Hover hit areas */}
+        {coords.map((c, i) => {
+          const w = points.length > 1 ? stepX : plotW;
+          return (
+            <rect
+              key={`hit-${i}`}
+              x={c.x - w / 2}
+              y={padTop}
+              width={w}
+              height={plotH}
+              fill="transparent"
+              onMouseEnter={() => setHovered(i)}
+              onMouseLeave={() => setHovered(null)}
+            />
+          );
+        })}
+
+        {/* Tooltip */}
+        {hoveredPoint && (
+          <g pointerEvents="none">
+            <line
+              x1={hoveredPoint.x}
+              y1={padTop}
+              x2={hoveredPoint.x}
+              y2={baseY}
+              stroke="#2F6FED"
+              strokeOpacity="0.4"
+              strokeDasharray="3 3"
+            />
+            <rect
+              x={tipX}
+              y={tipY}
+              width={tipW}
+              height={tipH}
+              rx="6"
+              className="fill-white stroke-[#E2E8F0]"
+            />
+            <text
+              x={tipX + tipW / 2}
+              y={tipY + 16}
+              fontSize="10"
+              textAnchor="middle"
+              className="fill-[#475569] font-sans"
+            >
+              {formatShortDate(hoveredPoint.date)}
+            </text>
+            <text
+              x={tipX + tipW / 2}
+              y={tipY + 31}
+              fontSize="12"
+              fontWeight="700"
+              textAnchor="middle"
+              className="fill-[#2F6FED] font-sans"
+            >
+              {formatINR(hoveredPoint.revenue)}
+            </text>
+          </g>
+        )}
+      </svg>
+    </div>
   );
 };
 
