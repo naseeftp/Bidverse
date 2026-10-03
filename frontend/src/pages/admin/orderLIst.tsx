@@ -79,7 +79,7 @@ const AdminOrders: React.FC = () => {
             {normalized.replace(/_/g, " ")}
           </span>
         );
-      case OrderStatus.CANCELLED:
+   
       case OrderStatus.REFUNDED:
         return (
           <span className="px-2 py-1 text-[8px] font-black uppercase tracking-widest rounded-[2px] border border-white/20 text-white/40">
