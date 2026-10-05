@@ -178,7 +178,6 @@ const Navbar: React.FC = () => {
 
             <Link to="/auctions" className={mobileNavLinkStyle}>Auctions</Link>
             <Link to="/auction-houses" className={mobileNavLinkStyle}>Auction Houses</Link>
-            <Link to="/about" className={mobileNavLinkStyle}>About Us</Link>
 
             {isAuthenticated ? (
               <>

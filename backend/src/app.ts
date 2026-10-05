@@ -41,7 +41,9 @@ app.use(cors({
     origin: [
         "http://localhost:5173",
         "http://localhost",
-        "https://master.d2syaumd39r9ht.amplifyapp.com"
+        // "https://master.d2syaumd39r9ht.amplifyapp.com",
+        "https://naseef.online",
+        "https://www.naseef.online"
 
     ],
     credentials: true,
@@ -73,7 +75,7 @@ app.use(BASE_ROUTES.PAYMENT_REQUEST, PaymentRequestRoutes)
 app.use(BASE_ROUTES.CHECKOUT, CheckoutRoutes)
 app.use(BASE_ROUTES.ORDER, OrderRoutes)
 app.use(BASE_ROUTES.DASHBOARD, DashboardRoutes)
-app.use(BASE_ROUTES.REVENUE,RevenueRoutes)
+app.use(BASE_ROUTES.REVENUE, RevenueRoutes)
 
 app.use(errorHandler);
 const startServer = async () => {
