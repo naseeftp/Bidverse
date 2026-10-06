@@ -4,7 +4,7 @@ import { ILiveAuctionStateRepository } from "../../repositories/interfaces/ILive
 import { ILiveAcutionStateService } from "../interface/ILiveAuctionSate.service";
 import { LiveStateMapper } from "../../mappers/liveState.mapper";
 import { BadRequestError, NotFoundError, UnauthorizedError } from "../../errors/AppError";
-import { LiveAuctionStatus, MESSAGES } from "../../constants/constants";
+import { LiveAuctionStatus, MAX_BID_AMOUNT, MESSAGES } from "../../constants/constants";
 import { AuctionItemDetailDTO } from "../../dtos/auctionHouse.dto/auctionItem.dto";
 import { ISlotRepository } from "../../repositories/interfaces/ISlot.repository";
 import { IAuctionItemRepository } from "../../repositories/interfaces/IAuctionItem.repository";
@@ -176,6 +176,9 @@ export class LiveAuctionStateService implements ILiveAcutionStateService {
         };
         const auction = await this._auctionRepo.findById(auctionId);
         if (!auction) throw new NotFoundError(MESSAGES.AUCTION_NOT_FOUND);
+        if(amount>MAX_BID_AMOUNT){
+            throw new BadRequestError( `Maximum bid amount is ₹${MAX_BID_AMOUNT.toLocaleString('en-IN')}`)
+        }
         const minValid = (auction.currentHighestBid || auction.startingPrice) + auction.minimumIncrement;
         if (amount < minValid) {
             throw new BadRequestError(`Bid Must be atleast ${minValid}`)

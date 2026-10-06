@@ -178,9 +178,9 @@ export const MESSAGES = {
     PAYMENT_SUCCESS: 'Payment Success',
     PAYMENT_NOT_FOUND: 'Payment not Found',
     PAYMENT_REQUEST_NOT_FOUND: 'Payment Request Not Found',
-    ORDER_PLACED:'Order Process Completed',
-    ORDER_NOT_FOUND:'Order Not Found',
-    REJECTION_REQUEST_SUBMITED:'Rejection Request Submitted Successfully',
+    ORDER_PLACED: 'Order Process Completed',
+    ORDER_NOT_FOUND: 'Order Not Found',
+    REJECTION_REQUEST_SUBMITED: 'Rejection Request Submitted Successfully',
     NOTIFICATION_NOT_FOUND: 'Notification Notfound',
     LIVE_STATE_NOT_FOUND: 'Live Not found',
     LIVE_STARTED: 'Live Started',
@@ -239,10 +239,11 @@ export enum LiveAuctionStatus {
     ENDED = "ENDED"
 }
 
-export const ROUND_DURATIONS_MS = [40_000, 20_000, 15_000];
+export const ROUND_DURATIONS_MS = [30_000, 20_000, 15_000];
 export const MAX_ROUND = 3;
 export const DEFAULT_EXPIRATION_HOURS = 48;
 
+export const MAX_BID_AMOUNT = 4_99_000;
 export const LiveAuctionStatusValues = Object.values(LiveAuctionStatus);
 
 

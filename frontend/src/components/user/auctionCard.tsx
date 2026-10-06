@@ -72,7 +72,7 @@ const AuctionCard: React.FC<AuctionCardProps> = ({ item, onBidSuccess }) => {
                 onBidSuccess?.() 
             }
             else {
-                toast.error(response?.message ?? '')
+                toast.error(response.message)
             }
         } catch {
             toast.error('failed to place bid')
@@ -253,7 +253,7 @@ const AuctionCard: React.FC<AuctionCardProps> = ({ item, onBidSuccess }) => {
                                 Starting Price
                             </span>
                             <span className="text-xs font-black text-[#1F1F1F]">
-                                {item.startingPrice ? `$${item.startingPrice.toLocaleString()}` : "TBD"}
+                                {item.startingPrice ? `₹${item.startingPrice.toLocaleString()}` : "TBD"}
                             </span>
                         </div>
 

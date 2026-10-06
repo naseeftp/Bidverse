@@ -174,7 +174,7 @@ const PlaceBidModal: React.FC<PlaceBidProps> = ({
                             </span>
                         ) : (
                             <span className="text-[9.5px] font-medium text-[#6B6B6B] mt-0.5">
-                                {hasbids ? "Highest Bid" : "Starting Price"} (₹{basePrice!.toLocaleString()}) + Increment (₹{minimumBidIncrement.toLocaleString()}) = Minimum Bid (${requireMinBid.toLocaleString()})
+                                {hasbids ? "Highest Bid" : "Starting Price"} (₹{basePrice!.toLocaleString()}) + Increment (₹{minimumBidIncrement.toLocaleString()}) = Minimum Bid (₹{requireMinBid.toLocaleString()})
                             </span>
                         )}
                     </div>

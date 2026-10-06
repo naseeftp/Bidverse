@@ -15,7 +15,7 @@ export class BidService{
             data:response.data
         }
       } catch (error) {
-        apiErrorHandler(error,'error while placing bid')
+       return apiErrorHandler(error,'error while placing bid')
       }
     }
     async getUserBids(page:number,limit:number,status?:string,search?:string){

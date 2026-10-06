@@ -3,7 +3,7 @@ import { IBidRepository } from "../../repositories/interfaces/IBid.repository";
 import { bidResponseDTO, myBidListDTO, placeBidDTO, bidHistoryDTO } from "../../dtos/user.dto/bid.dto";
 import { IUserRepository } from "../../repositories/interfaces/iUser.repository";
 import { BadRequestError, NotFoundError } from "../../errors/AppError";
-import { AuctionItemStatus, BidStatus, MESSAGES } from "../../constants/constants";
+import { AuctionItemStatus, BidStatus, MESSAGES,MAX_BID_AMOUNT} from "../../constants/constants";
 import { IAuctionItemRepository } from "../../repositories/interfaces/IAuctionItem.repository";
 import { BidMapper } from "../../mappers/bid.mapper";
 import { IGenericPaginatedResposnse } from "../../types/response.type";
@@ -44,7 +44,10 @@ export class BidService implements IBidService {
 
 
         const bidAmount=Number(data.amount)
-        if (Number(data.amount) < minimumRequiredBid) {
+        if(bidAmount>MAX_BID_AMOUNT){
+            throw new BadRequestError(`Maximum bid amount is ₹${MAX_BID_AMOUNT}`)
+        }
+        if (bidAmount < minimumRequiredBid) {
             throw new BadRequestError(`Bid amount must be at least ${minimumRequiredBid}`)
         };
         if (auctionExist.bidCount > 0) {
